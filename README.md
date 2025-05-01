@@ -30,12 +30,15 @@ forum
 subjetcs
 class
 [Al precionar una clase en "Subjects" debe mandarte a clase seleccionada]
+
 Benjamin:
 attecendance
 messages
-Modelo.py
+models.py
 
 
 comando:
 python manage.py runserver (Para iniciar)
 python manage.py migrate
+cls (limpiar la terminal)
+python manage.py makemigrations (pasar tablas a la base de datos)

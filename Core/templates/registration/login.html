@@ -8,6 +8,11 @@
             <div class="card shadow">
                 <div class="card-body">
                     <h2 class="text-center mb-4">Iniciar Sesión</h2>
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        Usuario o contraseña incorrectos
+                    </div>
+                    {% endif %}
                     <form method="post">
                         {% csrf_token %}
                         <div class="mb-3">
@@ -27,4 +32,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %} 

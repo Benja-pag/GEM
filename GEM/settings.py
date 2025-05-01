@@ -58,7 +58,7 @@ ROOT_URLCONF = 'GEM.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Carpeta para plantillas globales
+        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'Core/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -102,9 +102,31 @@ USE_TZ = True
 
 # Archivos estáticos y media
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    BASE_DIR / 'Core/static',
+]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Campo automático por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Modelo de usuario personalizado
+AUTH_USER_MODEL = 'Core.Usuario'
+
+# URLs de autenticación
+LOGIN_REDIRECT_URL = 'admin_panel'
+LOGOUT_REDIRECT_URL = 'home'
+LOGIN_URL = 'login'
+
+# Configuración de Bootstrap
+BOOTSTRAP5 = {
+    'include_jquery': True,
+}
+
+# Configuración de DataTables
+DATATABLES = {
+    'language': {
+        'url': '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+    }
+}

@@ -176,3 +176,6 @@ class UserDeleteView(LoginRequiredMixin, View):
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+
+class AttendanceView(TemplateView):
+    template_name = 'attendance.html'

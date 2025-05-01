@@ -4,7 +4,8 @@ from .views import (
     AdminPanelView,
     UserCreateView,
     UserUpdateView,
-    UserDeleteView
+    UserDeleteView,
+    AttendanceView
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('users/<int:user_id>/update/', UserUpdateView.as_view(), name='user_update'),
     path('users/<int:user_id>/delete/', UserDeleteView.as_view(), name='user_delete'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('asistencia/', AttendanceView.as_view(), name='attendance'),
 ]

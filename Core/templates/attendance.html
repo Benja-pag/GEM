@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Registro de Asistencia</h2>
+
+    <!-- Filtros -->
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="date" name="fecha" id="fecha" class="form-control" value="{{ fecha }}">
+        </div>
+        <div class="col-md-3">
+            <label for="curso" class="form-label">Curso</label>
+            <select name="curso" id="curso" class="form-select">
+                {% for curso in cursos %}
+                    <option value="{{ curso.id }}" {% if curso.id == curso_seleccionado %}selected{% endif %}>
+                        {{ curso.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="asignatura" class="form-label">Asignatura</label>
+            <select name="asignatura" id="asignatura" class="form-select">
+                {% for asignatura in asignaturas %}
+                    <option value="{{ asignatura.id }}" {% if asignatura.id == asignatura_seleccionada %}selected{% endif %}>
+                        {{ asignatura.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+    </form>
+
+    <!-- Tabla de asistencia -->
+    <form method="post">
+        {% csrf_token %}
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Alumno</th>
+                    <th>RUT/ID</th>
+                    <th>Estado</th>
+                    <th>Observaciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alumno in alumnos %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ alumno.nombre }}</td>
+                    <td>{{ alumno.rut }}</td>
+                    <td>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="estado_{{ alumno.id }}" value="presente" required>
+                            <label class="form-check-label text-success">Presente</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="estado_{{ alumno.id }}" value="ausente">
+                            <label class="form-check-label text-danger">Ausente</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="estado_{{ alumno.id }}" value="justificado">
+                            <label class="form-check-label text-warning">Justificado</label>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="text" name="observacion_{{ alumno.id }}" class="form-control" placeholder="Opcional">
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay alumnos para mostrar.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-end gap-2">
+            <button type="submit" class="btn btn-success">Guardar Asistencia</button>
+            <a href="###" class="btn btn-outline-secondary">Exportar a Excel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

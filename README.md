@@ -42,3 +42,7 @@ python manage.py runserver (Para iniciar)
 python manage.py migrate
 cls (limpiar la terminal)
 python manage.py makemigrations (pasar tablas a la base de datos)
+
+
+sitios:
+http://localhost:8000/asistencia/

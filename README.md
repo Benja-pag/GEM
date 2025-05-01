@@ -20,6 +20,22 @@ HTMLS:
 "test": Evaluaciones o exámenes online.
 
 
+Jesus:
+admin_panel
+login
+password_reset
+
+Ignacio:
+forum
+subjetcs
+class
+[Al precionar una clase en "Subjects" debe mandarte a clase seleccionada]
+Benjamin:
+attecendance
+messages
+Modelo.py
+
+
 comando:
 python manage.py runserver (Para iniciar)
-python manage.py migrate ()
+python manage.py migrate

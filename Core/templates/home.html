@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inicio - GEM{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto text-center">
+            <h1 class="display-4">Bienvenido a GEM</h1>
+            <p class="lead">Sistema de Gestión Educativa</p>
+            
+            {% if user.is_authenticated %}
+                {% if user.tipo_usuario == 'administrador' %}
+                    <a href="{% url 'admin_panel' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-tachometer-alt me-2"></i>Ir al Panel de Administración
+                    </a>
+                {% else %}
+                    <p class="text-muted">No tienes acceso al panel de administración.</p>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

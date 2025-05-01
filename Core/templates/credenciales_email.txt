@@ -1,0 +1,12 @@
+Hola {{ nombre }},
+
+Bienvenido/a al Sistema de Gestión Educativa GEM. A continuación, encontrarás tus credenciales de acceso:
+
+Email: {{ email }}
+RUT: {{ rut }}
+Contraseña: {{ password }}
+
+Por favor, ingresa al sistema usando tu email y contraseña. Te recomendamos cambiar tu contraseña después del primer inicio de sesión.
+
+Saludos cordiales,
+Equipo GEM 

@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel de Administración - GEM{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_panel.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 sidebar">
+            <div class="position-sticky pt-3">
+                <div class="text-center mb-4">
+                    <h4 class="text-primary">GEM</h4>
+                    <p class="text-muted small">Sistema de Gestión Educativa</p>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#usuarios" data-bs-toggle="tab">
+                            <i class="fas fa-users"></i> Usuarios
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#cursos" data-bs-toggle="tab">
+                            <i class="fas fa-book"></i> Cursos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#asignaturas" data-bs-toggle="tab">
+                            <i class="fas fa-graduation-cap"></i> Asignaturas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#calendario" data-bs-toggle="tab">
+                            <i class="fas fa-calendar"></i> Calendario
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reportes" data-bs-toggle="tab">
+                            <i class="fas fa-chart-bar"></i> Reportes
+                        </a>
+                    </li>
+                </ul>
+                <div class="mt-auto p-3">
+                    <div class="d-grid">
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Contenido principal -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 main-content">
+            <div class="tab-content">
+                <!-- Pestaña de Usuarios -->
+                <div class="tab-pane fade show active" id="usuarios">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="h4 mb-0">Gestión de Usuarios</h2>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#crearUsuarioModal">
+                            <i class="fas fa-plus me-2"></i>Nuevo Usuario
+                        </button>
+                    </div>
+
+                    <!-- Tabla de Usuarios -->
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>RUT</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios %}
+                                <tr>
+                                    <td>{{ usuario.rut }}</td>
+                                    <td>{{ usuario.get_full_name }}</td>
+                                    <td>{{ usuario.email }}</td>
+                                    <td>{{ usuario.get_tipo_usuario_display }}</td>
+                                    <td>
+                                        {% if usuario.is_active %}
+                                            <span class="badge bg-success">Activo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactivo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-action btn-outline-primary" onclick="editarUsuario({{ usuario.id }})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            {% if usuario.is_active %}
+                                                <button class="btn btn-action btn-outline-danger" onclick="desactivarUsuario({{ usuario.id }})">
+                                                    <i class="fas fa-user-slash"></i>
+                                                </button>
+                                            {% else %}
+                                                <button class="btn btn-action btn-outline-success" onclick="activarUsuario({{ usuario.id }})">
+                                                    <i class="fas fa-user-check"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <p class="text-muted mb-0">No hay usuarios registrados</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Otras pestañas -->
+                <div class="tab-pane fade" id="cursos">
+                    <h2>Gestión de Cursos</h2>
+                </div>
+                <div class="tab-pane fade" id="asignaturas">
+                    <h2>Gestión de Asignaturas</h2>
+                </div>
+                <div class="tab-pane fade" id="calendario">
+                    <h2>Calendario Académico</h2>
+                </div>
+                <div class="tab-pane fade" id="reportes">
+                    <h2>Reportes</h2>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Modal para crear usuario -->
+<div class="modal fade" id="crearUsuarioModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="crearUsuarioForm">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="id_first_name" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="id_first_name" name="first_name" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="id_last_name" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="id_last_name" name="last_name" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="id_rut" class="form-label">RUT</label>
+                        <input type="text" class="form-control" id="id_rut" name="rut" required placeholder="Ej: 12345678-9">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="id_tipo_usuario" class="form-label">Tipo de Usuario</label>
+                        <select class="form-control" id="id_tipo_usuario" name="tipo_usuario" required onchange="toggleAsignaturas(this)">
+                            <option value="">Seleccione un tipo</option>
+                            <option value="profesor">Profesor</option>
+                            <option value="estudiante">Estudiante</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3" id="asignaturas-group" style="display: none;">
+                        <label class="form-label">Asignaturas</label>
+                        <div class="asignaturas-list">
+                            {% for asignatura in asignaturas %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="asignaturas" value="{{ asignatura.id }}" id="asignatura_{{ asignatura.id }}">
+                                <label class="form-check-label" for="asignatura_{{ asignatura.id }}">
+                                    {{ asignatura.nombre }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="id_telefono" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="id_telefono" name="telefono">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="id_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                        <input type="date" class="form-control" id="id_fecha_nacimiento" name="fecha_nacimiento">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="id_direccion" class="form-label">Dirección</label>
+                        <textarea class="form-control" id="id_direccion" name="direccion" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="crearUsuarioForm" class="btn btn-primary" id="crearUsuarioBtn">Crear Usuario</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/admin_panel.js' %}?v=1.0.1"></script>
+{% endblock %}

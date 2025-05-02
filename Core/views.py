@@ -303,3 +303,6 @@ class EstudiantePanelView(LoginRequiredMixin, View):
         }
         
         return render(request, 'estudiante_panel.html', context)
+
+class AttendanceView(TemplateView):
+    template_name = 'attendance.html'

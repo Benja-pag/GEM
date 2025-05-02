@@ -18,3 +18,31 @@ HTMLS:
 "surveys": Encuestas académicas (satisfacción de curso, feedback de profesores, etc.).
 "tasks": Gestión de tareas académicas del estudiante.
 "test": Evaluaciones o exámenes online.
+
+
+Jesus:
+admin_panel
+login
+password_reset
+
+Ignacio:
+forum
+subjetcs
+class
+[Al precionar una clase en "Subjects" debe mandarte a clase seleccionada]
+
+Benjamin:
+attecendance
+messages
+models.py
+
+
+comando:
+python manage.py runserver (Para iniciar)
+python manage.py migrate
+cls (limpiar la terminal)
+python manage.py makemigrations (pasar tablas a la base de datos)
+
+
+sitios:
+http://localhost:8000/asistencia/

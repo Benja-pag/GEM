@@ -5,14 +5,7 @@ from .views import (
     UserManagementView,
     UserCreateView,
     UserUpdateView,
-    UserDeleteView,
-    CursoListView,
-    CursoCreateView,
-    CursoUpdateView,
-    CursoDeleteView,
-    CursoDetailView,
-    ProfesorPanelView,
-    EstudiantePanelView
+    UserDeleteView
 )
 
 urlpatterns = [
@@ -24,13 +17,8 @@ urlpatterns = [
     # URLs de usuarios
     path('users/', UserManagementView.as_view(), name='user_list'),
     path('users/create/', UserCreateView.as_view(), name='user_create'),
-    path('users/<int:pk>/update/', UserUpdateView.as_view(), name='user_update'),
-    path('users/<int:pk>/delete/', UserDeleteView.as_view(), name='user_delete'),
-    
-    # URLs de cursos
-    path('cursos/', CursoListView.as_view(), name='curso_list'),
-    path('cursos/create/', CursoCreateView.as_view(), name='curso_create'),
-    path('cursos/<int:curso_id>/', CursoDetailView.as_view(), name='curso_detail'),
-    path('cursos/<int:curso_id>/update/', CursoUpdateView.as_view(), name='curso_update'),
-    path('cursos/<int:curso_id>/delete/', CursoDeleteView.as_view(), name='curso_delete'),
+    path('users/<int:user_id>/', UserUpdateView.as_view(), name='user_detail'),
+    path('users/<int:user_id>/update/', UserUpdateView.as_view(), name='user_update'),
+    path('users/<int:user_id>/delete/', UserDeleteView.as_view(), name='user_delete'),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]

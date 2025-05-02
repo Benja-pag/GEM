@@ -58,7 +58,7 @@ ROOT_URLCONF = 'GEM.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates', BASE_DIR / 'Core/templates'],
+        'DIRS': [BASE_DIR / 'Core/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -117,7 +117,8 @@ AUTH_USER_MODEL = 'Core.Usuario'
 # URLs de autenticación
 LOGIN_REDIRECT_URL = 'admin_panel'
 LOGOUT_REDIRECT_URL = 'home'
-LOGIN_URL = 'login'
+LOGIN_URL = 'accounts/login/'
+LOGIN_TEMPLATE = 'login.html'
 
 # Configuración de Bootstrap
 BOOTSTRAP5 = {

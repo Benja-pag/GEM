@@ -6,45 +6,56 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar">
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-primary sidebar">
             <div class="position-sticky">
+                <div class="text-center py-4" style="margin-left: -15px;">
+                    <img src="{% static 'img/logo.png' %}" alt="Logo GEM" class="img-fluid mb-3" style="max-width: 250px; height: auto; object-fit: contain;">
+                    <h5 class="text-white">Panel de Control</h5>
+                </div>
                 <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <h5 class="text-white p-3">Panel de Control</h5>
-                    </li>
-                    {% if is_admin %}
+                    {% if user.rol == 'admin' %}
                     <li class="nav-item">
                         <a class="nav-link active text-white" href="#usuarios">
-                            <i class="fas fa-users"></i> Gestión de Usuarios
+                            <i class="fas fa-users me-2"></i> Usuarios
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-white" href="#cursos">
-                            <i class="fas fa-book"></i> Gestión de Cursos
+                            <i class="fas fa-book me-2"></i> Cursos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#estadisticas">
+                            <i class="fas fa-chart-bar me-2"></i> Estadísticas
                         </a>
                     </li>
                     {% endif %}
                     {% if user.rol == 'profesor' %}
                     <li class="nav-item">
                         <a class="nav-link text-white" href="#mis-cursos">
-                            <i class="fas fa-chalkboard-teacher"></i> Mis Cursos
+                            <i class="fas fa-chalkboard-teacher me-2"></i> Mis Cursos
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-white" href="#estudiantes">
-                            <i class="fas fa-user-graduate"></i> Mis Estudiantes
+                            <i class="fas fa-user-graduate me-2"></i> Estudiantes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#calificaciones">
+                            <i class="fas fa-star me-2"></i> Calificaciones
                         </a>
                     </li>
                     {% endif %}
                     {% if user.rol == 'estudiante' %}
                     <li class="nav-item">
                         <a class="nav-link text-white" href="#mis-cursos">
-                            <i class="fas fa-book"></i> Mis Cursos
+                            <i class="fas fa-book me-2"></i> Mis Cursos
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-white" href="#calificaciones">
-                            <i class="fas fa-star"></i> Mis Calificaciones
+                            <i class="fas fa-star me-2"></i> Mis Calificaciones
                         </a>
                     </li>
                     {% endif %}
@@ -54,53 +65,155 @@
 
         <!-- Contenido Principal -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <!-- Barra Superior -->
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Bienvenido, {{ user.get_full_name }}</h1>
+                <div>
+                    <h2 class="h3">Bienvenido, {{ user.get_full_name }}</h2>
+                    <p class="text-muted">
+                        {% if user.rol == 'admin' %}
+                            Administrador
+                        {% elif user.rol == 'profesor' %}
+                            Profesor
+                        {% else %}
+                            Estudiante
+                        {% endif %}
+                    </p>
+                </div>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
                         </button>
                     </form>
                 </div>
             </div>
 
-            {% if is_admin %}
+            {% if user.rol == 'admin' %}
+            <!-- Tarjetas de Resumen -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-start border-primary border-4 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-primary mb-1">Total Estudiantes</h6>
+                                    <h2 class="mb-0">{{ total_estudiantes }}</h2>
+                                </div>
+                                <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                    <i class="fas fa-user-graduate fa-2x text-primary"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-start border-success border-4 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-success mb-1">Total Profesores</h6>
+                                    <h2 class="mb-0">{{ total_profesores }}</h2>
+                                </div>
+                                <div class="bg-success bg-opacity-10 p-3 rounded">
+                                    <i class="fas fa-chalkboard-teacher fa-2x text-success"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-start border-info border-4 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-info mb-1">Cursos Activos</h6>
+                                    <h2 class="mb-0">{{ total_cursos }}</h2>
+                                </div>
+                                <div class="bg-info bg-opacity-10 p-3 rounded">
+                                    <i class="fas fa-book fa-2x text-info"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-start border-warning border-4 shadow-sm h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-warning mb-1">Promedio Calificaciones</h6>
+                                    <h2 class="mb-0">{{ promedio_general|floatformat:1 }}</h2>
+                                </div>
+                                <div class="bg-warning bg-opacity-10 p-3 rounded">
+                                    <i class="fas fa-star fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Gestión de Usuarios -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold text-primary">Gestión de Usuarios</h6>
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createUserModal">
-                        <i class="fas fa-user-plus"></i> Nuevo Usuario
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Gestión de Usuarios</h5>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                        <i class="fas fa-user-plus me-2"></i>Nuevo Usuario
                     </button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered" id="usersTable" width="100%" cellspacing="0">
-                            <thead>
+                        <table class="table table-hover" id="usersTable">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Nombre</th>
                                     <th>Email</th>
                                     <th>Rol</th>
                                     <th>Fecha Registro</th>
+                                    <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for usuario in usuarios_recientes %}
                                 <tr>
-                                    <td>{{ usuario.get_full_name }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle me-2">
+                                                {{ usuario.first_name|first|upper }}
+                                            </div>
+                                            {{ usuario.get_full_name }}
+                                        </div>
+                                    </td>
                                     <td>{{ usuario.email }}</td>
-                                    <td>{{ usuario.get_rol_display }}</td>
+                                    <td>
+                                        <span class="badge {% if usuario.rol == 'estudiante' %}bg-info{% else %}bg-success{% endif %}">
+                                            {% if usuario.rol == 'admin' %}
+                                                Administrador
+                                            {% elif usuario.rol == 'profesor' %}
+                                                Profesor
+                                            {% else %}
+                                                Estudiante
+                                            {% endif %}
+                                        </span>
+                                    </td>
                                     <td>{{ usuario.date_joined|date:"d/m/Y" }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary edit-user" data-user-id="{{ usuario.id }}">
-                                            <i class="fas fa-edit"></i> Editar
-                                        </button>
-                                        <button class="btn btn-sm btn-danger delete-user" data-user-id="{{ usuario.id }}">
-                                            <i class="fas fa-trash"></i> Eliminar
-                                        </button>
+                                        <span class="badge bg-success">Activo</span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary edit-user" data-user-id="{{ usuario.id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger delete-user" data-user-id="{{ usuario.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -110,56 +223,53 @@
                 </div>
             </div>
 
-            <!-- Tarjetas de Resumen -->
-            <div class="row">
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-primary shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Total Estudiantes</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_estudiantes }}</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-user-graduate fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Gestión de Cursos -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Gestión de Cursos</h5>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCursoModal">
+                        <i class="fas fa-plus me-2"></i>Nuevo Curso
+                    </button>
                 </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-success shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                        Total Profesores</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_profesores }}</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-left-info shadow h-100 py-2">
-                        <div class="card-body">
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                        Cursos Activos</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_cursos }}</div>
-                                </div>
-                                <div class="col-auto">
-                                    <i class="fas fa-book fa-2x text-gray-300"></i>
-                                </div>
-                            </div>
-                        </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="cursosTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Profesor</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Fecha Fin</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for curso in cursos %}
+                                <tr>
+                                    <td>{{ curso.nombre }}</td>
+                                    <td>{{ curso.profesor.get_full_name }}</td>
+                                    <td>{{ curso.fecha_inicio|date:"d/m/Y" }}</td>
+                                    <td>{{ curso.fecha_fin|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <span class="badge {% if curso.fecha_fin > now %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {% if curso.fecha_fin > now %}Activo{% else %}Finalizado{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary edit-curso" data-curso-id="{{ curso.id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger delete-curso" data-curso-id="{{ curso.id }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -167,19 +277,20 @@
 
             {% if user.rol == 'profesor' %}
             <!-- Contenido para Profesores -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Mis Cursos</h6>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Mis Cursos</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
+                        <table class="table table-hover">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Curso</th>
                                     <th>Estudiantes</th>
                                     <th>Fecha Inicio</th>
                                     <th>Fecha Fin</th>
+                                    <th>Progreso</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -191,12 +302,19 @@
                                     <td>{{ curso.fecha_inicio|date:"d/m/Y" }}</td>
                                     <td>{{ curso.fecha_fin|date:"d/m/Y" }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary view-students" data-course-id="{{ curso.id }}">
-                                            <i class="fas fa-users"></i> Ver Estudiantes
-                                        </button>
-                                        <button class="btn btn-sm btn-success add-grade" data-course-id="{{ curso.id }}">
-                                            <i class="fas fa-plus"></i> Agregar Calificación
-                                        </button>
+                                        <div class="progress" style="height: 5px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 75%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary view-students" data-course-id="{{ curso.id }}">
+                                                <i class="fas fa-users"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-success add-grade" data-course-id="{{ curso.id }}">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -209,18 +327,19 @@
 
             {% if user.rol == 'estudiante' %}
             <!-- Contenido para Estudiantes -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Mis Cursos</h6>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Mis Cursos</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
+                        <table class="table table-hover">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Curso</th>
                                     <th>Profesor</th>
                                     <th>Fecha Inscripción</th>
+                                    <th>Progreso</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -231,12 +350,19 @@
                                     <td>{{ inscripcion.curso.profesor.get_full_name }}</td>
                                     <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y" }}</td>
                                     <td>
-                                        <button class="btn btn-sm btn-primary view-material" data-course-id="{{ inscripcion.curso.id }}">
-                                            <i class="fas fa-book"></i> Ver Material
-                                        </button>
-                                        <button class="btn btn-sm btn-info view-grades" data-course-id="{{ inscripcion.curso.id }}">
-                                            <i class="fas fa-star"></i> Ver Calificaciones
-                                        </button>
+                                        <div class="progress" style="height: 5px;">
+                                            <div class="progress-bar" role="progressbar" style="width: 60%"></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm btn-outline-primary view-material" data-course-id="{{ inscripcion.curso.id }}">
+                                                <i class="fas fa-book"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-info view-grades" data-course-id="{{ inscripcion.curso.id }}">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -246,14 +372,14 @@
                 </div>
             </div>
 
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Mis Calificaciones</h6>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Mis Calificaciones</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered" width="100%" cellspacing="0">
-                            <thead>
+                        <table class="table table-hover">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Curso</th>
                                     <th>Nota</th>
@@ -265,7 +391,11 @@
                                 {% for calificacion in calificaciones %}
                                 <tr>
                                     <td>{{ calificacion.curso.nombre }}</td>
-                                    <td>{{ calificacion.nota }}</td>
+                                    <td>
+                                        <span class="badge {% if calificacion.nota >= 4 %}bg-success{% else %}bg-danger{% endif %}">
+                                            {{ calificacion.nota }}
+                                        </span>
+                                    </td>
                                     <td>{{ calificacion.fecha|date:"d/m/Y" }}</td>
                                     <td>{{ calificacion.comentario }}</td>
                                 </tr>
@@ -372,6 +502,99 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para Crear Curso -->
+<div class="modal fade" id="createCursoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Curso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createCursoForm">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre del Curso</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="profesor" class="form-label">Profesor</label>
+                        <select class="form-select" id="profesor" name="profesor" required>
+                            <option value="">Seleccione un profesor</option>
+                            {% for profesor in profesores %}
+                            <option value="{{ profesor.id }}">{{ profesor.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="createCursoBtn">Crear Curso</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Curso -->
+<div class="modal fade" id="editCursoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Curso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editCursoForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="edit_curso_id" name="curso_id">
+                    <div class="mb-3">
+                        <label for="edit_nombre" class="form-label">Nombre del Curso</label>
+                        <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_profesor" class="form-label">Profesor</label>
+                        <select class="form-select" id="edit_profesor" name="profesor" required>
+                            <option value="">Seleccione un profesor</option>
+                            {% for profesor in profesores %}
+                            <option value="{{ profesor.id }}">{{ profesor.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_fecha_inicio" class="form-label">Fecha Inicio</label>
+                        <input type="date" class="form-control" id="edit_fecha_inicio" name="fecha_inicio" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_fecha_fin" class="form-label">Fecha Fin</label>
+                        <input type="date" class="form-control" id="edit_fecha_fin" name="fecha_fin" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="updateCursoBtn">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% else %}
 <div class="container mt-5">
     <div class="alert alert-danger" role="alert">
@@ -387,20 +610,32 @@
         min-height: 100vh;
         box-shadow: 0 0 10px rgba(0,0,0,.1);
     }
-    .border-left-primary {
-        border-left: .25rem solid #4e73df!important;
+    .avatar {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
     }
-    .border-left-success {
-        border-left: .25rem solid #1cc88a!important;
+    .progress {
+        width: 100px;
     }
-    .border-left-info {
-        border-left: .25rem solid #36b9cc!important;
+    .table-hover tbody tr:hover {
+        background-color: rgba(0,0,0,.02);
+    }
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
     }
     .card {
+        border: none;
         transition: transform .2s;
     }
     .card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-2px);
+    }
+    .badge {
+        font-weight: 500;
     }
 </style>
 {% endblock %}
@@ -408,18 +643,29 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        // Inicializar DataTables
-        $('#usersTable').DataTable({
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
-            },
-            order: [[3, 'desc']]
-        });
+        // Inicializar DataTables solo si no están ya inicializadas
+        if (!$.fn.DataTable.isDataTable('#usersTable')) {
+            $('#usersTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+                },
+                order: [[3, 'desc']]
+            });
+        }
+
+        // Inicializar DataTables para cursos solo si no está ya inicializada
+        if (!$.fn.DataTable.isDataTable('#cursosTable')) {
+            $('#cursosTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+                }
+            });
+        }
 
         // Crear Usuario
         $('#createUserBtn').click(function() {
             const formData = $('#createUserForm').serialize();
-            $.post('/core/users/create/', formData, function(response) {
+            $.post('/users/create/', formData, function(response) {
                 if (response.success) {
                     Swal.fire({
                         icon: 'success',
@@ -495,6 +741,103 @@
                                 icon: 'success',
                                 title: '¡Éxito!',
                                 text: 'Usuario eliminado exitosamente'
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.error
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        // Crear Curso
+        $('#createCursoBtn').click(function() {
+            const formData = $('#createCursoForm').serialize();
+            $.post('/cursos/create/', formData, function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: 'Curso creado exitosamente'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.error
+                    });
+                }
+            });
+        });
+
+        // Editar Curso
+        $('.edit-curso').click(function() {
+            const cursoId = $(this).data('curso-id');
+            $.get(`/cursos/${cursoId}/`, function(response) {
+                if (response.success) {
+                    const curso = response.curso;
+                    $('#edit_curso_id').val(curso.id);
+                    $('#edit_nombre').val(curso.nombre);
+                    $('#edit_profesor').val(curso.profesor_id);
+                    $('#edit_descripcion').val(curso.descripcion);
+                    $('#edit_fecha_inicio').val(curso.fecha_inicio);
+                    $('#edit_fecha_fin').val(curso.fecha_fin);
+                    $('#editCursoModal').modal('show');
+                }
+            });
+        });
+
+        // Actualizar Curso
+        $('#updateCursoBtn').click(function() {
+            const cursoId = $('#edit_curso_id').val();
+            const formData = $('#editCursoForm').serialize();
+            $.post(`/cursos/${cursoId}/update/`, formData, function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: 'Curso actualizado exitosamente'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.error
+                    });
+                }
+            });
+        });
+
+        // Eliminar Curso
+        $('.delete-curso').click(function() {
+            const cursoId = $(this).data('curso-id');
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esta acción no se puede deshacer",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post(`/cursos/${cursoId}/delete/`, function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Éxito!',
+                                text: 'Curso eliminado exitosamente'
                             }).then(() => {
                                 location.reload();
                             });

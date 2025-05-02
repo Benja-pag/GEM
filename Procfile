@@ -1,0 +1,1 @@
+web: gunicorn GEM.wsgi:application --log-file - 

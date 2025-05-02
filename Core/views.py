@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, DetailView
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 from .models import Usuario, Curso, EstudianteCurso, Calificacion
@@ -17,68 +17,59 @@ class HomeView(TemplateView):
     
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return redirect('admin_panel')
+            if request.user.rol == 'admin':
+                return redirect('admin_panel')
+            elif request.user.rol == 'profesor':
+                return redirect('profesor_panel')
+            elif request.user.rol == 'estudiante':
+                return redirect('estudiante_panel')
         return super().get(request, *args, **kwargs)
 
 class AdminPanelView(LoginRequiredMixin, View):
-    template_name = 'admin_panel.html'
-    
     def get(self, request):
-        # Obtener estadísticas (solo para admin)
         if request.user.rol == 'admin':
+            # Estadísticas para admin
             total_estudiantes = Usuario.objects.filter(rol='estudiante').count()
             total_profesores = Usuario.objects.filter(rol='profesor').count()
             total_cursos = Curso.objects.count()
-            usuarios_recientes = Usuario.objects.exclude(rol='admin').order_by('-date_joined')
-            cursos_activos = Curso.objects.filter(fecha_fin__gte=timezone.now())
-            cursos_con_mas_estudiantes = Curso.objects.annotate(
-                num_estudiantes=Count('estudiantecurso')
-            ).order_by('-num_estudiantes')[:5]
-            cursos_con_promedio = Curso.objects.annotate(
-                promedio=Avg('calificacion__nota')
-            ).order_by('-promedio')
-        else:
-            total_estudiantes = None
-            total_profesores = None
-            total_cursos = None
-            usuarios_recientes = None
-            cursos_activos = None
-            cursos_con_mas_estudiantes = None
-            cursos_con_promedio = None
-
-        # Obtener datos según el rol del usuario
-        if request.user.rol == 'profesor':
+            cursos_activos = Curso.objects.filter(fecha_fin__gt=timezone.now().date()).count()
+            promedio_general = Calificacion.objects.aggregate(Avg('nota'))['nota__avg'] or 0
+            usuarios_recientes = Usuario.objects.exclude(rol='admin').order_by('-date_joined')[:5]
+            cursos = Curso.objects.all().order_by('-fecha_inicio')
+            profesores = Usuario.objects.filter(rol='profesor')
+            
+            context = {
+                'total_estudiantes': total_estudiantes,
+                'total_profesores': total_profesores,
+                'total_cursos': total_cursos,
+                'cursos_activos': cursos_activos,
+                'promedio_general': promedio_general,
+                'usuarios_recientes': usuarios_recientes,
+                'cursos': cursos,
+                'profesores': profesores,
+                'user_rol': 'admin'
+            }
+            
+        elif request.user.rol == 'profesor':
+            # Contenido para profesor
             mis_cursos = Curso.objects.filter(profesor=request.user)
-            estudiantes_por_curso = {}
-            for curso in mis_cursos:
-                estudiantes_por_curso[curso] = EstudianteCurso.objects.filter(curso=curso)
-        else:
-            mis_cursos = None
-            estudiantes_por_curso = None
-
-        if request.user.rol == 'estudiante':
-            cursos_inscritos = EstudianteCurso.objects.filter(estudiante=request.user)
-            calificaciones = Calificacion.objects.filter(estudiante=request.user)
-        else:
-            cursos_inscritos = None
-            calificaciones = None
-
-        context = {
-            'total_estudiantes': total_estudiantes,
-            'total_profesores': total_profesores,
-            'total_cursos': total_cursos,
-            'usuarios_recientes': usuarios_recientes,
-            'cursos_activos': cursos_activos,
-            'cursos_con_mas_estudiantes': cursos_con_mas_estudiantes,
-            'cursos_con_promedio': cursos_con_promedio,
-            'mis_cursos': mis_cursos,
-            'estudiantes_por_curso': estudiantes_por_curso,
-            'cursos_inscritos': cursos_inscritos,
-            'calificaciones': calificaciones,
-            'is_admin': request.user.rol == 'admin'
-        }
-        
-        return render(request, self.template_name, context)
+            context = {
+                'cursos': mis_cursos,
+                'user_rol': 'profesor'
+            }
+            
+        else:  # estudiante
+            # Contenido para estudiante
+            cursos_inscritos = EstudianteCurso.objects.filter(estudiante=request.user).select_related('curso')
+            mis_cursos = [inscripcion.curso for inscripcion in cursos_inscritos]
+            mis_calificaciones = Calificacion.objects.filter(estudiante=request.user)
+            context = {
+                'cursos_inscritos': cursos_inscritos,
+                'calificaciones': mis_calificaciones,
+                'user_rol': 'estudiante'
+            }
+            
+        return render(request, 'admin_panel.html', context)
 
 class UserManagementView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Usuario
@@ -176,3 +167,139 @@ class UserDeleteView(LoginRequiredMixin, View):
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+
+class CursoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = Curso
+    template_name = 'curso_list.html'
+    context_object_name = 'cursos'
+    ordering = ['-fecha_inicio']
+
+    def test_func(self):
+        return self.request.user.rol == 'admin'
+
+    def get_queryset(self):
+        return Curso.objects.all().order_by('-fecha_inicio')
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CursoCreateView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.rol == 'admin'
+
+    def post(self, request):
+        try:
+            nombre = request.POST.get('nombre')
+            profesor_id = request.POST.get('profesor')
+            descripcion = request.POST.get('descripcion')
+            fecha_inicio = request.POST.get('fecha_inicio')
+            fecha_fin = request.POST.get('fecha_fin')
+
+            profesor = Usuario.objects.get(id=profesor_id, rol='profesor')
+            
+            curso = Curso.objects.create(
+                nombre=nombre,
+                profesor=profesor,
+                descripcion=descripcion,
+                fecha_inicio=fecha_inicio,
+                fecha_fin=fecha_fin
+            )
+
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+class CursoUpdateView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.rol == 'admin'
+
+    def get(self, request, curso_id):
+        try:
+            curso = Curso.objects.get(id=curso_id)
+            return JsonResponse({
+                'success': True,
+                'curso': {
+                    'id': curso.id,
+                    'nombre': curso.nombre,
+                    'profesor_id': curso.profesor.id,
+                    'descripcion': curso.descripcion,
+                    'fecha_inicio': curso.fecha_inicio.strftime('%Y-%m-%d'),
+                    'fecha_fin': curso.fecha_fin.strftime('%Y-%m-%d')
+                }
+            })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    def post(self, request, curso_id):
+        try:
+            curso = Curso.objects.get(id=curso_id)
+            
+            curso.nombre = request.POST.get('nombre')
+            profesor_id = request.POST.get('profesor')
+            curso.profesor = Usuario.objects.get(id=profesor_id, rol='profesor')
+            curso.descripcion = request.POST.get('descripcion')
+            curso.fecha_inicio = request.POST.get('fecha_inicio')
+            curso.fecha_fin = request.POST.get('fecha_fin')
+            
+            curso.save()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+class CursoDeleteView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.rol == 'admin'
+
+    def post(self, request, curso_id):
+        try:
+            curso = Curso.objects.get(id=curso_id)
+            curso.delete()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+class CursoDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Curso
+    template_name = 'curso_detail.html'
+    context_object_name = 'curso'
+
+    def test_func(self):
+        return self.request.user.rol == 'admin'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['estudiantes'] = EstudianteCurso.objects.filter(curso=self.object)
+        calificaciones = Calificacion.objects.filter(curso=self.object)
+        context['calificaciones'] = {cal.estudiante.id: cal for cal in calificaciones}
+        context['now'] = timezone.now()
+        return context
+
+class ProfesorPanelView(LoginRequiredMixin, View):
+    def get(self, request):
+        if request.user.rol != 'profesor':
+            return redirect('home')
+        
+        # Obtener cursos del profesor
+        cursos = Curso.objects.filter(profesor=request.user)
+        
+        context = {
+            'cursos': cursos,
+        }
+        
+        return render(request, 'profesor_panel.html', context)
+
+class EstudiantePanelView(LoginRequiredMixin, View):
+    def get(self, request):
+        if request.user.rol != 'estudiante':
+            return redirect('home')
+        
+        # Obtener cursos del estudiante
+        cursos_inscritos = EstudianteCurso.objects.filter(estudiante=request.user)
+        
+        # Obtener calificaciones del estudiante
+        calificaciones = Calificacion.objects.filter(estudiante=request.user)
+        
+        context = {
+            'cursos_inscritos': cursos_inscritos,
+            'calificaciones': calificaciones,
+        }
+        
+        return render(request, 'estudiante_panel.html', context)

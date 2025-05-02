@@ -1,7 +1,9 @@
-from django.urls import path
+from django.urls import path, include  # Asegúrate de importar include
 from .views import (
     HomeView,
     AdminPanelView,
+    ProfesorPanelView,  # IMPORTA LA VISTA 'ProfesorPanelView'
+    EstudiantePanelView,  # IMPORTA LA VISTA 'EstudiantePanelView'
     UserManagementView,
     UserCreateView,
     UserUpdateView,
@@ -20,5 +22,5 @@ urlpatterns = [
     path('users/<int:user_id>/', UserUpdateView.as_view(), name='user_detail'),
     path('users/<int:user_id>/update/', UserUpdateView.as_view(), name='user_update'),
     path('users/<int:user_id>/delete/', UserDeleteView.as_view(), name='user_delete'),
-    path('accounts/', include('django.contrib.auth.urls')),
 ]
+

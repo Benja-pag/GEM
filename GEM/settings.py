@@ -118,7 +118,7 @@ AUTH_USER_MODEL = 'Core.Usuario'
 LOGIN_REDIRECT_URL = 'admin_panel'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_URL = 'accounts/login/'
-LOGIN_TEMPLATE = 'login.html'
+
 
 # Configuración de Bootstrap
 BOOTSTRAP5 = {

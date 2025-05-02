@@ -252,8 +252,8 @@
                                     <td>{{ curso.fecha_inicio|date:"d/m/Y" }}</td>
                                     <td>{{ curso.fecha_fin|date:"d/m/Y" }}</td>
                                     <td>
-                                        <span class="badge {% if curso.fecha_fin > now %}bg-success{% else %}bg-secondary{% endif %}">
-                                            {% if curso.fecha_fin > now %}Activo{% else %}Finalizado{% endif %}
+                                        <span class="badge {% if curso.fecha_fin|date:'Y-m-d' > now|date:'Y-m-d' %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {% if curso.fecha_fin|date:'Y-m-d' > now|date:'Y-m-d' %}Activo{% else %}Finalizado{% endif %}
                                         </span>
                                     </td>
                                     <td>
@@ -493,6 +493,11 @@
                             <option value="profesor">Profesor</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="edit_password" class="form-label">Nueva Contraseña</label>
+                        <input type="password" class="form-control" id="edit_password" name="password">
+                        <small class="text-muted">Dejar en blanco si no desea cambiar la contraseña</small>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -684,76 +689,106 @@
             });
         });
 
-        // Editar Usuario
-        $('.edit-user').click(function() {
+        // Manejar la edición de usuarios
+        $('.edit-user').on('click', function(e) {
+            e.preventDefault();
             const userId = $(this).data('user-id');
-            $.get(`/core/users/${userId}/`, function(user) {
-                $('#edit_user_id').val(user.id);
-                $('#edit_username').val(user.username);
-                $('#edit_email').val(user.email);
-                $('#edit_first_name').val(user.first_name);
-                $('#edit_last_name').val(user.last_name);
-                $('#edit_rol').val(user.rol);
-                $('#editUserModal').modal('show');
-            });
-        });
-
-        // Actualizar Usuario
-        $('#updateUserBtn').click(function() {
-            const userId = $('#edit_user_id').val();
-            const formData = $('#editUserForm').serialize();
-            $.post(`/core/users/${userId}/update/`, formData, function(response) {
-                if (response.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Éxito!',
-                        text: 'Usuario actualizado exitosamente'
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
+            $.ajax({
+                url: `/users/${userId}/`,
+                type: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        const user = response.user;
+                        $('#edit_user_id').val(user.id);
+                        $('#edit_username').val(user.username);
+                        $('#edit_email').val(user.email);
+                        $('#edit_first_name').val(user.first_name);
+                        $('#edit_last_name').val(user.last_name);
+                        $('#edit_rol').val(user.rol);
+                        $('#edit_password').val(''); // Limpiar el campo de contraseña
+                        $('#editUserModal').modal('show');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.error
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: response.error
+                        text: 'Error al cargar los datos del usuario: ' + error
                     });
                 }
             });
         });
 
-        // Eliminar Usuario
-        $('.delete-user').click(function() {
-            const userId = $(this).data('user-id');
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "Esta acción no se puede deshacer",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.post(`/core/users/${userId}/delete/`, function(response) {
-                        if (response.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: '¡Éxito!',
-                                text: 'Usuario eliminado exitosamente'
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: response.error
-                            });
-                        }
+        // Manejar la actualización de usuarios
+        $('#updateUserBtn').on('click', function() {
+            const userId = $('#edit_user_id').val();
+            const formData = $('#editUserForm').serialize();
+            
+            $.ajax({
+                url: `/users/${userId}/update/`,
+                type: 'POST',
+                data: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: 'Usuario actualizado exitosamente'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.error
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al actualizar el usuario: ' + error
                     });
                 }
             });
+        });
+
+        // Manejar la eliminación de usuarios
+        $('.delete-user').on('click', function() {
+            const userId = $(this).data('user-id');
+            if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+                $.ajax({
+                    url: `/users/${userId}/delete/`,
+                    type: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error al eliminar el usuario: ' + error);
+                    }
+                });
+            }
         });
 
         // Crear Curso

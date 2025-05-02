@@ -47,15 +47,17 @@ class AdminPanelView(LoginRequiredMixin, View):
                 'usuarios_recientes': usuarios_recientes,
                 'cursos': cursos,
                 'profesores': profesores,
-                'user_rol': 'admin'
+                'user_rol': 'admin',
+                'now': timezone.now()
             }
             
         elif request.user.rol == 'profesor':
             # Contenido para profesor
-            mis_cursos = Curso.objects.filter(profesor=request.user)
+            cursos = Curso.objects.filter(profesor=request.user)
             context = {
-                'cursos': mis_cursos,
-                'user_rol': 'profesor'
+                'cursos': cursos,
+                'user_rol': 'profesor',
+                'now': timezone.now()
             }
             
         else:  # estudiante
@@ -66,7 +68,8 @@ class AdminPanelView(LoginRequiredMixin, View):
             context = {
                 'cursos_inscritos': cursos_inscritos,
                 'calificaciones': mis_calificaciones,
-                'user_rol': 'estudiante'
+                'user_rol': 'estudiante',
+                'now': timezone.now()
             }
             
         return render(request, 'admin_panel.html', context)
@@ -117,30 +120,70 @@ class UserCreateView(LoginRequiredMixin, View):
             return JsonResponse({'success': False, 'error': str(e)})
 
 @method_decorator(csrf_exempt, name='dispatch')
-class UserUpdateView(LoginRequiredMixin, View):
+class UserDetailView(LoginRequiredMixin, View):
     def get(self, request, user_id):
         if not request.user.rol == 'admin':
-            return JsonResponse({'success': False, 'error': 'No tienes permisos para realizar esta acción'})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': 'No tienes permisos para realizar esta acción'})
+            return redirect('user_list')
         
         try:
             user = get_object_or_404(Usuario, id=user_id)
-            return JsonResponse({
-                'success': True,
-                'user': {
-                    'id': user.id,
-                    'username': user.username,
-                    'email': user.email,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'rol': user.rol
-                }
-            })
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'rol': user.rol
+                    }
+                })
+            return render(request, 'user_form.html', {'user': user})
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': str(e)})
+            messages.error(request, str(e))
+            return redirect('user_list')
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserUpdateView(LoginRequiredMixin, View):
+    template_name = 'user_form.html'
+
+    def get(self, request, user_id):
+        if not request.user.rol == 'admin':
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': 'No tienes permisos para realizar esta acción'})
+            return redirect('user_list')
+        
+        try:
+            user = get_object_or_404(Usuario, id=user_id)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'user': {
+                        'id': user.id,
+                        'username': user.username,
+                        'email': user.email,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'rol': user.rol
+                    }
+                })
+            return render(request, self.template_name, {'user': user})
+        except Exception as e:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': str(e)})
+            messages.error(request, str(e))
+            return redirect('user_list')
 
     def post(self, request, user_id):
         if not request.user.rol == 'admin':
-            return JsonResponse({'success': False, 'error': 'No tienes permisos para realizar esta acción'})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': 'No tienes permisos para realizar esta acción'})
+            return redirect('user_list')
         
         try:
             user = get_object_or_404(Usuario, id=user_id)
@@ -149,24 +192,63 @@ class UserUpdateView(LoginRequiredMixin, View):
             user.first_name = request.POST.get('first_name')
             user.last_name = request.POST.get('last_name')
             user.rol = request.POST.get('rol')
+            
+            # Actualizar contraseña solo si se proporciona una nueva
+            new_password = request.POST.get('password')
+            if new_password:
+                user.set_password(new_password)
+                
             user.save()
 
-            return JsonResponse({'success': True})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            messages.success(request, 'Usuario actualizado exitosamente')
+            return redirect('user_list')
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': str(e)})
+            messages.error(request, str(e))
+            return redirect('user_list')
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserDeleteView(LoginRequiredMixin, View):
+    template_name = 'user_confirm_delete.html'
+
+    def get(self, request, user_id):
+        if not request.user.rol == 'admin':
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': 'No tienes permisos para realizar esta acción'})
+            return redirect('user_list')
+        
+        try:
+            user = get_object_or_404(Usuario, id=user_id)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            return render(request, self.template_name, {'user': user})
+        except Exception as e:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': str(e)})
+            messages.error(request, str(e))
+            return redirect('user_list')
+
     def post(self, request, user_id):
         if not request.user.rol == 'admin':
-            return JsonResponse({'success': False, 'error': 'No tienes permisos para realizar esta acción'})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': 'No tienes permisos para realizar esta acción'})
+            return redirect('user_list')
         
         try:
             user = get_object_or_404(Usuario, id=user_id)
             user.delete()
-            return JsonResponse({'success': True})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            messages.success(request, 'Usuario eliminado exitosamente')
+            return redirect('user_list')
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': str(e)})
+            messages.error(request, str(e))
+            return redirect('user_list')
 
 class CursoListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Curso

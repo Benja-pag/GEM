@@ -6,8 +6,13 @@ from .views import (
     EstudiantePanelView,  # IMPORTA LA VISTA 'EstudiantePanelView'
     UserManagementView,
     UserCreateView,
+    UserDetailView,
     UserUpdateView,
-    UserDeleteView
+    UserDeleteView,
+    CursoCreateView,
+    CursoUpdateView,
+    CursoDeleteView,
+    CursoDetailView
 )
 
 urlpatterns = [
@@ -19,8 +24,14 @@ urlpatterns = [
     # URLs de usuarios
     path('users/', UserManagementView.as_view(), name='user_list'),
     path('users/create/', UserCreateView.as_view(), name='user_create'),
-    path('users/<int:user_id>/', UserUpdateView.as_view(), name='user_detail'),
+    path('users/<int:user_id>/', UserDetailView.as_view(), name='user_detail'),
     path('users/<int:user_id>/update/', UserUpdateView.as_view(), name='user_update'),
     path('users/<int:user_id>/delete/', UserDeleteView.as_view(), name='user_delete'),
+    
+    # URLs de cursos
+    path('cursos/create/', CursoCreateView.as_view(), name='curso_create'),
+    path('cursos/<int:curso_id>/', CursoDetailView.as_view(), name='curso_detail'),
+    path('cursos/<int:curso_id>/update/', CursoUpdateView.as_view(), name='curso_update'),
+    path('cursos/<int:curso_id>/delete/', CursoDeleteView.as_view(), name='curso_delete'),
 ]
 

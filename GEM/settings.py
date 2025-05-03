@@ -74,6 +74,19 @@ TEMPLATES = [
 # WSGI
 WSGI_APPLICATION = 'GEM.wsgi.application'
 
+
+# nuevas base de datos postgres 
+# DATABASES = {
+#     'default': {
+#         'ENGINE':'django.db.backends.postgres',
+#         'NAME': 'GEM'
+#         'USER': 'postgres',
+#         'PASSWORD': 'gem1234',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 # Base de datos
 DATABASES = {
     'default': {

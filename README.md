@@ -46,3 +46,18 @@ python manage.py makemigrations (pasar tablas a la base de datos)
 
 sitios:
 http://localhost:8000/asistencia/
+
+Para crear la base de datos:
+[Primero debes crear tu usuario que sea el por defecto "postgres"]
+[Segundo la contraseña debe ser si o si "gem1234"]
+[Tercero entrar a seleccionar sql shell]
+[Cuarto ingresar con el usuario]
+[quinto crear la base de datos con este comando "CREATE DATABASE GEM"]
+
+Comando habituales:
+\c gem (para entrar la base de datos)
+\l (Listar todas las base de datos)
+\dt (para lista las tablas)
+
+otro comando : 
+SELECT * FROM "public"."Core_usuario";

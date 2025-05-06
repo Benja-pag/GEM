@@ -76,28 +76,28 @@ WSGI_APPLICATION = 'GEM.wsgi.application'
 
 
 # nuevas base de datos postgres 
-# DATABASES = {
-#     'default': {
-#         'ENGINE':'django.db.backends.postgres',
-#         'NAME': 'GEM'
-#         'USER': 'postgres',
-#         'PASSWORD': 'gem1234',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
-
-# Base de datos
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3'),
-        'USER': os.getenv('DB_USER', ''),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', ''),
+        'ENGINE':'django.db.backends.postgres',
+        'NAME': 'GEM'
+        'USER': 'postgres',
+        'PASSWORD': 'gem1234',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
+# Base de datos
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
+#         'NAME': os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3'),
+#         'USER': os.getenv('DB_USER', ''),
+#         'PASSWORD': os.getenv('DB_PASSWORD', ''),
+#         'HOST': os.getenv('DB_HOST', ''),
+#         'PORT': os.getenv('DB_PORT', ''),
+#     }
+# }
 
 # Validadores de contraseña
 AUTH_PASSWORD_VALIDATORS = [

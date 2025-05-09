@@ -1,6 +1,15 @@
-from Core.models import AuthUser, Usuario, Administrativo
-from django.utils import timezone
+# create_user.py
+
+import os
+import django
 from datetime import date
+
+# Configuración de Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GEM.settings')  # Cambia 'GEM' si tu proyecto se llama distinto
+django.setup()
+
+# Ahora se pueden importar los modelos
+from Core.models import AuthUser, Usuario, Administrativo
 
 # Crear AuthUser
 auth_user = AuthUser.objects.create_user(
@@ -31,4 +40,4 @@ admin = Administrativo.objects.create(
     rol='ADMINISTRADOR'
 )
 
-print('Usuario administrador creado exitosamente') 
+print('Usuario administrador creado exitosamente')

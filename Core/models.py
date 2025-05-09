@@ -190,17 +190,3 @@ class Nota(models.Model):
 
     def __str__(self):
         return f'{self.estudiante.usuario} - {self.tipo_evaluacion} - {self.nota}'
-
-def login_view(request):
-    if request.method == 'POST':
-        rut = request.POST.get('rut')
-        div = request.POST.get('div')
-        password = request.POST.get('password')
-        
-        user = authenticate(request, rut=rut, div=div, password=password)
-        if user is not None:
-            login(request, user)
-            return redirect('home')
-        else:
-            # Manejar error de autenticación
-            pass

@@ -61,3 +61,7 @@ Comando habituales:
 
 otro comando : 
 SELECT * FROM "public"."Core_usuario";
+
+
+Correo: admin@gem.cl
+Contraseña: admin123s

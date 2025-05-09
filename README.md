@@ -73,3 +73,7 @@ usuario:
 ✅ Estudiante Luis Ramírez creado con contraseña 'lramírez'
 ✅ Estudiante Ana Castillo creado con contraseña 'acastillo'
 ✅ Estudiante Carlos Muñoz creado con contraseña 'cmuñoz'
+
+
+Para llenar la base de datos:
+python create_user.py 

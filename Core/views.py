@@ -353,7 +353,7 @@ class ProfesorPanelView(View):
             'clases': clases,
             'notas': notas
         }
-        return render(request, 'profesor_panel.html', context)
+        return render(request, 'teacher_panel.html', context)
 
 @method_decorator(login_required, name='dispatch')
 class EstudiantePanelView(View):
@@ -369,7 +369,7 @@ class EstudiantePanelView(View):
             'notas': notas,
             'asistencias': asistencias
         }
-        return render(request, 'estudiante_panel.html', context)
+        return render(request, 'students_panel.html', context)
 
 @method_decorator(login_required, name='dispatch')
 class AttendanceView(TemplateView):

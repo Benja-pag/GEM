@@ -65,3 +65,11 @@ SELECT * FROM "public"."Core_usuario";
 
 Correo: admin@gem.cl
 Contraseña: admin123s
+
+usuario: 
+✅ Usuario administrador creado exitosamente
+✅ Docente Juan Pérez creado con contraseña 'jpérez'
+✅ Docente María González creado con contraseña 'mgonzález'
+✅ Estudiante Luis Ramírez creado con contraseña 'lramírez'
+✅ Estudiante Ana Castillo creado con contraseña 'acastillo'
+✅ Estudiante Carlos Muñoz creado con contraseña 'cmuñoz'

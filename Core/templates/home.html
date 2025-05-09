@@ -3,15 +3,128 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 text-center">
-            <h1 class="display-4 mb-4">Bienvenido a GEM</h1>
-            <p class="lead mb-4">Sistema de Gestión Escolar</p>
+    <div class="row">
+        <div class="col-md-8 offset-md-2 text-center">
+            <h1 class="display-4 mb-4">Bienvenido al Sistema GEM</h1>
+            <p class="lead mb-4">Sistema de Gestión Educativa para Colegios</p>
             
-            {% if not user.is_authenticated %}
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <a href="{% url 'login' %}" class="btn btn-primary btn-lg px-4 gap-3">Iniciar Sesión</a>
-            </div>
+            {% if user.is_authenticated %}
+                <div class="alert alert-success">
+                    <h4>Bienvenido, {{ user.get_full_name }}</h4>
+                    <p>Has iniciado sesión como 
+                        {% if user.usuario.administrativo %}
+                            Administrador
+                        {% elif user.usuario.docente %}
+                            Docente
+                        {% elif user.usuario.estudiante %}
+                            Estudiante
+                        {% endif %}
+                    </p>
+                </div>
+                
+                {% if user.usuario.administrativo %}
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Gestión de Usuarios</h5>
+                                    <p class="card-text">Administra los usuarios del sistema</p>
+                                    <a href="{% url 'user_list' %}" class="btn btn-primary">Ir a Gestión</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Panel de Control</h5>
+                                    <p class="card-text">Accede al panel de administración</p>
+                                    <a href="{% url 'admin_panel' %}" class="btn btn-primary">Ir al Panel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elif user.usuario.docente %}
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Mis Cursos</h5>
+                                    <p class="card-text">Gestiona tus cursos y clases</p>
+                                    <a href="{% url 'profesor_panel' %}" class="btn btn-primary">Ver Cursos</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Asistencia</h5>
+                                    <p class="card-text">Registra la asistencia de tus estudiantes</p>
+                                    <a href="{% url 'attendance' %}" class="btn btn-primary">Registrar Asistencia</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elif user.usuario.estudiante %}
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Mis Cursos</h5>
+                                    <p class="card-text">Accede a tus cursos y materiales</p>
+                                    <a href="{% url 'estudiante_panel' %}" class="btn btn-primary">Ver Cursos</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Mis Calificaciones</h5>
+                                    <p class="card-text">Consulta tus calificaciones</p>
+                                    <a href="{% url 'estudiante_panel' %}" class="btn btn-primary">Ver Calificaciones</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="row mt-4">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Iniciar Sesión</h5>
+                                <p class="card-text">Accede al sistema con tus credenciales</p>
+                                <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Gestión de Usuarios</h5>
+                                <p class="card-text">Administración completa de usuarios del sistema</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Control de Asistencia</h5>
+                                <p class="card-text">Registro y seguimiento de asistencia</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Generación de Reportes</h5>
+                                <p class="card-text">Reportes detallados y estadísticas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>

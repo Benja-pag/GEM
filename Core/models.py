@@ -1,7 +1,71 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.utils.translation import gettext_lazy as _
-from .models import Estudiante, Docente
+from django.contrib.auth import authenticate, login
+
+class AuthUserManager(BaseUserManager):
+    def create_user(self, rut, div, password=None):
+        if not rut:
+            raise ValueError('El RUT es obligatorio')
+        user = self.model(rut=rut, div=div)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, rut, div, password=None):
+        user = self.create_user(rut=rut, div=div, password=password)
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+class AuthUser(AbstractBaseUser):
+    rut = models.CharField(max_length=10, unique=True)  # RUT sin dígito verificador
+    div = models.CharField(max_length=1)  # Dígito verificador
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    objects = AuthUserManager()
+
+    USERNAME_FIELD = 'rut'
+    REQUIRED_FIELDS = ['div']
+
+    def __str__(self):
+        return f"{self.rut}-{self.div}"
+
+    @property
+    def is_staff(self):
+        return self.is_admin
+
+    @property
+    def is_superuser(self):
+        return self.is_admin
+
+    def has_perm(self, perm, obj=None):
+        return self.is_admin
+
+    def has_module_perms(self, app_label):
+        return self.is_admin
+
+    @property
+    def usuario(self):
+        try:
+            return self.usuario_set.get()
+        except Usuario.DoesNotExist:
+            return None
+
+    def get_full_name(self):
+        if self.usuario:
+            return f"{self.usuario.nombre} {self.usuario.apellido_paterno}"
+        return f"{self.rut}-{self.div}"
+
+    def get_short_name(self):
+        if self.usuario:
+            return self.usuario.nombre
+        return f"{self.rut}-{self.div}"
+
+    def get_username(self):
+        return f"{self.rut}-{self.div}"
 
 # Modelo base que representa a cualquier tipo de usuario en el sistema
 class Usuario(models.Model):
@@ -15,6 +79,7 @@ class Usuario(models.Model):
     direccion = models.TextField()  # Dirección física del usuario
     fecha_nacimiento = models.DateField()  # Fecha de nacimiento del usuario
     fecha_creacion = models.DateTimeField(auto_now_add=True)  # Fecha de creación del registro (autoasignado)
+    auth_user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f'{self.nombre} {self.apellido_paterno}'  # Representación legible del objeto
@@ -125,3 +190,17 @@ class Nota(models.Model):
 
     def __str__(self):
         return f'{self.estudiante.usuario} - {self.tipo_evaluacion} - {self.nota}'
+
+def login_view(request):
+    if request.method == 'POST':
+        rut = request.POST.get('rut')
+        div = request.POST.get('div')
+        password = request.POST.get('password')
+        
+        user = authenticate(request, rut=rut, div=div, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            # Manejar error de autenticación
+            pass

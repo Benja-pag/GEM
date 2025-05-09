@@ -13,7 +13,7 @@
                     <h5 class="text-white">Panel de Control</h5>
                 </div>
                 <ul class="nav flex-column">
-                    {% if user.rol == 'admin' %}
+                    {% if user.is_admin %}
                     <li class="nav-item">
                         <a class="nav-link active text-white" href="#usuarios">
                             <i class="fas fa-users me-2"></i> Usuarios
@@ -30,35 +30,6 @@
                         </a>
                     </li>
                     {% endif %}
-                    {% if user.rol == 'profesor' %}
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#mis-cursos">
-                            <i class="fas fa-chalkboard-teacher me-2"></i> Mis Cursos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#estudiantes">
-                            <i class="fas fa-user-graduate me-2"></i> Estudiantes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#calificaciones">
-                            <i class="fas fa-star me-2"></i> Calificaciones
-                        </a>
-                    </li>
-                    {% endif %}
-                    {% if user.rol == 'estudiante' %}
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#mis-cursos">
-                            <i class="fas fa-book me-2"></i> Mis Cursos
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="#calificaciones">
-                            <i class="fas fa-star me-2"></i> Mis Calificaciones
-                        </a>
-                    </li>
-                    {% endif %}
                 </ul>
             </div>
         </nav>
@@ -68,14 +39,10 @@
             <!-- Barra Superior -->
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <div>
-                    <h2 class="h3">Bienvenido, {{ user.get_full_name }}</h2>
+                    <h2 class="h3">Bienvenido, {{ user.rut }}</h2>
                     <p class="text-muted">
-                        {% if user.rol == 'admin' %}
+                        {% if user.is_admin %}
                             Administrador
-                        {% elif user.rol == 'profesor' %}
-                            Profesor
-                        {% else %}
-                            Estudiante
                         {% endif %}
                     </p>
                 </div>
@@ -89,131 +56,172 @@
                 </div>
             </div>
 
-            {% if user.rol == 'admin' %}
-            <!-- Tarjetas de Resumen -->
+            {% if user.is_admin %}
+            <!-- Estadísticas -->
             <div class="row mb-4">
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-start border-primary border-4 shadow-sm h-100">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-primary mb-1">Total Estudiantes</h6>
-                                    <h2 class="mb-0">{{ total_estudiantes }}</h2>
-                                </div>
-                                <div class="bg-primary bg-opacity-10 p-3 rounded">
-                                    <i class="fas fa-user-graduate fa-2x text-primary"></i>
-                                </div>
-                            </div>
+                            <h5 class="card-title">Total Estudiantes</h5>
+                            <p class="card-text display-4">{{ total_estudiantes }}</p>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-start border-success border-4 shadow-sm h-100">
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-success mb-1">Total Profesores</h6>
-                                    <h2 class="mb-0">{{ total_profesores }}</h2>
-                                </div>
-                                <div class="bg-success bg-opacity-10 p-3 rounded">
-                                    <i class="fas fa-chalkboard-teacher fa-2x text-success"></i>
-                                </div>
-                            </div>
+                            <h5 class="card-title">Total Profesores</h5>
+                            <p class="card-text display-4">{{ total_profesores }}</p>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-start border-info border-4 shadow-sm h-100">
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-info mb-1">Cursos Activos</h6>
-                                    <h2 class="mb-0">{{ total_cursos }}</h2>
-                                </div>
-                                <div class="bg-info bg-opacity-10 p-3 rounded">
-                                    <i class="fas fa-book fa-2x text-info"></i>
-                                </div>
-                            </div>
+                            <h5 class="card-title">Total Clases</h5>
+                            <p class="card-text display-4">{{ total_clases }}</p>
                         </div>
                     </div>
                 </div>
-
-                <div class="col-xl-3 col-md-6 mb-4">
-                    <div class="card border-start border-warning border-4 shadow-sm h-100">
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="text-warning mb-1">Promedio Calificaciones</h6>
-                                    <h2 class="mb-0">{{ promedio_general|floatformat:1 }}</h2>
-                                </div>
-                                <div class="bg-warning bg-opacity-10 p-3 rounded">
-                                    <i class="fas fa-star fa-2x text-warning"></i>
-                                </div>
-                            </div>
+                            <h5 class="card-title">Promedio General</h5>
+                            <p class="card-text display-4">{{ promedio_general|floatformat:1 }}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Gestión de Usuarios -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Gestión de Usuarios</h5>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
-                        <i class="fas fa-user-plus me-2"></i>Nuevo Usuario
-                    </button>
+            <!-- Formulario de Creación de Administrador -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Crear Nuevo Administrador</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            {% if messages %}
+                            <div class="messages">
+                                {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label for="nombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="apellido_paterno" class="form-label">Apellido Paterno</label>
+                                    <input type="text" class="form-control" id="apellido_paterno" name="apellido_paterno" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="apellido_materno" class="form-label">Apellido Materno</label>
+                                    <input type="text" class="form-control" id="apellido_materno" name="apellido_materno" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="rut" class="form-label">RUT</label>
+                                    <input type="text" class="form-control" id="rut" name="rut" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="div" class="form-label">Dígito Verificador</label>
+                                    <input type="text" class="form-control" id="div" name="div" maxlength="1" required>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="correo" class="form-label">Correo Electrónico</label>
+                                    <input type="email" class="form-control" id="correo" name="correo" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="telefono" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control" id="telefono" name="telefono">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="direccion" class="form-label">Dirección</label>
+                                <input type="text" class="form-control" id="direccion" name="direccion">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento">
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="password" class="form-label">Contraseña</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
+                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="rol" class="form-label">Rol</label>
+                                <select class="form-select" id="rol" name="rol">
+                                    <option value="ADMINISTRADOR">Administrador</option>
+                                    <option value="SUPERVISOR">Supervisor</option>
+                                </select>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Crear Administrador</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Usuarios Recientes -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Usuarios Recientes</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover" id="usersTable">
-                            <thead class="table-light">
+                        <table class="table table-striped">
+                            <thead>
                                 <tr>
                                     <th>Nombre</th>
-                                    <th>Email</th>
-                                    <th>Rol</th>
-                                    <th>Fecha Registro</th>
-                                    <th>Estado</th>
+                                    <th>RUT</th>
+                                    <th>Correo</th>
+                                    <th>Fecha de Registro</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for usuario in usuarios_recientes %}
                                 <tr>
+                                    <td>{{ usuario.nombre }} {{ usuario.apellido_paterno }}</td>
+                                    <td>{{ usuario.rut }}-{{ usuario.div }}</td>
+                                    <td>{{ usuario.correo }}</td>
+                                    <td>{{ usuario.fecha_creacion|date:"d/m/Y" }}</td>
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle me-2">
-                                                {{ usuario.first_name|first|upper }}
-                                            </div>
-                                            {{ usuario.get_full_name }}
-                                        </div>
-                                    </td>
-                                    <td>{{ usuario.email }}</td>
-                                    <td>
-                                        <span class="badge {% if usuario.rol == 'estudiante' %}bg-info{% else %}bg-success{% endif %}">
-                                            {% if usuario.rol == 'admin' %}
-                                                Administrador
-                                            {% elif usuario.rol == 'profesor' %}
-                                                Profesor
-                                            {% else %}
-                                                Estudiante
-                                            {% endif %}
-                                        </span>
-                                    </td>
-                                    <td>{{ usuario.date_joined|date:"d/m/Y" }}</td>
-                                    <td>
-                                        <span class="badge bg-success">Activo</span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-outline-primary edit-user" data-user-id="{{ usuario.id }}">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger delete-user" data-user-id="{{ usuario.id }}">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
+                                        <a href="{% url 'user_detail' usuario.id %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'user_update' usuario.id %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'user_delete' usuario.id %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -223,181 +231,39 @@
                 </div>
             </div>
 
-            <!-- Gestión de Cursos -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Gestión de Cursos</h5>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCursoModal">
-                        <i class="fas fa-plus me-2"></i>Nuevo Curso
-                    </button>
+            <!-- Clases Activas -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Clases Activas</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover" id="cursosTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Profesor</th>
-                                    <th>Fecha Inicio</th>
-                                    <th>Fecha Fin</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for curso in cursos %}
-                                <tr>
-                                    <td>{{ curso.nombre }}</td>
-                                    <td>{{ curso.profesor.get_full_name }}</td>
-                                    <td>{{ curso.fecha_inicio|date:"d/m/Y" }}</td>
-                                    <td>{{ curso.fecha_fin|date:"d/m/Y" }}</td>
-                                    <td>
-                                        <span class="badge {% if curso.fecha_fin|date:'Y-m-d' > now|date:'Y-m-d' %}bg-success{% else %}bg-secondary{% endif %}">
-                                            {% if curso.fecha_fin|date:'Y-m-d' > now|date:'Y-m-d' %}Activo{% else %}Finalizado{% endif %}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-outline-primary edit-curso" data-curso-id="{{ curso.id }}">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger delete-curso" data-curso-id="{{ curso.id }}">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if user.rol == 'profesor' %}
-            <!-- Contenido para Profesores -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0">Mis Cursos</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Curso</th>
-                                    <th>Estudiantes</th>
-                                    <th>Fecha Inicio</th>
-                                    <th>Fecha Fin</th>
-                                    <th>Progreso</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for curso in mis_cursos %}
-                                <tr>
-                                    <td>{{ curso.nombre }}</td>
-                                    <td>{{ curso.estudiantecurso_set.count }}</td>
-                                    <td>{{ curso.fecha_inicio|date:"d/m/Y" }}</td>
-                                    <td>{{ curso.fecha_fin|date:"d/m/Y" }}</td>
-                                    <td>
-                                        <div class="progress" style="height: 5px;">
-                                            <div class="progress-bar" role="progressbar" style="width: 75%"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-outline-primary view-students" data-course-id="{{ curso.id }}">
-                                                <i class="fas fa-users"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-success add-grade" data-course-id="{{ curso.id }}">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-            {% if user.rol == 'estudiante' %}
-            <!-- Contenido para Estudiantes -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0">Mis Cursos</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
+                        <table class="table table-striped">
+                            <thead>
                                 <tr>
                                     <th>Curso</th>
                                     <th>Profesor</th>
-                                    <th>Fecha Inscripción</th>
-                                    <th>Progreso</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for inscripcion in cursos_inscritos %}
-                                <tr>
-                                    <td>{{ inscripcion.curso.nombre }}</td>
-                                    <td>{{ inscripcion.curso.profesor.get_full_name }}</td>
-                                    <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y" }}</td>
-                                    <td>
-                                        <div class="progress" style="height: 5px;">
-                                            <div class="progress-bar" role="progressbar" style="width: 60%"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-outline-primary view-material" data-course-id="{{ inscripcion.curso.id }}">
-                                                <i class="fas fa-book"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-info view-grades" data-course-id="{{ inscripcion.curso.id }}">
-                                                <i class="fas fa-star"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0">Mis Calificaciones</h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Curso</th>
-                                    <th>Nota</th>
                                     <th>Fecha</th>
-                                    <th>Comentario</th>
+                                    <th>Hora</th>
+                                    <th>Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for calificacion in calificaciones %}
+                                {% for clase in clases %}
                                 <tr>
-                                    <td>{{ calificacion.curso.nombre }}</td>
+                                    <td>{{ clase.curso.nombre }}</td>
+                                    <td>{{ clase.docente.usuario.nombre }} {{ clase.docente.usuario.apellido_paterno }}</td>
+                                    <td>{{ clase.fecha|date:"d/m/Y" }}</td>
+                                    <td>{{ clase.hora_inicio|time:"H:i" }} - {{ clase.hora_fin|time:"H:i" }}</td>
                                     <td>
-                                        <span class="badge {% if calificacion.nota >= 4 %}bg-success{% else %}bg-danger{% endif %}">
-                                            {{ calificacion.nota }}
-                                        </span>
+                                        {% if clase.fecha > now.date %}
+                                            <span class="badge bg-success">Pendiente</span>
+                                        {% elif clase.fecha == now.date %}
+                                            <span class="badge bg-warning">En curso</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Finalizada</span>
+                                        {% endif %}
                                     </td>
-                                    <td>{{ calificacion.fecha|date:"d/m/Y" }}</td>
-                                    <td>{{ calificacion.comentario }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -407,197 +273,6 @@
             </div>
             {% endif %}
         </main>
-    </div>
-</div>
-
-<!-- Modal para Crear Usuario -->
-<div class="modal fade" id="createUserModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Nuevo Usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="createUserForm">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Nombre de usuario</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="first_name" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="first_name" name="first_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="last_name" class="form-label">Apellido</label>
-                        <input type="text" class="form-control" id="last_name" name="last_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="rol" class="form-label">Rol</label>
-                        <select class="form-select" id="rol" name="rol" required>
-                            <option value="estudiante">Estudiante</option>
-                            <option value="profesor">Profesor</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="createUserBtn">Crear Usuario</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para Editar Usuario -->
-<div class="modal fade" id="editUserModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Editar Usuario</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editUserForm">
-                    {% csrf_token %}
-                    <input type="hidden" id="edit_user_id" name="user_id">
-                    <div class="mb-3">
-                        <label for="edit_username" class="form-label">Nombre de usuario</label>
-                        <input type="text" class="form-control" id="edit_username" name="username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="edit_email" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_first_name" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="edit_first_name" name="first_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_last_name" class="form-label">Apellido</label>
-                        <input type="text" class="form-control" id="edit_last_name" name="last_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_rol" class="form-label">Rol</label>
-                        <select class="form-select" id="edit_rol" name="rol" required>
-                            <option value="estudiante">Estudiante</option>
-                            <option value="profesor">Profesor</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_password" class="form-label">Nueva Contraseña</label>
-                        <input type="password" class="form-control" id="edit_password" name="password">
-                        <small class="text-muted">Dejar en blanco si no desea cambiar la contraseña</small>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="updateUserBtn">Guardar Cambios</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para Crear Curso -->
-<div class="modal fade" id="createCursoModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Nuevo Curso</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="createCursoForm">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre del Curso</label>
-                        <input type="text" class="form-control" id="nombre" name="nombre" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="profesor" class="form-label">Profesor</label>
-                        <select class="form-select" id="profesor" name="profesor" required>
-                            <option value="">Seleccione un profesor</option>
-                            {% for profesor in profesores %}
-                            <option value="{{ profesor.id }}">{{ profesor.get_full_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="descripcion" class="form-label">Descripción</label>
-                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
-                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="fecha_fin" class="form-label">Fecha Fin</label>
-                        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="createCursoBtn">Crear Curso</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal para Editar Curso -->
-<div class="modal fade" id="editCursoModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Editar Curso</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editCursoForm">
-                    {% csrf_token %}
-                    <input type="hidden" id="edit_curso_id" name="curso_id">
-                    <div class="mb-3">
-                        <label for="edit_nombre" class="form-label">Nombre del Curso</label>
-                        <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_profesor" class="form-label">Profesor</label>
-                        <select class="form-select" id="edit_profesor" name="profesor" required>
-                            <option value="">Seleccione un profesor</option>
-                            {% for profesor in profesores %}
-                            <option value="{{ profesor.id }}">{{ profesor.get_full_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_descripcion" class="form-label">Descripción</label>
-                        <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="3" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_fecha_inicio" class="form-label">Fecha Inicio</label>
-                        <input type="date" class="form-control" id="edit_fecha_inicio" name="fecha_inicio" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_fecha_fin" class="form-label">Fecha Fin</label>
-                        <input type="date" class="form-control" id="edit_fecha_fin" name="fecha_fin" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="updateCursoBtn">Guardar Cambios</button>
-            </div>
-        </div>
     </div>
 </div>
 {% else %}

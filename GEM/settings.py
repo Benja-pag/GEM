@@ -125,7 +125,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Modelo de usuario personalizado
-AUTH_USER_MODEL = 'Core.Usuario'
+AUTH_USER_MODEL = 'Core.AuthUser'
 
 # URLs de autenticación
 LOGIN_REDIRECT_URL = 'admin_panel'
@@ -153,3 +153,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', '')
+
+AUTHENTICATION_BACKENDS = [
+    'Core.auth.RUTBackend',
+]

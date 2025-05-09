@@ -1,29 +1,62 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import Usuario, Curso, EstudianteCurso, Calificacion
+from .models import Usuario, Administrativo, Docente, Estudiante, Asistencia, Calendario, Clase, Foro, Nota
 
 @admin.register(Usuario)
-class UsuarioAdmin(UserAdmin):
-    list_display = ('username', 'email', 'first_name', 'last_name', 'rol', 'is_staff')
-    list_filter = ('rol', 'is_staff', 'is_superuser', 'is_active')
-    fieldsets = UserAdmin.fieldsets + (
-        ('Información Adicional', {'fields': ('rol', 'fecha_nacimiento', 'telefono', 'direccion')}),
+class UsuarioAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'correo', 'telefono')
+    list_filter = ('fecha_creacion',)
+    search_fields = ('nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'correo')
+    fieldsets = (
+        ('Información Personal', {
+            'fields': ('nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'div', 'fecha_nacimiento')
+        }),
+        ('Información de Contacto', {
+            'fields': ('correo', 'telefono', 'direccion')
+        }),
     )
 
-@admin.register(Curso)
-class CursoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'profesor', 'fecha_inicio', 'fecha_fin')
-    list_filter = ('profesor', 'fecha_inicio', 'fecha_fin')
-    search_fields = ('nombre', 'descripcion')
+@admin.register(Administrativo)
+class AdministrativoAdmin(admin.ModelAdmin):
+    list_display = ('usuario', 'rol')
+    list_filter = ('rol',)
+    search_fields = ('usuario__nombre', 'usuario__apellido_paterno')
 
-@admin.register(EstudianteCurso)
-class EstudianteCursoAdmin(admin.ModelAdmin):
-    list_display = ('estudiante', 'curso', 'fecha_inscripcion')
-    list_filter = ('curso', 'fecha_inscripcion')
-    search_fields = ('estudiante__username', 'curso__nombre')
+@admin.register(Docente)
+class DocenteAdmin(admin.ModelAdmin):
+    list_display = ('usuario',)
+    search_fields = ('usuario__nombre', 'usuario__apellido_paterno')
 
-@admin.register(Calificacion)
-class CalificacionAdmin(admin.ModelAdmin):
-    list_display = ('estudiante', 'curso', 'nota', 'fecha')
-    list_filter = ('curso', 'fecha')
-    search_fields = ('estudiante__username', 'curso__nombre')
+@admin.register(Estudiante)
+class EstudianteAdmin(admin.ModelAdmin):
+    list_display = ('usuario', 'contacto_emergencia')
+    search_fields = ('usuario__nombre', 'usuario__apellido_paterno')
+
+@admin.register(Asistencia)
+class AsistenciaAdmin(admin.ModelAdmin):
+    list_display = ('estudiante', 'fecha', 'estado', 'hora_registro')
+    list_filter = ('estado', 'fecha')
+    search_fields = ('estudiante__usuario__nombre', 'estudiante__usuario__apellido_paterno')
+
+@admin.register(Calendario)
+class CalendarioAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'tipo_evento', 'fecha_inicio', 'fecha_fin')
+    list_filter = ('tipo_evento', 'fecha_inicio')
+    search_fields = ('titulo', 'descripcion')
+
+@admin.register(Clase)
+class ClaseAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'docente', 'fecha', 'hora_inicio', 'hora_fin')
+    list_filter = ('fecha', 'docente')
+    search_fields = ('titulo', 'descripcion', 'docente__usuario__nombre')
+
+@admin.register(Foro)
+class ForoAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'autor', 'fecha_publicacion')
+    list_filter = ('fecha_publicacion',)
+    search_fields = ('titulo', 'contenido', 'autor__nombre')
+
+@admin.register(Nota)
+class NotaAdmin(admin.ModelAdmin):
+    list_display = ('estudiante', 'docente', 'tipo_evaluacion', 'nota', 'fecha_registro')
+    list_filter = ('tipo_evaluacion', 'fecha_registro')
+    search_fields = ('estudiante__usuario__nombre', 'docente__usuario__nombre', 'descripcion')

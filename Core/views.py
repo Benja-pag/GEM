@@ -121,16 +121,23 @@ class AdminPanelView(View):
             return redirect('admin_panel')
 
 @method_decorator(login_required, name='dispatch')
-class UserManagementView(ListView):
-    model = Usuario
-    template_name = 'user_management.html'
-    context_object_name = 'usuarios'
-
-    def get_queryset(self):
-        if not self.request.user.is_admin:
-            messages.error(self.request, 'No tienes permiso para acceder a esta página')
-            return Usuario.objects.none()
-        return Usuario.objects.all().order_by('-fecha_creacion')
+class UserManagementView(View):
+    def get(self, request):
+        if not request.user.is_admin:
+            messages.error(request, 'No tienes permiso para acceder a esta página')
+            return redirect('home')
+        
+        usuarios = Usuario.objects.all().order_by('-fecha_creacion')
+        context = {
+            'usuarios': usuarios,
+            'total_estudiantes': Usuario.objects.filter(estudiante__isnull=False).count(),
+            'total_profesores': Usuario.objects.filter(docente__isnull=False).count(),
+            'total_clases': Clase.objects.count(),
+            'usuarios_recientes': usuarios[:10],
+            'clases': Clase.objects.all().order_by('fecha', 'hora_inicio')[:10],
+            'now': timezone.now(),
+        }
+        return render(request, 'admin_panel.html', context)
 
 @method_decorator(login_required, name='dispatch')
 class UserCreateView(View):
@@ -589,3 +596,20 @@ class ChangePasswordView(View):
         except Exception as e:
             messages.error(request, f'Error al cambiar contraseña: {str(e)}')
             return render(request, self.template_name)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserToggleStatusView(View):
+    def post(self, request, user_id):
+        try:
+            if not request.user.is_admin:
+                return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
+            
+            usuario = get_object_or_404(Usuario, id=user_id)
+            is_active = request.POST.get('is_active') == 'true'
+            
+            usuario.auth_user.is_active = is_active
+            usuario.auth_user.save()
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})

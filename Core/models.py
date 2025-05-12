@@ -3,16 +3,18 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils.translation import gettext_lazy as _
 
 class AuthUserManager(BaseUserManager):
-    def create_user(self, correo, password=None):
-        if not correo:
-            raise ValueError('El correo es obligatorio')
-        user = self.model(correo=correo)
+    def create_user(self, rut, div, password=None):
+        if not rut:
+            raise ValueError('El RUT es obligatorio')
+        if not div:
+            raise ValueError('El dígito verificador es obligatorio')
+        user = self.model(rut=rut, div=div)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, correo, password=None):
-        user = self.create_user(correo=correo, password=password)
+    def create_superuser(self, rut, div, password=None):
+        user = self.create_user(rut=rut, div=div, password=password)
         user.is_admin = True
         user.save(using=self._db)
         return user
@@ -168,8 +170,4 @@ class Nota(models.Model):
     fecha_registro = models.DateField(auto_now_add=True)  # Fecha de ingreso de la nota
 
     def __str__(self):
-<<<<<<< Updated upstream
         return f'{self.estudiante.usuario} - {self.tipo_evaluacion} - {self.nota}'
-=======
-        return f'{self.estudiante.usuario} - {self.tipo_evaluacion} - {self.nota}'
->>>>>>> Stashed changes

@@ -3,7 +3,7 @@ from .views import (
     HomeView, AdminPanelView, UserManagementView, UserCreateView,
     UserDetailView, UserUpdateView, UserDeleteView, ProfesorPanelView,
     EstudiantePanelView, AttendanceView, LoginView, LogoutView,
-    ChangePasswordView
+    ChangePasswordView, UserToggleStatusView
 )
 
 urlpatterns = [
@@ -20,6 +20,7 @@ urlpatterns = [
     path('users/<int:user_id>/', UserDetailView.as_view(), name='user_detail'),
     path('users/<int:user_id>/update/', UserUpdateView.as_view(), name='user_update'),
     path('users/<int:user_id>/delete/', UserDeleteView.as_view(), name='user_delete'),
+    path('users/<int:user_id>/toggle_status/', UserToggleStatusView.as_view(), name='user_toggle_status'),
     path('profesor-panel/', ProfesorPanelView.as_view(), name='profesor_panel'),
     path('estudiante-panel/', EstudiantePanelView.as_view(), name='estudiante_panel'),
     path('attendance/', AttendanceView.as_view(), name='attendance'),

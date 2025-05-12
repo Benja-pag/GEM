@@ -1,6 +1,5 @@
 import os
 import django
-<<<<<<< Updated upstream
 from datetime import date
 
 # Configuración de Django
@@ -129,52 +128,3 @@ for data in estudiantes_data:
     )
     Estudiante.objects.create(usuario=usuario, contacto_emergencia=data['contacto_emergencia'])
     print(f"✅ Estudiante {usuario.nombre} {usuario.apellido_paterno} creado con contraseña '{password}'")
-=======
-
-# Configurar el entorno de Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GEM.settings')
-django.setup()
-
-from Core.models import AuthUser, Usuario, Administrativo
-from django.contrib.auth.hashers import make_password
-
-def create_admin_user():
-    try:
-        # Crear usuario de autenticación
-        auth_user = AuthUser.objects.create(
-            rut='admin',
-            div='1',
-            password=make_password('admin123'),
-            is_admin=True
-        )
-
-        # Crear usuario
-        usuario = Usuario.objects.create(
-            nombre='Admin',
-            apellido_paterno='Sistema',
-            apellido_materno='GEM',
-            rut='admin',
-            div='1',
-            correo='admin@gem.cl',
-            telefono='123456789',
-            direccion='Dirección Admin',
-            fecha_nacimiento='2000-01-01',
-            auth_user=auth_user
-        )
-
-        # Crear administrativo
-        Administrativo.objects.create(
-            usuario=usuario,
-            rol='ADMINISTRADOR'
-        )
-
-        print('Usuario administrador creado exitosamente')
-        print('Correo: admin@gem.cl')
-        print('Contraseña: admin123')
-
-    except Exception as e:
-        print(f'Error al crear usuario: {str(e)}')
-
-if __name__ == '__main__':
-    create_admin_user() 
->>>>>>> Stashed changes

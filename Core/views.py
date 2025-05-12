@@ -33,33 +33,23 @@ class AdminPanelView(View):
     def get(self, request):
         if not request.user.is_authenticated or not request.user.is_admin:
             return redirect('login')
-        
         try:
             # Obtener estadísticas
             total_estudiantes = Usuario.objects.filter(estudiante__isnull=False).count()
             total_profesores = Usuario.objects.filter(docente__isnull=False).count()
             total_clases = Clase.objects.count()
-            
-            # Calcular promedio general
-            notas = Nota.objects.all()
-            promedio_general = notas.aggregate(Avg('nota'))['nota__avg'] or 0
-            
             # Obtener usuarios recientes
             usuarios_recientes = Usuario.objects.all().order_by('-fecha_creacion')[:10]
-            
             # Obtener clases activas
             clases = Clase.objects.all().order_by('fecha', 'hora_inicio')[:10]
-            
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
                 'total_clases': total_clases,
-                'promedio_general': promedio_general,
                 'usuarios_recientes': usuarios_recientes,
                 'clases': clases,
                 'now': timezone.now(),
             }
-            
             return render(request, 'admin_panel.html', context)
         except Exception as e:
             messages.error(request, f'Error al cargar el panel de administrador: {str(e)}')
@@ -69,7 +59,6 @@ class AdminPanelView(View):
         if not request.user.is_admin:
             messages.error(request, 'No tienes permiso para realizar esta acción')
             return redirect('home')
-
         try:
             # Obtener datos del formulario
             nombre = request.POST.get('nombre')
@@ -84,27 +73,22 @@ class AdminPanelView(View):
             password = request.POST.get('password')
             confirm_password = request.POST.get('confirm_password')
             rol = request.POST.get('rol', 'ADMINISTRATIVO')
-
             # Validar campos requeridos
             if not all([nombre, apellido_paterno, apellido_materno, rut, div, correo, password, confirm_password]):
                 messages.error(request, 'Por favor complete todos los campos requeridos')
                 return redirect('admin_panel')
-
             # Validar contraseñas
             if password != confirm_password:
                 messages.error(request, 'Las contraseñas no coinciden')
                 return redirect('admin_panel')
-
             # Verificar si el RUT ya existe
             if Usuario.objects.filter(rut=rut).exists():
                 messages.error(request, 'El RUT ya está registrado')
                 return redirect('admin_panel')
-
             # Verificar si el correo ya existe
             if Usuario.objects.filter(correo=correo).exists():
                 messages.error(request, 'El correo ya está registrado')
                 return redirect('admin_panel')
-
             # Crear usuario de autenticación con permisos de administrador
             auth_user = AuthUser.objects.create(
                 rut=rut,
@@ -112,7 +96,6 @@ class AdminPanelView(View):
                 password=make_password(password),
                 is_admin=True
             )
-
             # Crear usuario
             usuario = Usuario.objects.create(
                 nombre=nombre,
@@ -126,16 +109,13 @@ class AdminPanelView(View):
                 fecha_nacimiento=fecha_nacimiento,
                 auth_user=auth_user
             )
-
             # Crear administrativo
             Administrativo.objects.create(
                 usuario=usuario,
                 rol=rol
             )
-
             messages.success(request, 'Administrador creado exitosamente')
             return redirect('admin_panel')
-
         except Exception as e:
             messages.error(request, f'Error al crear administrador: {str(e)}')
             return redirect('admin_panel')
@@ -381,43 +361,26 @@ class AttendanceView(TemplateView):
             return redirect('home')
         return super().get(request, *args, **kwargs)
 
-class LoginView(View):
-    def get(self, request):
-        if request.user.is_authenticated:
-            return redirect('home')
-        return render(request, 'login.html')
-
-    def post(self, request):
+def login_view(request):
+    if request.method == 'POST':
         correo = request.POST.get('correo')
         password = request.POST.get('password')
-
-        if not correo or not password:
-            messages.error(request, 'Por favor ingrese correo y contraseña')
-            return render(request, 'login.html')
-
-        try:
-            # Buscar primero el usuario por correo
-            usuario = Usuario.objects.get(correo=correo)
-            # Obtener el AuthUser asociado
-            auth_user = usuario.auth_user
-            
-            # Verificar la contraseña
-            if check_password(password, auth_user.password):
-                login(request, auth_user)
-                # Redirigir según el tipo de usuario
-                if auth_user.is_admin:
-                    return redirect('admin_panel')
-                elif hasattr(usuario, 'docente'):
-                    return redirect('profesor_panel')
-                elif hasattr(usuario, 'estudiante'):
-                    return redirect('estudiante_panel')
-                return redirect('home')
-            else:
-                messages.error(request, 'Correo o contraseña incorrectos')
-        except Usuario.DoesNotExist:
-            messages.error(request, 'Correo o contraseña incorrectos')
         
-        return render(request, 'login.html')
+        user = authenticate(request, correo=correo, password=password)
+        if user is not None:
+            login(request, user)
+            if user.is_admin:
+                return redirect('admin_panel')
+            elif hasattr(user.usuario, 'docente'):
+                return redirect('profesor_panel')
+            elif hasattr(user.usuario, 'estudiante'):
+                return redirect('estudiante_panel')
+            return redirect('home')
+        else:
+            # Manejar error de autenticación
+            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
+    
+    return render(request, 'login.html')
 
 class LogoutView(View):
     def get(self, request):

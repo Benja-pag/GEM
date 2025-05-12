@@ -1,71 +1,50 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import authenticate, login
 
 class AuthUserManager(BaseUserManager):
-    def create_user(self, rut, div, password=None):
-        if not rut:
-            raise ValueError('El RUT es obligatorio')
-        user = self.model(rut=rut, div=div)
+    def create_user(self, correo, password=None):
+        if not correo:
+            raise ValueError('El correo es obligatorio')
+        user = self.model(correo=correo)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, rut, div, password=None):
-        user = self.create_user(rut=rut, div=div, password=password)
+    def create_superuser(self, correo, password=None):
+        user = self.create_user(correo=correo, password=password)
         user.is_admin = True
         user.save(using=self._db)
         return user
 
-class AuthUser(AbstractBaseUser):
-    rut = models.CharField(max_length=10, unique=True)  # RUT sin dígito verificador
-    div = models.CharField(max_length=1)  # Dígito verificador
+class AuthUser(AbstractBaseUser, PermissionsMixin):
+    rut = models.CharField(max_length=20, unique=True)
+    div = models.CharField(max_length=1)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
 
-    objects = AuthUserManager()
-
     USERNAME_FIELD = 'rut'
     REQUIRED_FIELDS = ['div']
 
+    objects = AuthUserManager()
+
     def __str__(self):
         return f"{self.rut}-{self.div}"
+
+    def get_full_name(self):
+        return f"{self.rut}-{self.div}"
+
+    def get_short_name(self):
+        return self.rut
 
     @property
     def is_staff(self):
         return self.is_admin
 
-    @property
-    def is_superuser(self):
-        return self.is_admin
-
-    def has_perm(self, perm, obj=None):
-        return self.is_admin
-
-    def has_module_perms(self, app_label):
-        return self.is_admin
-
-    @property
-    def usuario(self):
-        try:
-            return self.usuario_set.get()
-        except Usuario.DoesNotExist:
-            return None
-
-    def get_full_name(self):
-        if self.usuario:
-            return f"{self.usuario.nombre} {self.usuario.apellido_paterno}"
-        return f"{self.rut}-{self.div}"
-
-    def get_short_name(self):
-        if self.usuario:
-            return self.usuario.nombre
-        return f"{self.rut}-{self.div}"
-
-    def get_username(self):
-        return f"{self.rut}-{self.div}"
+    class Meta:
+        verbose_name = 'Usuario'
+        verbose_name_plural = 'Usuarios'
 
 # Modelo base que representa a cualquier tipo de usuario en el sistema
 class Usuario(models.Model):
@@ -189,4 +168,8 @@ class Nota(models.Model):
     fecha_registro = models.DateField(auto_now_add=True)  # Fecha de ingreso de la nota
 
     def __str__(self):
+<<<<<<< Updated upstream
         return f'{self.estudiante.usuario} - {self.tipo_evaluacion} - {self.nota}'
+=======
+        return f'{self.estudiante.usuario} - {self.tipo_evaluacion} - {self.nota}'
+>>>>>>> Stashed changes

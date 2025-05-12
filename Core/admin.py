@@ -1,62 +1,30 @@
 from django.contrib import admin
-from .models import Usuario, Administrativo, Docente, Estudiante, Asistencia, Calendario, Clase, Foro, Nota
+from django.contrib.auth.admin import UserAdmin
+from .models import AuthUser, Usuario, Administrativo, Docente, Estudiante, Asistencia, Calendario, Clase, Foro, Nota
 
-@admin.register(Usuario)
-class UsuarioAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'correo', 'telefono')
-    list_filter = ('fecha_creacion',)
-    search_fields = ('nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'correo')
+class AuthUserAdmin(UserAdmin):
+    list_display = ('rut', 'div', 'is_active', 'is_admin', 'date_joined')
+    list_filter = ('is_active', 'is_admin')
+    search_fields = ('rut',)
+    ordering = ('rut',)
     fieldsets = (
-        ('Información Personal', {
-            'fields': ('nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'div', 'fecha_nacimiento')
-        }),
-        ('Información de Contacto', {
-            'fields': ('correo', 'telefono', 'direccion')
-        }),
+        (None, {'fields': ('rut', 'div', 'password')}),
+        ('Permisos', {'fields': ('is_active', 'is_admin', 'groups', 'user_permissions')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('rut', 'div', 'password1', 'password2', 'is_active', 'is_admin')}
+        ),
     )
 
-@admin.register(Administrativo)
-class AdministrativoAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'rol')
-    list_filter = ('rol',)
-    search_fields = ('usuario__nombre', 'usuario__apellido_paterno')
-
-@admin.register(Docente)
-class DocenteAdmin(admin.ModelAdmin):
-    list_display = ('usuario',)
-    search_fields = ('usuario__nombre', 'usuario__apellido_paterno')
-
-@admin.register(Estudiante)
-class EstudianteAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'contacto_emergencia')
-    search_fields = ('usuario__nombre', 'usuario__apellido_paterno')
-
-@admin.register(Asistencia)
-class AsistenciaAdmin(admin.ModelAdmin):
-    list_display = ('estudiante', 'fecha', 'estado', 'hora_registro')
-    list_filter = ('estado', 'fecha')
-    search_fields = ('estudiante__usuario__nombre', 'estudiante__usuario__apellido_paterno')
-
-@admin.register(Calendario)
-class CalendarioAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'tipo_evento', 'fecha_inicio', 'fecha_fin')
-    list_filter = ('tipo_evento', 'fecha_inicio')
-    search_fields = ('titulo', 'descripcion')
-
-@admin.register(Clase)
-class ClaseAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'docente', 'fecha', 'hora_inicio', 'hora_fin')
-    list_filter = ('fecha', 'docente')
-    search_fields = ('titulo', 'descripcion', 'docente__usuario__nombre')
-
-@admin.register(Foro)
-class ForoAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'autor', 'fecha_publicacion')
-    list_filter = ('fecha_publicacion',)
-    search_fields = ('titulo', 'contenido', 'autor__nombre')
-
-@admin.register(Nota)
-class NotaAdmin(admin.ModelAdmin):
-    list_display = ('estudiante', 'docente', 'tipo_evaluacion', 'nota', 'fecha_registro')
-    list_filter = ('tipo_evaluacion', 'fecha_registro')
-    search_fields = ('estudiante__usuario__nombre', 'docente__usuario__nombre', 'descripcion')
+admin.site.register(AuthUser, AuthUserAdmin)
+admin.site.register(Usuario)
+admin.site.register(Administrativo)
+admin.site.register(Docente)
+admin.site.register(Estudiante)
+admin.site.register(Asistencia)
+admin.site.register(Calendario)
+admin.site.register(Clase)
+admin.site.register(Foro)
+admin.site.register(Nota)

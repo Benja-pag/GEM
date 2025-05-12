@@ -38,15 +38,15 @@ class AdminPanelView(View):
             total_estudiantes = Usuario.objects.filter(estudiante__isnull=False).count()
             total_profesores = Usuario.objects.filter(docente__isnull=False).count()
             total_clases = Clase.objects.count()
-            # Obtener usuarios recientes
-            usuarios_recientes = Usuario.objects.all().order_by('-fecha_creacion')[:10]
+            # Obtener usuarios
+            usuarios = Usuario.objects.all().order_by('-fecha_creacion')
             # Obtener clases activas
             clases = Clase.objects.all().order_by('fecha', 'hora_inicio')[:10]
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
                 'total_clases': total_clases,
-                'usuarios_recientes': usuarios_recientes,
+                'usuarios': usuarios,
                 'clases': clases,
                 'now': timezone.now(),
             }
@@ -127,13 +127,12 @@ class UserManagementView(View):
             messages.error(request, 'No tienes permiso para acceder a esta página')
             return redirect('home')
         
-        usuarios = Usuario.objects.all().order_by('-fecha_creacion')
+        users = Usuario.objects.all().order_by('-fecha_creacion')
         context = {
-            'usuarios': usuarios,
+            'users': users,
             'total_estudiantes': Usuario.objects.filter(estudiante__isnull=False).count(),
             'total_profesores': Usuario.objects.filter(docente__isnull=False).count(),
             'total_clases': Clase.objects.count(),
-            'usuarios_recientes': usuarios[:10],
             'clases': Clase.objects.all().order_by('fecha', 'hora_inicio')[:10],
             'now': timezone.now(),
         }
@@ -241,17 +240,15 @@ class UserDetailView(View):
                         'fecha_nacimiento': user.fecha_nacimiento
                     }
                 })
-            return render(request, 'user_form.html', {'user': user})
+            return redirect('admin_panel')
         except Exception as e:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'error': str(e)})
             messages.error(request, str(e))
-            return redirect('user_list')
+            return redirect('admin_panel')
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserUpdateView(View):
-    template_name = 'user_form.html'
-
     def get(self, request, user_id):
         try:
             user = get_object_or_404(Usuario, id=user_id)
@@ -271,12 +268,12 @@ class UserUpdateView(View):
                         'fecha_nacimiento': user.fecha_nacimiento
                     }
                 })
-            return render(request, self.template_name, {'user': user})
+            return redirect('admin_panel')
         except Exception as e:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'error': str(e)})
             messages.error(request, str(e))
-            return redirect('user_list')
+            return redirect('admin_panel')
 
     def post(self, request, user_id):
         try:
@@ -292,39 +289,49 @@ class UserUpdateView(View):
             user.fecha_nacimiento = request.POST.get('fecha_nacimiento')
             user.save()
             
-            return JsonResponse({'success': True})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-
-@method_decorator(csrf_exempt, name='dispatch')
-class UserDeleteView(View):
-    def get(self, request, user_id):
-        try:
-            user = get_object_or_404(Usuario, id=user_id)
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': True,
-                    'user': {
-                        'id': user.id,
-                        'nombre': user.nombre,
-                        'apellido_paterno': user.apellido_paterno,
-                        'apellido_materno': user.apellido_materno
-                    }
-                })
-            return render(request, 'user_confirm_delete.html', {'user': user})
+                return JsonResponse({'success': True})
+            messages.success(request, 'Usuario actualizado exitosamente')
+            return redirect('admin_panel')
         except Exception as e:
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'error': str(e)})
             messages.error(request, str(e))
-            return redirect('user_list')
+            return redirect('admin_panel')
 
+@method_decorator(csrf_exempt, name='dispatch')
+class UserDeleteView(View):
     def post(self, request, user_id):
         try:
-            user = get_object_or_404(Usuario, id=user_id)
-            user.delete()
-            return JsonResponse({'success': True})
+            usuario = get_object_or_404(Usuario, id=user_id)
+            
+            # Verificar si es un administrador máximo
+            if hasattr(usuario, 'administrativo') and usuario.administrativo.rol == 'ADMINISTRADOR':
+                # Contar cuántos administradores máximos hay
+                total_admins = Administrativo.objects.filter(rol='ADMINISTRADOR').count()
+                
+                # Si es el único administrador máximo, no permitir eliminarlo
+                if total_admins <= 1:
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'success': False, 
+                            'error': 'No se puede eliminar el último administrador máximo. Debe haber al menos un administrador máximo en el sistema.'
+                        })
+                    messages.error(request, 'No se puede eliminar el último administrador máximo. Debe haber al menos un administrador máximo en el sistema.')
+                    return redirect('admin_panel')
+            
+            # Si no es el último administrador máximo o no es administrador, proceder con la eliminación
+            usuario.delete()
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            messages.success(request, 'Usuario eliminado exitosamente')
+            return redirect('admin_panel')
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': str(e)})
+            messages.error(request, str(e))
+            return redirect('admin_panel')
 
 @method_decorator(login_required, name='dispatch')
 class ProfesorPanelView(View):
@@ -605,11 +612,13 @@ class UserToggleStatusView(View):
                 return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
             
             usuario = get_object_or_404(Usuario, id=user_id)
-            is_active = request.POST.get('is_active') == 'true'
-            
-            usuario.auth_user.is_active = is_active
+            # Invertir el estado actual
+            usuario.auth_user.is_active = not usuario.auth_user.is_active
             usuario.auth_user.save()
             
-            return JsonResponse({'success': True})
+            return JsonResponse({
+                'success': True,
+                'is_active': usuario.auth_user.is_active
+            })
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})

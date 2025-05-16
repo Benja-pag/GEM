@@ -47,6 +47,9 @@
                     </p>
                 </div>
                 <div class="btn-toolbar mb-2 mb-md-0">
+                    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#crearUsuarioModal">
+                        <i class="fas fa-user-plus me-2"></i> Crear Usuario
+                    </button>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-outline-danger">
@@ -85,100 +88,144 @@
                 </div>
             </div>
 
-            <!-- Formulario de Creación de Administrador -->
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Crear Nuevo Administrador</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="post">
-                            {% csrf_token %}
-                            
-                            {% if messages %}
-                            <div class="messages">
-                                {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <!-- Modal de Creación de Usuario -->
+            <div class="modal fade" id="crearUsuarioModal" tabindex="-1" aria-labelledby="crearUsuarioModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="crearUsuarioModalLabel">Crear Nuevo Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                {% if messages %}
+                                <div class="messages">
+                                    {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                    {% endfor %}
                                 </div>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
+                                {% endif %}
 
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <label for="nombre" class="form-label">Nombre</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                <!-- Campos básicos del modelo Usuario -->
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label for="nombre" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="apellido_paterno" class="form-label">Apellido Paterno</label>
+                                        <input type="text" class="form-control" id="apellido_paterno" name="apellido_paterno" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="apellido_materno" class="form-label">Apellido Materno</label>
+                                        <input type="text" class="form-control" id="apellido_materno" name="apellido_materno" required>
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <label for="apellido_paterno" class="form-label">Apellido Paterno</label>
-                                    <input type="text" class="form-control" id="apellido_paterno" name="apellido_paterno" required>
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="apellido_materno" class="form-label">Apellido Materno</label>
-                                    <input type="text" class="form-control" id="apellido_materno" name="apellido_materno" required>
-                                </div>
-                            </div>
 
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="rut" class="form-label">RUT</label>
-                                    <input type="text" class="form-control" id="rut" name="rut" required>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="rut" class="form-label">RUT</label>
+                                        <input type="text" class="form-control" id="rut" name="rut" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="div" class="form-label">Dígito Verificador</label>
+                                        <input type="text" class="form-control" id="div" name="div" maxlength="1" required>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="div" class="form-label">Dígito Verificador</label>
-                                    <input type="text" class="form-control" id="div" name="div" maxlength="1" required>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="correo" class="form-label">Correo Electrónico</label>
+                                        <input type="email" class="form-control" id="correo" name="correo" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="telefono" class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="correo" class="form-label">Correo Electrónico</label>
-                                    <input type="email" class="form-control" id="correo" name="correo" required>
+                                <div class="mb-3">
+                                    <label for="direccion" class="form-label">Dirección</label>
+                                    <textarea class="form-control" id="direccion" name="direccion" rows="2" required></textarea>
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="telefono" class="form-label">Teléfono</label>
-                                    <input type="tel" class="form-control" id="telefono" name="telefono">
+
+                                <div class="mb-3">
+                                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
                                 </div>
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="direccion" class="form-label">Dirección</label>
-                                <input type="text" class="form-control" id="direccion" name="direccion">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento">
-                            </div>
-
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="password" class="form-label">Contraseña</label>
-                                    <input type="password" class="form-control" id="password" name="password" required>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="password" class="form-label">Contraseña</label>
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
+                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
-                                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+
+                                <div class="mb-3">
+                                    <label for="tipo_usuario" class="form-label">Tipo de Usuario</label>
+                                    <select class="form-select" id="tipo_usuario" name="tipo_usuario" required>
+                                        <option value="">Seleccione un tipo de usuario</option>
+                                        <option value="ESTUDIANTE">Estudiante</option>
+                                        <option value="PROFESOR">Profesor</option>
+                                        <option value="ADMINISTRADOR">Administrador</option>
+                                        <option value="ADMINISTRADOR_MAXIMO">Administrador Máximo</option>
+                                    </select>
                                 </div>
-                            </div>
 
-                            <div class="mb-3">
-                                <label for="rol" class="form-label">Rol</label>
-                                <select class="form-select" id="rol" name="rol">
-                                    <option value="ADMINISTRADOR">Administrador</option>
-                                    <option value="SUPERVISOR">Supervisor</option>
-                                </select>
-                            </div>
+                                <!-- Campos específicos por tipo de usuario -->
+                                <div id="campos_estudiante" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="contacto_emergencia" class="form-label">Contacto de Emergencia</label>
+                                        <input type="text" class="form-control" id="contacto_emergencia" name="contacto_emergencia">
+                                    </div>
+                                </div>
 
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Crear Administrador</button>
-                            </div>
-                        </form>
+                                <div id="campos_administrativo" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="rol_administrativo" class="form-label">Rol Administrativo</label>
+                                        <select class="form-select" id="rol_administrativo" name="rol_administrativo">
+                                            <option value="ADMINISTRADOR">Administrador</option>
+                                            <option value="ADMINISTRADOR_MAXIMO">Administrador Máximo</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <script>
+                document.getElementById('tipo_usuario').addEventListener('change', function() {
+                    const tipoUsuario = this.value;
+                    const camposEstudiante = document.getElementById('campos_estudiante');
+                    const camposAdministrativo = document.getElementById('campos_administrativo');
+                    
+                    // Ocultar todos los campos específicos primero
+                    camposEstudiante.style.display = 'none';
+                    camposAdministrativo.style.display = 'none';
+                    
+                    // Mostrar los campos correspondientes según el tipo de usuario
+                    if (tipoUsuario === 'ESTUDIANTE') {
+                        camposEstudiante.style.display = 'block';
+                    } else if (tipoUsuario === 'ADMINISTRADOR' || tipoUsuario === 'ADMINISTRADOR_MAXIMO') {
+                        camposAdministrativo.style.display = 'block';
+                    }
+                });
+            </script>
 
             <!-- Lista de Usuarios Recientes -->
             <div class="card mb-4">
@@ -219,9 +266,9 @@
                                             <a href="{% url 'user_detail' usuario.id %}" class="btn btn-info btn-sm" title="Ver detalles">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{% url 'user_update' usuario.id %}" class="btn btn-warning btn-sm" title="Editar">
+                                            <button type="button" class="btn btn-warning btn-sm edit-user" data-user-id="{{ usuario.id }}" title="Editar">
                                                 <i class="fas fa-edit"></i>
-                                            </a>
+                                            </button>
                                             <button class="btn btn-sm toggle-user-status {% if usuario.auth_user.is_active %}btn-success{% else %}btn-danger{% endif %}" 
                                                     data-user-id="{{ usuario.id }}" 
                                                     data-is-active="{{ usuario.auth_user.is_active|lower }}"
@@ -285,6 +332,104 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal de Edición de Usuario -->
+            <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editUserModalLabel">Editar Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editUserForm">
+                                <input type="hidden" id="edit-user-id" name="user_id">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="edit-nombre" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="edit-nombre" name="nombre" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="edit-apellido-paterno" class="form-label">Apellido Paterno</label>
+                                        <input type="text" class="form-control" id="edit-apellido-paterno" name="apellido_paterno" required>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="edit-apellido-materno" class="form-label">Apellido Materno</label>
+                                        <input type="text" class="form-control" id="edit-apellido-materno" name="apellido_materno" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="edit-rut" class="form-label">RUT</label>
+                                        <input type="text" class="form-control" id="edit-rut" name="rut" required>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <label for="edit-div" class="form-label">DV</label>
+                                        <input type="text" class="form-control" id="edit-div" name="div" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="edit-correo" class="form-label">Correo Electrónico</label>
+                                        <input type="email" class="form-control" id="edit-correo" name="correo" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="edit-telefono" class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-control" id="edit-telefono" name="telefono" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="edit-fecha-nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                        <input type="date" class="form-control" id="edit-fecha-nacimiento" name="fecha_nacimiento" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-direccion" class="form-label">Dirección</label>
+                                    <textarea class="form-control" id="edit-direccion" name="direccion" rows="2" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-tipo-usuario" class="form-label">Tipo de Usuario</label>
+                                    <select class="form-select" id="edit-tipo-usuario" name="tipo_usuario" required>
+                                        <option value="">Seleccione un tipo</option>
+                                        <option value="estudiante">Estudiante</option>
+                                        <option value="docente">Docente</option>
+                                        <option value="administrativo">Administrador</option>
+                                    </select>
+                                </div>
+                                <!-- Campos específicos para estudiantes -->
+                                <div class="estudiante-fields" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="edit-contacto-emergencia" class="form-label">Contacto de Emergencia</label>
+                                        <input type="text" class="form-control" id="edit-contacto-emergencia" name="contacto_emergencia">
+                                    </div>
+                                </div>
+                                <!-- Campos específicos para administrativos -->
+                                <div class="administrativo-fields" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="edit-rol-administrativo" class="form-label">Rol Administrativo</label>
+                                        <select class="form-select" id="edit-rol-administrativo" name="rol_administrativo">
+                                            <option value="">Seleccione un rol</option>
+                                            <option value="secretaria">Secretaría</option>
+                                            <option value="coordinador">Coordinador</option>
+                                            <option value="director">Director</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" form="editUserForm" class="btn btn-primary">Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scripts -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script src="{% static 'js/user_actions.js' %}"></script>
+            <script src="{% static 'js/user_edit.js' %}"></script>
             {% endif %}
         </main>
     </div>
@@ -336,138 +481,8 @@
 
 {% block extra_js %}
 <script>
-    $(document).ready(function() {
-        // Obtener el token CSRF
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        const csrftoken = getCookie('csrftoken');
-
-        // Configurar AJAX para incluir el token CSRF
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                }
-            }
-        });
-
-        // Manejar el cambio de estado de usuario
-        $('.toggle-user-status').click(function() {
-            const userId = $(this).data('user-id');
-            const button = $(this);
-            const statusCell = button.closest('tr').find('td:nth-child(5)');
-
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: '¿Quieres cambiar el estado de este usuario?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, cambiar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/users/${userId}/toggle_status/`,
-                        type: 'POST',
-                        success: function(response) {
-                            if (response.success) {
-                                // Actualizar el botón y el estado en la tabla
-                                if (response.is_active) {
-                                    button.removeClass('btn-danger').addClass('btn-success');
-                                    button.find('i').removeClass('fa-user-slash').addClass('fa-user-check');
-                                    statusCell.text('Activo');
-                                } else {
-                                    button.removeClass('btn-success').addClass('btn-danger');
-                                    button.find('i').removeClass('fa-user-check').addClass('fa-user-slash');
-                                    statusCell.text('Inactivo');
-                                }
-                                // Actualizar el atributo data-is-active
-                                button.data('is-active', response.is_active.toString());
-
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: '¡Éxito!',
-                                    text: `Usuario ${response.is_active ? 'activado' : 'desactivado'} exitosamente`
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: response.error || 'No se pudo cambiar el estado del usuario'
-                                });
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Error al cambiar el estado del usuario: ' + error
-                            });
-                        }
-                    });
-                }
-            });
-        });
-
-        // Manejar la eliminación de usuarios
-        $('.delete-user').on('click', function() {
-            const userId = $(this).data('user-id');
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "Esta acción no se puede deshacer",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `/users/${userId}/delete/`,
-                        type: 'POST',
-                        success: function(response) {
-                            if (response.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: '¡Éxito!',
-                                    text: 'Usuario eliminado exitosamente'
-                                }).then(() => {
-                                    location.reload();
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: response.error
-                                });
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Error al eliminar el usuario: ' + error
-                            });
-                        }
-                    });
-                }
-            });
-        });
-    });
+    // Agregar el atributo data-is-admin al body
+    document.body.setAttribute('data-is-admin', '{% if user.is_admin %}true{% else %}false{% endif %}');
 </script>
+<script src="{% static 'js/user_management.js' %}"></script>
 {% endblock %}

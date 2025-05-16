@@ -72,30 +72,37 @@ class AdminPanelView(View):
             fecha_nacimiento = request.POST.get('fecha_nacimiento')
             password = request.POST.get('password')
             confirm_password = request.POST.get('confirm_password')
-            rol = request.POST.get('rol', 'ADMINISTRATIVO')
+            tipo_usuario = request.POST.get('tipo_usuario')
+            rol_administrativo = request.POST.get('rol_administrativo')
+
             # Validar campos requeridos
-            if not all([nombre, apellido_paterno, apellido_materno, rut, div, correo, password, confirm_password]):
+            if not all([nombre, apellido_paterno, apellido_materno, rut, div, correo, password, confirm_password, tipo_usuario]):
                 messages.error(request, 'Por favor complete todos los campos requeridos')
                 return redirect('admin_panel')
+
             # Validar contraseñas
             if password != confirm_password:
                 messages.error(request, 'Las contraseñas no coinciden')
                 return redirect('admin_panel')
+
             # Verificar si el RUT ya existe
             if Usuario.objects.filter(rut=rut).exists():
                 messages.error(request, 'El RUT ya está registrado')
                 return redirect('admin_panel')
+
             # Verificar si el correo ya existe
             if Usuario.objects.filter(correo=correo).exists():
                 messages.error(request, 'El correo ya está registrado')
                 return redirect('admin_panel')
-            # Crear usuario de autenticación con permisos de administrador
+
+            # Crear usuario de autenticación
             auth_user = AuthUser.objects.create(
                 rut=rut,
                 div=div,
                 password=make_password(password),
-                is_admin=True
+                is_admin=(tipo_usuario in ['ADMINISTRADOR', 'ADMINISTRADOR_MAXIMO'])
             )
+
             # Crear usuario
             usuario = Usuario.objects.create(
                 nombre=nombre,
@@ -109,15 +116,31 @@ class AdminPanelView(View):
                 fecha_nacimiento=fecha_nacimiento,
                 auth_user=auth_user
             )
-            # Crear administrativo
-            Administrativo.objects.create(
-                usuario=usuario,
-                rol=rol
-            )
-            messages.success(request, 'Administrador creado exitosamente')
+
+            # Crear el tipo de usuario correspondiente
+            if tipo_usuario == 'ESTUDIANTE':
+                contacto_emergencia = request.POST.get('contacto_emergencia')
+                if not contacto_emergencia:
+                    messages.error(request, 'El contacto de emergencia es requerido para estudiantes')
+                    usuario.delete()
+                    auth_user.delete()
+                    return redirect('admin_panel')
+                Estudiante.objects.create(
+                    usuario=usuario,
+                    contacto_emergencia=contacto_emergencia
+                )
+            elif tipo_usuario == 'PROFESOR':
+                Docente.objects.create(usuario=usuario)
+            elif tipo_usuario in ['ADMINISTRADOR', 'ADMINISTRADOR_MAXIMO']:
+                Administrativo.objects.create(
+                    usuario=usuario,
+                    rol=rol_administrativo or tipo_usuario
+                )
+
+            messages.success(request, f'Usuario {tipo_usuario.lower()} creado exitosamente')
             return redirect('admin_panel')
         except Exception as e:
-            messages.error(request, f'Error al crear administrador: {str(e)}')
+            messages.error(request, f'Error al crear usuario: {str(e)}')
             return redirect('admin_panel')
 
 @method_decorator(login_required, name='dispatch')
@@ -620,5 +643,126 @@ class UserToggleStatusView(View):
                 'success': True,
                 'is_active': usuario.auth_user.is_active
             })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator(csrf_exempt, name='dispatch')
+class UserDataView(View):
+    def get(self, request, user_id):
+        try:
+            # Separar el RUT y el dígito verificador
+            rut_parts = user_id.split('-')
+            if len(rut_parts) != 2:
+                return JsonResponse({'success': False, 'error': 'Formato de RUT inválido'})
+            
+            rut = rut_parts[0]
+            div = rut_parts[1]
+            
+            usuario = get_object_or_404(Usuario, rut=rut, div=div)
+            data = {
+                'success': True,
+                'data': {
+                    'nombre': usuario.nombre,
+                    'apellido_paterno': usuario.apellido_paterno,
+                    'apellido_materno': usuario.apellido_materno,
+                    'rut': usuario.rut,
+                    'div': usuario.div,
+                    'correo': usuario.correo,
+                    'telefono': usuario.telefono,
+                    'direccion': usuario.direccion,
+                    'fecha_nacimiento': usuario.fecha_nacimiento.strftime('%Y-%m-%d') if usuario.fecha_nacimiento else None,
+                    'tipo_usuario': 'estudiante' if hasattr(usuario, 'estudiante') else 'docente' if hasattr(usuario, 'docente') else 'administrativo',
+                }
+            }
+            
+            # Agregar datos específicos según el tipo de usuario
+            if hasattr(usuario, 'estudiante'):
+                data['data']['contacto_emergencia'] = usuario.estudiante.contacto_emergencia
+            elif hasattr(usuario, 'administrativo'):
+                data['data']['rol_administrativo'] = usuario.administrativo.rol
+            
+            return JsonResponse(data)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    def post(self, request, user_id):
+        try:
+            # Verificar que el usuario que hace la petición es docente o administrador
+            if not (hasattr(request.user.usuario, 'docente') or hasattr(request.user.usuario, 'administrativo')):
+                return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
+
+            # Separar el RUT y el dígito verificador
+            rut_parts = user_id.split('-')
+            if len(rut_parts) != 2:
+                return JsonResponse({'success': False, 'error': 'Formato de RUT inválido'})
+            
+            rut = rut_parts[0]
+            div = rut_parts[1]
+            
+            usuario = get_object_or_404(Usuario, rut=rut, div=div)
+            
+            # Verificar si el usuario es administrador máximo
+            if hasattr(usuario, 'administrativo') and usuario.administrativo.rol == 'ADMINISTRADOR_MAXIMO':
+                return JsonResponse({'success': False, 'error': 'No se puede modificar un administrador máximo'})
+            
+            # Actualizar datos básicos
+            usuario.nombre = request.POST.get('nombre')
+            usuario.apellido_paterno = request.POST.get('apellido_paterno')
+            usuario.apellido_materno = request.POST.get('apellido_materno')
+            usuario.rut = request.POST.get('rut')
+            usuario.div = request.POST.get('div')
+            usuario.correo = request.POST.get('correo')
+            usuario.telefono = request.POST.get('telefono')
+            usuario.direccion = request.POST.get('direccion')
+            usuario.fecha_nacimiento = request.POST.get('fecha_nacimiento')
+            usuario.save()
+            
+            # Actualizar datos de AuthUser
+            auth_user = usuario.auth_user
+            auth_user.rut = request.POST.get('rut')
+            auth_user.div = request.POST.get('div')
+            auth_user.correo = request.POST.get('correo')
+            auth_user.telefono = request.POST.get('telefono')
+            auth_user.direccion = request.POST.get('direccion')
+            auth_user.fecha_nacimiento = request.POST.get('fecha_nacimiento')
+            auth_user.save()
+            
+            # Manejar cambio de tipo de usuario
+            nuevo_tipo = request.POST.get('tipo_usuario')
+            tipo_actual = 'estudiante' if hasattr(usuario, 'estudiante') else 'docente' if hasattr(usuario, 'docente') else 'administrativo'
+            
+            # Solo permitir cambio de tipo si el usuario que hace la petición es administrador
+            if nuevo_tipo != tipo_actual and hasattr(request.user.usuario, 'administrativo'):
+                # Eliminar el tipo actual
+                if hasattr(usuario, 'estudiante'):
+                    usuario.estudiante.delete()
+                elif hasattr(usuario, 'docente'):
+                    usuario.docente.delete()
+                elif hasattr(usuario, 'administrativo'):
+                    usuario.administrativo.delete()
+                
+                # Crear el nuevo tipo
+                if nuevo_tipo == 'estudiante':
+                    Estudiante.objects.create(
+                        usuario=usuario,
+                        contacto_emergencia=request.POST.get('contacto_emergencia')
+                    )
+                elif nuevo_tipo == 'docente':
+                    Docente.objects.create(usuario=usuario)
+                elif nuevo_tipo == 'administrativo':
+                    Administrativo.objects.create(
+                        usuario=usuario,
+                        rol='ADMINISTRADOR'  # Siempre se crea como administrador normal
+                    )
+            
+            # Actualizar datos específicos según el tipo de usuario
+            if nuevo_tipo == 'estudiante' and hasattr(usuario, 'estudiante'):
+                usuario.estudiante.contacto_emergencia = request.POST.get('contacto_emergencia')
+                usuario.estudiante.save()
+            elif nuevo_tipo == 'administrativo' and hasattr(usuario, 'administrativo'):
+                usuario.administrativo.rol = 'ADMINISTRADOR'  # Siempre se mantiene como administrador normal
+                usuario.administrativo.save()
+            
+            return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})

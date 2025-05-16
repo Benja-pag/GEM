@@ -79,13 +79,18 @@ class Administrativo(models.Model):
         # Retorna el nombre del usuario con el rol legible (no la clave)
         return f'{self.usuario} - {self.get_rol_display()}'
 
-# Modelo para docentes
-class Docente(models.Model):
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)  # Relación uno a uno con Usuario
+class Especialidad(models.Model):
+    nombre = models.CharField(max_length=100)
 
     def __str__(self):
-        return f'Docente: {self.usuario}'  # Representación legible del objeto
+        return self.nombre
+# Modelo para docentes
+class Docente(models.Model):
+    usuario = models.OneToOneField('Usuario', on_delete=models.CASCADE)
+    especialidad = models.ForeignKey('Especialidad', on_delete=models.PROTECT, null=True, blank=True)  # ID de "Ninguna"
 
+    def __str__(self):
+        return f'Docente: {self.usuario} - Especialidad: {self.especialidad}'
 # Modelo para estudiantes
 class Estudiante(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)  # Relación uno a uno con Usuario
@@ -132,18 +137,6 @@ class Calendario(models.Model):
     def __str__(self):
         return f'{self.titulo} ({self.get_tipo_evento_display()}) - {self.fecha_inicio.strftime("%d/%m/%Y %H:%M")}'
 
-class Clase(models.Model):
-    docente = models.ForeignKey(Docente, on_delete=models.CASCADE)  # Quién imparte la clase
-    titulo = models.CharField(max_length=100)  # Título de la clase
-    descripcion = models.TextField(blank=True, null=True)  # Detalle de contenido o temas (opcional)
-    fecha = models.DateField()  # Día en que se realiza la clase
-    hora_inicio = models.TimeField()  # Hora de inicio
-    hora_fin = models.TimeField()  # Hora de término
-    creado_en = models.DateTimeField(auto_now_add=True)  # Fecha en que se registró la clase
-
-    def __str__(self):
-        return f'{self.titulo} - {self.fecha} ({self.docente.usuario.nombre})'
-
 class Foro(models.Model):
     titulo = models.CharField(max_length=150)  # Título del tema o pregunta
     contenido = models.TextField()  # Cuerpo del mensaje o publicación
@@ -171,3 +164,53 @@ class Nota(models.Model):
 
     def __str__(self):
         return f'{self.estudiante.usuario} - {self.tipo_evaluacion} - {self.nota}'
+
+# -------------------------------------
+# ASIGNATURAS, CLASES Y RELACIONES
+# -------------------------------------
+
+class Asignatura(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)  # Ej: Matemáticas, Historia
+    descripcion = models.TextField(blank=True, null=True)  # Opcional
+
+    def __str__(self):
+        return self.nombre
+
+
+class CursoAsignado(models.Model):
+    asignatura = models.ForeignKey(Asignatura, on_delete=models.CASCADE)  # Asignatura base
+    docente = models.ForeignKey(Docente, on_delete=models.PROTECT)  # Profesor a cargo
+    dias = models.CharField(max_length=50)  # Ej: "Lunes, Miércoles"
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    sala = models.CharField(max_length=50, blank=True, null=True)  # Opcional: sala o aula
+
+    def __str__(self):
+        return f'{self.asignatura.nombre} - {self.docente.usuario.nombre}'
+
+
+class Clase(models.Model):
+    curso = models.ForeignKey(CursoAsignado, on_delete=models.CASCADE, related_name='clases', null=True)
+    fecha = models.DateField()
+    descripcion = models.TextField(blank=True, null=True)
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.curso.asignatura.nombre} - {self.fecha}'
+
+class EstudianteAsignatura(models.Model):
+    estudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
+    curso_asignado = models.ForeignKey(CursoAsignado, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('estudiante', 'curso_asignado')
+
+    def __str__(self):
+        return f'{self.estudiante.usuario} inscrito en {self.curso_asignado.asignatura.nombre}'
+class Curso(models.Model):
+    letra = models.CharField(max_length=3, unique=True)  # Por ejemplo: '1A', '2B', etc.
+
+    def __str__(self):
+        return self.letra

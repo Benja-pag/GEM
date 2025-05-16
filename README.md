@@ -20,32 +20,7 @@ HTMLS:
 "test": Evaluaciones o exámenes online.
 
 
-Jesus:
-admin_panel
-login
-password_reset
 
-Ignacio:
-forum
-subjetcs
-class
-[Al precionar una clase en "Subjects" debe mandarte a clase seleccionada]
-
-Benjamin:
-attecendance
-messages
-models.py
-
-
-comando:
-python manage.py runserver (Para iniciar)
-python manage.py migrate
-cls (limpiar la terminal)
-python manage.py makemigrations (pasar tablas a la base de datos)
-
-
-sitios:
-http://localhost:8000/asistencia/
 
 Para crear la base de datos:
 [Primero debes crear tu usuario que sea el por defecto "postgres"]
@@ -54,26 +29,18 @@ Para crear la base de datos:
 [Cuarto ingresar con el usuario]
 [quinto crear la base de datos con este comando "CREATE DATABASE GEM"]
 
-Comando habituales:
+comando django visual estudio:
+cls (limpiar la terminal)
+python manage.py makemigrations (pasar tablas a la base de datos)
+python manage.py migrate (migraciones a la base de datos)
+python create_user.py (llenar la base de datos)
+python manage.py runserver (Para iniciar)
+
+Comando habituales base de datos:
 \c gem (para entrar la base de datos)
+\c postgres (para las base de datos)
 \l (Listar todas las base de datos)
 \dt (para lista las tablas)
-
-otro comando : 
+DROP DATABASE "gem"; (eliminar la base de datos)
+CREATE DATABASE GEM;(Crear la base de datos)
 SELECT * FROM "public"."Core_usuario";
-
-
-Correo: admin@gem.cl
-Contraseña: admin123s
-
-usuario: 
-✅ Usuario administrador creado exitosamente
-✅ Docente Juan Pérez creado con contraseña 'jpérez'
-✅ Docente María González creado con contraseña 'mgonzález'
-✅ Estudiante Luis Ramírez creado con contraseña 'lramírez'
-✅ Estudiante Ana Castillo creado con contraseña 'acastillo'
-✅ Estudiante Carlos Muñoz creado con contraseña 'cmuñoz'
-
-
-Para llenar la base de datos:
-python create_user.py 

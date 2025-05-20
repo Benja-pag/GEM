@@ -50,7 +50,7 @@
                     <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#crearUsuarioModal">
                         <i class="fas fa-user-plus me-2"></i> Crear Usuario
                     </button>
-                    <form method="post" action="{% url 'logout' %}">
+                    <form method="post" action="{% url 'logout' %}" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-outline-danger">
                             <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
@@ -300,10 +300,10 @@
                 </div>
             </div>
 
-            <!-- Clases Activas -->
-            <div class="card">
+            <!-- Cursos Activos -->
+            <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Clases Activas</h5>
+                    <h5 class="card-title mb-0">Cursos Activos</h5>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -329,8 +329,49 @@
                                     </td>
                                     <td>{{ clase.sala|default:"Sin sala asignada" }}</td>
                                     <td>
-                                        <span class="badge bg-success">Activa</span>
+                                        <span class="badge bg-success">Activo</span>
                                     </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Asignaturas -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Asignaturas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Curso</th>
+                                    <th>Profesor</th>
+                                    <th>Día</th>
+                                    <th>Horario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asignatura in asignaturas %}
+                                <tr>
+                                    <td>{{ asignatura.codigo }}</td>
+                                    <td>{{ asignatura.nombre }}</td>
+                                    <td>{{ asignatura.clase.nombre }}</td>
+                                    <td>
+                                        {% if asignatura.docente %}
+                                            {{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }}
+                                        {% else %}
+                                            <span class="text-muted">Sin profesor asignado</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ asignatura.dia }}</td>
+                                    <td>{{ asignatura.horario|time:"H:i" }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

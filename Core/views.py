@@ -41,8 +41,10 @@ class AdminPanelView(View):
             total_cursos = Asignatura.objects.count()  # Total de asignaturas
             # Obtener usuarios
             usuarios = Usuario.objects.all().order_by('-fecha_creacion')
-            # Obtener clases activas
-            clases = Clase.objects.all().order_by('nombre')[:10]
+            # Obtener todas las clases sin límite
+            clases = Clase.objects.all().order_by('nombre')
+            # Obtener todas las asignaturas
+            asignaturas = Asignatura.objects.all().order_by('codigo')
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
@@ -50,6 +52,7 @@ class AdminPanelView(View):
                 'total_cursos': total_cursos,
                 'usuarios': usuarios,
                 'clases': clases,
+                'asignaturas': asignaturas,
                 'now': timezone.now(),
             }
             return render(request, 'admin_panel.html', context)
@@ -422,7 +425,7 @@ def login_view(request):
     return render(request, 'login.html')
 
 class LogoutView(View):
-    def get(self, request):
+    def post(self, request):
         # Limpiar la sesión
         request.session.flush()
         # Cerrar la sesión de Django

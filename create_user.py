@@ -9,7 +9,8 @@ django.setup()
 # Importación de modelos
 from Core.models import (
     AuthUser, Usuario, Administrativo, Docente, Estudiante,
-    Especialidad, Curso, Asignatura, CursoAsignado, Clase, EstudianteAsignatura
+    Especialidad, Clase, Asignatura, ClaseAsignatura, Electivo,
+    InscripcionElectivo, CalendarioClase, CalendarioColegio
 )
 
 # -----------------------------
@@ -54,33 +55,36 @@ print("✅ Especialidades creadas")
 # ------------------------------------
 # Crear usuario administrador primero
 # ------------------------------------
-admin_auth_user = AuthUser.objects.create_user(
-    rut='20120767',
-    div='3',
-    password='admin123'
-)
-admin_auth_user.is_admin = True
-admin_auth_user.save()
+try:
+    admin_auth_user = AuthUser.objects.get(rut='20120767')
+    print('✅ Usuario administrador ya existe')
+except AuthUser.DoesNotExist:
+    admin_auth_user = AuthUser.objects.create_user(
+        rut='20120767',
+        div='3',
+        password='admin123'
+    )
+    admin_auth_user.is_admin = True
+    admin_auth_user.save()
 
-admin_usuario = Usuario.objects.create(
-    nombre='Admin',
-    apellido_paterno='Sistema',
-    apellido_materno='GEM',
-    rut='20120767',
-    div='3',
-    correo='admin@gem.cl',
-    telefono='123456789',
-    direccion='Dirección Admin',
-    fecha_nacimiento=date(1990, 1, 1),
-    auth_user=admin_auth_user
-)
+    admin_usuario = Usuario.objects.create(
+        nombre='Admin',
+        apellido_paterno='Sistema',
+        apellido_materno='GEM',
+        rut='20120767',
+        div='3',
+        correo='admin@gem.cl',
+        telefono='123456789',
+        direccion='Dirección Admin',
+        fecha_nacimiento=date(1990, 1, 1),
+        auth_user=admin_auth_user
+    )
 
-Administrativo.objects.create(
-    usuario=admin_usuario,
-    rol='ADMINISTRADOR'
-)
-
-print('✅ Usuario administrador creado exitosamente')
+    Administrativo.objects.create(
+        usuario=admin_usuario,
+        rol='ADMINISTRADOR'
+    )
+    print('✅ Usuario administrador creado exitosamente')
 
 # -----------------------------
 # Crear cursos directamente
@@ -89,7 +93,7 @@ cursos_nombres = ['1A', '1B', '1C', '1D', '2A', '2B', '2C', '2D', '3A', '3B', '3
 
 cursos = []
 for nombre in cursos_nombres:
-    curso, created = Curso.objects.get_or_create(letra=nombre)
+    curso, created = Clase.objects.get_or_create(nombre=nombre)
     cursos.append(curso)
 
 print("✅ Cursos creados")
@@ -247,50 +251,107 @@ for data in docentes_data:
 # Crear asignaturas
 # -----------------------------
 asignaturas_info = [
-    # Asignaturas base
-    'Matemáticas', 'Lenguaje y Comunicación', 'Historia y Geografía',
-    'Biología', 'Física', 'Química', 'Inglés', 'Educación Física',
-    'Arte', 'Tecnología',
-
-    # Versiones simplificadas
-    "Ninguna", "Matematicas", "Lenguaje", "Historia", "Biologia", "Fisica",
-    "Quimica", "Ingles", "Educación Fisica", "Arte", "Tecnologia",
-
-    # Electivos para una Escuela Humanista
-    "Filosofía y Ética",
-    "Literatura y Escritura Creativa",
-    "Historia del Arte y Cultura",
-    "Psicología y Desarrollo Humano",
-    "Sociología y Estudios Sociales",
-    "Teatro y Expresión Corporal",
-    "Música y Composición",
-    "Taller de Debate y Oratoria",
-    "Educación Ambiental y Sostenibilidad",
-    "Derechos Humanos y Ciudadanía",
-
-    # Electivos para una Escuela Científica
-    "Biología Avanzada",
-    "Química Experimental",
-    "Física Aplicada",
-    "Matemáticas Discretas",
-    "Programación y Robótica",
-    "Astronomía y Ciencias del Espacio",
-    "Investigación Científica y Método Experimental",
-    "Tecnología e Innovación",
-    "Ciencias de la Tierra y Medio Ambiente",
-    "Estadística y Análisis de Datos"
+    # Asignaturas base con sus detalles
+    {
+        'nombre': 'Matemáticas',
+        'codigo': 'MAT001',
+        'dia': 'Lunes',
+        'horario': time(8, 0),
+        'docente': docentes[1],  # El docente de matemáticas
+        'clase': cursos[0]  # Primera clase
+    },
+    {
+        'nombre': 'Lenguaje y Comunicación',
+        'codigo': 'LEN001',
+        'dia': 'Martes',
+        'horario': time(8, 0),
+        'docente': docentes[2],  # El docente de lenguaje
+        'clase': cursos[0]
+    },
+    {
+        'nombre': 'Historia y Geografía',
+        'codigo': 'HIS001',
+        'dia': 'Miércoles',
+        'horario': time(8, 0),
+        'docente': docentes[3],  # El docente de historia
+        'clase': cursos[0]
+    },
+    {
+        'nombre': 'Biología',
+        'codigo': 'BIO001',
+        'dia': 'Jueves',
+        'horario': time(8, 0),
+        'docente': docentes[4],  # El docente de biología
+        'clase': cursos[0]
+    },
+    {
+        'nombre': 'Física',
+        'codigo': 'FIS001',
+        'dia': 'Viernes',
+        'horario': time(8, 0),
+        'docente': docentes[5],  # El docente de física
+        'clase': cursos[0]
+    },
+    {
+        'nombre': 'Química',
+        'codigo': 'QUI001',
+        'dia': 'Lunes',
+        'horario': time(9, 30),
+        'docente': docentes[6],  # El docente de química
+        'clase': cursos[0]
+    },
+    {
+        'nombre': 'Inglés',
+        'codigo': 'ING001',
+        'dia': 'Martes',
+        'horario': time(9, 30),
+        'docente': docentes[7],  # El docente de inglés
+        'clase': cursos[0]
+    },
+    {
+        'nombre': 'Educación Física',
+        'codigo': 'EDF001',
+        'dia': 'Miércoles',
+        'horario': time(9, 30),
+        'docente': docentes[8],  # El docente de educación física
+        'clase': cursos[0]
+    },
+    {
+        'nombre': 'Arte',
+        'codigo': 'ART001',
+        'dia': 'Jueves',
+        'horario': time(9, 30),
+        'docente': docentes[9],  # El docente de arte
+        'clase': cursos[0]
+    },
+    {
+        'nombre': 'Tecnología',
+        'codigo': 'TEC001',
+        'dia': 'Viernes',
+        'horario': time(9, 30),
+        'docente': docentes[10],  # El docente de tecnología
+        'clase': cursos[0]
+    }
 ]
 
-
 asignaturas = []
-for nombre in asignaturas_info:
-    asignatura, created = Asignatura.objects.get_or_create(nombre=nombre)
+for info in asignaturas_info:
+    asignatura, created = Asignatura.objects.get_or_create(
+        nombre=info['nombre'],
+        defaults={
+            'codigo': info['codigo'],
+            'dia': info['dia'],
+            'horario': info['horario'],
+            'docente': info['docente'],
+            'clase': info['clase']
+        }
+    )
     asignaturas.append(asignatura)
 
 print("✅ Asignaturas creadas")
 
 # -----------------------------
-# Asignar asignaturas a docentes (CursoAsignado)
+# Asignar asignaturas a docentes (ClaseAsignatura)
 # -----------------------------
 dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
 hora_inicio = time(8, 0)
@@ -301,33 +362,20 @@ for curso in cursos:
         asignatura = asignaturas[(cursos.index(curso) + i) % len(asignaturas)]
         docente = docentes[(cursos.index(curso) + i) % len(docentes)]
         dia_asignado = dias[i % len(dias)]
-        CursoAsignado.objects.get_or_create(
-            asignatura=asignatura,
+        ClaseAsignatura.objects.get_or_create(
             docente=docente,
-            dias=dia_asignado,
+            asignatura=asignatura,
             hora_inicio=hora_inicio,
             hora_fin=hora_fin,
-            sala=f"Sala {cursos.index(curso)+1}"
+            dia=dia_asignado,
+            curso=curso.nombre
         )
 
-print("✅ CursoAsignado creado con asignaturas y docentes")
+print("✅ ClaseAsignatura creado con asignaturas y docentes")
 
 # -----------------------------
-# Crear clases para cada CursoAsignado
+# Crear estudiantes
 # -----------------------------
-curso_asignados = CursoAsignado.objects.all()
-for ca in curso_asignados:
-    Clase.objects.get_or_create(
-        curso=ca,
-        fecha=date.today(),
-        descripcion="Clase inicial",
-        hora_inicio=ca.hora_inicio,
-        hora_fin=ca.hora_fin
-    )
-
-print("✅ Clases creadas")
-
-
 estudiantes_data = [
     {
         'rut': '34567890', 'div': 'K',
@@ -335,7 +383,7 @@ estudiantes_data = [
         'correo': 'luis.ramirez@gem.cl', 'telefono': '333333333',
         'direccion': 'Pje. Los Robles 45', 'fecha_nacimiento': date(2008, 3, 15),
         'contacto_emergencia': 'Mamá: 999999999',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '12345678', 'div': '9',
@@ -343,7 +391,7 @@ estudiantes_data = [
         'correo': 'ana.gonzalez@gem.cl', 'telefono': '912345678',
         'direccion': 'Av. Libertad 123', 'fecha_nacimiento': date(2005, 7, 20),
         'contacto_emergencia': 'Papá: 998877665',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '23456789', 'div': '1',
@@ -351,7 +399,7 @@ estudiantes_data = [
         'correo': 'carlos.vargas@gem.cl', 'telefono': '923456789',
         'direccion': 'Calle Falsa 742', 'fecha_nacimiento': date(2007, 11, 5),
         'contacto_emergencia': 'Hermano: 987654321',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '34567901', 'div': '2',
@@ -359,7 +407,7 @@ estudiantes_data = [
         'correo': 'maria.lopez@gem.cl', 'telefono': '934567890',
         'direccion': 'Pasaje Luna 10', 'fecha_nacimiento': date(2006, 1, 10),
         'contacto_emergencia': 'Tía: 976543210',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '45678902', 'div': '3',
@@ -367,7 +415,7 @@ estudiantes_data = [
         'correo': 'jorge.torres@gem.cl', 'telefono': '945678901',
         'direccion': 'Av. Las Flores 55', 'fecha_nacimiento': date(2004, 5, 25),
         'contacto_emergencia': 'Mamá: 965432109',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '56789012', 'div': '4',
@@ -375,7 +423,7 @@ estudiantes_data = [
         'correo': 'valentina.rivas@gem.cl', 'telefono': '956789012',
         'direccion': 'Calle Sol 200', 'fecha_nacimiento': date(2008, 9, 30),
         'contacto_emergencia': 'Papá: 954321098',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '67890123', 'div': '5',
@@ -383,7 +431,7 @@ estudiantes_data = [
         'correo': 'sebastian.mendoza@gem.cl', 'telefono': '967890123',
         'direccion': 'Av. Las Palmas 77', 'fecha_nacimiento': date(2005, 12, 1),
         'contacto_emergencia': 'Mamá: 943210987',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '78901234', 'div': '6',
@@ -391,7 +439,7 @@ estudiantes_data = [
         'correo': 'camila.fuentes@gem.cl', 'telefono': '978901234',
         'direccion': 'Pje. La Reina 88', 'fecha_nacimiento': date(2007, 3, 14),
         'contacto_emergencia': 'Hermano: 932109876',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '89012345', 'div': '7',
@@ -399,7 +447,7 @@ estudiantes_data = [
         'correo': 'diego.sanchez@gem.cl', 'telefono': '989012345',
         'direccion': 'Calle Norte 15', 'fecha_nacimiento': date(2006, 6, 22),
         'contacto_emergencia': 'Tía: 921098765',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '90123456', 'div': '8',
@@ -407,7 +455,7 @@ estudiantes_data = [
         'correo': 'isidora.vega@gem.cl', 'telefono': '990123456',
         'direccion': 'Av. Sur 101', 'fecha_nacimiento': date(2004, 8, 18),
         'contacto_emergencia': 'Papá: 910987654',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '11223344', 'div': 'K',
@@ -415,7 +463,7 @@ estudiantes_data = [
         'correo': 'felipe.morales@gem.cl', 'telefono': '901234567',
         'direccion': 'Pje. Los Cedros 9', 'fecha_nacimiento': date(2005, 2, 28),
         'contacto_emergencia': 'Mamá: 909876543',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '22334455', 'div': '1',
@@ -423,7 +471,7 @@ estudiantes_data = [
         'correo': 'martina.herrera@gem.cl', 'telefono': '912345678',
         'direccion': 'Calle Nueva 456', 'fecha_nacimiento': date(2007, 4, 7),
         'contacto_emergencia': 'Hermano: 908765432',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '33445566', 'div': '2',
@@ -431,7 +479,7 @@ estudiantes_data = [
         'correo': 'matias.castillo@gem.cl', 'telefono': '923456789',
         'direccion': 'Av. Central 321', 'fecha_nacimiento': date(2006, 10, 9),
         'contacto_emergencia': 'Tía: 907654321',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '44556677', 'div': '3',
@@ -439,7 +487,7 @@ estudiantes_data = [
         'correo': 'lucia.perez@gem.cl', 'telefono': '934567890',
         'direccion': 'Pje. Las Violetas 14', 'fecha_nacimiento': date(2008, 12, 19),
         'contacto_emergencia': 'Papá: 906543210',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '55667788', 'div': '4',
@@ -447,7 +495,7 @@ estudiantes_data = [
         'correo': 'ignacio.rojas@gem.cl', 'telefono': '945678901',
         'direccion': 'Calle Sur 33', 'fecha_nacimiento': date(2005, 1, 3),
         'contacto_emergencia': 'Mamá: 905432109',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '66778899', 'div': '5',
@@ -455,7 +503,7 @@ estudiantes_data = [
         'correo': 'fernanda.munoz@gem.cl', 'telefono': '956789012',
         'direccion': 'Av. Los Pinos 8', 'fecha_nacimiento': date(2007, 9, 26),
         'contacto_emergencia': 'Papá: 904321098',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '77889900', 'div': '6',
@@ -463,7 +511,7 @@ estudiantes_data = [
         'correo': 'andres.salinas@gem.cl', 'telefono': '967890123',
         'direccion': 'Pje. Las Acacias 21', 'fecha_nacimiento': date(2006, 11, 12),
         'contacto_emergencia': 'Hermano: 903210987',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '88990011', 'div': '7',
@@ -471,7 +519,7 @@ estudiantes_data = [
         'correo': 'sofia.maldonado@gem.cl', 'telefono': '978901234',
         'direccion': 'Calle del Sol 77', 'fecha_nacimiento': date(2004, 7, 8),
         'contacto_emergencia': 'Tía: 902109876',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '99001122', 'div': '8',
@@ -479,7 +527,7 @@ estudiantes_data = [
         'correo': 'tomas.campos@gem.cl', 'telefono': '989012345',
         'direccion': 'Av. La Paz 4', 'fecha_nacimiento': date(2005, 5, 17),
         'contacto_emergencia': 'Mamá: 901098765',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '10111213', 'div': 'K',
@@ -487,7 +535,7 @@ estudiantes_data = [
         'correo': 'antonia.ortiz@gem.cl', 'telefono': '990123456',
         'direccion': 'Pje. Los Eucaliptos 23', 'fecha_nacimiento': date(2006, 8, 30),
         'contacto_emergencia': 'Papá: 900987654',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '11121314', 'div': '1',
@@ -495,7 +543,7 @@ estudiantes_data = [
         'correo': 'gabriel.salazar@gem.cl', 'telefono': '901234567',
         'direccion': 'Calle Luna 19', 'fecha_nacimiento': date(2007, 2, 11),
         'contacto_emergencia': 'Hermano: 899876543',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '12131415', 'div': '2',
@@ -503,7 +551,7 @@ estudiantes_data = [
         'correo': 'isabel.gutierrez@gem.cl', 'telefono': '912345678',
         'direccion': 'Av. Los Olmos 50', 'fecha_nacimiento': date(2004, 3, 5),
         'contacto_emergencia': 'Tía: 898765432',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '13141516', 'div': '3',
@@ -511,7 +559,7 @@ estudiantes_data = [
         'correo': 'nicolas.rivas@gem.cl', 'telefono': '923456789',
         'direccion': 'Pje. Los Nogales 12', 'fecha_nacimiento': date(2005, 10, 27),
         'contacto_emergencia': 'Papá: 897654321',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '14151617', 'div': '4',
@@ -519,7 +567,7 @@ estudiantes_data = [
         'correo': 'emilia.campos@gem.cl', 'telefono': '934567890',
         'direccion': 'Calle Las Camelias 5', 'fecha_nacimiento': date(2006, 12, 16),
         'contacto_emergencia': 'Mamá: 896543210',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
     {
         'rut': '15161718', 'div': '5',
@@ -527,9 +575,10 @@ estudiantes_data = [
         'correo': 'juan.lara@gem.cl', 'telefono': '945678901',
         'direccion': 'Av. Los Alamos 101', 'fecha_nacimiento': date(2007, 1, 22),
         'contacto_emergencia': 'Papá: 895432109',
-        'clase_nombre': '2B' 
+        'clase': cursos[0]  # Asignamos a la primera clase
     },
 ]
+
 for data in estudiantes_data:
     password = f"{data['nombre'][0]}{data['apellido_paterno']}".lower()
     auth_user = AuthUser.objects.create_user(
@@ -547,12 +596,12 @@ for data in estudiantes_data:
         telefono=data['telefono'],
         direccion=data['direccion'],
         fecha_nacimiento=data['fecha_nacimiento'],
-        auth_user=auth_user,
-        clase_nombre=data['clase_nombre'],
+        auth_user=auth_user
     )
     Estudiante.objects.create(
         usuario=usuario,
-        contacto_emergencia=data['contacto_emergencia']
+        contacto_emergencia=data['contacto_emergencia'],
+        clase=data['clase']
     )
     print(f"✅ Estudiante {usuario.nombre} {usuario.apellido_paterno} creado con contraseña '{password}'")
 

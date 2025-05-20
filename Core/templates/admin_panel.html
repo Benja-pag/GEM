@@ -86,6 +86,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Asignaturas</h5>
+                            <p class="card-text display-4">{{ total_cursos }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Modal de Creación de Usuario -->
@@ -304,26 +312,24 @@
                                 <tr>
                                     <th>Curso</th>
                                     <th>Profesor</th>
-                                    <th>Fecha</th>
-                                    <th>Hora</th>
+                                    <th>Sala</th>
                                     <th>Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for clase in clases %}
                                 <tr>
-                                    <td>{{ clase.curso.nombre }}</td>
-                                    <td>{{ clase.docente.usuario.nombre }} {{ clase.docente.usuario.apellido_paterno }}</td>
-                                    <td>{{ clase.fecha|date:"d/m/Y" }}</td>
-                                    <td>{{ clase.hora_inicio|time:"H:i" }} - {{ clase.hora_fin|time:"H:i" }}</td>
+                                    <td>{{ clase.nombre }}</td>
                                     <td>
-                                        {% if clase.fecha > now.date %}
-                                            <span class="badge bg-success">Pendiente</span>
-                                        {% elif clase.fecha == now.date %}
-                                            <span class="badge bg-warning">En curso</span>
+                                        {% if clase.profesor_jefe %}
+                                            {{ clase.profesor_jefe.usuario.nombre }} {{ clase.profesor_jefe.usuario.apellido_paterno }}
                                         {% else %}
-                                            <span class="badge bg-secondary">Finalizada</span>
+                                            <span class="text-muted">Sin profesor asignado</span>
                                         {% endif %}
+                                    </td>
+                                    <td>{{ clase.sala|default:"Sin sala asignada" }}</td>
+                                    <td>
+                                        <span class="badge bg-success">Activa</span>
                                     </td>
                                 </tr>
                                 {% endfor %}

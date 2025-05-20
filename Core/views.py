@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, DetailView
 from django.urls import reverse_lazy
 from django.http import JsonResponse
-from .models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, Nota, AuthUser
+from .models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, Nota, AuthUser, Asignatura
 from django.db.models import Count, Avg
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
@@ -38,14 +38,16 @@ class AdminPanelView(View):
             total_estudiantes = Usuario.objects.filter(estudiante__isnull=False).count()
             total_profesores = Usuario.objects.filter(docente__isnull=False).count()
             total_clases = Clase.objects.count()
+            total_cursos = Asignatura.objects.count()  # Total de asignaturas
             # Obtener usuarios
             usuarios = Usuario.objects.all().order_by('-fecha_creacion')
             # Obtener clases activas
-            clases = Clase.objects.all().order_by('fecha', 'hora_inicio')[:10]
+            clases = Clase.objects.all().order_by('nombre')[:10]
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
                 'total_clases': total_clases,
+                'total_cursos': total_cursos,
                 'usuarios': usuarios,
                 'clases': clases,
                 'now': timezone.now(),
@@ -156,7 +158,7 @@ class UserManagementView(View):
             'total_estudiantes': Usuario.objects.filter(estudiante__isnull=False).count(),
             'total_profesores': Usuario.objects.filter(docente__isnull=False).count(),
             'total_clases': Clase.objects.count(),
-            'clases': Clase.objects.all().order_by('fecha', 'hora_inicio')[:10],
+            'clases': Clase.objects.all().order_by('nombre')[:10],
             'now': timezone.now(),
         }
         return render(request, 'admin_panel.html', context)

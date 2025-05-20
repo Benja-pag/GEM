@@ -86,18 +86,6 @@ except AuthUser.DoesNotExist:
     )
     print('✅ Usuario administrador creado exitosamente')
 
-# -----------------------------
-# Crear cursos directamente
-# -----------------------------
-cursos_nombres = ['1A', '1B', '1C', '1D', '2A', '2B', '2C', '2D', '3A', '3B', '3C', '3D', '4A', '4B', '4C', '4D']
-
-cursos = []
-for nombre in cursos_nombres:
-    curso, created = Clase.objects.get_or_create(nombre=nombre)
-    cursos.append(curso)
-
-print("✅ Cursos creados")
-
 # ------------------------------------
 # Crear docentes (6 total)
 # ------------------------------------
@@ -226,127 +214,128 @@ docentes_data = [
 docentes = []
 for data in docentes_data:
     password = f"{data['nombre'][0]}{data['apellido_paterno']}".lower()
-    auth_user = AuthUser.objects.create_user(
+    
+    # Crear o obtener el usuario de autenticación
+    auth_user, created = AuthUser.objects.get_or_create(
         rut=data['rut'],
-        div=data['div'],
-        password=password
+        defaults={
+            'div': data['div'],
+            'password': password
+        }
     )
-    usuario = Usuario.objects.create(
-        nombre=data['nombre'],
-        apellido_paterno=data['apellido_paterno'],
-        apellido_materno=data['apellido_materno'],
+    
+    # Crear o obtener el usuario
+    usuario, created = Usuario.objects.get_or_create(
         rut=data['rut'],
-        div=data['div'],
-        correo=data['correo'],
-        telefono=data['telefono'],
-        direccion=data['direccion'],
-        fecha_nacimiento=data['fecha_nacimiento'],
-        auth_user=auth_user
+        defaults={
+            'nombre': data['nombre'],
+            'apellido_paterno': data['apellido_paterno'],
+            'apellido_materno': data['apellido_materno'],
+            'div': data['div'],
+            'correo': data['correo'],
+            'telefono': data['telefono'],
+            'direccion': data['direccion'],
+            'fecha_nacimiento': data['fecha_nacimiento'],
+            'auth_user': auth_user
+        }
     )
-    docente = Docente.objects.create(usuario=usuario, especialidad=data['especialidad'])
+    
+    # Crear o obtener el docente
+    docente, created = Docente.objects.get_or_create(
+        usuario=usuario,
+        defaults={
+            'especialidad': data['especialidad']
+        }
+    )
+    
     docentes.append(docente)
-    print(f"✅ Docente {usuario.nombre} {usuario.apellido_paterno} creado con contraseña '{password}'")
+    if created:
+        print(f"✅ Docente {usuario.nombre} {usuario.apellido_paterno} creado con contraseña '{password}'")
+    else:
+        print(f"✅ Docente {usuario.nombre} {usuario.apellido_paterno} ya existe")
+
+# -----------------------------
+# Crear cursos directamente
+# -----------------------------
+cursos_nombres = ['1A', '1B', '1C', '1D', '2A', '2B', '2C', '2D', '3A', '3B', '3C', '3D', '4A', '4B', '4C', '4D']
+
+cursos = []
+for i, nombre in enumerate(cursos_nombres):
+    # Asignar un profesor jefe a cada curso de manera cíclica
+    profesor_jefe = docentes[i % len(docentes)]
+    curso, created = Clase.objects.get_or_create(
+        nombre=nombre,
+        defaults={
+            'profesor_jefe': profesor_jefe,
+            'sala': f"Sala {nombre}"  # Asignar una sala por defecto
+        }
+    )
+    cursos.append(curso)
+    print(f"✅ Curso {nombre} creado con profesor jefe {profesor_jefe.usuario.nombre} {profesor_jefe.usuario.apellido_paterno}")
+
+print("✅ Cursos creados")
 
 # -----------------------------
 # Crear asignaturas
 # -----------------------------
 asignaturas_info = [
-    # Asignaturas base con sus detalles
     {
         'nombre': 'Matemáticas',
         'codigo': 'MAT001',
         'dia': 'Lunes',
         'horario': time(8, 0),
-        'docente': docentes[1],  # El docente de matemáticas
-        'clase': cursos[0]  # Primera clase
+        'docente': docentes[1],  # María González - Matemáticas
+        'clase': cursos[0]  # 1A
     },
     {
         'nombre': 'Lenguaje y Comunicación',
         'codigo': 'LEN001',
         'dia': 'Martes',
         'horario': time(8, 0),
-        'docente': docentes[2],  # El docente de lenguaje
-        'clase': cursos[0]
+        'docente': docentes[2],  # Pedro Sánchez - Lenguaje
+        'clase': cursos[0]  # 1A
     },
     {
         'nombre': 'Historia y Geografía',
         'codigo': 'HIS001',
         'dia': 'Miércoles',
         'horario': time(8, 0),
-        'docente': docentes[3],  # El docente de historia
-        'clase': cursos[0]
+        'docente': docentes[3],  # Lucía Martínez - Historia
+        'clase': cursos[0]  # 1A
     },
     {
         'nombre': 'Biología',
         'codigo': 'BIO001',
         'dia': 'Jueves',
         'horario': time(8, 0),
-        'docente': docentes[4],  # El docente de biología
-        'clase': cursos[0]
+        'docente': docentes[4],  # Javier Rojas - Biología
+        'clase': cursos[0]  # 1A
     },
     {
         'nombre': 'Física',
         'codigo': 'FIS001',
         'dia': 'Viernes',
         'horario': time(8, 0),
-        'docente': docentes[5],  # El docente de física
-        'clase': cursos[0]
-    },
-    {
-        'nombre': 'Química',
-        'codigo': 'QUI001',
-        'dia': 'Lunes',
-        'horario': time(9, 30),
-        'docente': docentes[6],  # El docente de química
-        'clase': cursos[0]
-    },
-    {
-        'nombre': 'Inglés',
-        'codigo': 'ING001',
-        'dia': 'Martes',
-        'horario': time(9, 30),
-        'docente': docentes[7],  # El docente de inglés
-        'clase': cursos[0]
-    },
-    {
-        'nombre': 'Educación Física',
-        'codigo': 'EDF001',
-        'dia': 'Miércoles',
-        'horario': time(9, 30),
-        'docente': docentes[8],  # El docente de educación física
-        'clase': cursos[0]
-    },
-    {
-        'nombre': 'Arte',
-        'codigo': 'ART001',
-        'dia': 'Jueves',
-        'horario': time(9, 30),
-        'docente': docentes[9],  # El docente de arte
-        'clase': cursos[0]
-    },
-    {
-        'nombre': 'Tecnología',
-        'codigo': 'TEC001',
-        'dia': 'Viernes',
-        'horario': time(9, 30),
-        'docente': docentes[10],  # El docente de tecnología
-        'clase': cursos[0]
+        'docente': docentes[5],  # Carmen Vidal - Física
+        'clase': cursos[0]  # 1A
     }
 ]
 
-asignaturas = []
+asignaturas = []  # Lista para almacenar las asignaturas creadas
 for info in asignaturas_info:
     asignatura, created = Asignatura.objects.get_or_create(
-        nombre=info['nombre'],
+        codigo=info['codigo'],
+        clase=info['clase'],
         defaults={
-            'codigo': info['codigo'],
-            'dia': info['dia'],
-            'horario': info['horario'],
+            'nombre': info['nombre'],
             'docente': info['docente'],
-            'clase': info['clase']
+            'dia': info['dia'],
+            'horario': info['horario']
         }
     )
-    asignaturas.append(asignatura)
+    asignaturas.append(asignatura)  # Agregar la asignatura a la lista
+    if created:
+        print(f"✅ Asignatura {info['nombre']} creada para {info['clase'].nombre} con profesor {info['docente'].usuario.nombre} {info['docente'].usuario.apellido_paterno}")
 
 print("✅ Asignaturas creadas")
 

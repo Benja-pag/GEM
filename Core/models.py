@@ -48,7 +48,7 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
 
-# Modelo base que representa a cualquier tipo de usuario en el sistema
+# Clase usuarios #
 class Usuario(models.Model):
     nombre = models.CharField(max_length=100)  # Nombre del usuario
     apellido_paterno = models.CharField(max_length=100)  # Apellido paterno
@@ -61,6 +61,7 @@ class Usuario(models.Model):
     fecha_nacimiento = models.DateField()  # Fecha de nacimiento del usuario
     fecha_creacion = models.DateTimeField(auto_now_add=True)  # Fecha de creación del registro (autoasignado)
     auth_user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
+    activador = models.BooleanField(default=True)  # Estado de activación de la cuenta
 
     def __str__(self):
         return f'{self.nombre} {self.apellido_paterno}'  # Representación legible del objeto
@@ -84,133 +85,180 @@ class Especialidad(models.Model):
 
     def __str__(self):
         return self.nombre
+
 # Modelo para docentes
 class Docente(models.Model):
     usuario = models.OneToOneField('Usuario', on_delete=models.CASCADE)
     especialidad = models.ForeignKey('Especialidad', on_delete=models.PROTECT, null=True, blank=True)  # ID de "Ninguna"
+    es_profesor_jefe = models.BooleanField(default=False)  # Por defecto no es profesor jefe
 
     def __str__(self):
         return f'Docente: {self.usuario} - Especialidad: {self.especialidad}'
-# Modelo para estudiantes
+
 class Estudiante(models.Model):
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)  # Relación uno a uno con Usuario
-    contacto_emergencia = models.CharField(max_length=100)  # Información de contacto en caso de emergencia
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+    contacto_emergencia = models.CharField(max_length=100)
+    clase = models.ForeignKey('Clase', on_delete=models.SET_NULL, null=True, blank=True, related_name='estudiantes')
 
     def __str__(self):
-        return f'Estudiante: {self.usuario}'  # Representación legible del objeto
-
-class Asistencia(models.Model):
-    ESTADOS = [
-        ('ASISTIO', 'Asistió'),
-        ('AUSENTE', 'Ausente'),
-        ('JUSTIFICADO', 'Justificado'),
-    ]
-
-    estudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE)  # Relación con estudiante
-    fecha = models.DateField()  # Fecha de la asistencia
-    estado = models.CharField(max_length=12, choices=ESTADOS)  # Estado de la asistencia
-    hora_registro = models.TimeField(auto_now_add=True)  # Hora en que se registró (opcional, con auto)
-
-    class Meta:
-        unique_together = ('estudiante', 'fecha')  # Evita duplicados por estudiante y fecha
-
-    def __str__(self):
-        return f'{self.estudiante.usuario} - {self.fecha} - {self.get_estado_display()}'
-
-class Calendario(models.Model):
-    TIPOS_EVENTO = [
-        ('PRUEBA', 'Prueba'),
-        ('ENTREGA', 'Entrega de trabajo'),
-        ('REUNION', 'Reunión'),
-        ('ACTIVIDAD', 'Actividad general'),
-        ('MATERIAL', 'Material disponible'),
-        ('OTRO', 'Otro'),
-    ]
-
-    titulo = models.CharField(max_length=100)  # Título del evento
-    descripcion = models.TextField(blank=True, null=True)  # Descripción adicional (opcional)
-    tipo_evento = models.CharField(max_length=20, choices=TIPOS_EVENTO)  # Tipo de evento
-    fecha_inicio = models.DateTimeField()  # Fecha y hora de inicio
-    fecha_fin = models.DateTimeField()  # Fecha y hora de fin (puede ser igual al inicio si es un evento corto)
-    creado_en = models.DateTimeField(auto_now_add=True)  # Registro automático de la creación del evento
-
-    def __str__(self):
-        return f'{self.titulo} ({self.get_tipo_evento_display()}) - {self.fecha_inicio.strftime("%d/%m/%Y %H:%M")}'
-
-class Foro(models.Model):
-    titulo = models.CharField(max_length=150)  # Título del tema o pregunta
-    contenido = models.TextField()  # Cuerpo del mensaje o publicación
-    autor = models.ForeignKey(Usuario, on_delete=models.CASCADE)  # Usuario que creó la publicación
-    fecha_publicacion = models.DateTimeField(auto_now_add=True)  # Fecha automática de publicación
-
-    def __str__(self):
-        return f'{self.titulo} - por {self.autor.nombre} {self.autor.apellido_paterno}'
-
-class Nota(models.Model):
-    TIPOS_EVALUACION = [
-        ('PRUEBA', 'Prueba'),
-        ('TAREA', 'Tarea'),
-        ('PROYECTO', 'Proyecto'),
-        ('EXAMEN', 'Examen'),
-        ('OTRO', 'Otro'),
-    ]
-
-    estudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE)  # Estudiante evaluado
-    docente = models.ForeignKey(Docente, on_delete=models.SET_NULL, null=True)  # Docente que evaluó
-    tipo_evaluacion = models.CharField(max_length=20, choices=TIPOS_EVALUACION)  # Tipo de evaluación
-    descripcion = models.CharField(max_length=255, blank=True, null=True)  # Detalle de la evaluación
-    nota = models.DecimalField(max_digits=4, decimal_places=2)  # Nota (por ejemplo: 6.50)
-    fecha_registro = models.DateField(auto_now_add=True)  # Fecha de ingreso de la nota
-
-    def __str__(self):
-        return f'{self.estudiante.usuario} - {self.tipo_evaluacion} - {self.nota}'
-
-# -------------------------------------
-# ASIGNATURAS, CLASES Y RELACIONES
-# -------------------------------------
+        return f'Estudiante: {self.usuario}'
 
 class Asignatura(models.Model):
-    nombre = models.CharField(max_length=100, unique=True)  # Ej: Matemáticas, Historia
-    descripcion = models.TextField(blank=True, null=True)  # Opcional
+    nombre = models.CharField(max_length=100)
+    codigo = models.CharField(max_length=50)
+    dia = models.CharField(max_length=15, choices=[
+        ('Lunes', 'Lunes'),
+        ('Martes', 'Martes'),
+        ('Miércoles', 'Miércoles'),
+        ('Jueves', 'Jueves'),
+        ('Viernes', 'Viernes'),
+    ])
+    horario = models.TimeField()
+    docente = models.ForeignKey('Docente', on_delete=models.PROTECT)
+    clase = models.ForeignKey('Clase', on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ('docente', 'dia', 'horario')  # Restricción para evitar superposición de horario por docente
+
+    def __str__(self):
+        return f'{self.nombre} ({self.codigo}) - {self.dia} {self.horario} - {self.docente} - {self.clase}'
+
+class Nota(models.Model):
+    TIPO_EVALUACION_CHOICES = [
+        ('Prueba', 'Prueba'),
+        ('Tarea', 'Tarea'),
+        ('Examen', 'Examen'),
+        ('Proyecto', 'Proyecto'),
+        # Puedes agregar más tipos de evaluación si quieres
+    ]
+
+    tipo_evaluacion = models.CharField(max_length=20, choices=TIPO_EVALUACION_CHOICES)
+    estudiante = models.ForeignKey('Estudiante', on_delete=models.CASCADE)
+    asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE)
+    nota = models.DecimalField(max_digits=5, decimal_places=2)  # Nota obtenida (por ejemplo, 61.00)
+    puntaje_obtenido = models.DecimalField(max_digits=5, decimal_places=2)  # Puntaje real obtenido (37.00)
+    puntaje_total = models.DecimalField(max_digits=5, decimal_places=2)  # Puntaje máximo posible (42.00)
+    fecha = models.DateField()
+
+    def __str__(self):
+        return f'{self.tipo_evaluacion} - {self.estudiante} - {self.asignatura} - Nota: {self.nota}'
+
+class Asistencia(models.Model):
+    fecha = models.DateField()
+    asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE)
+    estudiante = models.ForeignKey('Estudiante', on_delete=models.CASCADE)
+    asistencia = models.BooleanField()  # True = presente (sí), False = ausente (no)
+
+    def __str__(self):
+        estado = 'Presente' if self.asistencia else 'Ausente'
+        return f'{self.fecha} - {self.asignatura} - {self.estudiante} - {estado}'
+
+class ClaseAsignatura(models.Model):
+    docente = models.ForeignKey('Docente', on_delete=models.CASCADE)
+    asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE)
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    dia = models.CharField(max_length=10)  # Por ejemplo: "lunes", "martes", etc.
+    curso = models.CharField(max_length=50)  # Por ejemplo: "1 medio A"
+
+    class Meta:
+        unique_together = ('docente', 'dia', 'hora_inicio', 'hora_fin', 'curso')
+
+    def __str__(self):
+        return f'{self.docente} - {self.asignatura} - {self.dia} {self.hora_inicio}-{self.hora_fin} - {self.curso}'
+
+class CalendarioClase(models.Model):
+    nombre_actividad = models.CharField(max_length=100)  # Nombre de la actividad, e.g., "Prueba"
+    asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE)  # Relación con Asignatura
+    descripcion = models.TextField(blank=True, null=True)  # Descripción de la actividad
+    materiales = models.TextField(blank=True, null=True)  # Materiales generales (texto libre)
+    lista_materiales = models.JSONField(blank=True, null=True)  # Lista estructurada de materiales, opcional
+    fecha = models.DateField(blank=True, null=True)  # Fecha de la actividad
+    hora = models.TimeField(blank=True, null=True)  # Hora de la actividad
+
+    def __str__(self):
+        return f'{self.nombre_actividad} - {self.asignatura} ({self.fecha} {self.hora})'
+    
+class CalendarioColegio(models.Model):
+    nombre_actividad = models.CharField(max_length=100)  # Nombre de la actividad
+    descripcion = models.TextField(blank=True, null=True)  # Descripción de la actividad
+    encargado = models.CharField(max_length=100)  # Persona responsable de la actividad
+    ubicacion = models.CharField(max_length=100)  # Lugar donde se realiza la actividad
+    fecha = models.DateField()  # Fecha de la actividad
+    hora = models.TimeField()  # Hora de la actividad
+
+    def __str__(self):
+        return f'{self.nombre_actividad} - {self.fecha} {self.hora}'
+
+class Foro(models.Model):
+    titulo = models.CharField(max_length=200)  # Título del foro o tema
+    asunto = models.CharField(max_length=200)  # Asunto o subtítulo
+    contenido = models.TextField()  # Contenido del mensaje o tema
+    autor = models.ForeignKey('Usuario', on_delete=models.CASCADE)  # Autor del mensaje, relacionado con Usuario
+    fecha = models.DateField(auto_now_add=True)  # Fecha de creación (auto asignada)
+    hora = models.TimeField(auto_now_add=True)  # Hora de creación (auto asignada)
+
+    def __str__(self):
+        return f'{self.titulo} - {self.autor}'
+
+class MensajeAlumnoProfesor(models.Model):
+    emisor = models.ForeignKey('Usuario', on_delete=models.CASCADE, related_name='mensajes_enviados')
+    receptores = models.ManyToManyField('Usuario', related_name='mensajes_recibidos')
+    titulo = models.CharField(max_length=200)
+    contenido = models.TextField()
+    fecha = models.DateField(auto_now_add=True)
+    hora = models.TimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Mensaje de {self.emisor} - {self.titulo}'
+
+class ChatGrupo(models.Model):
+    nombre = models.CharField(max_length=100)  # Nombre del grupo
+    estudiantes = models.ManyToManyField('Estudiante', blank=True, related_name='chats_grupo')
+    docentes = models.ManyToManyField('Docente', blank=True, related_name='chats_grupo')
+    asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE, null=True, blank=True)
+    fecha_creacion = models.DateField(auto_now_add=True)
+    hora_creacion = models.TimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nombre
-
-
-class CursoAsignado(models.Model):
-    asignatura = models.ForeignKey(Asignatura, on_delete=models.CASCADE)  # Asignatura base
-    docente = models.ForeignKey(Docente, on_delete=models.PROTECT)  # Profesor a cargo
-    dias = models.CharField(max_length=50)  # Ej: "Lunes, Miércoles"
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
-    sala = models.CharField(max_length=50, blank=True, null=True)  # Opcional: sala o aula
-
-    def __str__(self):
-        return f'{self.asignatura.nombre} - {self.docente.usuario.nombre}'
-
-
+    
 class Clase(models.Model):
-    curso = models.ForeignKey(CursoAsignado, on_delete=models.CASCADE, related_name='clases', null=True)
-    fecha = models.DateField()
-    descripcion = models.TextField(blank=True, null=True)
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
-    creado_en = models.DateTimeField(auto_now_add=True)
+    nombre = models.CharField(max_length=100)
+    profesor_jefe = models.ForeignKey('Docente', on_delete=models.SET_NULL, null=True, blank=True, related_name='clases_jefe')
+    sala = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.curso.asignatura.nombre} - {self.fecha}'
-
-class EstudianteAsignatura(models.Model):
-    estudiante = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
-    curso_asignado = models.ForeignKey(CursoAsignado, on_delete=models.CASCADE)
+        return self.nombre
+    
+class Electivo(models.Model):
+    nombre = models.CharField(max_length=100)
+    asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE)
+    profesor = models.ForeignKey('Docente', on_delete=models.CASCADE)
+    sala = models.CharField(max_length=50)
+    dia = models.CharField(max_length=15, choices=[
+        ('Lunes', 'Lunes'),
+        ('Martes', 'Martes'),
+        ('Miércoles', 'Miércoles'),
+        ('Jueves', 'Jueves'),
+        ('Viernes', 'Viernes'),
+    ])
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
 
     class Meta:
-        unique_together = ('estudiante', 'curso_asignado')
+        unique_together = ('profesor', 'dia', 'hora_inicio', 'hora_fin')
 
     def __str__(self):
-        return f'{self.estudiante.usuario} inscrito en {self.curso_asignado.asignatura.nombre}'
-class Curso(models.Model):
-    letra = models.CharField(max_length=3, unique=True)  # Por ejemplo: '1A', '2B', etc.
+        return f'{self.nombre} ({self.asignatura.nombre}) - {self.dia} {self.hora_inicio}-{self.hora_fin}'
+
+class InscripcionElectivo(models.Model):
+    estudiante = models.ForeignKey('Estudiante', on_delete=models.CASCADE, related_name='electivos')
+    electivo = models.ForeignKey('Electivo', on_delete=models.CASCADE, related_name='inscripciones')
+    fecha_inscripcion = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('estudiante', 'electivo')  # Evita inscripciones duplicadas
 
     def __str__(self):
-        return self.letra
+        return f'{self.estudiante} inscrito en {self.electivo}'

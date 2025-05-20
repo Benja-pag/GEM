@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import AuthUser, Usuario, Administrativo, Docente, Estudiante, Asistencia, Calendario, Clase, Foro, Nota
+from .models import (
+    AuthUser, Usuario, Administrativo, Docente, Estudiante,
+    Asistencia, CalendarioClase, Clase, Foro, Nota
+)
 
 class AuthUserAdmin(UserAdmin):
     list_display = ('rut', 'div', 'is_active', 'is_admin', 'date_joined')
@@ -24,7 +27,7 @@ admin.site.register(Administrativo)
 admin.site.register(Docente)
 admin.site.register(Estudiante)
 admin.site.register(Asistencia)
-admin.site.register(Calendario)
+admin.site.register(CalendarioClase)
 admin.site.register(Clase)
 admin.site.register(Foro)
 admin.site.register(Nota)

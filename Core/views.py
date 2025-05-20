@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, DetailView
 from django.urls import reverse_lazy
 from django.http import JsonResponse
-from .models import Usuario, Administrativo, Docente, Estudiante, Asistencia, Calendario, Clase, Foro, Nota, AuthUser
+from .models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, Nota, AuthUser
 from django.db.models import Count, Avg
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods

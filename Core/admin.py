@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     AuthUser, Usuario, Administrativo, Docente, Estudiante,
-    Asistencia, CalendarioClase, Clase, Foro, Nota
+    Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, Nota
 )
 
 class AuthUserAdmin(UserAdmin):
@@ -28,6 +28,7 @@ admin.site.register(Docente)
 admin.site.register(Estudiante)
 admin.site.register(Asistencia)
 admin.site.register(CalendarioClase)
+admin.site.register(CalendarioColegio)
 admin.site.register(Clase)
 admin.site.register(Foro)
 admin.site.register(Nota)

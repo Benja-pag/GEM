@@ -1,6 +1,7 @@
 import os
 import django
 from datetime import time, date
+from django.contrib.auth.hashers import make_password
 
 # Configuración de Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GEM.settings')
@@ -220,9 +221,14 @@ for data in docentes_data:
         rut=data['rut'],
         defaults={
             'div': data['div'],
-            'password': password
+            'password': make_password(password)  # Hashear la contraseña
         }
     )
+    
+    if not created:
+        # Si el usuario ya existe, actualizar la contraseña
+        auth_user.set_password(password)
+        auth_user.save()
     
     # Crear o obtener el usuario
     usuario, created = Usuario.objects.get_or_create(

@@ -52,7 +52,7 @@
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            {{ user.get_full_name|default:user.get_username }}
+                            {{ user.usuario.nombre }} {{ user.usuario.apellido_paterno }} {{ user.usuario.apellido_materno }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li>
@@ -82,7 +82,7 @@
 
     <!-- Main Content -->
     <div class="container-fluid">
-        {% if messages %}
+        {% if messages and request.resolver_match.url_name != 'login' %}
         <div class="messages mt-3">
             {% for message in messages %}
             <div class="alert alert-{{ message.tags }} alert-dismissible fade show">

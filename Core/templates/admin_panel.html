@@ -39,7 +39,7 @@
             <!-- Barra Superior -->
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <div>
-                    <h2 class="h3">Bienvenido {{ user.rut}}-{{ user.div}}</h2>
+                    <h2 class="h3">Bienvenido {{ user.usuario.nombre }} {{ user.usuario.apellido_paterno }} {{ user.usuario.apellido_materno }}</h2>
                     <p class="text-muted">
                         {% if user.is_admin %}
                             Administrador
@@ -66,7 +66,7 @@
                     <div class="card bg-primary text-white">
                         <div class="card-body">
                             <h5 class="card-title">Total Estudiantes</h5>
-                            <p class="card-text display-4">{{ total_estudiantes }}</p>
+                            <p class="card-text display-4 text-dark">{{ total_estudiantes }}</p>
                         </div>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                     <div class="card bg-success text-white">
                         <div class="card-body">
                             <h5 class="card-title">Total Profesores</h5>
-                            <p class="card-text display-4">{{ total_profesores }}</p>
+                            <p class="card-text display-4 text-dark">{{ total_profesores }}</p>
                         </div>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
                     <div class="card bg-info text-white">
                         <div class="card-body">
                             <h5 class="card-title">Total Clases</h5>
-                            <p class="card-text display-4">{{ total_clases }}</p>
+                            <p class="card-text display-4 text-dark">{{ total_clases }}</p>
                         </div>
                     </div>
                 </div>
@@ -90,7 +90,7 @@
                     <div class="card bg-warning text-white">
                         <div class="card-body">
                             <h5 class="card-title">Total Asignaturas</h5>
-                            <p class="card-text display-4">{{ total_cursos }}</p>
+                            <p class="card-text display-4 text-dark">{{ total_cursos }}</p>
                         </div>
                     </div>
                 </div>

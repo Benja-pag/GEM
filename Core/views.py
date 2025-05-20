@@ -367,9 +367,16 @@ class ProfesorPanelView(View):
         if not hasattr(request.user.usuario, 'docente'):
             messages.error(request, 'No tienes permiso para acceder a esta página')
             return redirect('home')
-        docente = Docente.objects.first()  # Temporalmente mostramos el primer docente
-        clases = Clase.objects.filter(docente=docente)
-        notas = Nota.objects.filter(docente=docente)
+        
+        docente = request.user.usuario.docente
+        # Obtener clases donde el docente es profesor jefe
+        clases_profesor_jefe = Clase.objects.filter(profesor_jefe=docente)
+        # Obtener clases donde el docente imparte asignaturas
+        clases_asignaturas = Clase.objects.filter(asignatura__docente=docente)
+        # Combinar ambas querysets
+        clases = (clases_profesor_jefe | clases_asignaturas).distinct()
+        # Obtener las notas de las asignaturas que imparte el docente
+        notas = Nota.objects.filter(asignatura__docente=docente)
         
         context = {
             'clases': clases,
@@ -408,19 +415,38 @@ def login_view(request):
         correo = request.POST.get('correo')
         password = request.POST.get('password')
         
-        user = authenticate(request, correo=correo, password=password)
-        if user is not None:
-            login(request, user)
-            if user.is_admin:
-                return redirect('admin_panel')
-            elif hasattr(user.usuario, 'docente'):
-                return redirect('profesor_panel')
-            elif hasattr(user.usuario, 'estudiante'):
-                return redirect('estudiante_panel')
-            return redirect('home')
-        else:
-            # Manejar error de autenticación
-            return render(request, 'login.html', {'error': 'Credenciales inválidas'})
+        if not correo or not password:
+            messages.error(request, 'Por favor ingrese correo y contraseña')
+            return render(request, 'login.html')
+        
+        try:
+            # Buscar el usuario por correo en el modelo Usuario
+            usuario = Usuario.objects.get(correo=correo)
+            # Obtener el AuthUser asociado
+            auth_user = usuario.auth_user
+            
+            # Verificar si el usuario está activo
+            if not auth_user.is_active:
+                messages.error(request, 'Usuario desactivado. Por favor comuníquese con un administrador.')
+                return render(request, 'login.html')
+            
+            # Verificar la contraseña usando check_password
+            if check_password(password, auth_user.password):
+                login(request, auth_user)
+                # Redirigir según el rol del usuario
+                if auth_user.is_admin:
+                    return redirect('admin_panel')
+                elif hasattr(usuario, 'docente'):
+                    return redirect('profesor_panel')
+                elif hasattr(usuario, 'estudiante'):
+                    return redirect('estudiante_panel')
+                else:
+                    messages.error(request, 'Tipo de usuario no válido')
+                    return redirect('login')
+            else:
+                messages.error(request, 'Contraseña incorrecta')
+        except Usuario.DoesNotExist:
+            messages.error(request, 'El correo no está registrado')
     
     return render(request, 'login.html')
 

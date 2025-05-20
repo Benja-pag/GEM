@@ -20,7 +20,10 @@ HTMLS:
 "test": Evaluaciones o exámenes online.
 
 
-
+Descargas: 
+python -m venv env
+pip install django
+pip install psycopg2
 
 Para crear la base de datos:
 [Primero debes crear tu usuario que sea el por defecto "postgres"]

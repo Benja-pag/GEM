@@ -47,3 +47,19 @@ Comando habituales base de datos:
 DROP DATABASE "gem"; (eliminar la base de datos)
 CREATE DATABASE GEM;(Crear la base de datos)
 SELECT * FROM "public"."Core_usuario";
+
+
+igancio 
+foro
+home
+alumnos
+
+jesus 
+administrador
+docente
+attecendance
+
+benjamin
+surveys
+tasks
+test

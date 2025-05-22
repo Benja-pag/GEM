@@ -79,88 +79,173 @@ class AdminPanelView(View):
         if not request.user.is_admin:
             messages.error(request, 'No tienes permiso para realizar esta acción')
             return redirect('home')
+        
+        action = request.POST.get('action')
+        
         try:
-            # Obtener datos del formulario
-            nombre = request.POST.get('nombre')
-            apellido_paterno = request.POST.get('apellido_paterno')
-            apellido_materno = request.POST.get('apellido_materno')
-            rut = request.POST.get('rut')
-            div = request.POST.get('div')
-            correo = request.POST.get('correo')
-            telefono = request.POST.get('telefono')
-            direccion = request.POST.get('direccion')
-            fecha_nacimiento = request.POST.get('fecha_nacimiento')
-            password = request.POST.get('password')
-            confirm_password = request.POST.get('confirm_password')
-            tipo_usuario = request.POST.get('tipo_usuario')
-            rol_administrativo = request.POST.get('rol_administrativo')
-
-            # Validar campos requeridos
-            if not all([nombre, apellido_paterno, apellido_materno, rut, div, correo, password, confirm_password, tipo_usuario]):
-                messages.error(request, 'Por favor complete todos los campos requeridos')
+            if action == 'crear_estudiante':
+                return self.crear_estudiante(request)
+            elif action == 'crear_profesor':
+                return self.crear_profesor(request)
+            elif action == 'crear_administrador':
+                return self.crear_administrador(request)
+            elif action == 'crear_curso':
+                return self.crear_curso(request)
+            elif action == 'crear_asignatura':
+                return self.crear_asignatura(request)
+            else:
+                messages.error(request, 'Acción no válida')
                 return redirect('admin_panel')
+        except Exception as e:
+            messages.error(request, f'Error al procesar la solicitud: {str(e)}')
+            return redirect('admin_panel')
 
-            # Validar contraseñas
-            if password != confirm_password:
-                messages.error(request, 'Las contraseñas no coinciden')
-                return redirect('admin_panel')
+    def crear_estudiante(self, request):
+        try:
+            with transaction.atomic():
+                # Crear usuario de autenticación
+                auth_user = AuthUser.objects.create(
+                    rut=request.POST.get('rut'),
+                    div=request.POST.get('div'),
+                    password=make_password(request.POST.get('password')),
+                    is_admin=False
+                )
 
-            # Verificar si el RUT ya existe
-            if Usuario.objects.filter(rut=rut).exists():
-                messages.error(request, 'El RUT ya está registrado')
-                return redirect('admin_panel')
+                # Crear usuario
+                usuario = Usuario.objects.create(
+                    nombre=request.POST.get('nombre'),
+                    apellido_paterno=request.POST.get('apellido_paterno'),
+                    apellido_materno=request.POST.get('apellido_materno'),
+                    rut=request.POST.get('rut'),
+                    div=request.POST.get('div'),
+                    correo=request.POST.get('correo'),
+                    telefono=request.POST.get('telefono'),
+                    direccion=request.POST.get('direccion'),
+                    fecha_nacimiento=request.POST.get('fecha_nacimiento'),
+                    auth_user=auth_user
+                )
 
-            # Verificar si el correo ya existe
-            if Usuario.objects.filter(correo=correo).exists():
-                messages.error(request, 'El correo ya está registrado')
-                return redirect('admin_panel')
-
-            # Crear usuario de autenticación
-            auth_user = AuthUser.objects.create(
-                rut=rut,
-                div=div,
-                password=make_password(password),
-                is_admin=(tipo_usuario in ['ADMINISTRADOR', 'ADMINISTRADOR_MAXIMO'])
-            )
-
-            # Crear usuario
-            usuario = Usuario.objects.create(
-                nombre=nombre,
-                apellido_paterno=apellido_paterno,
-                apellido_materno=apellido_materno,
-                rut=rut,
-                div=div,
-                correo=correo,
-                telefono=telefono,
-                direccion=direccion,
-                fecha_nacimiento=fecha_nacimiento,
-                auth_user=auth_user
-            )
-
-            # Crear el tipo de usuario correspondiente
-            if tipo_usuario == 'ESTUDIANTE':
-                contacto_emergencia = request.POST.get('contacto_emergencia')
-                if not contacto_emergencia:
-                    messages.error(request, 'El contacto de emergencia es requerido para estudiantes')
-                    usuario.delete()
-                    auth_user.delete()
-                    return redirect('admin_panel')
+                # Crear estudiante
                 Estudiante.objects.create(
                     usuario=usuario,
-                    contacto_emergencia=contacto_emergencia
-                )
-            elif tipo_usuario == 'PROFESOR':
-                Docente.objects.create(usuario=usuario)
-            elif tipo_usuario in ['ADMINISTRADOR', 'ADMINISTRADOR_MAXIMO']:
-                Administrativo.objects.create(
-                    usuario=usuario,
-                    rol=rol_administrativo or tipo_usuario
+                    contacto_emergencia=request.POST.get('contacto_emergencia'),
+                    clase_id=request.POST.get('clase')
                 )
 
-            messages.success(request, f'Usuario {tipo_usuario.lower()} creado exitosamente')
-            return redirect('admin_panel')
+                messages.success(request, 'Estudiante creado exitosamente')
+                return redirect('admin_panel')
         except Exception as e:
-            messages.error(request, f'Error al crear usuario: {str(e)}')
+            messages.error(request, f'Error al crear estudiante: {str(e)}')
+            return redirect('admin_panel')
+
+    def crear_profesor(self, request):
+        try:
+            with transaction.atomic():
+                # Crear usuario de autenticación
+                auth_user = AuthUser.objects.create(
+                    rut=request.POST.get('rut'),
+                    div=request.POST.get('div'),
+                    password=make_password(request.POST.get('password')),
+                    is_admin=False
+                )
+
+                # Crear usuario
+                usuario = Usuario.objects.create(
+                    nombre=request.POST.get('nombre'),
+                    apellido_paterno=request.POST.get('apellido_paterno'),
+                    apellido_materno=request.POST.get('apellido_materno'),
+                    rut=request.POST.get('rut'),
+                    div=request.POST.get('div'),
+                    correo=request.POST.get('correo'),
+                    telefono=request.POST.get('telefono'),
+                    direccion=request.POST.get('direccion'),
+                    fecha_nacimiento=request.POST.get('fecha_nacimiento'),
+                    auth_user=auth_user
+                )
+
+                # Crear profesor
+                Docente.objects.create(
+                    usuario=usuario,
+                    especialidad=request.POST.get('especialidad')
+                )
+
+                messages.success(request, 'Profesor creado exitosamente')
+                return redirect('admin_panel')
+        except Exception as e:
+            messages.error(request, f'Error al crear profesor: {str(e)}')
+            return redirect('admin_panel')
+
+    def crear_administrador(self, request):
+        try:
+            with transaction.atomic():
+                # Crear usuario de autenticación
+                auth_user = AuthUser.objects.create(
+                    rut=request.POST.get('rut'),
+                    div=request.POST.get('div'),
+                    password=make_password(request.POST.get('password')),
+                    is_admin=True
+                )
+
+                # Crear usuario
+                usuario = Usuario.objects.create(
+                    nombre=request.POST.get('nombre'),
+                    apellido_paterno=request.POST.get('apellido_paterno'),
+                    apellido_materno=request.POST.get('apellido_materno'),
+                    rut=request.POST.get('rut'),
+                    div=request.POST.get('div'),
+                    correo=request.POST.get('correo'),
+                    telefono=request.POST.get('telefono'),
+                    direccion=request.POST.get('direccion'),
+                    fecha_nacimiento=request.POST.get('fecha_nacimiento'),
+                    auth_user=auth_user
+                )
+
+                # Crear administrativo
+                Administrativo.objects.create(
+                    usuario=usuario,
+                    rol=request.POST.get('rol_administrativo')
+                )
+
+                messages.success(request, 'Administrador creado exitosamente')
+                return redirect('admin_panel')
+        except Exception as e:
+            messages.error(request, f'Error al crear administrador: {str(e)}')
+            return redirect('admin_panel')
+
+    def crear_curso(self, request):
+        try:
+            with transaction.atomic():
+                # Crear curso
+                Clase.objects.create(
+                    nombre=request.POST.get('nombre'),
+                    profesor_jefe_id=request.POST.get('profesor_jefe'),
+                    sala=request.POST.get('sala'),
+                    capacidad=request.POST.get('capacidad')
+                )
+
+                messages.success(request, 'Curso creado exitosamente')
+                return redirect('admin_panel')
+        except Exception as e:
+            messages.error(request, f'Error al crear curso: {str(e)}')
+            return redirect('admin_panel')
+
+    def crear_asignatura(self, request):
+        try:
+            with transaction.atomic():
+                # Crear asignatura
+                Asignatura.objects.create(
+                    codigo=request.POST.get('codigo'),
+                    nombre=request.POST.get('nombre'),
+                    clase_id=request.POST.get('clase'),
+                    docente_id=request.POST.get('docente'),
+                    dia=request.POST.get('dia'),
+                    horario=request.POST.get('horario')
+                )
+
+                messages.success(request, 'Asignatura creada exitosamente')
+                return redirect('admin_panel')
+        except Exception as e:
+            messages.error(request, f'Error al crear asignatura: {str(e)}')
             return redirect('admin_panel')
 
 @method_decorator(login_required, name='dispatch')

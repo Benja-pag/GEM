@@ -133,9 +133,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form method="post">
+                            <form method="post" action="{% url 'admin_panel' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="tipo_usuario" value="ESTUDIANTE">
+                                <input type="hidden" name="action" value="crear_estudiante">
                                 
                                 <!-- Campos básicos -->
                                 <div class="row mb-3">
@@ -211,11 +211,12 @@
                                         {% endfor %}
                                     </select>
                                 </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Crear Estudiante</button>
+                                </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Crear Estudiante</button>
                         </div>
                     </div>
                 </div>
@@ -230,9 +231,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form method="post">
+                            <form method="post" action="{% url 'admin_panel' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="tipo_usuario" value="PROFESOR">
+                                <input type="hidden" name="action" value="crear_profesor">
                                 
                                 <!-- Campos básicos -->
                                 <div class="row mb-3">
@@ -311,11 +312,12 @@
                                         <option value="TECNOLOGIA">Tecnología</option>
                                     </select>
                                 </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Crear Profesor</button>
+                                </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Crear Profesor</button>
                         </div>
                     </div>
                 </div>
@@ -330,9 +332,9 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form method="post">
+                            <form method="post" action="{% url 'admin_panel' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="tipo_usuario" value="ADMINISTRADOR">
+                                <input type="hidden" name="action" value="crear_administrador">
                                 
                                 <!-- Campos básicos -->
                                 <div class="row mb-3">
@@ -401,11 +403,12 @@
                                         <option value="ADMINISTRADOR_MAXIMO">Administrador Máximo</option>
                                     </select>
                                 </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Crear Administrador</button>
+                                </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Crear Administrador</button>
                         </div>
                     </div>
                 </div>
@@ -420,7 +423,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form method="post">
+                            <form method="post" action="{% url 'admin_panel' %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="crear_curso">
                                 
@@ -448,11 +451,12 @@
                                     <label for="capacidad" class="form-label">Capacidad</label>
                                     <input type="number" class="form-control" id="capacidad" name="capacidad" min="1" required>
                                 </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Crear Curso</button>
+                                </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Crear Curso</button>
                         </div>
                     </div>
                 </div>
@@ -467,7 +471,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form method="post">
+                            <form method="post" action="{% url 'admin_panel' %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="crear_asignatura">
                                 
@@ -518,11 +522,12 @@
                                         <input type="time" class="form-control" id="horario" name="horario" required>
                                     </div>
                                 </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Crear Asignatura</button>
+                                </div>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">Crear Asignatura</button>
                         </div>
                     </div>
                 </div>

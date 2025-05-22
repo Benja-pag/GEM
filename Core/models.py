@@ -62,6 +62,7 @@ class Usuario(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)  # Fecha de creación del registro (autoasignado)
     auth_user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
     activador = models.BooleanField(default=True)  # Estado de activación de la cuenta
+    password = models.CharField(max_length=128)
 
     def __str__(self):
         return f'{self.nombre} {self.apellido_paterno}'  # Representación legible del objeto

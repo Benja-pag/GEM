@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Encuestas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="fas fa-poll"></i> Encuestas Académicas</h2>
+    <p class="mb-4">Participa en encuestas sobre tus cursos, profesores y experiencia académica.</p>
+
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Encuesta de Satisfacción del Curso</h5>
+            <p class="card-text">Ayúdanos a mejorar respondiendo esta breve encuesta sobre tu curso actual.</p>
+            <a href="#" class="btn btn-primary">Responder</a>
+        </div>
+    </div>
+
+    <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Feedback del Profesor</h5>
+            <p class="card-text">Comparte tus impresiones sobre la enseñanza y dinámica del profesor.</p>
+            <a href="#" class="btn btn-secondary">Participar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

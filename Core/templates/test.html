@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Evaluaciones{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4"><i class="fas fa-file-alt"></i> Evaluaciones Online</h2>
+    <p class="mb-4">Accede a las evaluaciones programadas y realiza tus pruebas online.</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Evaluación de Historia</h5>
+                    <p class="card-text">Disponible hasta: <strong>26/05/2025</strong></p>
+                    <a href="#" class="btn btn-outline-primary">Comenzar Evaluación</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Evaluación de Ciencias</h5>
+                    <p class="card-text text-muted">No disponible aún</p>
+                    <button class="btn btn-outline-secondary" disabled>Próximamente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

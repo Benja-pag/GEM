@@ -78,7 +78,8 @@ except AuthUser.DoesNotExist:
         telefono='123456789',
         direccion='Dirección Admin',
         fecha_nacimiento=date(1990, 1, 1),
-        auth_user=admin_auth_user
+        auth_user=admin_auth_user,
+        password='admin123'
     )
 
     Administrativo.objects.create(
@@ -88,129 +89,130 @@ except AuthUser.DoesNotExist:
     print('✅ Usuario administrador creado exitosamente')
 
 # ------------------------------------
-# Crear docentes (6 total)
+# Crear docentes 
 # ------------------------------------
 docentes_data = [
     {
         'rut': '12345638', 'div': '9',
-        'nombre': 'Juan', 'apellido_paterno': 'Pérez', 'apellido_materno': 'López',
+        'nombre': 'Juan', 'apellido_paterno': 'Perez', 'apellido_materno': 'Lopez',
         'correo': 'juan.perez@gem.cl', 'telefono': '111111111',
         'direccion': 'Calle Falsa 123', 'fecha_nacimiento': date(1980, 5, 10),
-        'especialidad': especialidades[0]  # Ninguna
+        'especialidad': especialidades[0], 'password': 'JPerez'
     },
     {
         'rut': '23456786', 'div': '5',
-        'nombre': 'María', 'apellido_paterno': 'González', 'apellido_materno': 'Ruiz',
+        'nombre': 'Maria', 'apellido_paterno': 'Gonzalez', 'apellido_materno': 'Ruiz',
         'correo': 'maria.gonzalez@gem.cl', 'telefono': '222222222',
         'direccion': 'Av. Siempre Viva 742', 'fecha_nacimiento': date(1985, 8, 20),
-        'especialidad': especialidades[1]  # Matemáticas
+        'especialidad': especialidades[1], 'password': 'MGonzalez'
     },
     {
         'rut': '87654321', 'div': '2',
-        'nombre': 'Pedro', 'apellido_paterno': 'Sánchez', 'apellido_materno': 'Torres',
+        'nombre': 'Pedro', 'apellido_paterno': 'Sanchez', 'apellido_materno': 'Torres',
         'correo': 'pedro.sanchez@gem.cl', 'telefono': '333333333',
         'direccion': 'Calle Uno 111', 'fecha_nacimiento': date(1982, 6, 18),
-        'especialidad': especialidades[2]  # Lenguaje
+        'especialidad': especialidades[2], 'password': 'PSanchez'
     },
     {
         'rut': '76543210', 'div': '4',
-        'nombre': 'Lucía', 'apellido_paterno': 'Martínez', 'apellido_materno': 'Díaz',
+        'nombre': 'Lucia', 'apellido_paterno': 'Martinez', 'apellido_materno': 'Diaz',
         'correo': 'lucia.martinez@gem.cl', 'telefono': '444444444',
         'direccion': 'Calle Dos 222', 'fecha_nacimiento': date(1987, 9, 30),
-        'especialidad': especialidades[3]  # Historia
+        'especialidad': especialidades[3], 'password': 'LMartinez'
     },
     {
         'rut': '65432109', 'div': '6',
         'nombre': 'Javier', 'apellido_paterno': 'Rojas', 'apellido_materno': 'Fuentes',
         'correo': 'javier.rojas@gem.cl', 'telefono': '555555555',
         'direccion': 'Calle Tres 333', 'fecha_nacimiento': date(1983, 2, 11),
-        'especialidad': especialidades[4]  # Biología
+        'especialidad': especialidades[4], 'password': 'JRojas'
     },
     {
         'rut': '54321098', 'div': '8',
         'nombre': 'Carmen', 'apellido_paterno': 'Vidal', 'apellido_materno': 'Carrasco',
         'correo': 'carmen.vidal@gem.cl', 'telefono': '666666666',
         'direccion': 'Calle Cuatro 444', 'fecha_nacimiento': date(1984, 12, 3),
-        'especialidad': especialidades[5]  # Física
+        'especialidad': especialidades[5], 'password': 'CVidal'
     },
     {
         'rut': '19876543', 'div': '1',
-        'nombre': 'Isabel', 'apellido_paterno': 'Fernández', 'apellido_materno': 'Salazar',
+        'nombre': 'Isabel', 'apellido_paterno': 'Fernandez', 'apellido_materno': 'Salazar',
         'correo': 'isabel.fernandez@gem.cl', 'telefono': '121212121',
         'direccion': 'Calle Nueve 999', 'fecha_nacimiento': date(1988, 6, 12),
-        'especialidad': especialidades[10]  # Tecnología
+        'especialidad': especialidades[10], 'password': 'IFernandez'
     },
     {
         'rut': '29876543', 'div': '2',
-        'nombre': 'Tomás', 'apellido_paterno': 'Herrera', 'apellido_materno': 'Bravo',
+        'nombre': 'Tomas', 'apellido_paterno': 'Herrera', 'apellido_materno': 'Bravo',
         'correo': 'tomas.herrera@gem.cl', 'telefono': '131313131',
         'direccion': 'Calle Diez 1010', 'fecha_nacimiento': date(1981, 1, 8),
-        'especialidad': especialidades[0]  # Ninguna
+        'especialidad': especialidades[0], 'password': 'THerrera'
     },
     {
         'rut': '39876543', 'div': '3',
-        'nombre': 'Daniela', 'apellido_paterno': 'Reyes', 'apellido_materno': 'Muñoz',
+        'nombre': 'Daniela', 'apellido_paterno': 'Reyes', 'apellido_materno': 'Munoz',
         'correo': 'daniela.reyes@gem.cl', 'telefono': '141414141',
         'direccion': 'Calle Once 1111', 'fecha_nacimiento': date(1990, 10, 14),
-        'especialidad': especialidades[2]  # Lenguaje
+        'especialidad': especialidades[2], 'password': 'DReyes'
     },
     {
         'rut': '49876543', 'div': '4',
-        'nombre': 'Matías', 'apellido_paterno': 'Lagos', 'apellido_materno': 'Zamora',
+        'nombre': 'Matias', 'apellido_paterno': 'Lagos', 'apellido_materno': 'Zamora',
         'correo': 'matias.lagos@gem.cl', 'telefono': '151515151',
         'direccion': 'Calle Doce 1212', 'fecha_nacimiento': date(1985, 5, 5),
-        'especialidad': especialidades[3]  # Historia
+        'especialidad': especialidades[3], 'password': 'MLagos'
     },
     {
         'rut': '59876543', 'div': '5',
         'nombre': 'Fernanda', 'apellido_paterno': 'Castro', 'apellido_materno': 'Ahumada',
         'correo': 'fernanda.castro@gem.cl', 'telefono': '161616161',
         'direccion': 'Calle Trece 1313', 'fecha_nacimiento': date(1986, 8, 19),
-        'especialidad': especialidades[4]  # Biología
+        'especialidad': especialidades[4], 'password': 'FCastro'
     },
     {
         'rut': '69876543', 'div': '6',
-        'nombre': 'Sebastián', 'apellido_paterno': 'Gutiérrez', 'apellido_materno': 'Ovalle',
+        'nombre': 'Sebastian', 'apellido_paterno': 'Gutierrez', 'apellido_materno': 'Ovalle',
         'correo': 'sebastian.gutierrez@gem.cl', 'telefono': '171717171',
         'direccion': 'Calle Catorce 1414', 'fecha_nacimiento': date(1983, 2, 2),
-        'especialidad': especialidades[5]  # Física
+        'especialidad': especialidades[5], 'password': 'SGutierrez'
     },
     {
         'rut': '79876543', 'div': '7',
-        'nombre': 'Rocío', 'apellido_paterno': 'Alvarado', 'apellido_materno': 'Contreras',
+        'nombre': 'Rocio', 'apellido_paterno': 'Alvarado', 'apellido_materno': 'Contreras',
         'correo': 'rocio.alvarado@gem.cl', 'telefono': '181818181',
         'direccion': 'Calle Quince 1515', 'fecha_nacimiento': date(1987, 7, 7),
-        'especialidad': especialidades[6]  # Química
+        'especialidad': especialidades[6], 'password': 'RAlvarado'
     },
     {
         'rut': '88888888', 'div': '8',
-        'nombre': 'Cristóbal', 'apellido_paterno': 'Navarro', 'apellido_materno': 'Morales',
+        'nombre': 'Cristobal', 'apellido_paterno': 'Navarro', 'apellido_materno': 'Morales',
         'correo': 'cristobal.navarro@gem.cl', 'telefono': '191919191',
-        'direccion': 'Calle Dieciséis 1616', 'fecha_nacimiento': date(1980, 4, 22),
-        'especialidad': especialidades[7]  # Inglés
+        'direccion': 'Calle Dieciseis 1616', 'fecha_nacimiento': date(1980, 4, 22),
+        'especialidad': especialidades[7], 'password': 'CNavarro'
     },
     {
         'rut': '99999999', 'div': '9',
-        'nombre': 'Valentina', 'apellido_paterno': 'Saavedra', 'apellido_materno': 'León',
+        'nombre': 'Valentina', 'apellido_paterno': 'Saavedra', 'apellido_materno': 'Leon',
         'correo': 'valentina.saavedra@gem.cl', 'telefono': '202020202',
         'direccion': 'Calle Diecisiete 1717', 'fecha_nacimiento': date(1991, 3, 17),
-        'especialidad': especialidades[8]  # Educación Física
+        'especialidad': especialidades[8], 'password': 'VSaavedra'
     },
     {
         'rut': '11111111', 'div': '1',
         'nombre': 'Felipe', 'apellido_paterno': 'Ortega', 'apellido_materno': 'Riquelme',
         'correo': 'felipe.ortega@gem.cl', 'telefono': '212121212',
         'direccion': 'Calle Dieciocho 1818', 'fecha_nacimiento': date(1989, 11, 11),
-        'especialidad': especialidades[9]  # Arte
+        'especialidad': especialidades[9], 'password': 'FOrtega'
     },
     {
         'rut': '12121212', 'div': '2',
         'nombre': 'Antonia', 'apellido_paterno': 'Silva', 'apellido_materno': 'Paredes',
         'correo': 'antonia.silva@gem.cl', 'telefono': '222222222',
         'direccion': 'Calle Diecinueve 1919', 'fecha_nacimiento': date(1982, 12, 24),
-        'especialidad': especialidades[10]  # Tecnología
+        'especialidad': especialidades[10], 'password': 'ASilva'
     }
 ]
+
 
 docentes = []
 for data in docentes_data:
@@ -255,10 +257,9 @@ for data in docentes_data:
     )
     
     docentes.append(docente)
-    if created:
-        print(f"✅ Docente {usuario.nombre} {usuario.apellido_paterno} creado con contraseña '{password}'")
-    else:
-        print(f"✅ Docente {usuario.nombre} {usuario.apellido_paterno} ya existe")
+
+print("✅ Todos los docentes fueron creados en el sistema.")
+
 
 # -----------------------------
 # Crear cursos directamente
@@ -374,59 +375,66 @@ print("✅ ClaseAsignatura creado con asignaturas y docentes")
 estudiantes_data = [
     {
         'rut': '34567890', 'div': 'K',
-        'nombre': 'Luis', 'apellido_paterno': 'Ramírez', 'apellido_materno': 'Soto',
+        'nombre': 'Luis', 'apellido_paterno': 'Ramirez', 'apellido_materno': 'Soto',
         'correo': 'luis.ramirez@gem.cl', 'telefono': '333333333',
         'direccion': 'Pje. Los Robles 45', 'fecha_nacimiento': date(2008, 3, 15),
-        'contacto_emergencia': 'Mamá: 999999999',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Mama: 999999999',
+        'clase': cursos[0],
+        'password': 'lramirez'
     },
     {
         'rut': '12345678', 'div': '9',
-        'nombre': 'Ana', 'apellido_paterno': 'González', 'apellido_materno': 'Mendoza',
+        'nombre': 'Ana', 'apellido_paterno': 'Gonzalez', 'apellido_materno': 'Mendoza',
         'correo': 'ana.gonzalez@gem.cl', 'telefono': '912345678',
         'direccion': 'Av. Libertad 123', 'fecha_nacimiento': date(2005, 7, 20),
-        'contacto_emergencia': 'Papá: 998877665',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Papa: 998877665',
+        'clase': cursos[0],
+        'password': 'agonzalez'
     },
     {
         'rut': '23456789', 'div': '1',
-        'nombre': 'Carlos', 'apellido_paterno': 'Vargas', 'apellido_materno': 'Pérez',
+        'nombre': 'Carlos', 'apellido_paterno': 'Vargas', 'apellido_materno': 'Perez',
         'correo': 'carlos.vargas@gem.cl', 'telefono': '923456789',
         'direccion': 'Calle Falsa 742', 'fecha_nacimiento': date(2007, 11, 5),
         'contacto_emergencia': 'Hermano: 987654321',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'clase': cursos[0],
+        'password': 'cvargas'
     },
     {
         'rut': '34567901', 'div': '2',
-        'nombre': 'María', 'apellido_paterno': 'López', 'apellido_materno': 'Rojas',
+        'nombre': 'Maria', 'apellido_paterno': 'Lopez', 'apellido_materno': 'Rojas',
         'correo': 'maria.lopez@gem.cl', 'telefono': '934567890',
         'direccion': 'Pasaje Luna 10', 'fecha_nacimiento': date(2006, 1, 10),
-        'contacto_emergencia': 'Tía: 976543210',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Tia: 976543210',
+        'clase': cursos[0],
+        'password': 'mlopez'
     },
     {
         'rut': '45678902', 'div': '3',
         'nombre': 'Jorge', 'apellido_paterno': 'Torres', 'apellido_materno': 'Silva',
         'correo': 'jorge.torres@gem.cl', 'telefono': '945678901',
         'direccion': 'Av. Las Flores 55', 'fecha_nacimiento': date(2004, 5, 25),
-        'contacto_emergencia': 'Mamá: 965432109',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Mama: 965432109',
+        'clase': cursos[0],
+        'password': 'jtorres'
     },
     {
         'rut': '56789012', 'div': '4',
         'nombre': 'Valentina', 'apellido_paterno': 'Rivas', 'apellido_materno': 'Navarro',
         'correo': 'valentina.rivas@gem.cl', 'telefono': '956789012',
         'direccion': 'Calle Sol 200', 'fecha_nacimiento': date(2008, 9, 30),
-        'contacto_emergencia': 'Papá: 954321098',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Papa: 954321098',
+        'clase': cursos[0],
+        'password': 'vrivas'
     },
     {
         'rut': '67890123', 'div': '5',
-        'nombre': 'Sebastián', 'apellido_paterno': 'Mendoza', 'apellido_materno': 'Campos',
+        'nombre': 'Sebastian', 'apellido_paterno': 'Mendoza', 'apellido_materno': 'Campos',
         'correo': 'sebastian.mendoza@gem.cl', 'telefono': '967890123',
         'direccion': 'Av. Las Palmas 77', 'fecha_nacimiento': date(2005, 12, 1),
-        'contacto_emergencia': 'Mamá: 943210987',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Mama: 943210987',
+        'clase': cursos[0],
+        'password': 'smendoza'
     },
     {
         'rut': '78901234', 'div': '6',
@@ -434,31 +442,35 @@ estudiantes_data = [
         'correo': 'camila.fuentes@gem.cl', 'telefono': '978901234',
         'direccion': 'Pje. La Reina 88', 'fecha_nacimiento': date(2007, 3, 14),
         'contacto_emergencia': 'Hermano: 932109876',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'clase': cursos[0],
+        'password': 'cfuentes'
     },
     {
         'rut': '89012345', 'div': '7',
-        'nombre': 'Diego', 'apellido_paterno': 'Sánchez', 'apellido_materno': 'Muñoz',
+        'nombre': 'Diego', 'apellido_paterno': 'Sanchez', 'apellido_materno': 'Munoz',
         'correo': 'diego.sanchez@gem.cl', 'telefono': '989012345',
         'direccion': 'Calle Norte 15', 'fecha_nacimiento': date(2006, 6, 22),
-        'contacto_emergencia': 'Tía: 921098765',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Tia: 921098765',
+        'clase': cursos[0],
+        'password': 'dsanchez'
     },
     {
         'rut': '90123456', 'div': '8',
         'nombre': 'Isidora', 'apellido_paterno': 'Vega', 'apellido_materno': 'Salazar',
         'correo': 'isidora.vega@gem.cl', 'telefono': '990123456',
         'direccion': 'Av. Sur 101', 'fecha_nacimiento': date(2004, 8, 18),
-        'contacto_emergencia': 'Papá: 910987654',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Papa: 910987654',
+        'clase': cursos[0],
+        'password': 'ivega'
     },
     {
         'rut': '11223344', 'div': 'K',
-        'nombre': 'Felipe', 'apellido_paterno': 'Morales', 'apellido_materno': 'Guzmán',
+        'nombre': 'Felipe', 'apellido_paterno': 'Morales', 'apellido_materno': 'Guzman',
         'correo': 'felipe.morales@gem.cl', 'telefono': '901234567',
         'direccion': 'Pje. Los Cedros 9', 'fecha_nacimiento': date(2005, 2, 28),
-        'contacto_emergencia': 'Mamá: 909876543',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Mama: 909876543',
+        'clase': cursos[0],
+        'password': 'fmorales'
     },
     {
         'rut': '22334455', 'div': '1',
@@ -466,120 +478,151 @@ estudiantes_data = [
         'correo': 'martina.herrera@gem.cl', 'telefono': '912345678',
         'direccion': 'Calle Nueva 456', 'fecha_nacimiento': date(2007, 4, 7),
         'contacto_emergencia': 'Hermano: 908765432',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'clase': cursos[0],
+        'password': 'mherrera'
     },
     {
         'rut': '33445566', 'div': '2',
-        'nombre': 'Matías', 'apellido_paterno': 'Castillo', 'apellido_materno': 'Ríos',
+        'nombre': 'Matias', 'apellido_paterno': 'Castillo', 'apellido_materno': 'Rios',
         'correo': 'matias.castillo@gem.cl', 'telefono': '923456789',
         'direccion': 'Av. Central 321', 'fecha_nacimiento': date(2006, 10, 9),
-        'contacto_emergencia': 'Tía: 907654321',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Tia: 907654321',
+        'clase': cursos[0],
+        'password': 'mcastillo'
     },
     {
         'rut': '44556677', 'div': '3',
-        'nombre': 'Lucía', 'apellido_paterno': 'Pérez', 'apellido_materno': 'Vargas',
+        'nombre': 'Lucia', 'apellido_paterno': 'Perez', 'apellido_materno': 'Vargas',
         'correo': 'lucia.perez@gem.cl', 'telefono': '934567890',
         'direccion': 'Pje. Las Violetas 14', 'fecha_nacimiento': date(2008, 12, 19),
-        'contacto_emergencia': 'Papá: 906543210',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Papa: 906543210',
+        'clase': cursos[0],
+        'password': 'lperez'
     },
     {
         'rut': '55667788', 'div': '4',
-        'nombre': 'Ignacio', 'apellido_paterno': 'Rojas', 'apellido_materno': 'Díaz',
+        'nombre': 'Ignacio', 'apellido_paterno': 'Rojas', 'apellido_materno': 'Diaz',
         'correo': 'ignacio.rojas@gem.cl', 'telefono': '945678901',
         'direccion': 'Calle Sur 33', 'fecha_nacimiento': date(2005, 1, 3),
-        'contacto_emergencia': 'Mamá: 905432109',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'contacto_emergencia': 'Mama: 905432109',
+        'clase': cursos[0],
+        'password': 'irojas'
     },
-    {
+        {
         'rut': '66778899', 'div': '5',
-        'nombre': 'Fernanda', 'apellido_paterno': 'Muñoz', 'apellido_materno': 'Cruz',
-        'correo': 'fernanda.munoz@gem.cl', 'telefono': '956789012',
-        'direccion': 'Av. Los Pinos 8', 'fecha_nacimiento': date(2007, 9, 26),
-        'contacto_emergencia': 'Papá: 904321098',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'nombre': 'Fernanda', 'apellido_paterno': 'Alvarez', 'apellido_materno': 'Castro',
+        'correo': 'fernanda.alvarez@gem.cl', 'telefono': '956789012',
+        'direccion': 'Av. Las Rosas 101', 'fecha_nacimiento': date(2007, 6, 27),
+        'contacto_emergencia': 'Tia: 904321098',
+        'clase': cursos[0],
+        'password': 'falvarez'
     },
     {
         'rut': '77889900', 'div': '6',
-        'nombre': 'Andrés', 'apellido_paterno': 'Salinas', 'apellido_materno': 'Lara',
-        'correo': 'andres.salinas@gem.cl', 'telefono': '967890123',
-        'direccion': 'Pje. Las Acacias 21', 'fecha_nacimiento': date(2006, 11, 12),
-        'contacto_emergencia': 'Hermano: 903210987',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'nombre': 'Andres', 'apellido_paterno': 'Carrasco', 'apellido_materno': 'Espinoza',
+        'correo': 'andres.carrasco@gem.cl', 'telefono': '967890123',
+        'direccion': 'Calle Norte 123', 'fecha_nacimiento': date(2006, 3, 11),
+        'contacto_emergencia': 'Mama: 903210987',
+        'clase': cursos[0],
+        'password': 'acarrasco'
     },
     {
         'rut': '88990011', 'div': '7',
-        'nombre': 'Sofía', 'apellido_paterno': 'Maldonado', 'apellido_materno': 'Torres',
-        'correo': 'sofia.maldonado@gem.cl', 'telefono': '978901234',
-        'direccion': 'Calle del Sol 77', 'fecha_nacimiento': date(2004, 7, 8),
-        'contacto_emergencia': 'Tía: 902109876',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'nombre': 'Sofia', 'apellido_paterno': 'Gallardo', 'apellido_materno': 'Pizarro',
+        'correo': 'sofia.gallardo@gem.cl', 'telefono': '978901234',
+        'direccion': 'Pasaje Central 56', 'fecha_nacimiento': date(2005, 9, 5),
+        'contacto_emergencia': 'Hermano: 902109876',
+        'clase': cursos[0],
+        'password': 'sgallardo'
     },
     {
         'rut': '99001122', 'div': '8',
-        'nombre': 'Tomás', 'apellido_paterno': 'Campos', 'apellido_materno': 'Fuentes',
-        'correo': 'tomas.campos@gem.cl', 'telefono': '989012345',
-        'direccion': 'Av. La Paz 4', 'fecha_nacimiento': date(2005, 5, 17),
-        'contacto_emergencia': 'Mamá: 901098765',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'nombre': 'Tomas', 'apellido_paterno': 'Reyes', 'apellido_materno': 'Saavedra',
+        'correo': 'tomas.reyes@gem.cl', 'telefono': '989012345',
+        'direccion': 'Av. Libertad 67', 'fecha_nacimiento': date(2008, 7, 8),
+        'contacto_emergencia': 'Papa: 901098765',
+        'clase': cursos[0],
+        'password': 'treyes'
     },
     {
-        'rut': '10111213', 'div': 'K',
-        'nombre': 'Antonia', 'apellido_paterno': 'Ortiz', 'apellido_materno': 'Vega',
-        'correo': 'antonia.ortiz@gem.cl', 'telefono': '990123456',
-        'direccion': 'Pje. Los Eucaliptos 23', 'fecha_nacimiento': date(2006, 8, 30),
-        'contacto_emergencia': 'Papá: 900987654',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'rut': '10111213', 'div': '9',
+        'nombre': 'Antonia', 'apellido_paterno': 'Ortega', 'apellido_materno': 'Bravo',
+        'correo': 'antonia.ortega@gem.cl', 'telefono': '990123456',
+        'direccion': 'Pje. Las Palmas 8', 'fecha_nacimiento': date(2004, 10, 23),
+        'contacto_emergencia': 'Mama: 900987654',
+        'clase': cursos[0],
+        'password': 'aortega'
     },
     {
-        'rut': '11121314', 'div': '1',
-        'nombre': 'Gabriel', 'apellido_paterno': 'Salazar', 'apellido_materno': 'Morales',
-        'correo': 'gabriel.salazar@gem.cl', 'telefono': '901234567',
-        'direccion': 'Calle Luna 19', 'fecha_nacimiento': date(2007, 2, 11),
-        'contacto_emergencia': 'Hermano: 899876543',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'rut': '12131415', 'div': 'K',
+        'nombre': 'Gabriel', 'apellido_paterno': 'Saez', 'apellido_materno': 'Alarcon',
+        'correo': 'gabriel.saez@gem.cl', 'telefono': '901234567',
+        'direccion': 'Calle Estrella 90', 'fecha_nacimiento': date(2007, 2, 17),
+        'contacto_emergencia': 'Papa: 899876543',
+        'clase': cursos[0],
+        'password': 'gsaez'
     },
     {
-        'rut': '12131415', 'div': '2',
-        'nombre': 'Isabel', 'apellido_paterno': 'Gutiérrez', 'apellido_materno': 'Herrera',
-        'correo': 'isabel.gutierrez@gem.cl', 'telefono': '912345678',
-        'direccion': 'Av. Los Olmos 50', 'fecha_nacimiento': date(2004, 3, 5),
-        'contacto_emergencia': 'Tía: 898765432',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'rut': '13141516', 'div': '1',
+        'nombre': 'Isabel', 'apellido_paterno': 'Cortes', 'apellido_materno': 'Nunez',
+        'correo': 'isabel.cortes@gem.cl', 'telefono': '912345678',
+        'direccion': 'Av. Andes 321', 'fecha_nacimiento': date(2006, 11, 2),
+        'contacto_emergencia': 'Hermana: 898765432',
+        'clase': cursos[0],
+        'password': 'icortes'
     },
     {
-        'rut': '13141516', 'div': '3',
-        'nombre': 'Nicolás', 'apellido_paterno': 'Rivas', 'apellido_materno': 'Castillo',
-        'correo': 'nicolas.rivas@gem.cl', 'telefono': '923456789',
-        'direccion': 'Pje. Los Nogales 12', 'fecha_nacimiento': date(2005, 10, 27),
-        'contacto_emergencia': 'Papá: 897654321',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'rut': '14151617', 'div': '2',
+        'nombre': 'Valentina', 'apellido_paterno': 'Rojas', 'apellido_materno': 'Salazar',
+        'correo': 'valentina.rojas@gem.cl', 'telefono': '923456789',
+        'direccion': 'Pje. Sur 111', 'fecha_nacimiento': date(2007, 4, 25),
+        'contacto_emergencia': 'Papa: 887654321',
+        'clase': cursos[0],
+        'password': 'vrojas'
     },
     {
-        'rut': '14151617', 'div': '4',
-        'nombre': 'Emilia', 'apellido_paterno': 'Campos', 'apellido_materno': 'Pérez',
-        'correo': 'emilia.campos@gem.cl', 'telefono': '934567890',
-        'direccion': 'Calle Las Camelias 5', 'fecha_nacimiento': date(2006, 12, 16),
-        'contacto_emergencia': 'Mamá: 896543210',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'rut': '15161718', 'div': '3',
+        'nombre': 'Lucas', 'apellido_paterno': 'Araya', 'apellido_materno': 'Gomez',
+        'correo': 'lucas.araya@gem.cl', 'telefono': '934567890',
+        'direccion': 'Camino Viejo 33', 'fecha_nacimiento': date(2006, 12, 15),
+        'contacto_emergencia': 'Mama: 876543210',
+        'clase': cursos[0],
+        'password': 'laraya'
     },
     {
-        'rut': '15161718', 'div': '5',
-        'nombre': 'Juan', 'apellido_paterno': 'Lara', 'apellido_materno': 'Salinas',
-        'correo': 'juan.lara@gem.cl', 'telefono': '945678901',
-        'direccion': 'Av. Los Alamos 101', 'fecha_nacimiento': date(2007, 1, 22),
-        'contacto_emergencia': 'Papá: 895432109',
-        'clase': cursos[0]  # Asignamos a la primera clase
+        'rut': '16171819', 'div': '4',
+        'nombre': 'Martina', 'apellido_paterno': 'Silva', 'apellido_materno': 'Venegas',
+        'correo': 'martina.silva@gem.cl', 'telefono': '945678901',
+        'direccion': 'Av. Lomas 72', 'fecha_nacimiento': date(2005, 5, 3),
+        'contacto_emergencia': 'Tia: 865432109',
+        'clase': cursos[0],
+        'password': 'msilva'
     },
+    {
+        'rut': '17181920', 'div': '5',
+        'nombre': 'Benjamin', 'apellido_paterno': 'Vera', 'apellido_materno': 'Hidalgo',
+        'correo': 'benjamin.vera@gem.cl', 'telefono': '956789012',
+        'direccion': 'Villa Esperanza 9', 'fecha_nacimiento': date(2007, 8, 30),
+        'contacto_emergencia': 'Abuela: 854321098',
+        'clase': cursos[0],
+        'password': 'bvera'
+    },
+    {
+        'rut': '18192021', 'div': '6',
+        'nombre': 'Camila', 'apellido_paterno': 'Fuentes', 'apellido_materno': 'Riquelme',
+        'correo': 'camila.fuentes@gem.cl', 'telefono': '967890123',
+        'direccion': 'Calle Azul 45', 'fecha_nacimiento': date(2006, 1, 19),
+        'contacto_emergencia': 'Mama: 843210987',
+        'clase': cursos[0],
+        'password': 'cfuentes'
+    }
 ]
 
 for data in estudiantes_data:
-    password = f"{data['nombre'][0]}{data['apellido_paterno']}".lower()
     auth_user = AuthUser.objects.create_user(
         rut=data['rut'],
         div=data['div'],
-        password=password
+        password=data['password']  # Usamos el password definido en el diccionario
     )
     usuario = Usuario.objects.create(
         nombre=data['nombre'],
@@ -598,6 +641,6 @@ for data in estudiantes_data:
         contacto_emergencia=data['contacto_emergencia'],
         clase=data['clase']
     )
-    print(f"✅ Estudiante {usuario.nombre} {usuario.apellido_paterno} creado con contraseña '{password}'")
 
 print("✅ Estudiantes creados")
+

@@ -797,3 +797,12 @@ class UserDataView(View):
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
+        
+class SurveysView(TemplateView):
+    template_name = 'surveys.html'
+
+class TasksView(TemplateView):
+    template_name = 'tasks.html'
+
+class TestsView(TemplateView):
+    template_name = 'tests.html'

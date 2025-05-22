@@ -4,7 +4,7 @@ from .views import (
     UserDetailView, UserUpdateView, UserDeleteView, ProfesorPanelView,
     EstudiantePanelView, AttendanceView, login_view, LogoutView,
     RegisterView, CreateAdminView, ChangePasswordView, UserToggleStatusView,
-    UserDataView
+    UserDataView,SurveysView,TasksView,TestsView
 )
 
 urlpatterns = [
@@ -31,5 +31,10 @@ urlpatterns = [
     # URLs para el manejo de datos de usuario
     path('users/<str:user_id>/get_data/', UserDataView.as_view(), name='get_user_data'),
     path('users/<str:user_id>/update/', UserDataView.as_view(), name='update_user'),
+
+    path('surveys/', SurveysView.as_view(), name='surveys'),
+    path('tasks/', TasksView.as_view(), name='tasks'),
+    path('tests/', TestsView.as_view(), name='tests'),
+
 ]
 

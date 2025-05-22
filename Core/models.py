@@ -50,19 +50,19 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
 
 # Clase usuarios #
 class Usuario(models.Model):
-    nombre = models.CharField(max_length=100)  # Nombre del usuario
-    apellido_paterno = models.CharField(max_length=100)  # Apellido paterno
-    apellido_materno = models.CharField(max_length=100)  # Apellido materno
-    rut = models.CharField(max_length=10, unique=True)  # RUT sin dígito verificador, único por usuario
-    div = models.CharField(max_length=1)  # Dígito verificador del RUT
-    correo = models.EmailField(unique=True)  # Correo electrónico único
-    telefono = models.CharField(max_length=15)  # Teléfono de contacto
-    direccion = models.TextField()  # Dirección física del usuario
-    fecha_nacimiento = models.DateField()  # Fecha de nacimiento del usuario
-    fecha_creacion = models.DateTimeField(auto_now_add=True)  # Fecha de creación del registro (autoasignado)
+    rut = models.CharField(max_length=20, unique=True)
+    div = models.CharField(max_length=1)
+    nombre = models.CharField(max_length=100)
+    apellido_paterno = models.CharField(max_length=100)
+    apellido_materno = models.CharField(max_length=100)
+    correo = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=20)
+    direccion = models.TextField()
+    fecha_nacimiento = models.DateField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
     auth_user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
-    activador = models.BooleanField(default=True)  # Estado de activación de la cuenta
-    password = models.CharField(max_length=128)
+    activador = models.BooleanField(default=False)
+    password = models.CharField(max_length=128, null=True)
 
     def __str__(self):
         return f'{self.nombre} {self.apellido_paterno}'  # Representación legible del objeto

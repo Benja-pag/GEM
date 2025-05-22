@@ -38,6 +38,7 @@ python manage.py makemigrations (pasar tablas a la base de datos)
 python manage.py migrate (migraciones a la base de datos)
 python create_user.py (llenar la base de datos)
 python manage.py runserver (Para iniciar)
+python manage.py flush (eliminar datos de la base de datos)
 
 Comando habituales base de datos:
 \c gem (para entrar la base de datos)

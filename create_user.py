@@ -610,7 +610,7 @@ estudiantes_data = [
     {
         'rut': '18192021', 'div': '6',
         'nombre': 'Camila', 'apellido_paterno': 'Fuentes', 'apellido_materno': 'Riquelme',
-        'correo': 'camila.fuentes@gem.cl', 'telefono': '967890123',
+        'correo': 'camila.fuentesR@gem.cl', 'telefono': '967890123',
         'direccion': 'Calle Azul 45', 'fecha_nacimiento': date(2006, 1, 19),
         'contacto_emergencia': 'Mama: 843210987',
         'clase': cursos[0],

@@ -35,25 +35,38 @@ class AdminPanelView(View):
             return redirect('login')
         try:
             # Obtener estadísticas
-            total_estudiantes = Usuario.objects.filter(estudiante__isnull=False).count()
-            total_profesores = Usuario.objects.filter(docente__isnull=False).count()
+            total_estudiantes = Estudiante.objects.count()
+            total_profesores = Docente.objects.count()
             total_clases = Clase.objects.count()
-            total_cursos = Asignatura.objects.count()  # Total de asignaturas
-            # Obtener usuarios
+            total_cursos = Asignatura.objects.count()
+            
+            # Obtener profesores para el formulario de creación de curso
+            profesores = Docente.objects.all()
+            
+            # Obtener todos los estudiantes
+            estudiantes_sin_curso = Estudiante.objects.all().select_related('usuario', 'clase')
+            
+            # Obtener todas las clases con el conteo de estudiantes
+            clases = Clase.objects.annotate(
+                total_estudiantes=Count('estudiantes')
+            ).all()
+            
+            # Obtener todos los usuarios ordenados por fecha de creación
             usuarios = Usuario.objects.all().order_by('-fecha_creacion')
-            # Obtener todas las clases sin límite
-            clases = Clase.objects.all().order_by('nombre')
+            
             # Obtener todas las asignaturas
-            asignaturas = Asignatura.objects.all().order_by('codigo')
+            asignaturas = Asignatura.objects.all()
+            
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
                 'total_clases': total_clases,
                 'total_cursos': total_cursos,
-                'usuarios': usuarios,
+                'profesores': profesores,
+                'estudiantes_sin_curso': estudiantes_sin_curso,
                 'clases': clases,
-                'asignaturas': asignaturas,
-                'now': timezone.now(),
+                'usuarios': usuarios,
+                'asignaturas': asignaturas
             }
             return render(request, 'admin_panel.html', context)
         except Exception as e:

@@ -26,10 +26,14 @@ $(document).ready(function() {
     });
 
     // Manejar el cambio de estado de usuario
-    $('.toggle-user-status').click(function() {
+    $('.toggle-user-status').click(function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const userId = $(this).data('user-id');
         const button = $(this);
-        const statusCell = button.closest('tr').find('td:nth-child(5)');
+        const row = button.closest('tr');
+        const statusCell = row.find('td:nth-child(5) .badge'); // Buscar el badge dentro de la celda de estado
 
         Swal.fire({
             title: '¿Estás seguro?',
@@ -43,19 +47,22 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: `/users/${userId}/toggle_status/`,
+                    url: `/users/${userId}/toggle-status/`,
                     type: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
                     success: function(response) {
                         if (response.success) {
                             // Actualizar el botón y el estado en la tabla
                             if (response.is_active) {
                                 button.removeClass('btn-danger').addClass('btn-success');
                                 button.find('i').removeClass('fa-user-slash').addClass('fa-user-check');
-                                statusCell.text('Activo');
+                                statusCell.removeClass('bg-danger').addClass('bg-success').text('Activo');
                             } else {
                                 button.removeClass('btn-success').addClass('btn-danger');
                                 button.find('i').removeClass('fa-user-check').addClass('fa-user-slash');
-                                statusCell.text('Inactivo');
+                                statusCell.removeClass('bg-success').addClass('bg-danger').text('Inactivo');
                             }
                             // Actualizar el atributo data-is-active
                             button.data('is-active', response.is_active.toString());
@@ -63,7 +70,9 @@ $(document).ready(function() {
                             Swal.fire({
                                 icon: 'success',
                                 title: '¡Éxito!',
-                                text: `Usuario ${response.is_active ? 'activado' : 'desactivado'} exitosamente`
+                                text: `Usuario ${response.is_active ? 'activado' : 'desactivado'} exitosamente`,
+                                timer: 2000,
+                                showConfirmButton: false
                             });
                         } else {
                             Swal.fire({

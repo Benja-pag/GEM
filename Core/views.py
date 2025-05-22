@@ -525,9 +525,14 @@ def login_view(request):
             # Obtener el AuthUser asociado
             auth_user = usuario.auth_user
             
-            # Verificar si el usuario está activo
+            # Verificar si el usuario está activo en el sistema de autenticación
             if not auth_user.is_active:
                 messages.error(request, 'Usuario desactivado. Por favor comuníquese con un administrador.')
+                return render(request, 'login.html')
+            
+            # Verificar si el usuario está activo en nuestro sistema
+            if not usuario.activador:
+                messages.error(request, 'Su cuenta está inactiva. Por favor comuníquese con un administrador.')
                 return render(request, 'login.html')
             
             # Verificar la contraseña usando check_password
@@ -758,23 +763,44 @@ class ChangePasswordView(View):
             messages.error(request, f'Error al cambiar contraseña: {str(e)}')
             return render(request, self.template_name)
 
+@method_decorator(login_required, name='dispatch')
 @method_decorator(csrf_exempt, name='dispatch')
-class UserToggleStatusView(View):
+class ToggleUserStatusView(View):
     def post(self, request, user_id):
         try:
-            if not request.user.is_admin:
+            print(f"Usuario autenticado: {request.user.is_authenticated}")
+            print(f"Es admin: {request.user.is_admin}")
+            print(f"User ID: {user_id}")
+            print(f"Request user: {request.user}")
+            print(f"Request user type: {type(request.user)}")
+            print(f"Request user attributes: {dir(request.user)}")
+            
+            # Verificar si el usuario está autenticado
+            if not request.user.is_authenticated:
+                return JsonResponse({'success': False, 'error': 'Usuario no autenticado'})
+            
+            # Verificar si el usuario es administrador
+            if not hasattr(request.user, 'is_admin') or not request.user.is_admin:
                 return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
             
             usuario = get_object_or_404(Usuario, id=user_id)
+            print(f"Usuario encontrado: {usuario}")
+            
+            # No permitir desactivar administradores máximos
+            if hasattr(usuario, 'administrativo') and usuario.administrativo.rol == 'ADMINISTRADOR_MAXIMO':
+                return JsonResponse({'success': False, 'error': 'No se puede desactivar un administrador máximo'})
+            
             # Invertir el estado actual
-            usuario.auth_user.is_active = not usuario.auth_user.is_active
-            usuario.auth_user.save()
+            usuario.activador = not usuario.activador
+            usuario.save()
+            print(f"Nuevo estado: {usuario.activador}")
             
             return JsonResponse({
                 'success': True,
-                'is_active': usuario.auth_user.is_active
+                'is_active': usuario.activador
             })
         except Exception as e:
+            print(f"Error: {str(e)}")
             return JsonResponse({'success': False, 'error': str(e)})
 
 @method_decorator(csrf_exempt, name='dispatch')

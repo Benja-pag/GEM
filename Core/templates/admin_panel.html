@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+{% csrf_token %}
 {% if user.is_authenticated %}
 <div class="container-fluid">
     <div class="row">
@@ -563,7 +564,11 @@
                                         Estudiante
                                     {% endif %}
                                 </td>
-                                <td>{% if usuario.auth_user.is_active %}Activo{% else %}Inactivo{% endif %}</td>
+                                <td>
+                                    <span class="badge {% if usuario.activador %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if usuario.activador %}Activo{% else %}Inactivo{% endif %}
+                                    </span>
+                                </td>
                                 <td>
                                     <div class="btn-group">
                                         <a href="{% url 'user_detail' usuario.id %}" class="btn btn-info btn-sm" title="Ver detalles">
@@ -572,11 +577,11 @@
                                         <button type="button" class="btn btn-warning btn-sm edit-user" data-user-id="{{ usuario.id }}" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="btn btn-sm toggle-user-status {% if usuario.auth_user.is_active %}btn-success{% else %}btn-danger{% endif %}" 
+                                        <button class="btn btn-sm toggle-user-status {% if usuario.activador %}btn-success{% else %}btn-danger{% endif %}" 
                                                 data-user-id="{{ usuario.id }}" 
-                                                data-is-active="{{ usuario.auth_user.is_active|lower }}"
-                                                title="{% if usuario.auth_user.is_active %}Desactivar{% else %}Activar{% endif %}">
-                                            <i class="fas {% if usuario.auth_user.is_active %}fa-user-check{% else %}fa-user-slash{% endif %}"></i>
+                                                data-is-active="{{ usuario.activador|lower }}"
+                                                title="{% if usuario.activador %}Desactivar{% else %}Activar{% endif %}">
+                                            <i class="fas {% if usuario.activador %}fa-user-check{% else %}fa-user-slash{% endif %}"></i>
                                         </button>
                                         <button class="btn btn-danger btn-sm delete-user" data-user-id="{{ usuario.id }}" title="Eliminar">
                                             <i class="fas fa-trash"></i>
@@ -773,8 +778,13 @@
 </div>
 {% else %}
 <div class="container mt-5">
-    <div class="alert alert-danger" role="alert">
-        Debes iniciar sesión para acceder a esta página.
+    <div class="alert alert-warning">
+        <h4 class="alert-heading">Acceso Denegado</h4>
+        <p>Debes iniciar sesión para acceder a esta página.</p>
+        <hr>
+        <p class="mb-0">
+            <a href="{% url 'login' %}" class="btn btn-primary">Iniciar Sesión</a>
+        </p>
     </div>
 </div>
 {% endif %}
@@ -802,5 +812,4 @@
         });
     });
 </script>
-<script src="{% static 'js/user_management.js' %}"></script>
 {% endblock %}

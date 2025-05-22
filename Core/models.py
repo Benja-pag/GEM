@@ -61,7 +61,7 @@ class Usuario(models.Model):
     fecha_nacimiento = models.DateField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     auth_user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
-    activador = models.BooleanField(default=False)
+    activador = models.BooleanField(default=True)
     password = models.CharField(max_length=128, null=True)
 
     def __str__(self):

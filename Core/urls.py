@@ -33,5 +33,6 @@ urlpatterns = [
     path('surveys/', SurveysView.as_view(), name='surveys'),
     path('tasks/', TasksView.as_view(), name='tasks'),
     path('tests/', TestsView.as_view(), name='tests'),
+    path('core/stats/', AdminPanelView.as_view(), name='core_stats'),
 ]
 

@@ -470,17 +470,15 @@ class ProfesorPanelView(View):
         
         docente = request.user.usuario.docente
         # Obtener clases donde el docente es profesor jefe
-        clases_profesor_jefe = Clase.objects.filter(profesor_jefe=docente)
-        # Obtener clases donde el docente imparte asignaturas
-        clases_asignaturas = Clase.objects.filter(asignatura__docente=docente)
-        # Combinar ambas querysets
-        clases = (clases_profesor_jefe | clases_asignaturas).distinct()
-        # Obtener las notas de las asignaturas que imparte el docente
-        notas = Nota.objects.filter(asignatura__docente=docente)
+        clases_profesor_jefe = Clase.objects.filter(profesor_jefe=docente).annotate(
+            total_estudiantes=Count('estudiantes')
+        )
+        # Obtener asignaturas que imparte el docente
+        asignaturas = Asignatura.objects.filter(docente=docente).select_related('clase')
         
         context = {
-            'clases': clases,
-            'notas': notas
+            'clases_profesor_jefe': clases_profesor_jefe,
+            'asignaturas': asignaturas
         }
         return render(request, 'teacher_panel.html', context)
 

@@ -3,28 +3,73 @@
 {% if user.is_authenticated %}
 <div class="container mt-4">
     <h1 class="mb-4">Panel de Docente</h1>
+    
+    <!-- Información del Profesor -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Información del Profesor</h5>
+                </div>
+                <div class="card-body">
+                    <h5>{{ user.usuario.nombre }} {{ user.usuario.apellido_paterno }} {{ user.usuario.apellido_materno }}</h5>
+                    <p class="text-muted">RUT: {{ user.usuario.rut }}-{{ user.usuario.div }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
-        <div class="col-md-4">
+        <!-- Curso como Profesor Jefe -->
+        {% if clases_profesor_jefe %}
+        <div class="col-md-6">
             <div class="card text-white bg-info mb-3">
-                <div class="card-header">Asignaturas</div>
+                <div class="card-header">Curso como Profesor Jefe</div>
                 <div class="card-body">
-                    <h5 class="card-title">Próximamente</h5>
-                    <p class="card-text">Aquí podrás gestionar tus clases y asignaturas.</p>
+                    {% for clase in clases_profesor_jefe %}
+                    <h5 class="card-title">{{ clase.nombre }}</h5>
+                    <p class="card-text">
+                        <strong>Sala:</strong> {{ clase.sala }}<br>
+                        <strong>Capacidad:</strong> {{ clase.capacidad }} estudiantes<br>
+                        <strong>Total Estudiantes:</strong> {{ clase.total_estudiantes }}
+                    </p>
+                    <a href="#" class="btn btn-light">Ver Detalles del Curso</a>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        {% endif %}
+
+        <!-- Asignaturas que imparte -->
+        <div class="col-md-6">
             <div class="card text-white bg-success mb-3">
-                <div class="card-header">Alumnos</div>
+                <div class="card-header">Asignaturas que imparte</div>
                 <div class="card-body">
-                    <h5 class="card-title">Próximamente</h5>
-                    <p class="card-text">Visualiza y comunica con tus estudiantes.</p>
+                    {% if asignaturas %}
+                        {% for asignatura in asignaturas %}
+                        <div class="mb-3">
+                            <h5 class="card-title">{{ asignatura.nombre }}</h5>
+                            <p class="card-text">
+                                <strong>Código:</strong> {{ asignatura.codigo }}<br>
+                                <strong>Curso:</strong> {{ asignatura.clase.nombre }}<br>
+                                <strong>Horario:</strong> {{ asignatura.dia }} {{ asignatura.horario }}
+                            </p>
+                            <a href="#" class="btn btn-light">Ver Detalles</a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="card-text">No tienes asignaturas asignadas actualmente.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+    </div>
+
+    <!-- Mensajes y Notificaciones -->
+    <div class="row mt-4">
+        <div class="col-md-12">
             <div class="card text-white bg-warning mb-3">
-                <div class="card-header">Mensajes</div>
+                <div class="card-header">Mensajes y Notificaciones</div>
                 <div class="card-body">
                     <h5 class="card-title">Próximamente</h5>
                     <p class="card-text">Chatea con estudiantes y recibe notificaciones.</p>

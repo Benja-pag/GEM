@@ -39,6 +39,7 @@ class AdminPanelView(View):
             total_profesores = Docente.objects.count()
             total_clases = Clase.objects.count()
             total_cursos = Asignatura.objects.count()
+            total_administradores = Administrativo.objects.count()
             
             # Obtener profesores para el formulario de creación de curso
             profesores = Docente.objects.all()
@@ -62,6 +63,7 @@ class AdminPanelView(View):
                 'total_profesores': total_profesores,
                 'total_clases': total_clases,
                 'total_cursos': total_cursos,
+                'total_administradores': total_administradores,
                 'profesores': profesores,
                 'estudiantes_sin_curso': estudiantes_sin_curso,
                 'clases': clases,

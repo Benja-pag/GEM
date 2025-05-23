@@ -1,15 +1,15 @@
 from django.urls import path
-from .views import (
+from Core.views import (
     HomeView, AdminPanelView, UserManagementView, UserCreateView,
     UserDetailView, UserUpdateView, UserDeleteView, ProfesorPanelView,
-    EstudiantePanelView, AttendanceView, login_view, LogoutView,
+    EstudiantePanelView, AttendanceView, LoginView, LogoutView,
     RegisterView, CreateAdminView, ChangePasswordView,
     UserDataView, SurveysView, TasksView, TestsView, ToggleUserStatusView
 )
 
 urlpatterns = [
     # URLs de autenticación
-    path('login/', login_view, name='login'),
+    path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', RegisterView.as_view(), name='register'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),

@@ -1,4 +1,6 @@
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
+from Core.models import Usuario
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
@@ -20,12 +22,15 @@ class LoginView(View):
     def post(self, request):
         correo = request.POST.get('correo')
         password = request.POST.get('password')
-
+        print(correo)
+        
         if not correo or not password:
             messages.error(request, 'Por favor ingrese correo y contraseña')
             return render(request, self.template_name)
 
-        usuario = obtener_usuario_por_correo(correo)
+        # usuario = obtener_usuario_por_correo(correo)
+       
+        usuario = get_object_or_404(Usuario, correo=correo)
         if not usuario:
             messages.error(request, 'El correo no está registrado')
             return render(request, self.template_name)

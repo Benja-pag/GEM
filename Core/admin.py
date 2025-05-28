@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     AuthUser, Usuario, Administrativo, Docente, Estudiante,
-    Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, Nota, Asignatura
+    Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, Asignatura
 )
 
 class AuthUserAdmin(UserAdmin):
@@ -21,17 +21,17 @@ class AuthUserAdmin(UserAdmin):
         ),
     )
 
-class ClaseAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'profesor_jefe', 'sala')
-    list_filter = ('profesor_jefe',)
-    search_fields = ('nombre', 'sala')
-    ordering = ('nombre',)
+# class ClaseAdmin(admin.ModelAdmin):
+#     list_display = ('nombre', 'profesor_jefe', 'sala')
+#     list_filter = ('profesor_jefe',)
+#     search_fields = ('nombre', 'sala')
+#     ordering = ('nombre',)
 
-class AsignaturaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'clase', 'docente', 'dia', 'horario')
-    list_filter = ('clase', 'docente', 'dia')
-    search_fields = ('nombre', 'codigo')
-    ordering = ('clase', 'dia', 'horario')
+# class AsignaturaAdmin(admin.ModelAdmin):
+#     list_display = ('nombre', 'clase', 'docente', 'dia', 'horario')
+#     list_filter = ('clase', 'docente', 'dia')
+#     search_fields = ('nombre', 'codigo')
+#     ordering = ('clase', 'dia', 'horario')
 
 admin.site.register(AuthUser, AuthUserAdmin)
 admin.site.register(Usuario)
@@ -41,7 +41,6 @@ admin.site.register(Estudiante)
 admin.site.register(Asistencia)
 admin.site.register(CalendarioClase)
 admin.site.register(CalendarioColegio)
-admin.site.register(Clase, ClaseAdmin)
+admin.site.register(Clase)
 admin.site.register(Foro)
-admin.site.register(Nota)
-admin.site.register(Asignatura, AsignaturaAdmin)
+admin.site.register(Asignatura)

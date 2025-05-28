@@ -102,7 +102,7 @@ class Especialidad(models.Model):
 class Estudiante(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
     contacto_emergencia = models.CharField(max_length=100)
-    clase = models.ForeignKey('Clase', on_delete=models.SET_NULL, null=True, blank=True, related_name='estudiantes')
+    curso = models.ForeignKey('Curso', on_delete=models.SET_NULL, null=True, blank=True, related_name='estudiantes')
 
     def __str__(self):
         return f'Estudiante: {self.usuario}'

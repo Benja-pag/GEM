@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, Nota, AuthUser, Asignatura
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida
 from django.db.models import Count, Avg
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -19,8 +19,7 @@ class AdminPanelView(View):
             # Obtener estadísticas
             total_estudiantes = Estudiante.objects.count()
             total_profesores = Docente.objects.count()
-            total_clases = Clase.objects.count()
-            total_cursos = Asignatura.objects.count()
+            total_asignaturas_impartidas = AsignaturaImpartida.objects.count()
             total_administradores = Administrativo.objects.count()
             
             # Obtener profesores para el formulario de creación de curso
@@ -28,11 +27,6 @@ class AdminPanelView(View):
             
             # Obtener todos los estudiantes
             estudiantes_sin_curso = Estudiante.objects.all().select_related('usuario', 'clase')
-            
-            # Obtener todas las clases con el conteo de estudiantes
-            clases = Clase.objects.annotate(
-                total_estudiantes=Count('estudiantes')
-            ).all()
             
             # Obtener todos los usuarios ordenados por fecha de creación
             usuarios = Usuario.objects.all().order_by('-fecha_creacion')
@@ -43,12 +37,10 @@ class AdminPanelView(View):
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
-                'total_clases': total_clases,
-                'total_cursos': total_cursos,
+                'total_asignaturas_impartidas': total_asignaturas_impartidas,
                 'total_administradores': total_administradores,
                 'profesores': profesores,
                 'estudiantes_sin_curso': estudiantes_sin_curso,
-                'clases': clases,
                 'usuarios': usuarios,
                 'asignaturas': asignaturas
             }

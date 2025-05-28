@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator
+from django.utils import timezone
 #Tabla Asignatura#
 class Asignatura(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
@@ -13,7 +14,6 @@ class Asignatura(models.Model):
 class AsignaturaImpartida(models.Model):
     asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE, related_name='imparticiones')
     docente = models.ForeignKey('Docente', on_delete=models.SET_NULL, null=True, related_name='asignaturas_impartidas')
-    clase = models.ForeignKey('Clase', on_delete=models.CASCADE, related_name='asignaturas_impartidas')
     codigo = models.CharField(
         max_length=20,
         unique=True,
@@ -28,12 +28,12 @@ class AsignaturaImpartida(models.Model):
     horario = models.CharField(max_length=100, help_text='Ej: Lunes 08:00-09:30')
 
     def __str__(self):
-        return f'{self.asignatura.nombre} - {self.clase}'
+        return f'{self.codigo} - {self.asignatura.nombre} - {self.docente.usuario.nombre} {self.docente.usuario.apellido_paterno}'
 #Tabla Asignatura_inscrita#
 class AsignaturaInscrita(models.Model):
     estudiante = models.ForeignKey('Estudiante', on_delete=models.CASCADE, related_name='asignaturas_inscritas')
     asignatura_impartida = models.ForeignKey('AsignaturaImpartida', on_delete=models.CASCADE, related_name='inscripciones')
-    fecha_inscripcion = models.DateTimeField(auto_now_add=True)
+    fecha_inscripcion = models.DateTimeField(default=timezone.now)
     validada = models.BooleanField(default=False, help_text="Si la inscripción fue confirmada por el sistema o administración")
 
     class Meta:
@@ -70,12 +70,12 @@ class Curso(models.Model):
 
 #Tabla Asistencia#
 class Asistencia(models.Model):
-    clase = models.ForeignKey('Clase', on_delete=models.CASCADE, related_name='asistencias')
+    clase = models.ForeignKey('Clase', on_delete=models.CASCADE, related_name='asistencias', null=True, blank=True)
     estudiante = models.ForeignKey('Estudiante', on_delete=models.CASCADE, related_name='asistencias')
     presente = models.BooleanField(default=False)
     justificado = models.BooleanField(default=False)
     observaciones = models.TextField(blank=True, null=True)
-    fecha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_registro = models.DateTimeField(default=timezone.now)
 
     class Meta:
         unique_together = ('clase', 'estudiante')  # Un registro único por estudiante y clase

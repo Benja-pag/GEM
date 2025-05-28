@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.http import JsonResponse
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, Nota, AuthUser, Asignatura
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura
 from django.db.models import Count, Avg
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, DetailView
 from django.utils import timezone
@@ -23,11 +23,11 @@ class EstudiantePanelView(View):
             messages.error(request, 'No tienes permiso para acceder a esta página')
             return redirect('home')
         estudiante = Estudiante.objects.first()  # Temporalmente mostramos el primer estudiante
-        notas = Nota.objects.filter(estudiante=estudiante)
+        # notas = Nota.objects.filter(estudiante=estudiante)
         asistencias = Asistencia.objects.filter(estudiante=estudiante)
         
         context = {
-            'notas': notas,
+            # 'notas': notas,
             'asistencias': asistencias
         }
         return render(request, 'students_panel.html', context)

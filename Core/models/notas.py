@@ -2,39 +2,32 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 
-from django.db import models
+class Nota(models.Model):
+    TIPO_EVALUACION_CHOICES = [
+        ('Prueba', 'Prueba'),
+        ('Tarea', 'Tarea'),
+        ('Examen', 'Examen'),
+        ('Proyecto', 'Proyecto'),
+        # Puedes agregar más tipos de evaluación si quieres
+    ]
 
-# Evaluaciones Base: Plantillas generales por asignatura o tipo
-class EvaluacionBase(models.Model):
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField(blank=True, null=True)
-    asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE, related_name='evaluaciones_base')
-    ponderacion = models.DecimalField(max_digits=5, decimal_places=2, help_text="Porcentaje que representa esta evaluación (Ej: 20.00)")
-    
-    def __str__(self):
-        return f'{self.nombre} - {self.asignatura.nombre}'
-
-
-# Evaluaciones específicas aplicadas en una clase
-class Evaluacion(models.Model):
-    evaluacion_base = models.ForeignKey('EvaluacionBase', on_delete=models.CASCADE, related_name='evaluaciones')
-    clase = models.ForeignKey('Clase', on_delete=models.CASCADE, related_name='evaluaciones')
+    tipo_evaluacion = models.CharField(max_length=20, choices=TIPO_EVALUACION_CHOICES)
+    estudiante = models.ForeignKey('Estudiante', on_delete=models.CASCADE)
+    asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE)
+    nota = models.DecimalField(max_digits=5, decimal_places=2)  # Nota obtenida (por ejemplo, 61.00)
+    puntaje_obtenido = models.DecimalField(max_digits=5, decimal_places=2)  # Puntaje real obtenido (37.00)
+    puntaje_total = models.DecimalField(max_digits=5, decimal_places=2)  # Puntaje máximo posible (42.00)
     fecha = models.DateField()
-    observaciones = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f'{self.evaluacion_base.nombre} - {self.clase} ({self.fecha})'
+        return f'{self.tipo_evaluacion} - {self.estudiante} - {self.asignatura} - Nota: {self.nota}'
 
-
-# Notas asignadas a cada estudiante para una evaluación
-class AlumnoEvaluacion(models.Model):
-    estudiante = models.ForeignKey('Estudiante', on_delete=models.CASCADE, related_name='notas')
-    evaluacion = models.ForeignKey('Evaluacion', on_delete=models.CASCADE, related_name='resultados')
-    nota = models.DecimalField(max_digits=4, decimal_places=2, help_text='Nota del estudiante (Ej: 6.50)')
-    observaciones = models.TextField(blank=True, null=True)
-
-    class Meta:
-        unique_together = ('estudiante', 'evaluacion')
+class Asistencia(models.Model):
+    fecha = models.DateField()
+    asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE)
+    estudiante = models.ForeignKey('Estudiante', on_delete=models.CASCADE)
+    asistencia = models.BooleanField()  # True = presente (sí), False = ausente (no)
 
     def __str__(self):
-        return f'{self.estudiante.usuario} - {self.evaluacion.evaluacion_base.nombre}: {self.nota}'
+        estado = 'Presente' if self.asistencia else 'Ausente'
+        return f'{self.fecha} - {self.asignatura} - {self.estudiante} - {estado}'

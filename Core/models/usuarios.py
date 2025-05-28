@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 
-#Tabla AuthUserManager#
 class AuthUserManager(BaseUserManager):
     def create_user(self, rut, div, password=None):
         if not rut:
@@ -20,7 +19,6 @@ class AuthUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-#Tabla AuthUser#
 class AuthUser(AbstractBaseUser, PermissionsMixin):
     rut = models.CharField(max_length=20, unique=True)
     div = models.CharField(max_length=1)
@@ -50,7 +48,7 @@ class AuthUser(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
 
-#Tabla Usuario#
+
 class Usuario(models.Model):
     rut = models.CharField(max_length=20, unique=True)
     div = models.CharField(max_length=1)
@@ -69,7 +67,7 @@ class Usuario(models.Model):
     def __str__(self):
         return f'{self.nombre} {self.apellido_paterno}'  # Representación legible del objeto
 
-#Tabla Administrativo#
+
 class Administrativo(models.Model):
     # Definimos los roles disponibles para el administrativo
     ROLES = [
@@ -83,7 +81,7 @@ class Administrativo(models.Model):
         # Retorna el nombre del usuario con el rol legible (no la clave)
         return f'{self.usuario} - {self.get_rol_display()}'
 
-#Tabla docente#
+
 class Docente(models.Model):
     usuario = models.OneToOneField('Usuario', on_delete=models.CASCADE)
     especialidad = models.ForeignKey('Especialidad', on_delete=models.PROTECT, null=True, blank=True)  # ID de "Ninguna"
@@ -98,7 +96,7 @@ class Especialidad(models.Model):
     def __str__(self):
         return self.nombre
 
-#Tabla estudiante#
+
 class Estudiante(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
     contacto_emergencia = models.CharField(max_length=100)
@@ -106,11 +104,3 @@ class Estudiante(models.Model):
 
     def __str__(self):
         return f'Estudiante: {self.usuario}'
-
-#Tabla Profesor jefe#
-class ProfesorJefe(models.Model):
-    docente = models.ForeignKey('Docente', on_delete=models.CASCADE, related_name='jefaturas')
-    clase = models.OneToOneField('Clase', on_delete=models.CASCADE, related_name='profesor_jefe')
-    fecha_asignacion = models.DateField(auto_now_add=True)
-    def __str__(self):
-        return f'{self.docente.usuario} - Jefe de {self.clase}'

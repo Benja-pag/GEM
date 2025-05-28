@@ -2,57 +2,36 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 
-
-# Foro principal creado por un usuario
 class Foro(models.Model):
-    titulo = models.CharField(max_length=200)
-    asunto = models.CharField(max_length=200)
-    contenido = models.TextField()
-    autor = models.ForeignKey('Usuario', on_delete=models.CASCADE)
-    fecha = models.DateField(auto_now_add=True)
-    hora = models.TimeField(auto_now_add=True)
+    titulo = models.CharField(max_length=200)  # Título del foro o tema
+    asunto = models.CharField(max_length=200)  # Asunto o subtítulo
+    contenido = models.TextField()  # Contenido del mensaje o tema
+    autor = models.ForeignKey('Usuario', on_delete=models.CASCADE)  # Autor del mensaje, relacionado con Usuario
+    fecha = models.DateField(auto_now_add=True)  # Fecha de creación (auto asignada)
+    hora = models.TimeField(auto_now_add=True)  # Hora de creación (auto asignada)
 
     def __str__(self):
         return f'{self.titulo} - {self.autor}'
 
-
-# Mensajes o respuestas dentro de un foro específico
-class MensajeForo(models.Model):
-    foro = models.ForeignKey('Foro', on_delete=models.CASCADE, related_name='mensajes')
-    autor = models.ForeignKey('Usuario', on_delete=models.CASCADE)
+class MensajeAlumnoProfesor(models.Model):
+    emisor = models.ForeignKey('Usuario', on_delete=models.CASCADE, related_name='mensajes_enviados')
+    receptores = models.ManyToManyField('Usuario', related_name='mensajes_recibidos')
+    titulo = models.CharField(max_length=200)
     contenido = models.TextField()
-    fecha = models.DateTimeField(auto_now_add=True)
+    fecha = models.DateField(auto_now_add=True)
+    hora = models.TimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Respuesta de {self.autor} en {self.foro.titulo}'
+        return f'Mensaje de {self.emisor} - {self.titulo}'
 
-
-# Chat individual por clase (por ejemplo, 2B - Matemáticas)
-class ChatClase(models.Model):
-    clase = models.OneToOneField('Clase', on_delete=models.CASCADE, related_name='chat')
-    nombre = models.CharField(max_length=100)
-
-    def __str__(self):
-        return f'Chat de Clase: {self.nombre}'
-
-
-# Chat grupal general entre usuarios (grupos de estudio, electivos, etc.)
 class ChatGrupo(models.Model):
-    nombre = models.CharField(max_length=100)
-    participantes = models.ManyToManyField('Usuario', related_name='chats_grupales')
+    nombre = models.CharField(max_length=100)  # Nombre del grupo
+    estudiantes = models.ManyToManyField('Estudiante', blank=True, related_name='chats_grupo')
+    docentes = models.ManyToManyField('Docente', blank=True, related_name='chats_grupo')
+    asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE, null=True, blank=True)
+    fecha_creacion = models.DateField(auto_now_add=True)
+    hora_creacion = models.TimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nombre
-
-
-# Mensajes enviados dentro de los chats (ya sea por clase o grupo)
-class MensajeChat(models.Model):
-    autor = models.ForeignKey('Usuario', on_delete=models.CASCADE)
-    contenido = models.TextField()
-    fecha_envio = models.DateTimeField(auto_now_add=True)
-    chat_clase = models.ForeignKey('ChatClase', on_delete=models.CASCADE, related_name='mensajes', null=True, blank=True)
-    chat_grupo = models.ForeignKey('ChatGrupo', on_delete=models.CASCADE, related_name='mensajes', null=True, blank=True)
-
-    def __str__(self):
-        destino = self.chat_clase or self.chat_grupo
-        return f'Mensaje de {self.autor} en {destino}'
+  

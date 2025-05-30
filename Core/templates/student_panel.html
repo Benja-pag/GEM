@@ -6,11 +6,9 @@
     <div class="card mb-4">
         <div class="card-header bg-success text-white">Información del Estudiante</div>
         <div class="card-body">
-            <p><strong>RUT:</strong> {{ user.rut }}</p>
-            <p><strong>Nombre:</strong> {{ user.nombre }}</p>
-            <p><strong>Apellido Paterno:</strong> {{ user.apellido_paterno }}</p>
-            <p><strong>Apellido Materno:</strong> {{ user.apellido_materno }}</p>
-            <p><strong>Correo:</strong> {{ user.correo }}</p>
+            <p><strong>RUT:</strong> {{ alumno.rut }}</p>
+            <p><strong>Nombre:</strong> {{ alumno.nombre }} {{ alumno.apellido_paterno }} {{ alumno.apellido_materno }}</p>
+            <p><strong>Correo:</strong> {{ alumno.correo }}</p>
         </div>
     </div>
     <div class="row">

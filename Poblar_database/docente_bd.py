@@ -97,3 +97,4 @@ for data in docentes_data:
     )
 
 print("✅ Docentes creados exitosamente")
+

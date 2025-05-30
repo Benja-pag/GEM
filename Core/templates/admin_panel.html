@@ -488,7 +488,7 @@
                         </thead>
                         <tbody>
                             {% for usuario in usuarios %}
-                            <tr class="clickable-row" data-href="{% url 'user_detail' usuario.id %}" style="cursor: pointer;">
+                            <!-- <tr class="clickable-row" data-href="{% url 'user_detail' usuario.id %}" style="cursor: pointer;">
                                 <td>{{ usuario.rut }}-{{ usuario.div }}</td>
                                 <td>{{ usuario.nombre }} {{ usuario.apellido_paterno }} {{ usuario.apellido_materno }}</td>
                                 <td>{{ usuario.correo }}</td>
@@ -525,8 +525,8 @@
                                         </button>
                                     </div>
                                 </td>
-                            </tr>
-                            {% empty %}
+                            </tr> -->
+                            <!-- {% empty %} -->
                             <tr>
                                 <td colspan="6" class="text-center">No hay usuarios registrados</td>
                             </tr>

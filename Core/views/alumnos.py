@@ -34,6 +34,7 @@ class EstudiantePanelView(View):
         context = {
             # 'notas': notas,
             # 'asistencias': asistencias,
+            'alumno' : usuario,
             'curso' : curso,
             'estudiantes_curso': estudiantes_curso,
             'asignaturas_estudiante': asignaturas_estudiante

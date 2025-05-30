@@ -106,6 +106,7 @@ def actualizar_usuario(usuario, data):
 
     return usuario
 
+
 # def cambiar_tipo_usuario(usuario, nuevo_tipo):
 #     """
 #     Cambia el tipo de usuario de un usuario existente.

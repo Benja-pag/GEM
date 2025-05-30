@@ -15,6 +15,8 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from Core.servicios.repos import usuarios
 from Core.servicios.helpers import validadores, serializadores
+from Core.servicios.repos.asignaturas import get_asignaturas_estudiante
+from Core.servicios.repos.cursos import get_estudiantes_por_curso
 
 @method_decorator(login_required, name='dispatch')
 class EstudiantePanelView(View):
@@ -22,15 +24,24 @@ class EstudiantePanelView(View):
         if not hasattr(request.user.usuario, 'estudiante'):
             messages.error(request, 'No tienes permiso para acceder a esta página')
             return redirect('home')
-        estudiante = Estudiante.objects.first()  # Temporalmente mostramos el primer estudiante
+        usuario = request.user.usuario
         # notas = Nota.objects.filter(estudiante=estudiante)
-        asistencias = Asistencia.objects.filter(estudiante=estudiante)
+        # asistencias = Asistencia.objects.filter(estudiante=estudiante)
+        curso = usuario.estudiante.curso
+        estudiantes_curso = get_estudiantes_por_curso(usuario.estudiante.curso_id)
+        asignaturas_estudiante = get_asignaturas_estudiante(usuario.pk)  
         
         context = {
             # 'notas': notas,
-            'asistencias': asistencias
+            # 'asistencias': asistencias,
+            'curso' : curso,
+            'estudiantes_curso': estudiantes_curso,
+            'asignaturas_estudiante': asignaturas_estudiante
         }
-        return render(request, 'students_panel.html', context)
+        
+        return render(request, 'student_panel.html', context)
+
+
 
 @method_decorator(login_required, name='dispatch')
 class AttendanceView(TemplateView):

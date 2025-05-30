@@ -62,7 +62,7 @@ class Usuario(models.Model):
     direccion = models.TextField()
     fecha_nacimiento = models.DateField()
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    auth_user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, null=True, blank=True)
+    auth_user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, primary_key=True)
     activador = models.BooleanField(default=True)
     password = models.CharField(max_length=128, null=True)
 
@@ -85,7 +85,7 @@ class Administrativo(models.Model):
 
 #Tabla docente#
 class Docente(models.Model):
-    usuario = models.OneToOneField('Usuario', on_delete=models.CASCADE)
+    usuario = models.OneToOneField('Usuario', on_delete=models.CASCADE, primary_key=True)
     especialidad = models.ForeignKey('Especialidad', on_delete=models.PROTECT, null=True, blank=True)  # ID de "Ninguna"
     es_profesor_jefe = models.BooleanField(default=False)  # Por defecto no es profesor jefe
 
@@ -100,7 +100,7 @@ class Especialidad(models.Model):
 
 #Tabla estudiante#
 class Estudiante(models.Model):
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
     contacto_emergencia = models.CharField(max_length=100)
     curso = models.ForeignKey('Curso', on_delete=models.SET_NULL, null=True, blank=True, related_name='estudiantes')
 

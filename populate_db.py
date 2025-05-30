@@ -7,7 +7,7 @@ django.setup()
 
 from django.contrib.auth.hashers import make_password
 from Core.models import (
-    AuthUser, Usuario, Especialidad, Docente, Administrativo, Curso, Estudiante, EvaluacionBase, Asignatura, AsignaturaImpartida
+    AuthUser, Usuario, Especialidad, Docente, Administrativo, Curso, Estudiante, EvaluacionBase, Asignatura, AsignaturaImpartida, AsignaturaInscrita
 )
 
 # Crear usuario administrador
@@ -58,6 +58,9 @@ for nombre in especialidades_nombres:
 docentes_data = [
     {'rut': '12345678', 'div': '1', 'nombre': 'Juan', 'apellido_paterno': 'Perez', 'apellido_materno': 'Lopez', 'correo': 'juan.perez@gem.cl', 'telefono': '111111111', 'direccion': 'Calle Falsa 123', 'fecha_nacimiento': date(1980, 5, 10), 'especialidad': especialidades[0], 'password': 'JPerez'},
     {'rut': '23456789', 'div': '2', 'nombre': 'Maria', 'apellido_paterno': 'Gonzalez', 'apellido_materno': 'Ruiz', 'correo': 'maria.gonzalez@gem.cl', 'telefono': '222222222', 'direccion': 'Av. Siempre Viva 742', 'fecha_nacimiento': date(1985, 8, 20), 'especialidad': especialidades[1], 'password': 'MGonzalez'},
+    {'rut': '34567890', 'div': '3', 'nombre': 'Paula', 'apellido_paterno': 'Muñoz', 'apellido_materno': 'Salinas', 'correo': 'paula.munoz@gem.cl', 'telefono': '333333333', 'direccion': 'Calle Nueva 456', 'fecha_nacimiento': date(1979, 3, 12), 'especialidad': especialidades[2], 'password': 'PMunoz'},
+    {'rut': '45678901', 'div': '4', 'nombre': 'Ricardo', 'apellido_paterno': 'Soto', 'apellido_materno': 'Paredes', 'correo': 'ricardo.soto@gem.cl', 'telefono': '444444444', 'direccion': 'Av. Central 789', 'fecha_nacimiento': date(1975, 11, 23), 'especialidad': especialidades[3], 'password': 'RSoto'},
+    {'rut': '56789012', 'div': '5', 'nombre': 'Claudia', 'apellido_paterno': 'Fernandez', 'apellido_materno': 'Cordero', 'correo': 'claudia.fernandez@gem.cl', 'telefono': '555555555', 'direccion': 'Calle Principal 123', 'fecha_nacimiento': date(1982, 7, 5), 'especialidad': especialidades[4], 'password': 'CFernandez'},
 ]
 docentes = []
 for data in docentes_data:
@@ -99,12 +102,14 @@ for data in cursos_data:
 
 # Crear asignaturas
 asignaturas_nombres = [
-    "Matemáticas", "Lenguaje", "Historia", "Biología"
+    "Matemáticas", "Lenguaje", "Historia", "Biología", "Física", "Química", "Inglés", "Educación Física", "Arte", "Música"
 ]
 asignaturas = []
-for nombre in asignaturas_nombres:
-    asignatura, _ = Asignatura.objects.get_or_create(nombre=nombre)
-    asignaturas.append(asignatura)
+
+for i in range(1, 5):
+    for nombre in asignaturas_nombres:
+        asignatura, _ = Asignatura.objects.get_or_create(nombre=nombre, nivel=i)
+        asignaturas.append(asignatura)
 
 # Crear evaluaciones base para cada asignatura
 for asignatura in asignaturas:
@@ -126,23 +131,22 @@ for asignatura in asignaturas:
 
 # Crear asignaturas impartidas (ramo)
 asignaturas_impartidas = []
-codigo_count = 1
+
 for curso in cursos:
-    for i, asignatura in enumerate(asignaturas):
-        docente = docentes[i % len(docentes)]
-        codigo = f"{asignatura.nombre[:3].upper()}_{curso.nivel}{curso.letra}_{codigo_count}"
-        asignatura_impartida, _ = AsignaturaImpartida.objects.get_or_create(
+    for asignatura in Asignatura.objects.filter(nivel=curso.nivel):
+        docente = Docente.objects.order_by('?').first()  # Elige un docente al azar o según lógica
+        codigo = f"{asignatura.nombre[:3].upper()}_{curso.nivel}{curso.letra}"
+        ai, _ = AsignaturaImpartida.objects.get_or_create(
             asignatura=asignatura,
             docente=docente,
             defaults={
                 'codigo': codigo,
                 'horario': f"Lunes {8 + i}:00-09:30"
-            }
+        }
         )
-        asignaturas_impartidas.append(asignatura_impartida)
-        codigo_count += 1
+        asignaturas_impartidas.append(ai)
 
-# Crear estudiantes (más ejemplos)
+# Crear estudiantes 
 estudiantes_data = [
     {'rut': '11111111', 'div': '1', 'nombre': 'Ana', 'apellido_paterno': 'Gomez', 'apellido_materno': 'Perez', 'correo': 'ana.gomez@gem.cl', 'telefono': '912345678', 'direccion': 'Calle Uno 1', 'fecha_nacimiento': date(2008, 3, 15), 'contacto_emergencia': 'Mama: 999999999', 'curso': cursos[0], 'password': 'anagomez'},
     {'rut': '22222222', 'div': '2', 'nombre': 'Luis', 'apellido_paterno': 'Ramirez', 'apellido_materno': 'Soto', 'correo': 'luis.ramirez@gem.cl', 'telefono': '923456789', 'direccion': 'Calle Dos 2', 'fecha_nacimiento': date(2008, 5, 20), 'contacto_emergencia': 'Papa: 888888888', 'curso': cursos[1], 'password': 'luisramirez'},
@@ -182,5 +186,15 @@ for data in estudiantes_data:
             'curso': data['curso']
         }
     )
+
+# Asignar asignaturas impartidas a estudiantes
+
+for estudiante in Estudiante.objects.all():
+    asignaturas_impartidas = AsignaturaImpartida.objects.filter(asignatura__nivel=estudiante.curso.nivel)
+    for asignatura_impartida in asignaturas_impartidas:
+        AsignaturaInscrita.objects.get_or_create(
+            estudiante=estudiante,
+            asignatura_impartida=asignatura_impartida
+        )
 
 print("✅ Docentes, cursos, asignaturas, asignaturas impartidas y estudiantes creados con éxito.")

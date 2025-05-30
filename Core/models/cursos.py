@@ -5,11 +5,15 @@ from django.core.validators import RegexValidator
 from django.utils import timezone
 #Tabla Asignatura#
 class Asignatura(models.Model):
-    nombre = models.CharField(max_length=100, unique=True)
+    NIVEL_CHOICES = [(i, f"{i}°") for i in range(1, 5)]  # 1° a 4°
+    
+    nombre = models.CharField(max_length=100)
+    nivel = models.PositiveSmallIntegerField(choices=NIVEL_CHOICES)
     es_electivo = models.BooleanField(default=False, help_text="Marca si la asignatura es de tipo electivo")
 
     def __str__(self):
         return self.nombre
+
 #Tabla Asignatura_impartida#
 class AsignaturaImpartida(models.Model):
     asignatura = models.ForeignKey('Asignatura', on_delete=models.CASCADE, related_name='imparticiones')
@@ -66,7 +70,7 @@ class Curso(models.Model):
         unique_together = ('nivel', 'letra')
 
     def __str__(self):
-        return f"{self.nivel}{self.letra}"  # Ej: "1A"
+        return f"{self.nivel}°{self.letra}"  # Ej: "1A"
 
 #Tabla Asistencia#
 class Asistencia(models.Model):

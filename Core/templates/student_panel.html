@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<div class="container mt-4">
+    <h1 class="mb-4">Panel de Estudiante</h1>
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">Información del Estudiante</div>
+        <div class="card-body">
+            <p><strong>RUT:</strong> {{ user.rut }}</p>
+            <p><strong>Nombre:</strong> {{ user.nombre }}</p>
+            <p><strong>Apellido Paterno:</strong> {{ user.apellido_paterno }}</p>
+            <p><strong>Apellido Materno:</strong> {{ user.apellido_materno }}</p>
+            <p><strong>Correo:</strong> {{ user.correo }}</p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Mis Clases</div>
+                <div class="card-body">
+                    <h5 class="card-title">Próximamente</h5>
+                    <p class="card-text">Aquí podrás ver tus materias y horarios.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-header">Calendario</div>
+                <div class="card-body">
+                    <h5 class="card-title">Próximamente</h5>
+                    <p class="card-text">Consulta eventos y fechas importantes.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Mensajes</div>
+                <div class="card-body">
+                    <h5 class="card-title">Próximamente</h5>
+                    <p class="card-text">Envía y recibe mensajes de tus profesores.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if estudiantes_curso %}
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">{{curso}}</div>
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>RUT</th>
+                        <th>Nombre</th>
+                        <th>Apellido Paterno</th>
+                        <th>Apellido Materno</th>
+                        <th>Correo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for estudiante in estudiantes_curso %}
+                    <tr>
+                        <td>{{ estudiante.usuario.rut }}</td>
+                        <td>{{ estudiante.usuario.nombre }}</td>
+                        <td>{{ estudiante.usuario.apellido_paterno }}</td>
+                        <td>{{ estudiante.usuario.apellido_materno }}</td>
+                        <td>{{ estudiante.usuario.correo }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+        <p>No hay alumnos en este curso.</p>
+    {% endif %}
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-white">Mis Asignaturas</div>
+        <div class="card-body">
+            {% for asignatura in asignaturas_estudiante %}
+            <div class="asignatura_list_item row mb-3" >
+                <h5 class ="col-md-6">{{asignatura.asignatura_impartida.codigo}} {{ asignatura.asignatura_impartida.asignatura.nombre }}</h5>
+                <p class="col-md-6">Profesor: {{ asignatura.profesor.usuario.nombre }} {{ asignatura.profesor.usuario.apellido_paterno }}</p>
+            </div>
+            {% endfor %}
+            <!-- Aquí podrías agregar un enlace a una vista de asignaturas -->
+        </div>
+</div>
+
+{% else %}
+<div class="alert alert-danger mt-4" role="alert">
+    Debes iniciar sesión para acceder a este panel.
+</div>
+{% endif %}
+{% endblock %}

@@ -28,10 +28,9 @@ class LoginView(View):
             messages.error(request, 'Por favor ingrese correo y contraseña')
             return render(request, self.template_name)
 
-        # usuario = obtener_usuario_por_correo(correo)
-       
-        usuario = get_object_or_404(Usuario, correo=correo)
-        if not usuario:
+        try:
+            usuario = Usuario.objects.get(correo=correo)
+        except Usuario.DoesNotExist:
             messages.error(request, 'El correo no está registrado')
             return render(request, self.template_name)
 
@@ -42,7 +41,7 @@ class LoginView(View):
 
         if check_password(password, auth_user.password):
             login(request, auth_user)
-            return self.redirect_by_role( usuario, auth_user)
+            return self.redirect_by_role(usuario, auth_user)
         else:
             messages.error(request, 'Contraseña incorrecta')
             return render(request, self.template_name)

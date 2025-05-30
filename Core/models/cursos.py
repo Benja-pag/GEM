@@ -89,3 +89,10 @@ class Asistencia(models.Model):
         if self.justificado:
             estado += " (Justificado)"
         return f'{self.estudiante} - {self.clase} - {estado}'
+
+class CursoProfesorJefe(models.Model):
+    curso = models.OneToOneField('Curso', on_delete=models.CASCADE, related_name='jefatura_historial', db_column='curso_id')
+    docente = models.ForeignKey('Docente', on_delete=models.CASCADE, related_name='cursos_jefe')
+
+    def __str__(self):
+        return f'{self.docente.usuario} - Jefe de {self.curso}'     

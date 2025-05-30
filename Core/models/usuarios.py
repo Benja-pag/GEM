@@ -110,7 +110,8 @@ class Estudiante(models.Model):
 #Tabla Profesor jefe#
 class ProfesorJefe(models.Model):
     docente = models.ForeignKey('Docente', on_delete=models.CASCADE, related_name='jefaturas')
-    clase = models.OneToOneField('Clase', on_delete=models.CASCADE, related_name='profesor_jefe')
+    curso = models.OneToOneField('Curso', on_delete=models.CASCADE, related_name='jefatura_actual', null=True, blank=True, default=None)
     fecha_asignacion = models.DateField(auto_now_add=True)
+    
     def __str__(self):
-        return f'{self.docente.usuario} - Jefe de {self.clase}'
+        return f'{self.docente.usuario} - Jefe de {self.curso}'

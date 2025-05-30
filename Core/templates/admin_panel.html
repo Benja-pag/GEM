@@ -88,7 +88,7 @@
                     <div class="card bg-warning text-white">
                         <div class="card-body">
                             <h5 class="card-title">Total Asignaturas</h5>
-                            <p class="card-text display-4 text-white">{{ total_cursos }}</p>
+                            <p class="card-text display-4 text-white">{{ total_asignaturas }}</p>
                         </div>
                     </div>
                 </div>
@@ -198,20 +198,7 @@
                                 </div>
 
                                 <!-- Campos específicos para estudiantes -->
-                                <div class="mb-3">
-                                    <label for="contacto_emergencia" class="form-label">Contacto de Emergencia</label>
-                                    <input type="text" class="form-control" id="contacto_emergencia" name="contacto_emergencia" required>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="clase" class="form-label">Curso</label>
-                                    <select class="form-select" id="clase" name="clase" required>
-                                        <option value="">Seleccione un curso</option>
-                                        {% for clase in clases %}
-                                        <option value="{{ clase.id }}">{{ clase.nombre }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
+                                {{ estudiante_form.as_p }}
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -234,7 +221,7 @@
                         <div class="modal-body">
                             <form method="post" action="{% url 'admin_panel' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="action" value="crear_profesor">
+                                <input type="hidden" name="action" value="crear_docente">
                                 
                                 <!-- Campos básicos -->
                                 <div class="row mb-3">
@@ -295,28 +282,12 @@
                                     </div>
                                 </div>
 
-                                <!-- Campos específicos para profesores -->
-                                <div class="mb-3">
-                                    <label for="especialidad" class="form-label">Especialidad</label>
-                                    <select class="form-select" id="especialidad" name="especialidad" required>
-                                        <option value="">Seleccione una especialidad</option>
-                                        <option value="MATEMATICAS">Matemáticas</option>
-                                        <option value="LENGUAJE">Lenguaje</option>
-                                        <option value="HISTORIA">Historia</option>
-                                        <option value="BIOLOGIA">Biología</option>
-                                        <option value="FISICA">Física</option>
-                                        <option value="QUIMICA">Química</option>
-                                        <option value="INGLES">Inglés</option>
-                                        <option value="EDUCACION_FISICA">Educación Física</option>
-                                        <option value="ARTE">Arte</option>
-                                        <option value="MUSICA">Música</option>
-                                        <option value="TECNOLOGIA">Tecnología</option>
-                                    </select>
-                                </div>
+                                <!-- Campos específicos para docentes -->
+                                {{ docente_form.as_p }}
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-primary">Crear Profesor</button>
+                                    <button type="submit" class="btn btn-primary">Crear Docente</button>
                                 </div>
                             </form>
                         </div>
@@ -397,13 +368,7 @@
                                 </div>
 
                                 <!-- Campos específicos para administrativos -->
-                                <div class="mb-3">
-                                    <label for="rol_administrativo" class="form-label">Rol Administrativo</label>
-                                    <select class="form-select" id="rol_administrativo" name="rol_administrativo" required>
-                                        <option value="ADMINISTRADOR">Administrador</option>
-                                        <option value="ADMINISTRADOR_MAXIMO">Administrador Máximo</option>
-                                    </select>
-                                </div>
+                                {{ administrativo_form.as_p }}
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -428,9 +393,25 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="crear_curso">
                                 
-                                <div class="mb-3">
-                                    <label for="nombre_curso" class="form-label">Nombre del Curso</label>
-                                    <input type="text" class="form-control" id="nombre_curso" name="nombre" required>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label for="nivel" class="form-label">Nivel</label>
+                                        <select class="form-select" id="nivel" name="nivel" required>
+                                            <option value="">Seleccione un nivel</option>
+                                            <option value="1">1°</option>
+                                            <option value="2">2°</option>
+                                            <option value="3">3°</option>
+                                            <option value="4">4°</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="letra" class="form-label">Letra</label>
+                                        <select class="form-select" id="letra" name="letra" required>
+                                            <option value="">Seleccione una letra</option>
+                                            <option value="A">A</option>
+                                            <option value="B">B</option>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">
@@ -441,16 +422,6 @@
                                         <option value="{{ profesor.id }}">{{ profesor.usuario.nombre }} {{ profesor.usuario.apellido_paterno }}</option>
                                         {% endfor %}
                                     </select>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="sala" class="form-label">Sala</label>
-                                    <input type="text" class="form-control" id="sala" name="sala" required>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="capacidad" class="form-label">Capacidad</label>
-                                    <input type="number" class="form-control" id="capacidad" name="capacidad" min="1" required>
                                 </div>
 
                                 <div class="modal-footer">
@@ -477,50 +448,16 @@
                                 <input type="hidden" name="action" value="crear_asignatura">
                                 
                                 <div class="mb-3">
-                                    <label for="codigo" class="form-label">Código</label>
-                                    <input type="text" class="form-control" id="codigo" name="codigo" required>
+                                    <label for="nombre" class="form-label">Nombre de la Asignatura</label>
+                                    <input type="text" class="form-control" id="nombre" name="nombre" required>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="nombre_asignatura" class="form-label">Nombre de la Asignatura</label>
-                                    <input type="text" class="form-control" id="nombre_asignatura" name="nombre" required>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="clase_asignatura" class="form-label">Curso</label>
-                                    <select class="form-select" id="clase_asignatura" name="clase" required>
-                                        <option value="">Seleccione un curso</option>
-                                        {% for clase in clases %}
-                                        <option value="{{ clase.id }}">{{ clase.nombre }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="docente_asignatura" class="form-label">Profesor</label>
-                                    <select class="form-select" id="docente_asignatura" name="docente" required>
-                                        <option value="">Seleccione un profesor</option>
-                                        {% for profesor in profesores %}
-                                        <option value="{{ profesor.id }}">{{ profesor.usuario.nombre }} {{ profesor.usuario.apellido_paterno }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="dia" class="form-label">Día</label>
-                                        <select class="form-select" id="dia" name="dia" required>
-                                            <option value="">Seleccione un día</option>
-                                            <option value="LUNES">Lunes</option>
-                                            <option value="MARTES">Martes</option>
-                                            <option value="MIERCOLES">Miércoles</option>
-                                            <option value="JUEVES">Jueves</option>
-                                            <option value="VIERNES">Viernes</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="horario" class="form-label">Horario</label>
-                                        <input type="time" class="form-control" id="horario" name="horario" required>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="es_electivo" name="es_electivo">
+                                        <label class="form-check-label" for="es_electivo">
+                                            Es Electivo
+                                        </label>
                                     </div>
                                 </div>
 
@@ -607,30 +544,32 @@
                         <thead>
                             <tr>
                                 <th>Curso</th>
-                                <th>Profesor</th>
-                                <th>Sala</th>
+                                <th>Profesor Jefe</th>
                                 <th>Estudiantes</th>
                                 <th>Estado</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for clase in clases %}
+                            {% for curso in cursos %}
                             <tr>
-                                <td>{{ clase.nombre }}</td>
+                                <td>{{ curso.nivel }}°{{ curso.letra }}</td>
                                 <td>
-                                    {% if clase.profesor_jefe %}
-                                        {{ clase.profesor_jefe.usuario.nombre }} {{ clase.profesor_jefe.usuario.apellido_paterno }}
+                                    {% if curso.jefatura_actual %}
+                                        {{ curso.jefatura_actual.docente.usuario.nombre }} {{ curso.jefatura_actual.docente.usuario.apellido_paterno }}
                                     {% else %}
                                         <span class="text-muted">Sin profesor asignado</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ clase.sala|default:"Sin sala asignada" }}</td>
                                 <td>
-                                    <span class="badge bg-info">{{ clase.total_estudiantes }} estudiantes</span>
+                                    <span class="badge bg-info">{{ curso.total_estudiantes }} estudiantes</span>
                                 </td>
                                 <td>
                                     <span class="badge bg-success">Activo</span>
                                 </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No hay cursos registrados</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -649,7 +588,6 @@
                                 <th>Nombre</th>
                                 <th>Curso</th>
                                 <th>Profesor</th>
-                                <th>Día</th>
                                 <th>Horario</th>
                             </tr>
                         </thead>
@@ -657,8 +595,14 @@
                             {% for asignatura in asignaturas %}
                             <tr>
                                 <td>{{ asignatura.codigo }}</td>
-                                <td>{{ asignatura.nombre }}</td>
-                                <td>{{ asignatura.clase.nombre }}</td>
+                                <td>{{ asignatura.asignatura.nombre }}</td>
+                                <td>
+                                    {% if asignatura.clases.first %}
+                                        {{ asignatura.clases.first.curso.nivel }}°{{ asignatura.clases.first.curso.letra }}
+                                    {% else %}
+                                        <span class="text-muted">Sin curso asignado</span>
+                                    {% endif %}
+                                </td>
                                 <td>
                                     {% if asignatura.docente %}
                                         {{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }}
@@ -666,8 +610,11 @@
                                         <span class="text-muted">Sin profesor asignado</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ asignatura.dia }}</td>
-                                <td>{{ asignatura.horario|time:"H:i" }}</td>
+                                <td>{{ asignatura.horario }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No hay asignaturas registradas</td>
                             </tr>
                             {% endfor %}
                         </tbody>

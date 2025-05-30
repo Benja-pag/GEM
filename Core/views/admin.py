@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, ProfesorJefe
 from django.db.models import Count, Avg
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from Core.servicios.repos import usuarios
 from Core.servicios.helpers import validadores, serializadores
+from ..forms import EstudianteForm, DocenteForm, AdministrativoForm, CursoForm, AsignaturaForm, ProfesorJefeForm
+from Core.servicios.repos.usuarios import crear_usuario, actualizar_usuario
 
 @method_decorator(login_required, name='dispatch')
 class AdminPanelView(View):
@@ -21,37 +23,59 @@ class AdminPanelView(View):
             total_profesores = Docente.objects.count()
             total_asignaturas_impartidas = AsignaturaImpartida.objects.count()
             total_administradores = Administrativo.objects.count()
+            total_clases = Clase.objects.count()
+            total_asignaturas = Asignatura.objects.count()
             
             # Obtener profesores para el formulario de creación de curso
             profesores = Docente.objects.all()
             
             # Obtener todos los estudiantes
-            estudiantes_sin_curso = Estudiante.objects.all().select_related('usuario', 'clase')
+            estudiantes_sin_curso = Estudiante.objects.all().select_related('usuario', 'curso')
             
             # Obtener todos los usuarios ordenados por fecha de creación
             usuarios = Usuario.objects.all().order_by('-fecha_creacion')
             
-            # Obtener todas las asignaturas
-            asignaturas = Asignatura.objects.all()
+            # Obtener todas las asignaturas con sus relaciones
+            asignaturas = AsignaturaImpartida.objects.select_related(
+                'asignatura',
+                'docente__usuario'
+            ).all()
+            
+            # Obtener cursos con sus profesores jefe
+            cursos = Curso.objects.select_related('jefatura_actual__docente__usuario').all()
+            
+            # Inicializar formularios
+            estudiante_form = EstudianteForm()
+            docente_form = DocenteForm()
+            administrativo_form = AdministrativoForm()
+            curso_form = CursoForm()
+            asignatura_form = AsignaturaForm()
+            profesor_jefe_form = ProfesorJefeForm()
             
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
                 'total_asignaturas_impartidas': total_asignaturas_impartidas,
                 'total_administradores': total_administradores,
+                'total_clases': total_clases,
+                'total_asignaturas': total_asignaturas,
                 'profesores': profesores,
                 'estudiantes_sin_curso': estudiantes_sin_curso,
                 'usuarios': usuarios,
-                'asignaturas': asignaturas
+                'asignaturas': asignaturas,
+                'cursos': cursos,
+                'estudiante_form': estudiante_form,
+                'docente_form': docente_form,
+                'administrativo_form': administrativo_form,
+                'curso_form': curso_form,
+                'asignatura_form': asignatura_form,
+                'profesor_jefe_form': profesor_jefe_form,
             }
             return render(request, 'admin_panel.html', context)
         except Exception as e:
             messages.error(request, f'Error al cargar el panel de administrador: {str(e)}')
             return redirect('home')
 
-
-    ### Esto no debería estar aquí, pero lo dejaremos por ahora
-    ### la idea es que cada acción tenga su propia vista y el front se encargue de llamarla
     def post(self, request):
         if not request.user.is_admin:
             messages.error(request, 'No tienes permiso para realizar esta acción')
@@ -61,85 +85,64 @@ class AdminPanelView(View):
         
         try:
             if action == 'crear_estudiante':
-                return self.crear_estudiante(request)
-            elif action == 'crear_profesor':
-                return self.crear_profesor(request)
+                form = EstudianteForm(request.POST)
+                if form.is_valid():
+                    data = form.cleaned_data
+                    data['tipo_usuario'] = 'ESTUDIANTE'
+                    crear_usuario(data, 'ESTUDIANTE')
+                    messages.success(request, 'Estudiante creado exitosamente')
+                    return redirect('admin_panel')
+                else:
+                    estudiante_form = form
+            elif action == 'crear_docente':
+                form = DocenteForm(request.POST)
+                if form.is_valid():
+                    data = form.cleaned_data
+                    data['tipo_usuario'] = 'DOCENTE'
+                    crear_usuario(data, 'DOCENTE')
+                    messages.success(request, 'Docente creado exitosamente')
+                    return redirect('admin_panel')
+                else:
+                    docente_form = form
             elif action == 'crear_administrador':
-                return self.crear_administrador(request)
+                form = AdministrativoForm(request.POST)
+                if form.is_valid():
+                    data = form.cleaned_data
+                    data['tipo_usuario'] = 'ADMINISTRATIVO'
+                    crear_usuario(data, 'ADMINISTRATIVO')
+                    messages.success(request, 'Administrador creado exitosamente')
+                    return redirect('admin_panel')
+                else:
+                    administrativo_form = form
             elif action == 'crear_curso':
-                return self.crear_curso(request)
+                form = CursoForm(request.POST)
+                if form.is_valid():
+                    curso = form.save()
+                    # Si se proporcionó un docente, crear la jefatura
+                    docente_id = request.POST.get('docente')
+                    if docente_id:
+                        ProfesorJefe.objects.create(
+                            curso=curso,
+                            docente_id=docente_id
+                        )
+                    messages.success(request, 'Curso creado exitosamente')
+                    return redirect('admin_panel')
+                else:
+                    curso_form = form
             elif action == 'crear_asignatura':
-                return self.crear_asignatura(request)
+                form = AsignaturaForm(request.POST)
+                if form.is_valid():
+                    form.save()
+                    messages.success(request, 'Asignatura creada exitosamente')
+                    return redirect('admin_panel')
+                else:
+                    asignatura_form = form
             else:
                 messages.error(request, 'Acción no válida')
                 return redirect('admin_panel')
         except Exception as e:
             messages.error(request, f'Error al procesar la solicitud: {str(e)}')
             return redirect('admin_panel')
-             
-    def crear_estudiante(self, request):
-        try:
-            usuarios.crear_usuario(request.POST, 'ESTUDIANTE')
-            messages.success(request, 'Estudiante creado exitosamente')
-            return redirect('admin_panel')
-        except Exception as e:
-            messages.error(request, f'Error al crear estudiante: {str(e)}')
-            return redirect('admin_panel')
-
-    def crear_profesor(self, request):
-        try:
-            usuarios.crear_usuario(request.POST, 'DOCENTE')
-            messages.success(request, 'Profesor creado exitosamente')
-            return redirect('admin_panel')
-        except Exception as e:
-            messages.error(request, f'Error al crear profesor: {str(e)}')
-            return redirect('admin_panel')
-
-    def crear_administrador(self, request):
-        try:     
-            usuarios.crear_usuario(request.POST, 'ADMINISTRATIVO')
-            messages.success(request, 'Administrador creado exitosamente')
-            return redirect('admin_panel')
-        except Exception as e:
-            messages.error(request, f'Error al crear administrador: {str(e)}')
-            return redirect('admin_panel')
-
-    def crear_curso(self, request):
-        try:
-            with transaction.atomic():
-                # Crear curso
-                Clase.objects.create(
-                    nombre=request.POST.get('nombre'),
-                    profesor_jefe_id=request.POST.get('profesor_jefe'),
-                    sala=request.POST.get('sala'),
-                    capacidad=request.POST.get('capacidad')
-                )
-
-                messages.success(request, 'Curso creado exitosamente')
-                return redirect('admin_panel')
-        except Exception as e:
-            messages.error(request, f'Error al crear curso: {str(e)}')
-            return redirect('admin_panel')
-
-    def crear_asignatura(self, request):
-        try:
-            with transaction.atomic():
-                # Crear asignatura
-                Asignatura.objects.create(
-                    codigo=request.POST.get('codigo'),
-                    nombre=request.POST.get('nombre'),
-                    clase_id=request.POST.get('clase'),
-                    docente_id=request.POST.get('docente'),
-                    dia=request.POST.get('dia'),
-                    horario=request.POST.get('horario')
-                )
-
-                messages.success(request, 'Asignatura creada exitosamente')
-                return redirect('admin_panel')
-        except Exception as e:
-            messages.error(request, f'Error al crear asignatura: {str(e)}')
-            return redirect('admin_panel')
-
 
 @method_decorator(login_required, name='dispatch')
 class CreateAdminView(View):

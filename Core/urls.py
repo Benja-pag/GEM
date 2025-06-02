@@ -1,10 +1,11 @@
 from django.urls import path
 from Core.views import (
-    HomeView, AdminPanelView, UserManagementView, UserCreateView,
+    HomeView, AdminPanelView, UserManagementView, UserCreateView, CalendarioView,
     UserDetailView, UserUpdateView, UserDeleteView, ProfesorPanelView,
     EstudiantePanelView, AttendanceView, LoginView, LogoutView,
     RegisterView, CreateAdminView, ChangePasswordView,
-    UserDataView, SurveysView, TasksView, TestsView, ToggleUserStatusView
+    UserDataView, SurveysView, TasksView, TestsView, ToggleUserStatusView,
+    CalendarioEventosView, CalendarioGuardarEventoView, CalendarioEliminarEventoView
 )
 
 urlpatterns = [
@@ -34,5 +35,11 @@ urlpatterns = [
     path('tasks/', TasksView.as_view(), name='tasks'),
     path('tests/', TestsView.as_view(), name='tests'),
     path('core/stats/', AdminPanelView.as_view(), name='core_stats'),
+
+    # URLs del Calendario
+    path('calendar/', CalendarioView.as_view(), name='calendar'),
+    path('calendar/events/', CalendarioEventosView.as_view(), name='calendar_events'),
+    path('calendar/save-event/', CalendarioGuardarEventoView.as_view(), name='calendar_save_event'),
+    path('calendar/delete-event/', CalendarioEliminarEventoView.as_view(), name='calendar_delete_event'),
 ]
 

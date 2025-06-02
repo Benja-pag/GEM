@@ -22,13 +22,15 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-white bg-secondary mb-3">
-                <div class="card-header">Calendario</div>
-                <div class="card-body">
-                    <h5 class="card-title">Próximamente</h5>
-                    <p class="card-text">Consulta eventos y fechas importantes.</p>
+            <a href="{% url 'calendar' %}" style="text-decoration: none;">
+                <div class="card text-white bg-secondary mb-3">
+                    <div class="card-header">Calendario</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Próximamente</h5>
+                        <p class="card-text">Consulta eventos y fechas importantes.</p>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
         <div class="col-md-4">
             <div class="card text-white bg-danger mb-3">

@@ -93,7 +93,8 @@ for data in docentes_data:
     )
     Docente.objects.get_or_create(
         usuario=usuario,
-        defaults={'especialidad': data['especialidad']}
+        defaults={'especialidad': data['especialidad']},
+        
     )
 
 print("✅ Docentes creados exitosamente")

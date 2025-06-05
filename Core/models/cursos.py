@@ -29,7 +29,6 @@ class AsignaturaImpartida(models.Model):
         ],
         help_text='Ej: MAT_101, BIO-2, HIS01'
     )
-    horario = models.CharField(max_length=100, help_text='Ej: Lunes 08:00-09:30')
 
     def __str__(self):
         return f'{self.codigo} - {self.asignatura.nombre} - {self.docente.usuario.nombre} {self.docente.usuario.apellido_paterno}'
@@ -47,16 +46,39 @@ class AsignaturaInscrita(models.Model):
         return f'{self.estudiante.usuario} inscrito en {self.asignatura_impartida.asignatura.nombre}'
 #Tabla Clase#
 class Clase(models.Model):
+    DIAS_CHOICES = [
+        ('LUNES', 'Lunes'),
+        ('MARTES', 'Martes'),
+        ('MIERCOLES', 'Miércoles'),
+        ('JUEVES', 'Jueves'),
+        ('VIERNES', 'Viernes'),
+    ]
+
+    SALA_CHOICES = [
+        ('SALA_1', 'Sala 1'),
+        ('SALA_2', 'Sala 2'),
+        ('SALA_3', 'Sala 3'),
+        ('SALA_4', 'Sala 4'),
+        ('SALA_5', 'Sala 5'),
+        ('SALA_6', 'Sala 6'),
+        ('SALA_7', 'Sala 7'),
+        ('SALA_8', 'Sala 8'),
+        ('LAB_COMP', 'Laboratorio de Computación'),
+        ('LAB_CIEN', 'Laboratorio de Ciencias'),
+        ('GIMNASIO', 'Gimnasio'),
+        ('BIBLIOTECA', 'Biblioteca'),
+        ('AUDITORIO', 'Auditorio'),
+    ]
+    
     asignatura_impartida = models.ForeignKey('AsignaturaImpartida', on_delete=models.CASCADE, related_name='clases')
-    curso = models.ForeignKey('Curso', on_delete=models.CASCADE, related_name='clases')  # Relación con Curso
-    fecha = models.DateField()
+    curso = models.ForeignKey('Curso', on_delete=models.CASCADE, related_name='clases', null=True, blank=True, help_text='Opcional para asignaturas electivas donde se mezclan cursos')
+    fecha = models.CharField(max_length=10, choices=DIAS_CHOICES)
     horario = models.CharField(max_length=100, help_text='Ej: 08:00-09:30')
-    contenido = models.TextField(blank=True, null=True, help_text='Temas tratados en esta clase')
-    observaciones = models.TextField(blank=True, null=True)
-    realizada = models.BooleanField(default=False)
+    sala = models.CharField(max_length=20, choices=SALA_CHOICES, help_text='Sala donde se impartirá la clase')
 
     def __str__(self):
-        return f'{self.asignatura_impartida} - {self.curso} - {self.fecha}'
+        curso_str = f' - {self.curso}' if self.curso else ''
+        return f'{self.asignatura_impartida} - {self.fecha} - {self.sala}{curso_str}'
 
 #Tabla Curso#
 class Curso(models.Model):
@@ -89,10 +111,3 @@ class Asistencia(models.Model):
         if self.justificado:
             estado += " (Justificado)"
         return f'{self.estudiante} - {self.clase} - {estado}'
-
-class CursoProfesorJefe(models.Model):
-    curso = models.OneToOneField('Curso', on_delete=models.CASCADE, related_name='jefatura_historial', db_column='curso_id')
-    docente = models.ForeignKey('Docente', on_delete=models.CASCADE, related_name='cursos_jefe')
-
-    def __str__(self):
-        return f'{self.docente.usuario} - Jefe de {self.curso}'     

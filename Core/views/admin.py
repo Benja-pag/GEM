@@ -39,7 +39,7 @@ class AdminPanelView(View):
             asignaturas = AsignaturaImpartida.objects.select_related(
                 'asignatura',
                 'docente__usuario'
-            ).all()
+            ).prefetch_related('clases').all()
             
             # Obtener cursos con sus profesores jefe
             cursos = Curso.objects.select_related('jefatura_actual__docente__usuario').all()
@@ -130,13 +130,35 @@ class AdminPanelView(View):
                 else:
                     curso_form = form
             elif action == 'crear_asignatura':
-                form = AsignaturaForm(request.POST)
-                if form.is_valid():
-                    form.save()
+                try:
+                    # Crear la asignatura base
+                    asignatura = Asignatura.objects.create(
+                        nombre=request.POST.get('nombre'),
+                        nivel=request.POST.get('nivel'),
+                        es_electivo=request.POST.get('es_electivo') == 'on'
+                    )
+
+                    # Crear la asignatura impartida
+                    codigo = f"{asignatura.nombre[:3].upper()}{asignatura.nivel}"
+                    asignatura_impartida = AsignaturaImpartida.objects.create(
+                        asignatura=asignatura,
+                        docente_id=request.POST.get('docente'),
+                        codigo=codigo
+                    )
+
+                    # Crear la clase con el día, bloque y sala seleccionados
+                    Clase.objects.create(
+                        asignatura_impartida=asignatura_impartida,
+                        fecha=request.POST.get('dia'),
+                        bloque=request.POST.get('bloque'),
+                        sala=request.POST.get('sala')
+                    )
+
                     messages.success(request, 'Asignatura creada exitosamente')
                     return redirect('admin_panel')
-                else:
-                    asignatura_form = form
+                except Exception as e:
+                    messages.error(request, f'Error al crear asignatura: {str(e)}')
+                    return redirect('admin_panel')
             else:
                 messages.error(request, 'Acción no válida')
                 return redirect('admin_panel')

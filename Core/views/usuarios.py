@@ -61,11 +61,12 @@ class UserCreateView(View):
 class UserDetailView(View):
     def get(self, request, user_id):
         try:
-            user = usuarios.obtener_usuario_por_id(user_id)
+            auth_user = get_object_or_404(AuthUser, id=user_id)
+            usuario = auth_user.usuario
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': True,
-                    'user': serializadores.usuario_a_dict(user)
+                    'user': serializadores.usuario_a_dict(usuario)
                 })
             return redirect('admin_panel')
         except Exception as e:

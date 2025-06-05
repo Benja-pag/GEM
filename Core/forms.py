@@ -75,13 +75,7 @@ class AdministrativoForm(forms.ModelForm):
 class AsignaturaImpartidaForm(forms.ModelForm):
     class Meta:
         model = AsignaturaImpartida
-        fields = ['asignatura', 'docente', 'horario']
-        widgets = {
-            'horario': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ej: Lunes 08:00-09:30'
-            })
-        }
+        fields = ['asignatura', 'docente']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

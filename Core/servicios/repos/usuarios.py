@@ -23,6 +23,17 @@ def obtener_usuario_por_correo(correo):
         return AuthUser.objects.get(correo=correo)
     except AuthUser.DoesNotExist:
         return None
+def obtener_usuario_por_id(user_id):
+    """
+    Obtiene un usuario por su ID.
+    :param user_id: ID del usuario a buscar.
+    :return: Usuario encontrado o None si no existe.
+    """
+    try:
+        auth_user = AuthUser.objects.get(id=user_id)
+        return auth_user.usuario
+    except AuthUser.DoesNotExist:
+        return None
 # Funcion principal para crear un usuario
 def crear_usuario(data, tipo_usuario):
     

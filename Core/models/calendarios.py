@@ -26,33 +26,51 @@ class CalendarioColegio(models.Model):
         return f'{self.nombre_actividad} - {self.fecha} {self.hora}'
 
 class HorarioCurso(models.Model):
-    ACTIVIDAD_CHOICES = [
-        ('Clase', 'Clase'),
-        ('Recreo', 'Recreo'),
-        ('Almuerzo', 'Almuerzo'),
+    BLOQUE_CHOICES = [
+        ('1', '08:00 - 08:45'),
+        ('2', '08:45 - 09:30'),
+        ('RECREO1', '09:30 - 09:45'),
+        ('3', '09:45 - 10:30'),
+        ('4', '10:30 - 11:15'),
+        ('RECREO2', '11:15 - 11:30'),
+        ('5', '11:30 - 12:15'),
+        ('6', '12:15 - 13:00'),
+        ('ALMUERZO', '13:00 - 13:45'),
+        ('7', '13:45 - 14:30'),
+        ('8', '14:30 - 15:15'),
+        ('9', '15:15 - 16:00'),
     ]
 
     DIA_CHOICES = [
-        ('Lunes', 'Lunes'),
-        ('Martes', 'Martes'),
-        ('Miércoles', 'Miércoles'),
-        ('Jueves', 'Jueves'),
-        ('Viernes', 'Viernes'),
+        ('LUNES', 'Lunes'),
+        ('MARTES', 'Martes'),
+        ('MIERCOLES', 'Miércoles'),
+        ('JUEVES', 'Jueves'),
+        ('VIERNES', 'Viernes'),
     ]
 
-    curso = models.ForeignKey('Curso', on_delete=models.CASCADE, related_name='horarios')
-    asignatura_impartida = models.ForeignKey('AsignaturaImpartida', on_delete=models.CASCADE, null=True, blank=True)
-    actividad = models.CharField(max_length=10, choices=ACTIVIDAD_CHOICES)
-    dia = models.CharField(max_length=10, choices=DIA_CHOICES)
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
+    ACTIVIDAD_CHOICES = [
+        ('CLASE', 'Clase'),
+        ('RECREO', 'Recreo'),
+        ('ALMUERZO', 'Almuerzo'),
+    ]
 
-    class Meta:
-        unique_together = [
-            ('curso', 'dia', 'hora_inicio'),  # No puede haber dos actividades al mismo tiempo para un curso
-        ]
+    bloque = models.CharField(max_length=8, choices=BLOQUE_CHOICES)
+    dia = models.CharField(max_length=10, choices=DIA_CHOICES)
+    actividad = models.CharField(max_length=8, choices=ACTIVIDAD_CHOICES)
 
     def __str__(self):
-        if self.actividad == 'Clase':
-            return f'{self.curso} - {self.asignatura_impartida.codigo} - {self.actividad} - {self.dia} ({self.hora_inicio}-{self.hora_fin})'
-        return f'{self.curso} - {self.actividad} - {self.dia} ({self.hora_inicio}-{self.hora_fin})'
+        return f'{self.dia} - {self.get_bloque_display()} - {self.actividad}'
+
+    class Meta:
+        unique_together = [('bloque', 'dia')]
+
+    @property
+    def es_viernes(self):
+        return self.dia == 'VIERNES'
+
+    @property
+    def horario_valido(self):
+        if self.es_viernes and self.bloque in ['7', '8', '9', 'ALMUERZO']:
+            return False
+        return True

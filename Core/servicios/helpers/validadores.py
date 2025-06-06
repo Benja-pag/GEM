@@ -14,7 +14,7 @@ def es_correo_existente(mail):
 
 def validar_data_crear_usuario(data, tipo_usuario='ESTUDIANTE'):
     errores = []
-    
+
     # Validar campos básicos obligatorios
     campos_obligatorios = [
         'nombre', 'apellido_paterno', 'apellido_materno',
@@ -29,7 +29,7 @@ def validar_data_crear_usuario(data, tipo_usuario='ESTUDIANTE'):
     # Si hay errores en campos obligatorios, retornar
     if errores:
         return False, errores
-    
+
     # Validar RUT
     if not validar_formato_rut(data['rut']):
         errores.append("El formato del RUT no es válido.")
@@ -42,7 +42,7 @@ def validar_data_crear_usuario(data, tipo_usuario='ESTUDIANTE'):
     if not re.match(r'^\d{9}$', data['telefono']):
         errores.append("El teléfono debe tener 9 dígitos numéricos.")
     
-    # Validar contraseña
+    # Validar contraseña    
     if len(data['password']) < 8:
         errores.append("La contraseña debe tener al menos 8 caracteres.")
     

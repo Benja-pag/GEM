@@ -123,7 +123,7 @@ $(document).ready(function() {
         
         // Asegurarse de que el ID del usuario se incluya
         formData.append('user_id', userId);
-        
+
         $.ajax({
             url: `/users/${userId}/data/`,
             type: 'POST',

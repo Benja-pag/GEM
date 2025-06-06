@@ -34,6 +34,8 @@ call python Poblar_database\solucionador_conflictos.py
 echo 8. Creando alumnos...
 call python Poblar_database\alumnos_bd.py
 
+call python Poblar_database\asignaturas_inscritas.py
+
 echo Base de datos poblada exitosamente!
 
 echo Activando entorno virtual...

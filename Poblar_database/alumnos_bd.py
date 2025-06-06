@@ -11,7 +11,7 @@ django.setup()
 
 from django.contrib.auth.hashers import make_password
 from Core.models import (
-    AuthUser, Usuario, Especialidad, Docente, Administrativo, Curso, Estudiante, EvaluacionBase, Asignatura, AsignaturaImpartida
+    AuthUser, Usuario, Especialidad, Docente, Administrativo, Curso, Estudiante, EvaluacionBase, Asignatura, AsignaturaInscrita, AsignaturaImpartida
 )
 
 cursos = list(Curso.objects.all())
@@ -1497,3 +1497,5 @@ for data in estudiantes_data:
     )
 
 print("✅ Estudiantes creados exitosamente")
+
+

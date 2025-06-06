@@ -27,8 +27,21 @@ class AdminPanelView(View):
             total_clases = Clase.objects.count()
             total_asignaturas = Asignatura.objects.count()
             
-            # Obtener todos los docentes para el formulario de creación de curso
-            docentes = Docente.objects.select_related('usuario').all()
+            # Obtener todos los docentes con sus relaciones
+            docentes = Docente.objects.select_related(
+                'usuario',
+                'especialidad'
+            ).prefetch_related(
+                'jefaturas'
+            ).all()
+            
+            # Debug: imprimir información de los docentes
+            print(f"Total de docentes encontrados: {len(docentes)}")
+            for docente in docentes:
+                print(f"Docente: {docente.usuario.nombre} {docente.usuario.apellido_paterno}")
+                print(f"- ID: {docente.usuario.auth_user_id}")
+                print(f"- Es profesor jefe: {docente.es_profesor_jefe}")
+                print(f"- Tiene jefatura: {docente.jefaturas.exists()}")
             
             # Obtener todos los estudiantes
             estudiantes_sin_curso = Estudiante.objects.all().select_related('usuario', 'curso')
@@ -68,14 +81,86 @@ class AdminPanelView(View):
             return redirect('home')
 
     def post(self, request):
-        if not request.user.is_admin:
+        if not request.user.is_authenticated or not request.user.is_admin:
             messages.error(request, 'No tienes permiso para realizar esta acción')
-            return redirect('home')
-        
-        action = request.POST.get('action')
-        
+            return redirect('login')
+
         try:
-            if action == 'crear_estudiante':
+            action = request.POST.get('action')
+            print("ok")
+            if action == 'crear_curso':
+                try:
+                    # Validar datos
+                    nivel = request.POST.get('nivel')
+                    letra = request.POST.get('letra', '').upper()
+                    profesor_jefe_id = request.POST.get('profesor_jefe_id')
+                    
+                    errores = []
+                    if not nivel or not nivel.isdigit() or int(nivel) < 1 or int(nivel) > 4:
+                        errores.append('El nivel debe estar entre 1 y 4')
+                    
+                    if not letra or letra not in ['A', 'B', 'C']:
+                        errores.append('La letra debe ser A o B')
+                    
+                    if not profesor_jefe_id:
+                        errores.append('Debe seleccionar un profesor jefe')
+                    
+                    # Verificar si ya existe un curso con el mismo nivel y letra
+                    if Curso.objects.filter(nivel=nivel, letra=letra).exists():
+                        errores.append(f'Ya existe un curso {nivel}°{letra}')
+                    
+                    # Verificar si el profesor ya es jefe de otro curso
+                    if profesor_jefe_id:
+                        docente = get_object_or_404(Docente, usuario__auth_user_id=profesor_jefe_id)
+                        if docente.jefaturas.filter(curso__isnull=False).exists():
+                            errores.append('El profesor seleccionado ya es jefe de otro curso')
+                    
+                    if errores:
+                        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                            return JsonResponse({
+                                'success': False,
+                                'errors': errores
+                            })
+                        for error in errores:
+                            messages.error(request, error)
+                        return redirect('admin_panel')
+                    
+                    with transaction.atomic():
+                        # Crear el curso
+                        curso = Curso.objects.create(
+                            nivel=nivel,
+                            letra=letra
+                        )
+                        
+                        # Actualizar el docente y crear la relación de profesor jefe
+                        docente = get_object_or_404(Docente, usuario__auth_user_id=profesor_jefe_id)
+                        docente.es_profesor_jefe = True
+                        docente.save()
+                        
+                        ProfesorJefe.objects.create(
+                            docente=docente,
+                            curso=curso
+                        )
+                        
+                        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                            return JsonResponse({
+                                'success': True,
+                                'message': f'Curso {curso.nivel}°{curso.letra} creado exitosamente'
+                            })
+                        
+                        messages.success(request, f'Curso {curso.nivel}°{curso.letra} creado exitosamente')
+                        return redirect('admin_panel')
+                        
+                except Exception as e:
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'success': False,
+                            'errors': [str(e)]
+                        })
+                    messages.error(request, f'Error al crear curso: {str(e)}')
+                    return redirect('admin_panel')
+            
+            elif action == 'crear_estudiante':
                 data = {
                     'nombre': request.POST.get('nombre'),
                     'apellido_paterno': request.POST.get('apellido_paterno'),
@@ -201,78 +286,6 @@ class AdminPanelView(View):
                         return JsonResponse({'success': False, 'errors': {'__all__': [str(e)]}})
                     return redirect('admin_panel')
                     
-            elif action == 'crear_curso':
-                try:
-                    # Obtener los datos del formulario
-                    nivel = request.POST.get('nivel')
-                    letra = request.POST.get('letra').upper()  # Convertir a mayúscula
-                    profesor_jefe_id = request.POST.get('profesor_jefe_id')
-
-                    # Validar que todos los campos requeridos estén presentes
-                    errores = []
-                    if not nivel:
-                        errores.append('El nivel es obligatorio')
-                    if not letra:
-                        errores.append('La letra es obligatoria')
-                    if not profesor_jefe_id:
-                        errores.append('El profesor jefe es obligatorio')
-
-                    # Validar formato de nivel
-                    try:
-                        nivel = int(nivel)
-                        if nivel < 1 or nivel > 12:
-                            errores.append('El nivel debe estar entre 1 y 12')
-                    except ValueError:
-                        errores.append('El nivel debe ser un número válido')
-
-                    # Validar formato de letra
-                    if letra and not letra.isalpha():
-                        errores.append('La letra debe ser un carácter alfabético')
-
-                    if errores:
-                        return JsonResponse({
-                            'success': False,
-                            'errors': {'__all__': errores}
-                        })
-
-                    # Verificar si ya existe un curso con el mismo nivel y letra
-                    curso_existente = Curso.objects.filter(nivel=nivel, letra=letra).first()
-                    if curso_existente:
-                        return JsonResponse({
-                            'success': False,
-                            'errors': {'__all__': [f'Ya existe un curso {nivel}°{letra}. Por favor, elija otro nivel o letra.']}
-                        })
-
-                    # Verificar si el profesor ya es jefe de otro curso
-                    profesor_jefe = Docente.objects.get(usuario_id=profesor_jefe_id)
-                    jefatura_existente = ProfesorJefe.objects.filter(docente=profesor_jefe).first()
-                    if jefatura_existente:
-                        return JsonResponse({
-                            'success': False,
-                            'errors': {'__all__': [f'El profesor {profesor_jefe.usuario.nombre} {profesor_jefe.usuario.apellido_paterno} ya es jefe del curso {jefatura_existente.curso}']}
-                        })
-
-                    # Crear el curso
-                    curso = Curso.objects.create(nivel=nivel, letra=letra)
-
-                    # Asignar el profesor jefe
-                    ProfesorJefe.objects.create(docente=profesor_jefe, curso=curso)
-
-                    return JsonResponse({
-                        'success': True,
-                        'message': f'Curso {nivel}°{letra} creado exitosamente'
-                    })
-
-                except Docente.DoesNotExist:
-                    return JsonResponse({
-                        'success': False,
-                        'errors': {'__all__': ['El profesor seleccionado no existe']}
-                    })
-                except Exception as e:
-                    return JsonResponse({
-                        'success': False,
-                        'errors': {'__all__': [f'Error al crear el curso: {str(e)}']}
-                    })
             elif action == 'crear_asignatura':
                 try:
                     # Crear la asignatura base

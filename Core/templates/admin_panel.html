@@ -9,6 +9,7 @@
 <script src="{% static 'js/user_actions.js' %}"></script>
 <script src="{% static 'js/user_edit.js' %}"></script>
 <script src="{% static 'js/user_details.js' %}"></script>
+<script src="{% static 'js/curso_form.js' %}"></script>
 <script>
     // Agregar el atributo data-is-admin al body
     document.addEventListener('DOMContentLoaded', function() {
@@ -724,15 +725,28 @@
                                     <label for="profesor_jefe_id" class="form-label">Profesor Jefe</label>
                                     <select class="form-select" id="profesor_jefe_id" name="profesor_jefe_id" required>
                                         <option value="">-- Seleccione un profesor jefe --</option>
-                                        {% for docente in docentes %}
-                                            {% if docente.usuario and docente.usuario.id %}
-                                                <option value="{{ docente.usuario.id }}" data-nombre="{{ docente.usuario.nombre }} {{ docente.usuario.apellido_paterno }}">
-                                                    {{ docente.usuario.nombre }} {{ docente.usuario.apellido_paterno }}
-                                                </option>
-                                            {% endif %}
-                                        {% endfor %}
+                                        {% if docentes %}
+                                            {% for docente in docentes %}
+                                                {% if docente.usuario %}
+                                                    <option value="{{ docente.usuario.auth_user_id }}" 
+                                                            data-nombre="{{ docente.usuario.nombre }} {{ docente.usuario.apellido_paterno }}"
+                                                            {% if docente.jefaturas.exists %}disabled{% endif %}>
+                                                        {{ docente.usuario.nombre }} {{ docente.usuario.apellido_paterno }}
+                                                        {% if docente.jefaturas.exists %}
+                                                            (Ya es profesor jefe de otro curso)
+                                                        {% endif %}
+                                                        {% if docente.es_profesor_jefe %}
+                                                            (Marcado como profesor jefe)
+                                                        {% endif %}
+                                                    </option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <option value="" disabled>No hay docentes disponibles</option>
+                                        {% endif %}
                                     </select>
                                     <div class="invalid-feedback">Por favor seleccione un profesor jefe</div>
+                                    <small class="text-muted">Los profesores que ya son jefes de otro curso aparecen deshabilitados</small>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

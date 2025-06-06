@@ -68,14 +68,18 @@
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
-                                        <th>Teléfono</th>
+                                        <th>Curso</th>
+                                        <th>RUT</th>
+                                        <th>Correo Electrónico</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for estudiante in estudiantes %}
                                     <tr>
                                         <td>{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }} {{ estudiante.usuario.apellido_materno }}</td>
-                                        <td>{{ estudiante.usuario.telefono }}</td>
+                                        <td>{{ estudiante.curso }}</td>
+                                        <td>{{ estudiante.usuario.rut }}</td>
+                                        <td>{{ estudiante.usuario.email }}</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

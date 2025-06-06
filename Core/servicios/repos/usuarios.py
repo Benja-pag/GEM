@@ -1,6 +1,7 @@
 from Core.models import AuthUser, Usuario, Docente, Estudiante, Administrativo
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from datetime import datetime
 
 
 def obtener_usuario_por_rut(rut):
@@ -109,14 +110,25 @@ def actualizar_usuario(usuario, data):
         usuario.correo = data.get('correo', usuario.correo)
         usuario.telefono = data.get('telefono', usuario.telefono)
         usuario.direccion = data.get('direccion', usuario.direccion)
-        usuario.fecha_nacimiento = data.get('fecha_nacimiento', usuario.fecha_nacimiento)
+        
+        # Manejar fecha_nacimiento
+        fecha_nacimiento = data.get('fecha_nacimiento')
+        if fecha_nacimiento:
+            if isinstance(fecha_nacimiento, str):
+                try:
+                    usuario.fecha_nacimiento = datetime.strptime(fecha_nacimiento, '%Y-%m-%d').date()
+                except ValueError:
+                    # Si el formato no es correcto, mantener la fecha actual
+                    pass
+            else:
+                usuario.fecha_nacimiento = fecha_nacimiento
         usuario.save()
 
         # Actualizar tipo de usuario específico
         if hasattr(usuario, 'estudiante'):
             estudiante = usuario.estudiante
             estudiante.contacto_emergencia = data.get('contacto_emergencia', estudiante.contacto_emergencia)
-            estudiante.clase_id = data.get('clase', estudiante.clase_id)
+            estudiante.curso_id = data.get('curso', estudiante.curso_id)
             estudiante.save()
         elif hasattr(usuario, 'docente'):
             docente = usuario.docente
@@ -155,3 +167,20 @@ def actualizar_usuario(usuario, data):
 #             Administrativo.objects.create(usuario=usuario)
 
 #     return usuario
+
+def limpiar_authusers_huerfanos():
+    """
+    Elimina todos los registros de AuthUser que no tienen un Usuario asociado.
+    """
+    try:
+        with transaction.atomic():
+            # Encontrar todos los AuthUsers que no tienen un Usuario asociado
+            auth_users_huerfanos = AuthUser.objects.filter(usuario__isnull=True)
+            cantidad = auth_users_huerfanos.count()
+            
+            # Eliminar los registros huérfanos
+            auth_users_huerfanos.delete()
+            
+            return cantidad
+    except Exception as e:
+        raise Exception(f"Error al limpiar AuthUsers huérfanos: {str(e)}")

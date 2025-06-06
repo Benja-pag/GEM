@@ -6,7 +6,7 @@ from Core.views import (
     RegisterView, CreateAdminView, ChangePasswordView,
     UserDataView, SurveysView, TasksView, TestsView, ToggleUserStatusView,
     CalendarioEventosView, CalendarioGuardarEventoView, CalendarioEliminarEventoView,
-    CursoDetalleView, AsignaturaDetalleView
+    CursoDetalleView, AsignaturaDetalleView, CleanupAuthUsersView
 )
 
 urlpatterns = [
@@ -26,6 +26,7 @@ urlpatterns = [
     path('users/<int:user_id>/delete/', UserDeleteView.as_view(), name='user_delete'),
     path('users/<int:user_id>/toggle-status/', ToggleUserStatusView.as_view(), name='toggle_user_status'),
     path('users/<int:user_id>/data/', UserDataView.as_view(), name='user_data'),
+    path('users/cleanup-auth/', CleanupAuthUsersView.as_view(), name='cleanup_auth_users'),
     
     path('profesor-panel/', ProfesorPanelView.as_view(), name='profesor_panel'),
     path('estudiante-panel/', EstudiantePanelView.as_view(), name='estudiante_panel'),

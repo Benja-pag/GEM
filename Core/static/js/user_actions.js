@@ -31,14 +31,14 @@ $(document).ready(function() {
         e.preventDefault();
         e.stopPropagation();
         
-        const userId = $(this).data('user-id');
         const button = $(this);
-        const row = button.closest('tr');
-        const statusCell = row.find('td:nth-child(5) .badge');
-
+        const userId = button.data('user-id');
+        const isActive = button.data('is-active') === true;
+        const newStatus = !isActive;
+        
         Swal.fire({
             title: '¿Estás seguro?',
-            text: '¿Quieres cambiar el estado de este usuario?',
+            text: `¿Quieres ${newStatus ? 'activar' : 'desactivar'} este usuario?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -50,34 +50,55 @@ $(document).ready(function() {
                 $.ajax({
                     url: `/users/${userId}/toggle-status/`,
                     type: 'POST',
-                    headers: {
-                        'X-CSRFToken': csrftoken
-                    },
                     success: function(response) {
                         if (response.success) {
+                            // Actualizar el botón
+                            button.data('is-active', response.is_active);
+                            
                             if (response.is_active) {
-                                button.removeClass('btn-danger').addClass('btn-success');
-                                button.find('i').removeClass('fa-user-slash').addClass('fa-user-check');
-                                statusCell.removeClass('bg-danger').addClass('bg-success').text('Activo');
+                                button
+                                    .removeClass('btn-danger')
+                                    .addClass('btn-success')
+                                    .attr('title', 'Desactivar')
+                                    .find('i')
+                                    .removeClass('fa-user-slash')
+                                    .addClass('fa-user-check');
                             } else {
-                                button.removeClass('btn-success').addClass('btn-danger');
-                                button.find('i').removeClass('fa-user-check').addClass('fa-user-slash');
-                                statusCell.removeClass('bg-success').addClass('bg-danger').text('Inactivo');
+                                button
+                                    .removeClass('btn-success')
+                                    .addClass('btn-danger')
+                                    .attr('title', 'Activar')
+                                    .find('i')
+                                    .removeClass('fa-user-check')
+                                    .addClass('fa-user-slash');
                             }
-                            button.data('is-active', response.is_active.toString());
-
+                            
+                            // Actualizar el badge de estado
+                            const statusCell = button.closest('tr').find('td:nth-child(5) .badge');
+                            if (response.is_active) {
+                                statusCell
+                                    .removeClass('bg-danger')
+                                    .addClass('bg-success')
+                                    .text('Activo');
+                            } else {
+                                statusCell
+                                    .removeClass('bg-success')
+                                    .addClass('bg-danger')
+                                    .text('Inactivo');
+                            }
+                            
                             Swal.fire({
                                 icon: 'success',
                                 title: '¡Éxito!',
                                 text: `Usuario ${response.is_active ? 'activado' : 'desactivado'} exitosamente`,
-                                timer: 2000,
-                                showConfirmButton: false
+                                showConfirmButton: false,
+                                timer: 1500
                             });
                         } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: response.error || 'No se pudo cambiar el estado del usuario'
+                                text: response.error || 'Error al cambiar el estado del usuario'
                             });
                         }
                     },
@@ -94,15 +115,17 @@ $(document).ready(function() {
     });
 
     // Manejar la eliminación de usuarios
-    $('.delete-user').on('click', function() {
+    $('.delete-user').click(function() {
         const userId = $(this).data('user-id');
+        const row = $(this).closest('tr');
+        
         Swal.fire({
             title: '¿Estás seguro?',
-            text: "Esta acción no se puede deshacer",
+            text: "Esta acción eliminará al usuario y todos sus datos relacionados. Esta acción no se puede deshacer.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
@@ -112,18 +135,30 @@ $(document).ready(function() {
                     type: 'POST',
                     success: function(response) {
                         if (response.success) {
+                            // Eliminar la fila de la tabla
+                            row.fadeOut(400, function() {
+                                $(this).remove();
+                                
+                                // Si no quedan más filas, mostrar mensaje
+                                if ($('table tbody tr').length === 0) {
+                                    $('table tbody').append(
+                                        '<tr><td colspan="6" class="text-center">No hay usuarios registrados</td></tr>'
+                                    );
+                                }
+                            });
+                            
                             Swal.fire({
                                 icon: 'success',
                                 title: '¡Éxito!',
-                                text: 'Usuario eliminado exitosamente'
-                            }).then(() => {
-                                location.reload();
+                                text: 'Usuario eliminado exitosamente',
+                                showConfirmButton: false,
+                                timer: 1500
                             });
                         } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: response.error
+                                text: response.error || 'Error al eliminar el usuario'
                             });
                         }
                     },

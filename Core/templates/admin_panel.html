@@ -8,6 +8,7 @@
 <script src="{% static 'js/docente_form.js' %}"></script>
 <script src="{% static 'js/user_actions.js' %}"></script>
 <script src="{% static 'js/user_edit.js' %}"></script>
+<script src="{% static 'js/user_details.js' %}"></script>
 <script>
     // Agregar el atributo data-is-admin al body
     document.addEventListener('DOMContentLoaded', function() {
@@ -888,19 +889,19 @@
                                 </td>
                                 <td>
                                     <div class="btn-group">
-                                        <a href="{% url 'user_detail' usuario.auth_user.id %}" class="btn btn-info btn-sm" title="Ver detalles">
+                                        <button type="button" class="btn btn-info btn-sm view-user" data-user-id="{{ usuario.auth_user_id }}" title="Ver detalles">
                                             <i class="fas fa-eye"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-warning btn-sm edit-user" data-user-id="{{ usuario.auth_user.id }}" title="Editar">
+                                        </button>
+                                        <button type="button" class="btn btn-warning btn-sm edit-user" data-user-id="{{ usuario.auth_user_id }}" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <button class="btn btn-sm toggle-user-status {% if usuario.activador %}btn-success{% else %}btn-danger{% endif %}" 
-                                                data-user-id="{{ usuario.auth_user.id }}" 
+                                                data-user-id="{{ usuario.auth_user_id }}" 
                                                 data-is-active="{{ usuario.activador|lower }}"
                                                 title="{% if usuario.activador %}Desactivar{% else %}Activar{% endif %}">
                                             <i class="fas {% if usuario.activador %}fa-user-check{% else %}fa-user-slash{% endif %}"></i>
                                         </button>
-                                        <button class="btn btn-danger btn-sm delete-user" data-user-id="{{ usuario.auth_user.id }}" title="Eliminar">
+                                        <button class="btn btn-danger btn-sm delete-user" data-user-id="{{ usuario.auth_user_id }}" title="Eliminar">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
@@ -1065,47 +1066,41 @@
                         <div class="modal-body">
                             <form id="editUserForm">
                                 <input type="hidden" id="edit-user-id" name="user_id">
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label for="edit-nombre" class="form-label">Nombre</label>
-                                        <input type="text" class="form-control" id="edit-nombre" name="nombre" required>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="edit-apellido-paterno" class="form-label">Apellido Paterno</label>
-                                        <input type="text" class="form-control" id="edit-apellido-paterno" name="apellido_paterno" required>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="edit-apellido-materno" class="form-label">Apellido Materno</label>
-                                        <input type="text" class="form-control" id="edit-apellido-materno" name="apellido_materno" required>
-                                    </div>
+                                <div class="mb-3">
+                                    <label for="edit-nombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="edit-nombre" name="nombre" required>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label for="edit-rut" class="form-label">RUT</label>
-                                        <input type="text" class="form-control" id="edit-rut" name="rut" required>
-                                    </div>
-                                    <div class="col-md-2 mb-3">
-                                        <label for="edit-div" class="form-label">DV</label>
-                                        <input type="text" class="form-control" id="edit-div" name="div" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="edit-correo" class="form-label">Correo Electrónico</label>
-                                        <input type="email" class="form-control" id="edit-correo" name="correo" required>
-                                    </div>
+                                <div class="mb-3">
+                                    <label for="edit-apellido-paterno" class="form-label">Apellido Paterno</label>
+                                    <input type="text" class="form-control" id="edit-apellido-paterno" name="apellido_paterno" required>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="edit-telefono" class="form-label">Teléfono</label>
-                                        <input type="tel" class="form-control" id="edit-telefono" name="telefono" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="edit-fecha-nacimiento" class="form-label">Fecha de Nacimiento</label>
-                                        <input type="date" class="form-control" id="edit-fecha-nacimiento" name="fecha_nacimiento" required>
-                                    </div>
+                                <div class="mb-3">
+                                    <label for="edit-apellido-materno" class="form-label">Apellido Materno</label>
+                                    <input type="text" class="form-control" id="edit-apellido-materno" name="apellido_materno" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-rut" class="form-label">RUT</label>
+                                    <input type="text" class="form-control" id="edit-rut" name="rut" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-div" class="form-label">Dígito Verificador</label>
+                                    <input type="text" class="form-control" id="edit-div" name="div" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-correo" class="form-label">Correo</label>
+                                    <input type="email" class="form-control" id="edit-correo" name="correo" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-telefono" class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control" id="edit-telefono" name="telefono" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit-direccion" class="form-label">Dirección</label>
                                     <textarea class="form-control" id="edit-direccion" name="direccion" rows="2" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-fecha-nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-control" id="edit-fecha-nacimiento" name="fecha_nacimiento" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit-tipo-usuario" class="form-label">Tipo de Usuario</label>
@@ -1121,6 +1116,33 @@
                                     <div class="mb-3">
                                         <label for="edit-contacto-emergencia" class="form-label">Contacto de Emergencia</label>
                                         <input type="text" class="form-control" id="edit-contacto-emergencia" name="contacto_emergencia">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="edit-curso" class="form-label">Curso</label>
+                                        <select class="form-select" id="edit-curso" name="curso">
+                                            <option value="">Seleccione un curso</option>
+                                            {% for curso in cursos %}
+                                                <option value="{{ curso.id }}">{{ curso.nivel }}°{{ curso.letra }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- Campos específicos para docentes -->
+                                <div class="docente-fields" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="edit-especialidad" class="form-label">Especialidad</label>
+                                        <select class="form-select" id="edit-especialidad" name="especialidad">
+                                            <option value="">Seleccione una especialidad</option>
+                                            {% for especialidad in especialidades %}
+                                                <option value="{{ especialidad.id }}">{{ especialidad.nombre }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="edit-es-profesor-jefe" name="es_profesor_jefe">
+                                            <label class="form-check-label" for="edit-es-profesor-jefe">Es Profesor Jefe</label>
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- Campos específicos para administrativos -->
@@ -1140,6 +1162,60 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <button type="submit" form="editUserForm" class="btn btn-primary">Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Detalles de Usuario -->
+            <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="userDetailsModalLabel">Detalles del Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Información Personal</h6>
+                                    <p><strong>Nombre Completo:</strong> <span id="detail-nombre-completo"></span></p>
+                                    <p><strong>RUT:</strong> <span id="detail-rut"></span></p>
+                                    <p><strong>Correo:</strong> <span id="detail-correo"></span></p>
+                                    <p><strong>Teléfono:</strong> <span id="detail-telefono"></span></p>
+                                    <p><strong>Dirección:</strong> <span id="detail-direccion"></span></p>
+                                    <p><strong>Fecha de Nacimiento:</strong> <span id="detail-fecha-nacimiento"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Información del Sistema</h6>
+                                    <p><strong>Tipo de Usuario:</strong> <span id="detail-tipo-usuario"></span></p>
+                                    <p><strong>Estado:</strong> <span id="detail-estado" class="badge"></span></p>
+                                    <p><strong>Fecha de Creación:</strong> <span id="detail-fecha-creacion"></span></p>
+                                    
+                                    <!-- Información específica de Estudiante -->
+                                    <div id="detail-estudiante-info" style="display: none;">
+                                        <h6 class="mt-4 mb-3">Información de Estudiante</h6>
+                                        <p><strong>Contacto de Emergencia:</strong> <span id="detail-contacto-emergencia"></span></p>
+                                        <p><strong>Curso:</strong> <span id="detail-curso"></span></p>
+                                    </div>
+                                    
+                                    <!-- Información específica de Docente -->
+                                    <div id="detail-docente-info" style="display: none;">
+                                        <h6 class="mt-4 mb-3">Información de Docente</h6>
+                                        <p><strong>Especialidad:</strong> <span id="detail-especialidad"></span></p>
+                                        <p><strong>Profesor Jefe:</strong> <span id="detail-es-profesor-jefe"></span></p>
+                                    </div>
+                                    
+                                    <!-- Información específica de Administrativo -->
+                                    <div id="detail-administrativo-info" style="display: none;">
+                                        <h6 class="mt-4 mb-3">Información de Administrativo</h6>
+                                        <p><strong>Rol:</strong> <span id="detail-rol-administrativo"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         </div>
                     </div>
                 </div>

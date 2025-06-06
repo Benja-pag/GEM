@@ -365,13 +365,6 @@ class CreateAdminView(View):
 class ToggleUserStatusView(View):
     def post(self, request, user_id):
         try:
-            print(f"Usuario autenticado: {request.user.is_authenticated}")
-            print(f"Es admin: {request.user.is_admin}")
-            print(f"User ID: {user_id}")
-            print(f"Request user: {request.user}")
-            print(f"Request user type: {type(request.user)}")
-            print(f"Request user attributes: {dir(request.user)}")
-            
             # Verificar si el usuario está autenticado
             if not request.user.is_authenticated:
                 return JsonResponse({'success': False, 'error': 'Usuario no autenticado'})
@@ -380,8 +373,7 @@ class ToggleUserStatusView(View):
             if not hasattr(request.user, 'is_admin') or not request.user.is_admin:
                 return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
             
-            usuario = get_object_or_404(Usuario, id=user_id)
-            print(f"Usuario encontrado: {usuario}")
+            usuario = get_object_or_404(Usuario, auth_user_id=user_id)
             
             # No permitir desactivar administradores máximos
             if hasattr(usuario, 'administrativo') and usuario.administrativo.rol == 'ADMINISTRADOR_MAXIMO':
@@ -390,12 +382,15 @@ class ToggleUserStatusView(View):
             # Invertir el estado actual
             usuario.activador = not usuario.activador
             usuario.save()
-            print(f"Nuevo estado: {usuario.activador}")
+            
+            # También actualizar el estado en AuthUser
+            auth_user = usuario.auth_user
+            auth_user.is_active = usuario.activador
+            auth_user.save()
             
             return JsonResponse({
                 'success': True,
                 'is_active': usuario.activador
             })
         except Exception as e:
-            print(f"Error: {str(e)}")
             return JsonResponse({'success': False, 'error': str(e)})

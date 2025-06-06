@@ -286,7 +286,7 @@ $('form[action="{% url \'admin_panel\' %}"]').on('submit', function(e) {
             prefix = 'estudiante_';
             break;
         case 'crear_docente':
-            prefix = 'profesor_';
+            prefix = 'docente_';
             break;
         case 'crear_administrador':
             prefix = 'admin_';

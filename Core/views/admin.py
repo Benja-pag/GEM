@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, ProfesorJefe
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, ProfesorJefe, Especialidad
 from django.db.models import Count, Avg
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -45,6 +45,9 @@ class AdminPanelView(View):
             # Obtener cursos con sus profesores jefe
             cursos = Curso.objects.select_related('jefatura_actual__docente__usuario').all()
             
+            # Obtener todas las especialidades
+            especialidades = Especialidad.objects.all()
+            
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
@@ -57,6 +60,7 @@ class AdminPanelView(View):
                 'usuarios': usuarios,
                 'asignaturas': asignaturas,
                 'cursos': cursos,
+                'especialidades': especialidades,
             }
             return render(request, 'admin_panel.html', context)
         except Exception as e:
@@ -83,25 +87,30 @@ class AdminPanelView(View):
                     'direccion': request.POST.get('direccion'),
                     'fecha_nacimiento': request.POST.get('fecha_nacimiento'),
                     'password': request.POST.get('password'),
-                    'confirm_password': request.POST.get('confirm_password'),
-                    'tipo_usuario': 'ESTUDIANTE',
-                    'contacto_emergencia': request.POST.get('contacto_emergencia')
+                    'contacto_emergencia': request.POST.get('contacto_emergencia'),
+                    'curso': request.POST.get('curso')
                 }
                 
                 # Validar datos
-                es_valido, errores = validadores.validar_data_crear_usuario(data)
+                es_valido, errores = validadores.validar_data_crear_usuario(data, tipo_usuario='ESTUDIANTE')
                 if not es_valido:
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                         return JsonResponse({
                             'success': False,
-                            'errors': {'__all__': errores}
+                            'errors': errores
                         })
                     for error in errores:
                         messages.error(request, error)
                     return redirect('admin_panel')
                 
-                crear_usuario(data, 'ESTUDIANTE')
-                messages.success(request, 'Estudiante creado exitosamente')
+                try:
+                    usuario = crear_usuario(data, 'ESTUDIANTE')
+                    messages.success(request, f'Estudiante {usuario.nombre} {usuario.apellido_paterno} creado exitosamente')
+                except Exception as e:
+                    messages.error(request, f'Error al crear estudiante: {str(e)}')
+                
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': True})
                 return redirect('admin_panel')
                     
             elif action == 'crear_docente':
@@ -117,12 +126,12 @@ class AdminPanelView(View):
                     'fecha_nacimiento': request.POST.get('fecha_nacimiento'),
                     'password': request.POST.get('password'),
                     'confirm_password': request.POST.get('confirm_password'),
-                    'tipo_usuario': 'DOCENTE',
-                    'especialidad': request.POST.get('especialidad')
+                    'especialidad': request.POST.get('especialidad'),
+                    'es_profesor_jefe': request.POST.get('es_profesor_jefe') == 'true'
                 }
                 
                 # Validar datos
-                es_valido, errores = validadores.validar_data_crear_usuario(data)
+                es_valido, errores = validadores.validar_data_crear_usuario(data, tipo_usuario='DOCENTE')
                 if not es_valido:
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                         return JsonResponse({
@@ -133,9 +142,20 @@ class AdminPanelView(View):
                         messages.error(request, error)
                     return redirect('admin_panel')
                 
-                crear_usuario(data, 'DOCENTE')
-                messages.success(request, 'Docente creado exitosamente')
-                return redirect('admin_panel')
+                try:
+                    # Crear usuario base y docente
+                    usuario = crear_usuario(data, 'DOCENTE')
+                    messages.success(request, f'Docente {usuario.nombre} {usuario.apellido_paterno} creado exitosamente')
+                    
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({'success': True})
+                    return redirect('admin_panel')
+                    
+                except Exception as e:
+                    messages.error(request, f'Error al crear docente: {str(e)}')
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({'success': False, 'errors': {'__all__': [str(e)]}})
+                    return redirect('admin_panel')
                     
             elif action == 'crear_administrador':
                 data = {
@@ -151,11 +171,11 @@ class AdminPanelView(View):
                     'password': request.POST.get('password'),
                     'confirm_password': request.POST.get('confirm_password'),
                     'tipo_usuario': 'ADMINISTRATIVO',
-                    'rol_administrativo': request.POST.get('rol', 'ADMINISTRATIVO')
+                    'rol': request.POST.get('rol', 'ADMINISTRATIVO')
                 }
                 
                 # Validar datos
-                es_valido, errores = validadores.validar_data_crear_usuario(data)
+                es_valido, errores = validadores.validar_data_crear_usuario(data, tipo_usuario='ADMINISTRATIVO')
                 if not es_valido:
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                         return JsonResponse({
@@ -166,9 +186,20 @@ class AdminPanelView(View):
                         messages.error(request, error)
                     return redirect('admin_panel')
                 
-                crear_usuario(data, 'ADMINISTRATIVO')
-                messages.success(request, 'Administrador creado exitosamente')
-                return redirect('admin_panel')
+                try:
+                    # Crear usuario base y administrativo
+                    usuario = crear_usuario(data, 'ADMINISTRATIVO')
+                    messages.success(request, f'Administrador {usuario.nombre} {usuario.apellido_paterno} creado exitosamente')
+                    
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({'success': True})
+                    return redirect('admin_panel')
+                    
+                except Exception as e:
+                    messages.error(request, f'Error al crear administrador: {str(e)}')
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({'success': False, 'errors': {'__all__': [str(e)]}})
+                    return redirect('admin_panel')
                     
             elif action == 'crear_curso':
                 try:
@@ -278,6 +309,8 @@ class AdminPanelView(View):
                 
         except Exception as e:
             messages.error(request, f'Error al procesar la solicitud: {str(e)}')
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': str(e)})
             return redirect('admin_panel')
 
 @method_decorator(login_required, name='dispatch')

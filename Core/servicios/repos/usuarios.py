@@ -36,43 +36,55 @@ def obtener_usuario_por_id(user_id):
         return None
 # Funcion principal para crear un usuario
 def crear_usuario(data, tipo_usuario):
-    
-    with transaction.atomic():
-        auth_user = AuthUser.objects.create(
-            rut=data['rut'],
-            div=data['div'],
-            password=make_password(data['password']),
-            is_admin=(tipo_usuario == 'ADMINISTRATIVO')
-        )
-        usuario = Usuario.objects.create(
-            nombre=data['nombre'],
-            apellido_paterno=data['apellido_paterno'],
-            apellido_materno=data['apellido_materno'],
-            rut=data['rut'],
-            div=data['div'],
-            correo=data['correo'],
-            telefono=data.get('telefono'),
-            direccion=data.get('direccion'),
-            fecha_nacimiento=data.get('fecha_nacimiento'),
-            auth_user=auth_user
-        )
-        if tipo_usuario == 'ESTUDIANTE':
-            Estudiante.objects.create(
-                usuario=usuario,
-                contacto_emergencia=data.get('contacto_emergencia'),
-                clase_id=data.get('clase')
+    try:
+        with transaction.atomic():
+            # Primero creamos el AuthUser (autenticación)
+            auth_user = AuthUser.objects.create_user(
+                rut=data['rut'],
+                div=data['div'],
+                password=data['password']
             )
-        elif tipo_usuario == 'DOCENTE':
-            Docente.objects.create(
-                usuario=usuario,
-                especialidad=data.get('especialidad')
+            
+            if tipo_usuario == 'ADMINISTRATIVO':
+                auth_user.is_admin = True
+                auth_user.save()
+
+            # Luego creamos el Usuario (información personal)
+            usuario = Usuario.objects.create(
+                auth_user=auth_user,
+                nombre=data['nombre'],
+                apellido_paterno=data['apellido_paterno'],
+                apellido_materno=data['apellido_materno'],
+                rut=data['rut'],
+                div=data['div'],
+                correo=data['correo'],
+                telefono=data.get('telefono', ''),
+                direccion=data.get('direccion', ''),
+                fecha_nacimiento=data.get('fecha_nacimiento')
             )
-        elif tipo_usuario == 'ADMINISTRATIVO':
-            Administrativo.objects.create(
-                usuario=usuario,
-                rol=data.get('rol_administrativo', 'ADMINISTRATIVO')
-            )
-        return usuario
+
+            # Finalmente, creamos el tipo específico de usuario
+            if tipo_usuario == 'ESTUDIANTE':
+                Estudiante.objects.create(
+                    usuario=usuario,
+                    contacto_emergencia=data.get('contacto_emergencia', ''),
+                    curso_id=data.get('curso')
+                )
+            elif tipo_usuario == 'DOCENTE':
+                Docente.objects.create(
+                    usuario=usuario,
+                    especialidad_id=data.get('especialidad'),
+                    es_profesor_jefe=data.get('es_profesor_jefe', False)
+                )
+            elif tipo_usuario == 'ADMINISTRATIVO':
+                Administrativo.objects.create(
+                    usuario=usuario,
+                    rol=data.get('rol_administrativo', 'ADMINISTRATIVO')
+                )
+
+            return usuario
+    except Exception as e:
+        raise Exception(f"Error al crear usuario: {str(e)}")
     
 def actualizar_usuario(usuario, data):
     """

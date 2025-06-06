@@ -5,6 +5,9 @@
 {% csrf_token %}
 {% if user.is_authenticated %}
 <div class="container-fluid">
+    <!-- Contenedor de alertas -->
+    <div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 1050"></div>
+    
     <div class="row">
         <!-- Sidebar -->
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-primary sidebar">
@@ -141,59 +144,59 @@
                                 <!-- Campos básicos -->
                                 <div class="row mb-3">
                                     <div class="col-md-4">
-                                        <label for="nombre" class="form-label">Nombre</label>
-                                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                        <label for="estudiante_nombre" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="estudiante_nombre" name="nombre" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="apellido_paterno" class="form-label">Apellido Paterno</label>
-                                        <input type="text" class="form-control" id="apellido_paterno" name="apellido_paterno" required>
+                                        <label for="estudiante_apellido_paterno" class="form-label">Apellido Paterno</label>
+                                        <input type="text" class="form-control" id="estudiante_apellido_paterno" name="apellido_paterno" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="apellido_materno" class="form-label">Apellido Materno</label>
-                                        <input type="text" class="form-control" id="apellido_materno" name="apellido_materno" required>
+                                        <label for="estudiante_apellido_materno" class="form-label">Apellido Materno</label>
+                                        <input type="text" class="form-control" id="estudiante_apellido_materno" name="apellido_materno" required>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="rut" class="form-label">RUT</label>
-                                        <input type="text" class="form-control" id="rut" name="rut" required>
+                                        <label for="estudiante_rut" class="form-label">RUT</label>
+                                        <input type="text" class="form-control" id="estudiante_rut" name="rut" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="div" class="form-label">Dígito Verificador</label>
-                                        <input type="text" class="form-control" id="div" name="div" maxlength="1" required>
+                                        <label for="estudiante_div" class="form-label">Dígito Verificador</label>
+                                        <input type="text" class="form-control" id="estudiante_div" name="div" maxlength="1" required>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="correo" class="form-label">Correo Electrónico</label>
-                                        <input type="email" class="form-control" id="correo" name="correo" required>
+                                        <label for="estudiante_correo" class="form-label">Correo Electrónico</label>
+                                        <input type="email" class="form-control" id="estudiante_correo" name="correo" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="telefono" class="form-label">Teléfono</label>
-                                        <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                                        <label for="estudiante_telefono" class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-control" id="estudiante_telefono" name="telefono" required>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="direccion" class="form-label">Dirección</label>
-                                    <textarea class="form-control" id="direccion" name="direccion" rows="2" required></textarea>
+                                    <label for="estudiante_direccion" class="form-label">Dirección</label>
+                                    <textarea class="form-control" id="estudiante_direccion" name="direccion" rows="2" required></textarea>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                                    <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                                    <label for="estudiante_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-control" id="estudiante_fecha_nacimiento" name="fecha_nacimiento" required>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="password" class="form-label">Contraseña</label>
-                                        <input type="password" class="form-control" id="password" name="password" required>
+                                        <label for="estudiante_password" class="form-label">Contraseña</label>
+                                        <input type="password" class="form-control" id="estudiante_password" name="password" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
-                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                        <label for="estudiante_confirm_password" class="form-label">Confirmar Contraseña</label>
+                                        <input type="password" class="form-control" id="estudiante_confirm_password" name="confirm_password" required>
                                     </div>
                                 </div>
 
@@ -226,59 +229,59 @@
                                 <!-- Campos básicos -->
                                 <div class="row mb-3">
                                     <div class="col-md-4">
-                                        <label for="nombre" class="form-label">Nombre</label>
-                                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                        <label for="profesor_nombre" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="profesor_nombre" name="nombre" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="apellido_paterno" class="form-label">Apellido Paterno</label>
-                                        <input type="text" class="form-control" id="apellido_paterno" name="apellido_paterno" required>
+                                        <label for="profesor_apellido_paterno" class="form-label">Apellido Paterno</label>
+                                        <input type="text" class="form-control" id="profesor_apellido_paterno" name="apellido_paterno" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="apellido_materno" class="form-label">Apellido Materno</label>
-                                        <input type="text" class="form-control" id="apellido_materno" name="apellido_materno" required>
+                                        <label for="profesor_apellido_materno" class="form-label">Apellido Materno</label>
+                                        <input type="text" class="form-control" id="profesor_apellido_materno" name="apellido_materno" required>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="rut" class="form-label">RUT</label>
-                                        <input type="text" class="form-control" id="rut" name="rut" required>
+                                        <label for="profesor_rut" class="form-label">RUT</label>
+                                        <input type="text" class="form-control" id="profesor_rut" name="rut" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="div" class="form-label">Dígito Verificador</label>
-                                        <input type="text" class="form-control" id="div" name="div" maxlength="1" required>
+                                        <label for="profesor_div" class="form-label">Dígito Verificador</label>
+                                        <input type="text" class="form-control" id="profesor_div" name="div" maxlength="1" required>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="correo" class="form-label">Correo Electrónico</label>
-                                        <input type="email" class="form-control" id="correo" name="correo" required>
+                                        <label for="profesor_correo" class="form-label">Correo Electrónico</label>
+                                        <input type="email" class="form-control" id="profesor_correo" name="correo" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="telefono" class="form-label">Teléfono</label>
-                                        <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                                        <label for="profesor_telefono" class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-control" id="profesor_telefono" name="telefono" required>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="direccion" class="form-label">Dirección</label>
-                                    <textarea class="form-control" id="direccion" name="direccion" rows="2" required></textarea>
+                                    <label for="profesor_direccion" class="form-label">Dirección</label>
+                                    <textarea class="form-control" id="profesor_direccion" name="direccion" rows="2" required></textarea>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                                    <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                                    <label for="profesor_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-control" id="profesor_fecha_nacimiento" name="fecha_nacimiento" required>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="password" class="form-label">Contraseña</label>
-                                        <input type="password" class="form-control" id="password" name="password" required>
+                                        <label for="profesor_password" class="form-label">Contraseña</label>
+                                        <input type="password" class="form-control" id="profesor_password" name="password" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
-                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                        <label for="profesor_confirm_password" class="form-label">Confirmar Contraseña</label>
+                                        <input type="password" class="form-control" id="profesor_confirm_password" name="confirm_password" required>
                                     </div>
                                 </div>
 
@@ -311,59 +314,59 @@
                                 <!-- Campos básicos -->
                                 <div class="row mb-3">
                                     <div class="col-md-4">
-                                        <label for="nombre" class="form-label">Nombre</label>
-                                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                                        <label for="admin_nombre" class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" id="admin_nombre" name="nombre" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="apellido_paterno" class="form-label">Apellido Paterno</label>
-                                        <input type="text" class="form-control" id="apellido_paterno" name="apellido_paterno" required>
+                                        <label for="admin_apellido_paterno" class="form-label">Apellido Paterno</label>
+                                        <input type="text" class="form-control" id="admin_apellido_paterno" name="apellido_paterno" required>
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="apellido_materno" class="form-label">Apellido Materno</label>
-                                        <input type="text" class="form-control" id="apellido_materno" name="apellido_materno" required>
+                                        <label for="admin_apellido_materno" class="form-label">Apellido Materno</label>
+                                        <input type="text" class="form-control" id="admin_apellido_materno" name="apellido_materno" required>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="rut" class="form-label">RUT</label>
-                                        <input type="text" class="form-control" id="rut" name="rut" required>
+                                        <label for="admin_rut" class="form-label">RUT</label>
+                                        <input type="text" class="form-control" id="admin_rut" name="rut" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="div" class="form-label">Dígito Verificador</label>
-                                        <input type="text" class="form-control" id="div" name="div" maxlength="1" required>
+                                        <label for="admin_div" class="form-label">Dígito Verificador</label>
+                                        <input type="text" class="form-control" id="admin_div" name="div" maxlength="1" required>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="correo" class="form-label">Correo Electrónico</label>
-                                        <input type="email" class="form-control" id="correo" name="correo" required>
+                                        <label for="admin_correo" class="form-label">Correo Electrónico</label>
+                                        <input type="email" class="form-control" id="admin_correo" name="correo" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="telefono" class="form-label">Teléfono</label>
-                                        <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                                        <label for="admin_telefono" class="form-label">Teléfono</label>
+                                        <input type="tel" class="form-control" id="admin_telefono" name="telefono" required>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="direccion" class="form-label">Dirección</label>
-                                    <textarea class="form-control" id="direccion" name="direccion" rows="2" required></textarea>
+                                    <label for="admin_direccion" class="form-label">Dirección</label>
+                                    <textarea class="form-control" id="admin_direccion" name="direccion" rows="2" required></textarea>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                                    <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                                    <label for="admin_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-control" id="admin_fecha_nacimiento" name="fecha_nacimiento" required>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label for="password" class="form-label">Contraseña</label>
-                                        <input type="password" class="form-control" id="password" name="password" required>
+                                        <label for="admin_password" class="form-label">Contraseña</label>
+                                        <input type="password" class="form-control" id="admin_password" name="password" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
-                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                        <label for="admin_confirm_password" class="form-label">Confirmar Contraseña</label>
+                                        <input type="password" class="form-control" id="admin_confirm_password" name="confirm_password" required>
                                     </div>
                                 </div>
 
@@ -380,53 +383,49 @@
                 </div>
             </div>
 
-            <!-- Modal de Creación de Curso -->
-            <div class="modal fade" id="crearCursoModal" tabindex="-1" aria-labelledby="crearCursoModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
+            <!-- Modal Crear Curso -->
+            <div class="modal fade" id="crearCursoModal" tabindex="-1" aria-labelledby="crearCursoModalLabel" aria-hidden="true" data-bs-backdrop="static">
+                <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="crearCursoModalLabel">Crear Nuevo Curso</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form method="post" action="{% url 'admin_panel' %}">
+                            <form id="crearCursoForm" method="post" action="{% url 'admin_panel' %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="action" value="crear_curso">
                                 
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label for="nivel" class="form-label">Nivel</label>
-                                        <select class="form-select" id="nivel" name="nivel" required>
-                                            <option value="">Seleccione un nivel</option>
-                                            <option value="1">1°</option>
-                                            <option value="2">2°</option>
-                                            <option value="3">3°</option>
-                                            <option value="4">4°</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="letra" class="form-label">Letra</label>
-                                        <select class="form-select" id="letra" name="letra" required>
-                                            <option value="">Seleccione una letra</option>
-                                            <option value="A">A</option>
-                                            <option value="B">B</option>
-                                        </select>
-                                    </div>
-                                </div>
-
+                                <!-- Contenedor de errores -->
+                                <div class="alert alert-danger mb-3" style="display: none;"></div>
+                                
                                 <div class="mb-3">
-                                    <label for="profesor_jefe" class="form-label">Profesor Jefe</label>
-                                    <select class="form-select" id="profesor_jefe" name="profesor_jefe" required>
-                                        <option value="">Seleccione un profesor</option>
-                                        {% for profesor in profesores %}
-                                        <option value="{{ profesor.id }}">{{ profesor.usuario.nombre }} {{ profesor.usuario.apellido_paterno }}</option>
+                                    <label for="nivel" class="form-label">Nivel</label>
+                                    <input type="number" class="form-control" id="nivel" name="nivel" min="1" max="12" required>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="letra" class="form-label">Letra</label>
+                                    <input type="text" class="form-control" id="letra" name="letra" maxlength="1" required>
+                                    <div class="invalid-feedback"></div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="profesor_jefe_id" class="form-label">Profesor Jefe</label>
+                                    <select class="form-select" id="profesor_jefe_id" name="profesor_jefe_id" required>
+                                        <option value="">-- Seleccione un profesor jefe --</option>
+                                        {% for docente in docentes %}
+                                            {% if docente.usuario and docente.usuario.id %}
+                                                <option value="{{ docente.usuario.id }}" data-nombre="{{ docente.usuario.nombre }} {{ docente.usuario.apellido_paterno }}">
+                                                    {{ docente.usuario.nombre }} {{ docente.usuario.apellido_paterno }}
+                                                </option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
+                                    <div class="invalid-feedback">Por favor seleccione un profesor jefe</div>
                                 </div>
-
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                    <button type="submit" class="btn btn-primary">Crear Curso</button>
+                                    <button type="submit" class="btn btn-primary" id="crearCursoBtn">Crear</button>
                                 </div>
                             </form>
                         </div>
@@ -453,8 +452,8 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="nivel" class="form-label">Nivel</label>
-                                    <select class="form-select" id="nivel" name="nivel" required>
+                                    <label for="asignatura_nivel" class="form-label">Nivel</label>
+                                    <select class="form-select" id="asignatura_nivel" name="nivel" required>
                                         <option value="">Seleccione un nivel</option>
                                         <option value="1">1°</option>
                                         <option value="2">2°</option>
@@ -840,8 +839,85 @@
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+            <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+            <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
             <script src="{% static 'js/user_actions.js' %}"></script>
             <script src="{% static 'js/user_edit.js' %}"></script>
+
+            <script>
+                // Variable global para controlar la inicialización
+                window.dataTablesInitialized = false;
+
+                function initializeDataTables() {
+                    if (window.dataTablesInitialized) {
+                        return;
+                    }
+
+                    try {
+                        // Configuración de DataTables
+                        $.extend(true, $.fn.dataTable.defaults, {
+                            pageLength: 10,
+                            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                            responsive: true,
+                            destroy: true, // Permite re-inicializar la tabla si es necesario
+                            retrieve: true // Intenta recuperar una instancia existente
+                        });
+
+                        // Inicializar DataTables solo en tablas que no tengan ya DataTables inicializado
+                        $('.table').each(function() {
+                            try {
+                                if (!$.fn.DataTable.isDataTable(this)) {
+                                    $(this).DataTable({
+                                        language: {
+                                            "decimal": "",
+                                            "emptyTable": "No hay datos disponibles en la tabla",
+                                            "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                                            "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                                            "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                                            "infoPostFix": "",
+                                            "thousands": ",",
+                                            "lengthMenu": "Mostrar _MENU_ registros",
+                                            "loadingRecords": "Cargando...",
+                                            "processing": "Procesando...",
+                                            "search": "Buscar:",
+                                            "zeroRecords": "No se encontraron registros coincidentes",
+                                            "paginate": {
+                                                "first": "Primero",
+                                                "last": "Último",
+                                                "next": "Siguiente",
+                                                "previous": "Anterior"
+                                            },
+                                            "aria": {
+                                                "sortAscending": ": activar para ordenar columna ascendente",
+                                                "sortDescending": ": activar para ordenar columna descendente"
+                                            }
+                                        }
+                                    });
+                                }
+                            } catch (e) {
+                                console.warn('Error al inicializar DataTable en una tabla específica:', e);
+                            }
+                        });
+
+                        window.dataTablesInitialized = true;
+                    } catch (e) {
+                        console.error('Error al inicializar DataTables:', e);
+                    }
+                }
+
+                // Inicializar cuando el documento esté listo
+                $(document).ready(function() {
+                    // Esperar un momento para asegurar que todos los elementos estén cargados
+                    setTimeout(initializeDataTables, 100);
+                });
+
+                // Reinicializar después de cargar contenido dinámico
+                $(document).ajaxComplete(function() {
+                    // Esperar un momento para asegurar que todos los elementos estén cargados
+                    setTimeout(initializeDataTables, 100);
+                });
+            </script>
             {% endif %}
         </main>
     </div>

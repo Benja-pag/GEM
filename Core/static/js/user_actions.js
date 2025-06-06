@@ -15,6 +15,7 @@ $(document).ready(function() {
         return cookieValue;
     }
     const csrftoken = getCookie('csrftoken');
+    console.log('Token CSRF:', csrftoken); // Para depuración
 
     // Configurar AJAX para incluir el token CSRF
     $.ajaxSetup({
@@ -33,7 +34,7 @@ $(document).ready(function() {
         const userId = $(this).data('user-id');
         const button = $(this);
         const row = button.closest('tr');
-        const statusCell = row.find('td:nth-child(5) .badge'); // Buscar el badge dentro de la celda de estado
+        const statusCell = row.find('td:nth-child(5) .badge');
 
         Swal.fire({
             title: '¿Estás seguro?',
@@ -54,7 +55,6 @@ $(document).ready(function() {
                     },
                     success: function(response) {
                         if (response.success) {
-                            // Actualizar el botón y el estado en la tabla
                             if (response.is_active) {
                                 button.removeClass('btn-danger').addClass('btn-success');
                                 button.find('i').removeClass('fa-user-slash').addClass('fa-user-check');
@@ -64,7 +64,6 @@ $(document).ready(function() {
                                 button.find('i').removeClass('fa-user-check').addClass('fa-user-slash');
                                 statusCell.removeClass('bg-success').addClass('bg-danger').text('Inactivo');
                             }
-                            // Actualizar el atributo data-is-active
                             button.data('is-active', response.is_active.toString());
 
                             Swal.fire({
@@ -138,5 +137,213 @@ $(document).ready(function() {
                 });
             }
         });
+    });
+
+    // Manejar el envío del formulario de creación de curso
+    $('#crearCursoForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        // Limpiar errores previos
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').remove();
+        $('.alert').remove();
+        
+        const form = $(this);
+        const profesorJefeSelect = $('#profesor_jefe_id');
+        const profesorJefeId = profesorJefeSelect.val();
+        
+        // Logs detallados para depuración
+        console.log('Formulario enviado');
+        console.log('Select de profesor jefe:', profesorJefeSelect);
+        console.log('Valor seleccionado:', profesorJefeId);
+        console.log('HTML del select:', profesorJefeSelect.prop('outerHTML'));
+        
+        // Log detallado de cada opción
+        profesorJefeSelect.find('option').each(function(index) {
+            console.log(`Opción ${index}:`, {
+                value: $(this).val(),
+                text: $(this).text().trim(),
+                selected: $(this).prop('selected'),
+                dataNombre: $(this).data('nombre'),
+                html: $(this).prop('outerHTML')
+            });
+        });
+        
+        // Validar que se haya seleccionado un profesor jefe
+        if (!profesorJefeId) {
+            profesorJefeSelect.addClass('is-invalid');
+            profesorJefeSelect.after('<div class="invalid-feedback">Por favor seleccione un profesor jefe</div>');
+            return;
+        }
+
+        // Crear objeto con los datos
+        const formData = new FormData(form[0]);
+        formData.append('action', 'crear_curso');
+        formData.append('csrfmiddlewaretoken', csrftoken);
+        
+        console.log('Datos a enviar:', Object.fromEntries(formData));
+        
+        // Enviar el formulario
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                console.log('Respuesta del servidor:', response);
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: 'Curso creado exitosamente',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                } else {
+                    if (response.errors) {
+                        if (response.errors.__all__) {
+                            const errorDiv = $('<div>')
+                                .addClass('alert alert-danger mb-3')
+                                .text(response.errors.__all__[0]);
+                            form.prepend(errorDiv);
+                        } else {
+                            Object.keys(response.errors).forEach(function(field) {
+                                const input = $(`#${field}`);
+                                input.addClass('is-invalid');
+                                input.after(`<div class="invalid-feedback">${response.errors[field][0]}</div>`);
+                            });
+                        }
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error en la petición:', error);
+                console.error('Estado de la respuesta:', xhr.status);
+                console.error('Respuesta del servidor:', xhr.responseText);
+                
+                if (xhr.status === 302) {
+                    window.location.href = '/login/';
+                    return;
+                }
+                
+                const errorDiv = $('<div>')
+                    .addClass('alert alert-danger mb-3')
+                    .text('Error al procesar la solicitud: ' + error);
+                form.prepend(errorDiv);
+            }
+        });
+    });
+
+    // Limpiar validación cuando se cierra el modal
+    $('#crearCursoModal').on('hidden.bs.modal', function() {
+        const form = $('#crearCursoForm');
+        form.find('.is-invalid').removeClass('is-invalid');
+        form.find('.invalid-feedback').remove();
+        form.find('.alert').remove();
+        form[0].reset();
+    });
+});
+
+// Función para mostrar alertas
+function showAlert(type, message) {
+    const alertDiv = $('<div>')
+        .addClass(`alert alert-${type} alert-dismissible fade show`)
+        .attr('role', 'alert')
+        .html(`
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `);
+    
+    $('#alertContainer').append(alertDiv);
+    
+    // Auto cerrar la alerta después de 5 segundos
+    setTimeout(function() {
+        alertDiv.alert('close');
+    }, 5000);
+}
+
+// Manejar el envío del formulario de creación de estudiante
+$('form[action="{% url \'admin_panel\' %}"]').on('submit', function(e) {
+    e.preventDefault();
+    
+    // Limpiar errores previos
+    $('.is-invalid').removeClass('is-invalid');
+    $('.invalid-feedback').remove();
+    $('.alert').remove();
+    
+    const form = $(this);
+    const action = form.find('input[name="action"]').val();
+    
+    // Validar campos requeridos según el tipo de formulario
+    let hasErrors = false;
+    let prefix = '';
+    
+    switch(action) {
+        case 'crear_estudiante':
+            prefix = 'estudiante_';
+            break;
+        case 'crear_docente':
+            prefix = 'profesor_';
+            break;
+        case 'crear_administrador':
+            prefix = 'admin_';
+            break;
+    }
+    
+    const requiredFields = ['nombre', 'apellido_paterno', 'apellido_materno', 'rut', 'div', 'correo', 'telefono', 'direccion', 'fecha_nacimiento', 'password', 'confirm_password'];
+    
+    requiredFields.forEach(function(field) {
+        const input = $(`#${prefix}${field}`);
+        if (!input.val()) {
+            input.addClass('is-invalid');
+            input.after(`<div class="invalid-feedback">Este campo es obligatorio</div>`);
+            hasErrors = true;
+        }
+    });
+    
+    if (hasErrors) {
+        return;
+    }
+    
+    $.ajax({
+        url: form.attr('action'),
+        method: 'POST',
+        data: form.serialize(),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', response.message);
+                $(`#${action}Modal`).modal('hide');
+                setTimeout(function() {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                if (response.errors) {
+                    if (response.errors.__all__) {
+                        const errorDiv = $('<div>')
+                            .addClass('alert alert-danger mb-3')
+                            .text(response.errors.__all__[0]);
+                        form.prepend(errorDiv);
+                    } else {
+                        Object.keys(response.errors).forEach(function(field) {
+                            const input = $(`#${prefix}${field}`);
+                            input.addClass('is-invalid');
+                            input.after(`<div class="invalid-feedback">${response.errors[field][0]}</div>`);
+                        });
+                    }
+                }
+            }
+        },
+        error: function(xhr, status, error) {
+            const errorDiv = $('<div>')
+                .addClass('alert alert-danger mb-3')
+                .text('Error al procesar la solicitud: ' + error);
+            form.prepend(errorDiv);
+        }
     });
 }); 

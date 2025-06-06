@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.http import JsonResponse
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, ProfesorJefe
 from django.db.models import Count, Avg
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
@@ -23,15 +23,24 @@ class ProfesorPanelView(View):
             return redirect('home')
         
         docente = request.user.usuario.docente
-        # Obtener clases donde el docente es profesor jefe
-        clases_profesor_jefe = Clase.objects.filter(profesor_jefe=docente).annotate(
+        
+        # Obtener cursos donde el docente es profesor jefe
+        cursos_profesor_jefe = Curso.objects.filter(
+            jefatura_actual__docente=docente
+        ).select_related('jefatura_actual__docente__usuario').annotate(
             total_estudiantes=Count('estudiantes')
         )
+        
         # Obtener asignaturas que imparte el docente
-        asignaturas = Asignatura.objects.filter(docente=docente).select_related('clase')
+        asignaturas = AsignaturaImpartida.objects.filter(
+            docente=docente
+        ).select_related(
+            'asignatura',
+            'docente__usuario'
+        ).prefetch_related('clases')
         
         context = {
-            'clases_profesor_jefe': clases_profesor_jefe,
+            'cursos_profesor_jefe': cursos_profesor_jefe,
             'asignaturas': asignaturas
         }
         return render(request, 'teacher_panel.html', context)

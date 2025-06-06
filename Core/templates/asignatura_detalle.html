@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalles de {{ asignatura.asignatura.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Detalles de {{ asignatura.asignatura.nombre }}</h2>
+            
+            <!-- Información de la Asignatura -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Información de la Asignatura</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Nombre:</strong> {{ asignatura.asignatura.nombre }}</p>
+                            <p><strong>Código:</strong> {{ asignatura.asignatura.codigo }}</p>
+                            <p><strong>Profesor:</strong> {{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }} {{ asignatura.docente.usuario.apellido_materno }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Total Estudiantes:</strong> {{ estudiantes|length }}</p>
+                            <p><strong>Total Clases:</strong> {{ clases|length }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Horario de Clases -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Horario de Clases</h5>
+                    {% if clases %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Día</th>
+                                        <th>Horario</th>
+                                        <th>Sala</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for clase in clases %}
+                                    <tr>
+                                        <td>{{ clase.fecha }}</td>
+                                        <td>{{ clase.horario }}</td>
+                                        <td>{{ clase.sala }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p>No hay clases registradas para esta asignatura.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Lista de Estudiantes -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Estudiantes Inscritos</h5>
+                    {% if estudiantes %}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Teléfono</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for estudiante in estudiantes %}
+                                    <tr>
+                                        <td>{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }} {{ estudiante.usuario.apellido_materno }}</td>
+                                        <td>{{ estudiante.usuario.telefono }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p>No hay estudiantes inscritos en esta asignatura.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

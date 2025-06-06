@@ -1,86 +1,86 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel del Profesor{% endblock %}
+
 {% block content %}
-{% if user.is_authenticated %}
 <div class="container mt-4">
-    <h1 class="mb-4">Panel de Docente</h1>
+    <h2>Panel del Profesor</h2>
     
     <!-- Información del Profesor -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Información del Profesor</h5>
-                </div>
-                <div class="card-body">
-                    <h5>{{ user.usuario.nombre }} {{ user.usuario.apellido_paterno }} {{ user.usuario.apellido_materno }}</h5>
-                    <p class="text-muted">RUT: {{ user.usuario.rut }}-{{ user.usuario.div }}</p>
-                </div>
-            </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Información Personal</h5>
+            <p><strong>Nombre:</strong> {{ request.user.usuario.nombre }} {{ request.user.usuario.apellido }}</p>
+            <p><strong>Email:</strong> {{ request.user.usuario.email }}</p>
+            <p><strong>Teléfono:</strong> {{ request.user.usuario.telefono }}</p>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Curso como Profesor Jefe -->
-        {% if clases_profesor_jefe %}
-        <div class="col-md-6">
-            <div class="card text-white bg-info mb-3">
-                <div class="card-header">Curso como Profesor Jefe</div>
-                <div class="card-body">
-                    {% for clase in clases_profesor_jefe %}
-                    <h5 class="card-title">{{ clase.nombre }}</h5>
-                    <p class="card-text">
-                        <strong>Sala:</strong> {{ clase.sala }}<br>
-                        <strong>Capacidad:</strong> {{ clase.capacidad }} estudiantes<br>
-                        <strong>Total Estudiantes:</strong> {{ clase.total_estudiantes }}
-                    </p>
-                    <a href="#" class="btn btn-light">Ver Detalles del Curso</a>
-                    {% endfor %}
+    <!-- Cursos como Profesor Jefe -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Cursos como Profesor Jefe</h5>
+            {% if cursos_profesor_jefe %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Curso</th>
+                                <th>Total Estudiantes</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for curso in cursos_profesor_jefe %}
+                            <tr>
+                                <td>{{ curso.nivel }}° {{ curso.letra }}</td>
+                                <td>{{ curso.total_estudiantes }}</td>
+                                <td>
+                                    <a href="{% url 'curso_detalle' curso.id %}" class="btn btn-sm btn-primary">Ver Detalles</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Asignaturas que imparte -->
-        <div class="col-md-6">
-            <div class="card text-white bg-success mb-3">
-                <div class="card-header">Asignaturas que imparte</div>
-                <div class="card-body">
-                    {% if asignaturas %}
-                        {% for asignatura in asignaturas %}
-                        <div class="mb-3">
-                            <h5 class="card-title">{{ asignatura.nombre }}</h5>
-                            <p class="card-text">
-                                <strong>Código:</strong> {{ asignatura.codigo }}<br>
-                                <strong>Curso:</strong> {{ asignatura.clase.nombre }}<br>
-                                <strong>Horario:</strong> {{ asignatura.dia }} {{ asignatura.horario }}
-                            </p>
-                            <a href="#" class="btn btn-light">Ver Detalles</a>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="card-text">No tienes asignaturas asignadas actualmente.</p>
-                    {% endif %}
-                </div>
-            </div>
+            {% else %}
+                <p>No eres profesor jefe de ningún curso.</p>
+            {% endif %}
         </div>
     </div>
 
-    <!-- Mensajes y Notificaciones -->
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <div class="card text-white bg-warning mb-3">
-                <div class="card-header">Mensajes y Notificaciones</div>
-                <div class="card-body">
-                    <h5 class="card-title">Próximamente</h5>
-                    <p class="card-text">Chatea con estudiantes y recibe notificaciones.</p>
+    <!-- Asignaturas que Imparte -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Asignaturas que Imparte</h5>
+            {% if asignaturas %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Asignatura</th>
+                                <th>Curso</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for asignatura_impartida in asignaturas %}
+                            <tr>
+                                <td>{{ asignatura_impartida.asignatura.nombre }}</td>
+                                <td>{{ asignatura_impartida.curso.nivel }}° {{ asignatura_impartida.curso.letra }}</td>
+                                <td>
+                                    <a href="{% url 'asignatura_detalle' asignatura_impartida.id %}" class="btn btn-sm btn-primary">Ver Detalles</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </div>
+            {% else %}
+                <p>No tienes asignaturas asignadas.</p>
+            {% endif %}
         </div>
     </div>
 </div>
-{% else %}
-<div class="alert alert-danger mt-4" role="alert">
-    Debes iniciar sesión para acceder a este panel.
-</div>
-{% endif %}
 {% endblock %}

@@ -5,7 +5,8 @@ from Core.views import (
     EstudiantePanelView, AttendanceView, LoginView, LogoutView,
     RegisterView, CreateAdminView, ChangePasswordView,
     UserDataView, SurveysView, TasksView, TestsView, ToggleUserStatusView,
-    CalendarioEventosView, CalendarioGuardarEventoView, CalendarioEliminarEventoView
+    CalendarioEventosView, CalendarioGuardarEventoView, CalendarioEliminarEventoView,
+    CursoDetalleView, AsignaturaDetalleView
 )
 
 urlpatterns = [
@@ -41,5 +42,9 @@ urlpatterns = [
     path('calendar/events/', CalendarioEventosView.as_view(), name='calendar_events'),
     path('calendar/save-event/', CalendarioGuardarEventoView.as_view(), name='calendar_save_event'),
     path('calendar/delete-event/', CalendarioEliminarEventoView.as_view(), name='calendar_delete_event'),
+
+    # URLs de cursos y asignaturas
+    path('curso/<int:curso_id>/', CursoDetalleView.as_view(), name='curso_detalle'),
+    path('asignatura/<int:asignatura_id>/', AsignaturaDetalleView.as_view(), name='asignatura_detalle'),
 ]
 

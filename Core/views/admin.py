@@ -9,8 +9,9 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from Core.servicios.repos import usuarios
 from Core.servicios.helpers import validadores, serializadores
-from ..forms import EstudianteForm, DocenteForm, AdministrativoForm, CursoForm, AsignaturaForm, ProfesorJefeForm
 from Core.servicios.repos.usuarios import crear_usuario, actualizar_usuario
+from Core.servicios.repos.cursos import get_curso, get_estudiantes_por_curso
+from django.http import JsonResponse
 
 @method_decorator(login_required, name='dispatch')
 class AdminPanelView(View):
@@ -26,8 +27,8 @@ class AdminPanelView(View):
             total_clases = Clase.objects.count()
             total_asignaturas = Asignatura.objects.count()
             
-            # Obtener profesores para el formulario de creación de curso
-            profesores = Docente.objects.all()
+            # Obtener todos los docentes para el formulario de creación de curso
+            docentes = Docente.objects.select_related('usuario').all()
             
             # Obtener todos los estudiantes
             estudiantes_sin_curso = Estudiante.objects.all().select_related('usuario', 'curso')
@@ -44,14 +45,6 @@ class AdminPanelView(View):
             # Obtener cursos con sus profesores jefe
             cursos = Curso.objects.select_related('jefatura_actual__docente__usuario').all()
             
-            # Inicializar formularios
-            estudiante_form = EstudianteForm()
-            docente_form = DocenteForm()
-            administrativo_form = AdministrativoForm()
-            curso_form = CursoForm()
-            asignatura_form = AsignaturaForm()
-            profesor_jefe_form = ProfesorJefeForm()
-            
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
@@ -59,17 +52,11 @@ class AdminPanelView(View):
                 'total_administradores': total_administradores,
                 'total_clases': total_clases,
                 'total_asignaturas': total_asignaturas,
-                'profesores': profesores,
+                'docentes': docentes,
                 'estudiantes_sin_curso': estudiantes_sin_curso,
                 'usuarios': usuarios,
                 'asignaturas': asignaturas,
                 'cursos': cursos,
-                'estudiante_form': estudiante_form,
-                'docente_form': docente_form,
-                'administrativo_form': administrativo_form,
-                'curso_form': curso_form,
-                'asignatura_form': asignatura_form,
-                'profesor_jefe_form': profesor_jefe_form,
             }
             return render(request, 'admin_panel.html', context)
         except Exception as e:
@@ -85,50 +72,176 @@ class AdminPanelView(View):
         
         try:
             if action == 'crear_estudiante':
-                form = EstudianteForm(request.POST)
-                if form.is_valid():
-                    data = form.cleaned_data
-                    data['tipo_usuario'] = 'ESTUDIANTE'
-                    crear_usuario(data, 'ESTUDIANTE')
-                    messages.success(request, 'Estudiante creado exitosamente')
+                data = {
+                    'nombre': request.POST.get('nombre'),
+                    'apellido_paterno': request.POST.get('apellido_paterno'),
+                    'apellido_materno': request.POST.get('apellido_materno'),
+                    'rut': request.POST.get('rut'),
+                    'div': request.POST.get('div'),
+                    'correo': request.POST.get('correo'),
+                    'telefono': request.POST.get('telefono'),
+                    'direccion': request.POST.get('direccion'),
+                    'fecha_nacimiento': request.POST.get('fecha_nacimiento'),
+                    'password': request.POST.get('password'),
+                    'confirm_password': request.POST.get('confirm_password'),
+                    'tipo_usuario': 'ESTUDIANTE',
+                    'contacto_emergencia': request.POST.get('contacto_emergencia')
+                }
+                
+                # Validar datos
+                es_valido, errores = validadores.validar_data_crear_usuario(data)
+                if not es_valido:
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'success': False,
+                            'errors': {'__all__': errores}
+                        })
+                    for error in errores:
+                        messages.error(request, error)
                     return redirect('admin_panel')
-                else:
-                    estudiante_form = form
+                
+                crear_usuario(data, 'ESTUDIANTE')
+                messages.success(request, 'Estudiante creado exitosamente')
+                return redirect('admin_panel')
+                    
             elif action == 'crear_docente':
-                form = DocenteForm(request.POST)
-                if form.is_valid():
-                    data = form.cleaned_data
-                    data['tipo_usuario'] = 'DOCENTE'
-                    crear_usuario(data, 'DOCENTE')
-                    messages.success(request, 'Docente creado exitosamente')
+                data = {
+                    'nombre': request.POST.get('nombre'),
+                    'apellido_paterno': request.POST.get('apellido_paterno'),
+                    'apellido_materno': request.POST.get('apellido_materno'),
+                    'rut': request.POST.get('rut'),
+                    'div': request.POST.get('div'),
+                    'correo': request.POST.get('correo'),
+                    'telefono': request.POST.get('telefono'),
+                    'direccion': request.POST.get('direccion'),
+                    'fecha_nacimiento': request.POST.get('fecha_nacimiento'),
+                    'password': request.POST.get('password'),
+                    'confirm_password': request.POST.get('confirm_password'),
+                    'tipo_usuario': 'DOCENTE',
+                    'especialidad': request.POST.get('especialidad')
+                }
+                
+                # Validar datos
+                es_valido, errores = validadores.validar_data_crear_usuario(data)
+                if not es_valido:
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'success': False,
+                            'errors': {'__all__': errores}
+                        })
+                    for error in errores:
+                        messages.error(request, error)
                     return redirect('admin_panel')
-                else:
-                    docente_form = form
+                
+                crear_usuario(data, 'DOCENTE')
+                messages.success(request, 'Docente creado exitosamente')
+                return redirect('admin_panel')
+                    
             elif action == 'crear_administrador':
-                form = AdministrativoForm(request.POST)
-                if form.is_valid():
-                    data = form.cleaned_data
-                    data['tipo_usuario'] = 'ADMINISTRATIVO'
-                    crear_usuario(data, 'ADMINISTRATIVO')
-                    messages.success(request, 'Administrador creado exitosamente')
+                data = {
+                    'nombre': request.POST.get('nombre'),
+                    'apellido_paterno': request.POST.get('apellido_paterno'),
+                    'apellido_materno': request.POST.get('apellido_materno'),
+                    'rut': request.POST.get('rut'),
+                    'div': request.POST.get('div'),
+                    'correo': request.POST.get('correo'),
+                    'telefono': request.POST.get('telefono'),
+                    'direccion': request.POST.get('direccion'),
+                    'fecha_nacimiento': request.POST.get('fecha_nacimiento'),
+                    'password': request.POST.get('password'),
+                    'confirm_password': request.POST.get('confirm_password'),
+                    'tipo_usuario': 'ADMINISTRATIVO',
+                    'rol_administrativo': request.POST.get('rol', 'ADMINISTRATIVO')
+                }
+                
+                # Validar datos
+                es_valido, errores = validadores.validar_data_crear_usuario(data)
+                if not es_valido:
+                    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'success': False,
+                            'errors': {'__all__': errores}
+                        })
+                    for error in errores:
+                        messages.error(request, error)
                     return redirect('admin_panel')
-                else:
-                    administrativo_form = form
+                
+                crear_usuario(data, 'ADMINISTRATIVO')
+                messages.success(request, 'Administrador creado exitosamente')
+                return redirect('admin_panel')
+                    
             elif action == 'crear_curso':
-                form = CursoForm(request.POST)
-                if form.is_valid():
-                    curso = form.save()
-                    # Si se proporcionó un docente, crear la jefatura
-                    docente_id = request.POST.get('docente')
-                    if docente_id:
-                        ProfesorJefe.objects.create(
-                            curso=curso,
-                            docente_id=docente_id
-                        )
-                    messages.success(request, 'Curso creado exitosamente')
-                    return redirect('admin_panel')
-                else:
-                    curso_form = form
+                try:
+                    # Obtener los datos del formulario
+                    nivel = request.POST.get('nivel')
+                    letra = request.POST.get('letra').upper()  # Convertir a mayúscula
+                    profesor_jefe_id = request.POST.get('profesor_jefe_id')
+
+                    # Validar que todos los campos requeridos estén presentes
+                    errores = []
+                    if not nivel:
+                        errores.append('El nivel es obligatorio')
+                    if not letra:
+                        errores.append('La letra es obligatoria')
+                    if not profesor_jefe_id:
+                        errores.append('El profesor jefe es obligatorio')
+
+                    # Validar formato de nivel
+                    try:
+                        nivel = int(nivel)
+                        if nivel < 1 or nivel > 12:
+                            errores.append('El nivel debe estar entre 1 y 12')
+                    except ValueError:
+                        errores.append('El nivel debe ser un número válido')
+
+                    # Validar formato de letra
+                    if letra and not letra.isalpha():
+                        errores.append('La letra debe ser un carácter alfabético')
+
+                    if errores:
+                        return JsonResponse({
+                            'success': False,
+                            'errors': {'__all__': errores}
+                        })
+
+                    # Verificar si ya existe un curso con el mismo nivel y letra
+                    curso_existente = Curso.objects.filter(nivel=nivel, letra=letra).first()
+                    if curso_existente:
+                        return JsonResponse({
+                            'success': False,
+                            'errors': {'__all__': [f'Ya existe un curso {nivel}°{letra}. Por favor, elija otro nivel o letra.']}
+                        })
+
+                    # Verificar si el profesor ya es jefe de otro curso
+                    profesor_jefe = Docente.objects.get(usuario_id=profesor_jefe_id)
+                    jefatura_existente = ProfesorJefe.objects.filter(docente=profesor_jefe).first()
+                    if jefatura_existente:
+                        return JsonResponse({
+                            'success': False,
+                            'errors': {'__all__': [f'El profesor {profesor_jefe.usuario.nombre} {profesor_jefe.usuario.apellido_paterno} ya es jefe del curso {jefatura_existente.curso}']}
+                        })
+
+                    # Crear el curso
+                    curso = Curso.objects.create(nivel=nivel, letra=letra)
+
+                    # Asignar el profesor jefe
+                    ProfesorJefe.objects.create(docente=profesor_jefe, curso=curso)
+
+                    return JsonResponse({
+                        'success': True,
+                        'message': f'Curso {nivel}°{letra} creado exitosamente'
+                    })
+
+                except Docente.DoesNotExist:
+                    return JsonResponse({
+                        'success': False,
+                        'errors': {'__all__': ['El profesor seleccionado no existe']}
+                    })
+                except Exception as e:
+                    return JsonResponse({
+                        'success': False,
+                        'errors': {'__all__': [f'Error al crear el curso: {str(e)}']}
+                    })
             elif action == 'crear_asignatura':
                 try:
                     # Crear la asignatura base
@@ -162,6 +275,7 @@ class AdminPanelView(View):
             else:
                 messages.error(request, 'Acción no válida')
                 return redirect('admin_panel')
+                
         except Exception as e:
             messages.error(request, f'Error al procesar la solicitud: {str(e)}')
             return redirect('admin_panel')
@@ -183,67 +297,30 @@ class CreateAdminView(View):
 
         try:
             # Obtener datos del formulario
-            nombre = request.POST.get('nombre')
-            apellido_paterno = request.POST.get('apellido_paterno')
-            apellido_materno = request.POST.get('apellido_materno')
-            rut = request.POST.get('rut')
-            div = request.POST.get('div')
-            correo = request.POST.get('correo')
-            telefono = request.POST.get('telefono')
-            direccion = request.POST.get('direccion')
-            fecha_nacimiento = request.POST.get('fecha_nacimiento')
-            password = request.POST.get('password')
-            confirm_password = request.POST.get('confirm_password')
-            rol = request.POST.get('rol', 'ADMINISTRATIVO')
+            data = {
+                'nombre': request.POST.get('nombre'),
+                'apellido_paterno': request.POST.get('apellido_paterno'),
+                'apellido_materno': request.POST.get('apellido_materno'),
+                'rut': request.POST.get('rut'),
+                'div': request.POST.get('div'),
+                'correo': request.POST.get('correo'),
+                'telefono': request.POST.get('telefono'),
+                'direccion': request.POST.get('direccion'),
+                'fecha_nacimiento': request.POST.get('fecha_nacimiento'),
+                'password': request.POST.get('password'),
+                'confirm_password': request.POST.get('confirm_password'),
+                'tipo_usuario': 'ADMINISTRATIVO',
+                'rol_administrativo': request.POST.get('rol', 'ADMINISTRATIVO')
+            }
 
-            # Validar campos requeridos
-            if not all([nombre, apellido_paterno, apellido_materno, rut, div, correo, password, confirm_password]):
-                messages.error(request, 'Por favor complete todos los campos requeridos')
+            # Validar datos
+            es_valido, errores = validadores.validar_data_crear_usuario(data)
+            if not es_valido:
+                for error in errores:
+                    messages.error(request, error)
                 return render(request, self.template_name)
 
-            # Validar contraseñas
-            if password != confirm_password:
-                messages.error(request, 'Las contraseñas no coinciden')
-                return render(request, self.template_name)
-
-            # Verificar si el RUT ya existe
-            if Usuario.objects.filter(rut=rut).exists():
-                messages.error(request, 'El RUT ya está registrado')
-                return render(request, self.template_name)
-
-            # Verificar si el correo ya existe
-            if Usuario.objects.filter(correo=correo).exists():
-                messages.error(request, 'El correo ya está registrado')
-                return render(request, self.template_name)
-
-            # Crear usuario de autenticación con permisos de administrador
-            auth_user = AuthUser.objects.create(
-                rut=rut,
-                div=div,
-                password=make_password(password),
-                is_admin=True
-            )
-
-            # Crear usuario
-            usuario = Usuario.objects.create(
-                nombre=nombre,
-                apellido_paterno=apellido_paterno,
-                apellido_materno=apellido_materno,
-                rut=rut,
-                div=div,
-                correo=correo,
-                telefono=telefono,
-                direccion=direccion,
-                fecha_nacimiento=fecha_nacimiento,
-                auth_user=auth_user
-            )
-
-            # Crear administrativo
-            Administrativo.objects.create(
-                usuario=usuario,
-                rol=rol
-            )
-
+            crear_usuario(data, 'ADMINISTRATIVO')
             messages.success(request, 'Administrador creado exitosamente')
             return redirect('user_list')
 

@@ -14,9 +14,10 @@
         <div class="col-md-3">
             <label for="curso" class="form-label">Curso</label>
             <select name="curso" id="curso" class="form-select">
+                <option value="">-- Seleccione un curso --</option>
                 {% for curso in cursos %}
                     <option value="{{ curso.id }}" {% if curso.id == curso_seleccionado %}selected{% endif %}>
-                        {{ curso.nombre }}
+                        {{ curso.nivel }}°{{ curso.letra }}
                     </option>
                 {% endfor %}
             </select>
@@ -24,9 +25,10 @@
         <div class="col-md-3">
             <label for="asignatura" class="form-label">Asignatura</label>
             <select name="asignatura" id="asignatura" class="form-select">
+                <option value="">-- Seleccione una asignatura --</option>
                 {% for asignatura in asignaturas %}
                     <option value="{{ asignatura.id }}" {% if asignatura.id == asignatura_seleccionada %}selected{% endif %}>
-                        {{ asignatura.nombre }}
+                        {{ asignatura.asignatura.nombre }} - {{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }}
                     </option>
                 {% endfor %}
             </select>
@@ -39,38 +41,41 @@
     <!-- Tabla de asistencia -->
     <form method="post">
         {% csrf_token %}
+        <input type="hidden" name="fecha" value="{{ fecha }}">
+        <input type="hidden" name="curso" value="{{ curso_seleccionado }}">
+        <input type="hidden" name="asignatura" value="{{ asignatura_seleccionada }}">
         <table class="table table-bordered table-hover">
             <thead class="table-light">
                 <tr>
                     <th>#</th>
                     <th>Alumno</th>
-                    <th>RUT/ID</th>
+                    <th>RUT</th>
                     <th>Estado</th>
                     <th>Observaciones</th>
                 </tr>
             </thead>
             <tbody>
-                {% for alumno in alumnos %}
+                {% for estudiante in estudiantes %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ alumno.nombre }}</td>
-                    <td>{{ alumno.rut }}</td>
+                    <td>{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }} {{ estudiante.usuario.apellido_materno }}</td>
+                    <td>{{ estudiante.usuario.rut }}-{{ estudiante.usuario.div }}</td>
                     <td>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="estado_{{ alumno.id }}" value="presente" required>
+                            <input class="form-check-input" type="radio" name="estado_{{ estudiante.usuario.id }}" value="presente" required>
                             <label class="form-check-label text-success">Presente</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="estado_{{ alumno.id }}" value="ausente">
+                            <input class="form-check-input" type="radio" name="estado_{{ estudiante.usuario.id }}" value="ausente">
                             <label class="form-check-label text-danger">Ausente</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="estado_{{ alumno.id }}" value="justificado">
+                            <input class="form-check-input" type="radio" name="estado_{{ estudiante.usuario.id }}" value="justificado">
                             <label class="form-check-label text-warning">Justificado</label>
                         </div>
                     </td>
                     <td>
-                        <input type="text" name="observacion_{{ alumno.id }}" class="form-control" placeholder="Opcional">
+                        <input type="text" name="observacion_{{ estudiante.usuario.id }}" class="form-control" placeholder="Opcional">
                     </td>
                 </tr>
                 {% empty %}

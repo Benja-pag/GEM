@@ -4,83 +4,356 @@
 {% block title %}Panel del Profesor{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Panel del Profesor</h2>
-    
-    <!-- Información del Profesor -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Información Personal</h5>
-            <p><strong>Nombre:</strong> {{ request.user.usuario.nombre }} {{ request.user.usuario.apellido }}</p>
-            <p><strong>Email:</strong> {{ request.user.usuario.email }}</p>
-            <p><strong>Teléfono:</strong> {{ request.user.usuario.telefono }}</p>
+<div class="container-fluid mt-4">
+    <!-- Encabezado con información del profesor -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body bg-gradient-dark text-white rounded">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-chalkboard-teacher fa-3x me-3 text-info"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h2 class="mb-1 text-info">{{ request.user.usuario.nombre }} {{ request.user.usuario.apellido }}</h2>
+                            <p class="mb-0 text-white-75"><i class="fas fa-envelope me-2"></i><span class="text-white">{{ request.user.usuario.correo }}</span></p>
+                            <p class="mb-0 text-white-75"><i class="fas fa-user-tag me-2"></i><span class="text-white">{{ request.user.usuario.docente.especialidad.nombre }}</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Cursos como Profesor Jefe -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Cursos como Profesor Jefe</h5>
-            {% if cursos_profesor_jefe %}
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Curso</th>
-                                <th>Total Estudiantes</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for curso in cursos_profesor_jefe %}
-                            <tr>
-                                <td>{{ curso.nivel }}° {{ curso.letra }}</td>
-                                <td>{{ curso.total_estudiantes }}</td>
-                                <td>
-                                    <a href="{% url 'curso_detalle' curso.id %}" class="btn btn-sm btn-primary">Ver Detalles</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <p>No eres profesor jefe de ningún curso.</p>
-            {% endif %}
-        </div>
-    </div>
+    <!-- Pestañas principales -->
+    <ul class="nav nav-tabs mb-4" id="teacherTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="resumen-tab" data-bs-toggle="tab" data-bs-target="#resumen" type="button">
+                <i class="fas fa-home me-2"></i>Resumen
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="cursos-tab" data-bs-toggle="tab" data-bs-target="#cursos" type="button">
+                <i class="fas fa-users me-2"></i>Cursos Jefe
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="asignaturas-tab" data-bs-toggle="tab" data-bs-target="#asignaturas" type="button">
+                <i class="fas fa-book me-2"></i>Asignaturas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="evaluaciones-tab" data-bs-toggle="tab" data-bs-target="#evaluaciones" type="button">
+                <i class="fas fa-clipboard-list me-2"></i>Evaluaciones
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="retro-tab" data-bs-toggle="tab" data-bs-target="#retro" type="button">
+                <i class="fas fa-comments me-2"></i>Retroalimentación
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="asistencia-tab" data-bs-toggle="tab" data-bs-target="#asistencia" type="button">
+                <i class="fas fa-calendar-check me-2"></i>Asistencia
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="calendario-tab" data-bs-toggle="tab" data-bs-target="#calendario" type="button">
+                <i class="fas fa-calendar-alt me-2"></i>Calendario
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="mensajes-tab" data-bs-toggle="tab" data-bs-target="#mensajes" type="button">
+                <i class="fas fa-envelope me-2"></i>Mensajes
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="materiales-tab" data-bs-toggle="tab" data-bs-target="#materiales" type="button">
+                <i class="fas fa-folder-open me-2"></i>Materiales
+            </button>
+        </li>
+    </ul>
 
-    <!-- Asignaturas que Imparte -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Asignaturas que Imparte</h5>
-            {% if asignaturas %}
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Asignatura</th>
-                                <th>Curso</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for asignatura_impartida in asignaturas %}
-                            <tr>
-                                <td>{{ asignatura_impartida.asignatura.nombre }}</td>
-                                <td>{{ asignatura_impartida.curso.nivel }}° {{ asignatura_impartida.curso.letra }}</td>
-                                <td>
-                                    <a href="{% url 'asignatura_detalle' asignatura_impartida.id %}" class="btn btn-sm btn-primary">Ver Detalles</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <div class="tab-content" id="teacherTabsContent">
+        <!-- Resumen (funcional) -->
+        <div class="tab-pane fade show active" id="resumen">
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                            <h5>Cursos como Jefe</h5>
+                            <h2 class="text-primary">{{ cursos_profesor_jefe|length }}</h2>
+                            <small class="text-muted">Total de cursos</small>
+                        </div>
+                    </div>
                 </div>
-            {% else %}
-                <p>No tienes asignaturas asignadas.</p>
-            {% endif %}
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-book-open fa-2x text-success mb-2"></i>
+                            <h5>Asignaturas que Imparte</h5>
+                            <h2 class="text-success">{{ asignaturas|length }}</h2>
+                            <small class="text-muted">Total de asignaturas</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-bell fa-2x text-danger mb-2"></i>
+                            <h5>Notificaciones</h5>
+                            <h2 class="text-danger">3</h2>
+                            <small class="text-muted">Sin leer</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Cursos Jefe (funcional) -->
+        <div class="tab-pane fade" id="cursos">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-user-tie me-2 text-primary"></i>Cursos como Profesor Jefe</h5>
+                    {% if cursos_profesor_jefe %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Curso</th>
+                                    <th>Total Estudiantes</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for curso in cursos_profesor_jefe %}
+                                <tr>
+                                    <td class="fw-bold">{{ curso.nivel }}°{{ curso.letra }}</td>
+                                    <td>{{ curso.total_estudiantes }}</td>
+                                    <td><a href="{% url 'curso_detalle' curso.id %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye me-1"></i>Ver Detalles</a></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No eres profesor jefe de ningún curso.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Asignaturas (funcional) -->
+        <div class="tab-pane fade" id="asignaturas">
+            <div class="row">
+                {% for asignatura_impartida in asignaturas %}
+                <div class="col-12 mb-3">
+                    <div class="card h-100 border-0 shadow-sm asignatura-card">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="asignatura-bar me-3" style="width: 6px; height: 48px; border-radius: 4px; background: linear-gradient(180deg, #4e73df, #224abe);"></div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                                    <div>
+                                        <h5 class="mb-1 fw-bold text-primary">{{ asignatura_impartida.asignatura.nombre }}</h5>
+                                        <span class="badge bg-light text-primary border border-primary">{{ asignatura_impartida.codigo }}</span>
+                                        {% with curso=asignatura_impartida.clases.first.curso %}
+                                            {% if curso %}
+                                                <div class="mt-1">
+                                                    <span class="badge bg-info text-white fs-6">{{ curso.nivel }}° {{ curso.letra }}</span>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                    <div class="mt-2 mt-md-0">
+                                        <a href="{% url 'asignatura_detalle' asignatura_impartida.id %}" class="btn btn-sm btn-primary"><i class="fas fa-eye me-1"></i>Ver Detalles</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Evaluaciones (prototipo) -->
+        <div class="tab-pane fade" id="evaluaciones">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-clipboard-list me-2 text-warning"></i>Evaluaciones</h5>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Asignatura</th>
+                                    <th>Evaluación</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Matemáticas</td>
+                                    <td>Prueba 1</td>
+                                    <td>15/04/2024</td>
+                                    <td><span class="badge bg-success">Calificada</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info"><i class="fas fa-pen"></i> Calificar</button>
+                                        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i> Ver</button>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-robot"></i> Generar Preguntas IA</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Lenguaje</td>
+                                    <td>Ensayo</td>
+                                    <td>20/04/2024</td>
+                                    <td><span class="badge bg-warning">Pendiente</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info"><i class="fas fa-pen"></i> Calificar</button>
+                                        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-eye"></i> Ver</button>
+                                        <button class="btn btn-sm btn-outline-primary"><i class="fas fa-robot"></i> Generar Preguntas IA</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Retroalimentación (prototipo) -->
+        <div class="tab-pane fade" id="retro">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-comments me-2 text-info"></i>Retroalimentación</h5>
+                    <form>
+                        <div class="mb-3">
+                            <label for="retroAlumno" class="form-label">Selecciona estudiante</label>
+                            <select class="form-select" id="retroAlumno">
+                                <option>Juan Pérez</option>
+                                <option>María González</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="retroTexto" class="form-label">Retroalimentación</label>
+                            <textarea class="form-control" id="retroTexto" rows="3" placeholder="Escribe la retroalimentación..." disabled></textarea>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary"><i class="fas fa-robot me-1"></i> Generar Retroalimentación IA</button>
+                        <button type="button" class="btn btn-outline-success ms-2"><i class="fas fa-paper-plane me-1"></i> Enviar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Asistencia (prototipo) -->
+        <div class="tab-pane fade" id="asistencia">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-calendar-check me-2 text-success"></i>Asistencia</h5>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Curso</th>
+                                    <th>Asignatura</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>10/04/2024</td>
+                                    <td>2°A</td>
+                                    <td>Matemáticas</td>
+                                    <td><span class="badge bg-success">Presente</span></td>
+                                </tr>
+                                <tr>
+                                    <td>10/04/2024</td>
+                                    <td>3°B</td>
+                                    <td>Lenguaje</td>
+                                    <td><span class="badge bg-danger">Ausente</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Calendario (prototipo) -->
+        <div class="tab-pane fade" id="calendario">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-calendar-alt me-2 text-primary"></i>Calendario</h5>
+                    <div id="calendar" class="p-5 text-center text-muted">
+                        <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                        <p>Calendario de eventos y evaluaciones</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Mensajes (prototipo) -->
+        <div class="tab-pane fade" id="mensajes">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-envelope me-2 text-info"></i>Mensajes</h5>
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Mensaje de Coordinación</h6>
+                                <small>Hace 10 min</small>
+                            </div>
+                            <p class="mb-1">Reunión de apoderados el viernes.</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Mensaje de Apoderado</h6>
+                                <small>Hace 1 hora</small>
+                            </div>
+                            <p class="mb-1">Consulta sobre tarea de matemáticas.</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Materiales (prototipo) -->
+        <div class="tab-pane fade" id="materiales">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-folder-open me-2 text-warning"></i>Materiales</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Guía de Ejercicios 1
+                            <span class="badge bg-primary rounded-pill">Matemáticas</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            PPT Clase 2
+                            <span class="badge bg-success rounded-pill">Lenguaje</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .bg-gradient-dark {
+        background: linear-gradient(45deg, #2c3e50, #1a252f);
+    }
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.75);
+    }
+    .asignatura-card {
+        transition: box-shadow 0.2s;
+        border-left: 6px solid #4e73df;
+        background: #fff;
+    }
+    .asignatura-card:hover {
+        box-shadow: 0 4px 16px rgba(78, 115, 223, 0.15);
+        border-left: 6px solid #224abe;
+    }
+    .asignatura-bar {
+        background: linear-gradient(180deg, #4e73df, #224abe);
+    }
+    .card-title i {
+        vertical-align: middle;
+    }
+</style>
 {% endblock %}

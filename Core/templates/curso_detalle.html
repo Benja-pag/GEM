@@ -5,21 +5,63 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Detalles del Curso {{ curso }}</h2>
-            
-            <!-- Información del Curso -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Información del Curso</h5>
-                    <div class="row">
-                        <div class="col-md-6">
+    <!-- Encabezado visual del curso -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body bg-gradient-dark text-white rounded d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-users fa-3x me-3 text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h2 class="mb-1">Curso {{ curso.nivel }}°{{ curso.letra }}</h2>
+                        <p class="mb-0 text-white-75"><i class="fas fa-user-tie me-2"></i>
+                            <strong>Profesor Jefe:</strong>
+                            {% if profesor_jefe %}
+                                {{ profesor_jefe.docente.usuario.nombre }} {{ profesor_jefe.docente.usuario.apellido_paterno }} {{ profesor_jefe.docente.usuario.apellido_materno }}
+                            {% else %}
+                                <span class="text-light">Sin profesor asignado</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="flex-shrink-0 ms-4">
+                        <span class="badge bg-primary p-3 fs-5"><i class="fas fa-user-graduate me-2"></i>{{ estudiantes|length }} Estudiantes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs agrupadas -->
+    <ul class="nav nav-tabs mb-4" id="cursoTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button"><i class="fas fa-info-circle me-2"></i>General</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantes" type="button"><i class="fas fa-user-friends me-2"></i>Estudiantes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="asignaturas-tab" data-bs-toggle="tab" data-bs-target="#asignaturas" type="button"><i class="fas fa-book me-2"></i>Asignaturas</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="comunicaciones-tab" data-bs-toggle="tab" data-bs-target="#comunicaciones" type="button"><i class="fas fa-envelope-open-text me-2"></i>Comunicaciones</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ia-tab" data-bs-toggle="tab" data-bs-target="#ia" type="button"><i class="fas fa-robot me-2"></i>Herramientas IA</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="cursoTabsContent">
+        <!-- General: Información, Apoderados, Observaciones -->
+        <div class="tab-pane fade show active" id="general">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-info-circle me-2 text-primary"></i>Información del Curso</h5>
                             <p><strong>Nivel:</strong> {{ curso.nivel }}°</p>
                             <p><strong>Letra:</strong> {{ curso.letra }}</p>
                             <p><strong>Total Estudiantes:</strong> {{ estudiantes|length }}</p>
-                        </div>
-                        <div class="col-md-6">
                             <p><strong>Profesor Jefe:</strong>
                                 {% if profesor_jefe %}
                                     {{ profesor_jefe.docente.usuario.nombre }} {{ profesor_jefe.docente.usuario.apellido_paterno }} {{ profesor_jefe.docente.usuario.apellido_materno }}
@@ -31,18 +73,66 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Lista de Estudiantes -->
-            <div class="card mb-4">
+            <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Estudiantes del Curso</h5>
+                    <h5 class="card-title"><i class="fas fa-user-shield me-2 text-warning"></i>Apoderados (Prototipo)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>Apoderado</th>
+                                    <th>Teléfono</th>
+                                    <th>Email</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Juan Pérez</td>
+                                    <td>María López</td>
+                                    <td>+56 9 1234 5678</td>
+                                    <td>maria.lopez@email.com</td>
+                                    <td><button class="btn btn-sm btn-outline-info"><i class="fas fa-envelope"></i> Mensaje</button></td>
+                                </tr>
+                                <tr>
+                                    <td>María González</td>
+                                    <td>Carlos González</td>
+                                    <td>+56 9 8765 4321</td>
+                                    <td>carlos.gonzalez@email.com</td>
+                                    <td><button class="btn btn-sm btn-outline-info"><i class="fas fa-envelope"></i> Mensaje</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-clipboard-list me-2 text-info"></i>Observaciones y Seguimiento (Prototipo)</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <strong>Juan Pérez:</strong> Participa activamente en clases. <span class="badge bg-success ms-2">Positiva</span>
+                        </li>
+                        <li class="list-group-item">
+                            <strong>María González:</strong> Necesita mejorar la puntualidad. <span class="badge bg-warning ms-2">Pendiente</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- Estudiantes: Lista, Fichas, Reportes -->
+        <div class="tab-pane fade" id="estudiantes">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-user-friends me-2 text-primary"></i>Estudiantes del Curso</h5>
                     {% if estudiantes %}
                         <div class="table-responsive">
-                            <table class="table">
-                                <thead>
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
                                     <tr>
-                                        <th>Nombre</th>
-                                        <th>Teléfono</th>
+                                        <th><i class="fas fa-user"></i> Nombre</th>
+                                        <th><i class="fas fa-phone"></i> Teléfono</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -56,22 +146,88 @@
                             </table>
                         </div>
                     {% else %}
-                        <p>No hay estudiantes registrados en este curso.</p>
+                        <p class="text-muted">No hay estudiantes registrados en este curso.</p>
                     {% endif %}
                 </div>
             </div>
-
-            <!-- Asignaturas del Curso -->
-            <div class="card mb-4">
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-calendar-check me-2 text-success"></i>Asistencia (Prototipo)</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Juan Pérez
+                                    <span class="badge bg-success">98%</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    María González
+                                    <span class="badge bg-warning">85%</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-chart-line me-2 text-primary"></i>Rendimiento (Prototipo)</h5>
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    Juan Pérez
+                                    <span class="badge bg-primary">6.2</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    María González
+                                    <span class="badge bg-danger">4.1</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Asignaturas del Curso</h5>
+                    <h5 class="card-title"><i class="fas fa-id-card me-2 text-info"></i>Fichas de Estudiantes (Prototipo)</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="fw-bold">Juan Pérez</h6>
+                                    <p><strong>RUT:</strong> 12345678-9</p>
+                                    <p><strong>Promedio:</strong> 6.2</p>
+                                    <p><strong>Asistencia:</strong> 98%</p>
+                                    <p><strong>Observaciones:</strong> Participa activamente en clases.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="fw-bold">María González</h6>
+                                    <p><strong>RUT:</strong> 98765432-1</p>
+                                    <p><strong>Promedio:</strong> 4.1</p>
+                                    <p><strong>Asistencia:</strong> 85%</p>
+                                    <p><strong>Observaciones:</strong> Necesita mejorar la puntualidad.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Asignaturas: Asignaturas, Evaluaciones -->
+        <div class="tab-pane fade" id="asignaturas">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-book me-2 text-success"></i>Asignaturas del Curso</h5>
                     {% if asignaturas %}
                         <div class="table-responsive">
-                            <table class="table">
-                                <thead>
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
                                     <tr>
-                                        <th>Asignatura</th>
-                                        <th>Profesor</th>
+                                        <th><i class="fas fa-book-open"></i> Asignatura</th>
+                                        <th><i class="fas fa-chalkboard-teacher"></i> Profesor</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -81,7 +237,7 @@
                                         <td>{{ asignatura.asignatura.nombre }}</td>
                                         <td>{{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }} {{ asignatura.docente.usuario.apellido_materno }}</td>
                                         <td>
-                                            <a href="{% url 'asignatura_detalle' asignatura.id %}" class="btn btn-sm btn-primary">Ver Detalles</a>
+                                            <a href="{% url 'asignatura_detalle' asignatura.id %}" class="btn btn-sm btn-primary"><i class="fas fa-eye me-1"></i>Ver Detalles</a>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -89,11 +245,113 @@
                             </table>
                         </div>
                     {% else %}
-                        <p>No hay asignaturas registradas para este curso.</p>
+                        <p class="text-muted">No hay asignaturas registradas para este curso.</p>
                     {% endif %}
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-clipboard-list me-2 text-warning"></i>Evaluaciones Generales (Prototipo)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Asignatura</th>
+                                    <th>Evaluación</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Matemáticas</td>
+                                    <td>Prueba 1</td>
+                                    <td>15/04/2024</td>
+                                    <td><span class="badge bg-success">Calificada</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> Ver</button></td>
+                                </tr>
+                                <tr>
+                                    <td>Lenguaje</td>
+                                    <td>Ensayo</td>
+                                    <td>20/04/2024</td>
+                                    <td><span class="badge bg-warning">Pendiente</span></td>
+                                    <td><button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> Ver</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Comunicaciones: Comunicaciones, Documentos, Calendario -->
+        <div class="tab-pane fade" id="comunicaciones">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-envelope-open-text me-2 text-danger"></i>Comunicaciones y Circulares (Prototipo)</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Circular 01 - Reunión de Apoderados
+                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> Ver</button>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Mensaje enviado a apoderados
+                            <button class="btn btn-sm btn-outline-info"><i class="fas fa-envelope"></i> Ver</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-folder-open me-2 text-warning"></i>Documentos y Materiales (Prototipo)</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Reglamento Interno
+                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i> Descargar</button>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Circular de Seguridad
+                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i> Descargar</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-calendar-alt me-2 text-primary"></i>Calendario de Actividades (Prototipo)</h5>
+                    <div class="p-4 text-center text-muted">
+                        <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+                        <p>Próxima reunión de apoderados: 25/04/2024</p>
+                        <p>Salida pedagógica: 10/05/2024</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Herramientas IA (Prototipo) -->
+        <div class="tab-pane fade" id="ia">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-robot me-2 text-primary"></i>Herramientas de IA (Prototipo)</h5>
+                    <div class="mb-3">
+                        <button class="btn btn-outline-primary"><i class="fas fa-robot me-1"></i> Generar Reporte Automático</button>
+                        <button class="btn btn-outline-success ms-2"><i class="fas fa-lightbulb me-1"></i> Sugerencias de Intervención</button>
+                        <button class="btn btn-outline-info ms-2"><i class="fas fa-envelope me-1"></i> Generar Comunicado IA</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .bg-gradient-dark {
+        background: linear-gradient(45deg, #2c3e50, #1a252f);
+    }
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.75);
+    }
+    .card-title i {
+        vertical-align: middle;
+    }
+</style>
 {% endblock %} 

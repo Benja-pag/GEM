@@ -203,6 +203,448 @@
                  </div>
              </div>
 
+            <!-- Sistema de Pestañas -->
+            <div class="container-fluid">
+                <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab" aria-controls="usuarios" aria-selected="true">
+                            <i class="fas fa-users me-2"></i>Usuarios
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="cursos-tab" data-bs-toggle="tab" data-bs-target="#cursos" type="button" role="tab" aria-controls="cursos" aria-selected="false">
+                            <i class="fas fa-book me-2"></i>Cursos
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="asignaturas-tab" data-bs-toggle="tab" data-bs-target="#asignaturas" type="button" role="tab" aria-controls="asignaturas" aria-selected="false">
+                            <i class="fas fa-book-open me-2"></i>Asignaturas
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reportes-tab" data-bs-toggle="tab" data-bs-target="#reportes" type="button" role="tab" aria-controls="reportes" aria-selected="false">
+                            <i class="fas fa-chart-bar me-2"></i>Reportes
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="comunicaciones-tab" data-bs-toggle="tab" data-bs-target="#comunicaciones" type="button" role="tab" aria-controls="comunicaciones" aria-selected="false">
+                            <i class="fas fa-comments me-2"></i>Comunicaciones
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="calendario-tab" data-bs-toggle="tab" data-bs-target="#calendario" type="button" role="tab" aria-controls="calendario" aria-selected="false">
+                            <i class="fas fa-calendar-alt me-2"></i>Calendario
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="adminTabsContent">
+                    <!-- Pestaña de Usuarios -->
+                    <div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover align-middle shadow-sm">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-id-card"></i> RUT</th>
+                                        <th><i class="fas fa-user"></i> Nombre</th>
+                                        <th><i class="fas fa-envelope"></i> Correo</th>
+                                        <th><i class="fas fa-user-tag"></i> Tipo</th>
+                                        <th><i class="fas fa-toggle-on"></i> Estado</th>
+                                        <th><i class="fas fa-cogs"></i> Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for usuario in usuarios %}
+                                    <tr class="clickable-row" data-href="#" style="cursor:pointer;">
+                                        <td>{{ usuario.rut }}-{{ usuario.div }}</td>
+                                        <td>{{ usuario.nombre }} {{ usuario.apellido_paterno }} {{ usuario.apellido_materno }}</td>
+                                        <td>{{ usuario.correo }}</td>
+                                        <td>
+                                            {% if usuario.administrativo %}
+                                                <span class="badge bg-secondary">{{ usuario.administrativo.get_rol_display }}</span>
+                                            {% elif usuario.docente %}
+                                                <span class="badge bg-info">Docente</span>
+                                            {% elif usuario.estudiante %}
+                                                <span class="badge bg-primary">Estudiante</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if usuario.activador %}bg-success{% else %}bg-danger{% endif %}">
+                                                {% if usuario.activador %}Activo{% else %}Inactivo{% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-info btn-sm view-user" data-user-id="{{ usuario.auth_user_id }}" title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-warning btn-sm edit-user" data-user-id="{{ usuario.auth_user_id }}" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm toggle-user-status {% if usuario.activador %}btn-success{% else %}btn-danger{% endif %}" 
+                                                        data-user-id="{{ usuario.auth_user_id }}" 
+                                                        data-is-active="{{ usuario.activador|lower }}"
+                                                        title="{% if usuario.activador %}Desactivar{% else %}Activar{% endif %}">
+                                                    <i class="fas {% if usuario.activador %}fa-user-check{% else %}fa-user-slash{% endif %}"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm delete-user" data-user-id="{{ usuario.auth_user_id }}" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">No hay usuarios registrados</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pestaña de Cursos -->
+                    <div class="tab-pane fade" id="cursos" role="tabpanel" aria-labelledby="cursos-tab">
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle shadow-sm">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-chalkboard"></i> Curso</th>
+                                        <th><i class="fas fa-user-tie"></i> Profesor Jefe</th>
+                                        <th><i class="fas fa-users"></i> Estudiantes</th>
+                                        <th><i class="fas fa-toggle-on"></i> Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for curso in cursos %}
+                                    <tr>
+                                        <td><span class="badge bg-primary">{{ curso.nivel }}°{{ curso.letra }}</span></td>
+                                        <td>
+                                            {% if curso.jefatura_actual %}
+                                                <span class="badge bg-info">{{ curso.jefatura_actual.docente.usuario.nombre }} {{ curso.jefatura_actual.docente.usuario.apellido_paterno }}</span>
+                                            {% else %}
+                                                <span class="text-muted">Sin profesor asignado</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ curso.total_estudiantes }} estudiantes</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">Activo</span>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">No hay cursos registrados</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pestaña de Asignaturas -->
+                    <div class="tab-pane fade" id="asignaturas" role="tabpanel" aria-labelledby="asignaturas-tab">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover align-middle shadow-sm">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-barcode"></i> Código</th>
+                                        <th><i class="fas fa-book"></i> Nombre</th>
+                                        <th><i class="fas fa-chalkboard"></i> Curso</th>
+                                        <th><i class="fas fa-user-tie"></i> Profesor</th>
+                                        <th><i class="fas fa-calendar-day"></i> Día</th>
+                                        <th><i class="fas fa-clock"></i> Horario</th>
+                                        <th><i class="fas fa-door-open"></i> Sala</th>
+                                        <th><i class="fas fa-toggle-on"></i> Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for asignatura in asignaturas %}
+                                        {% for clase in asignatura.clases.all %}
+                                        <tr>
+                                            <td><span class="badge bg-secondary">{{ asignatura.codigo }}</span></td>
+                                            <td>{{ asignatura.asignatura.nombre }}</td>
+                                            <td>
+                                                {% if clase.curso %}
+                                                    <span class="badge bg-primary">{{ clase.curso.nivel }}°{{ clase.curso.letra }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">Electivo</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if asignatura.docente %}
+                                                    <span class="badge bg-info">{{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }}</span>
+                                                {% else %}
+                                                    <span class="text-danger">Sin profesor</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ clase.get_fecha_display }}</span>
+                                            </td>
+                                            <td>
+                                                {% if clase.horario == '1' %}
+                                                    <span class="badge bg-success">08:00 - 08:45</span>
+                                                {% elif clase.horario == '2' %}
+                                                    <span class="badge bg-success">08:45 - 09:30</span>
+                                                {% elif clase.horario == '3' %}
+                                                    <span class="badge bg-success">09:45 - 10:30</span>
+                                                {% elif clase.horario == '4' %}
+                                                    <span class="badge bg-success">10:30 - 11:15</span>
+                                                {% elif clase.horario == '5' %}
+                                                    <span class="badge bg-success">11:30 - 12:15</span>
+                                                {% elif clase.horario == '6' %}
+                                                    <span class="badge bg-success">12:15 - 13:00</span>
+                                                {% elif clase.horario == '7' %}
+                                                    <span class="badge bg-success">13:45 - 14:30</span>
+                                                {% elif clase.horario == '8' %}
+                                                    <span class="badge bg-success">14:30 - 15:15</span>
+                                                {% elif clase.horario == '9' %}
+                                                    <span class="badge bg-success">15:15 - 16:00</span>
+                                                {% elif clase.horario == 'RECREO1' %}
+                                                    <span class="badge bg-warning">09:30 - 09:45 (Recreo)</span>
+                                                {% elif clase.horario == 'RECREO2' %}
+                                                    <span class="badge bg-warning">11:15 - 11:30 (Recreo)</span>
+                                                {% elif clase.horario == 'ALMUERZO' %}
+                                                    <span class="badge bg-warning">13:00 - 13:45 (Almuerzo)</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if clase.sala == 'GIMNASIO' %}
+                                                    <span class="badge bg-warning">{{ clase.get_sala_display }}</span>
+                                                {% elif 'LAB_' in clase.sala %}
+                                                    <span class="badge bg-info">{{ clase.get_sala_display }}</span>
+                                                {% elif clase.sala == 'SALA_9' or clase.sala == 'SALA_10' %}
+                                                    <span class="badge bg-secondary">{{ clase.get_sala_display }} (Electivos)</span>
+                                                {% else %}
+                                                    <span class="badge bg-primary">{{ clase.get_sala_display }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if clase.fecha == 'VIERNES' and clase.horario > '6' %}
+                                                    <span class="badge bg-danger">Horario no válido</span>
+                                                {% else %}
+                                                    <span class="badge bg-success">Activo</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="8" class="text-center">No hay asignaturas registradas</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pestaña de Reportes -->
+                    <div class="tab-pane fade" id="reportes" role="tabpanel" aria-labelledby="reportes-tab">
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-file-alt me-2"></i>Reportes Académicos</h5>
+                                        <div class="list-group mt-3">
+                                            <button class="list-group-item list-group-item-action">
+                                                <i class="fas fa-graduation-cap me-2"></i>Rendimiento por Curso
+                                            </button>
+                                            <button class="list-group-item list-group-item-action">
+                                                <i class="fas fa-chart-line me-2"></i>Progreso Estudiantil
+                                            </button>
+                                            <button class="list-group-item list-group-item-action">
+                                                <i class="fas fa-chart-pie me-2"></i>Estadísticas Generales
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-clipboard-list me-2"></i>Reportes Administrativos</h5>
+                                        <div class="list-group mt-3">
+                                            <button class="list-group-item list-group-item-action">
+                                                <i class="fas fa-user-check me-2"></i>Asistencia Docente
+                                            </button>
+                                            <button class="list-group-item list-group-item-action">
+                                                <i class="fas fa-calendar-check me-2"></i>Control de Horarios
+                                            </button>
+                                            <button class="list-group-item list-group-item-action">
+                                                <i class="fas fa-tasks me-2"></i>Estado de Cursos
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-download me-2"></i>Exportar Reportes</h5>
+                                        <div class="list-group mt-3">
+                                            <button class="list-group-item list-group-item-action">
+                                                <i class="fas fa-file-pdf me-2"></i>Exportar a PDF
+                                            </button>
+                                            <button class="list-group-item list-group-item-action">
+                                                <i class="fas fa-file-excel me-2"></i>Exportar a Excel
+                                            </button>
+                                            <button class="list-group-item list-group-item-action">
+                                                <i class="fas fa-file-csv me-2"></i>Exportar a CSV
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pestaña de Comunicaciones -->
+                    <div class="tab-pane fade" id="comunicaciones" role="tabpanel" aria-labelledby="comunicaciones-tab">
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-bullhorn me-2"></i>Nueva Comunicación</h5>
+                                        <form class="mt-3">
+                                            <div class="mb-3">
+                                                <label class="form-label">Destinatarios</label>
+                                                <select class="form-select" multiple>
+                                                    <option value="todos">Todos los Usuarios</option>
+                                                    <option value="estudiantes">Estudiantes</option>
+                                                    <option value="docentes">Docentes</option>
+                                                    <option value="administrativos">Administrativos</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Asunto</label>
+                                                <input type="text" class="form-control" placeholder="Ingrese el asunto">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Mensaje</label>
+                                                <textarea class="form-control" rows="5" placeholder="Escriba su mensaje"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Adjuntos</label>
+                                                <input type="file" class="form-control" multiple>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-paper-plane me-2"></i>Enviar Comunicación
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-history me-2"></i>Comunicaciones Recientes</h5>
+                                        <div class="list-group mt-3">
+                                            <a href="#" class="list-group-item list-group-item-action">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h6 class="mb-1">Reunión de Apoderados</h6>
+                                                    <small>Hace 2 días</small>
+                                                </div>
+                                                <p class="mb-1">Información sobre la próxima reunión...</p>
+                                                <small>Enviado a: Todos los Apoderados</small>
+                                            </a>
+                                            <a href="#" class="list-group-item list-group-item-action">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h6 class="mb-1">Cambio de Horario</h6>
+                                                    <small>Hace 5 días</small>
+                                                </div>
+                                                <p class="mb-1">Ajustes en el horario de clases...</p>
+                                                <small>Enviado a: Docentes</small>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pestaña de Calendario -->
+                    <div class="tab-pane fade" id="calendario" role="tabpanel" aria-labelledby="calendario-tab">
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <h5 class="card-title mb-0"><i class="fas fa-calendar-alt me-2"></i>Calendario Escolar</h5>
+                                            <div class="btn-group">
+                                                <button class="btn btn-outline-primary">
+                                                    <i class="fas fa-plus me-2"></i>Nuevo Evento
+                                                </button>
+                                                <button class="btn btn-outline-secondary">
+                                                    <i class="fas fa-sync-alt me-2"></i>Actualizar
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="calendar" style="height: 600px;">
+                                            <!-- Aquí iría el calendario -->
+                                            <div class="text-center py-5">
+                                                <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+                                                <p class="text-muted">Calendario en desarrollo</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card shadow-sm mb-4">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-list me-2"></i>Próximos Eventos</h5>
+                                        <div class="list-group mt-3">
+                                            <div class="list-group-item">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h6 class="mb-1">Reunión de Apoderados</h6>
+                                                    <small class="text-muted">15 Mar</small>
+                                                </div>
+                                                <p class="mb-1">Auditorio Principal</p>
+                                                <small class="text-muted">19:00 - 21:00</small>
+                                            </div>
+                                            <div class="list-group-item">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h6 class="mb-1">Evaluación Final</h6>
+                                                    <small class="text-muted">20 Mar</small>
+                                                </div>
+                                                <p class="mb-1">Todas las asignaturas</p>
+                                                <small class="text-muted">08:00 - 13:00</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><i class="fas fa-filter me-2"></i>Filtrar Eventos</h5>
+                                        <div class="mt-3">
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="eventosAcademicos" checked>
+                                                <label class="form-check-label" for="eventosAcademicos">
+                                                    Eventos Académicos
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="eventosAdministrativos" checked>
+                                                <label class="form-check-label" for="eventosAdministrativos">
+                                                    Eventos Administrativos
+                                                </label>
+                                            </div>
+                                            <div class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" id="eventosExtraprogramaticos" checked>
+                                                <label class="form-check-label" for="eventosExtraprogramaticos">
+                                                    Eventos Extraprogramáticos
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Modal de Creación de Estudiante -->
             <div class="modal fade" id="crearEstudianteModal" tabindex="-1" aria-labelledby="crearEstudianteModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -837,209 +1279,6 @@
                             </form>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Lista de Usuarios Recientes -->
-            <div class="container-fluid mb-2">
-                <h5 class="mb-3"><i class="fas fa-users me-2"></i>Usuarios Recientes</h5>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle shadow-sm">
-                        <thead>
-                            <tr>
-                                <th><i class="fas fa-id-card"></i> RUT</th>
-                                <th><i class="fas fa-user"></i> Nombre</th>
-                                <th><i class="fas fa-envelope"></i> Correo</th>
-                                <th><i class="fas fa-user-tag"></i> Tipo</th>
-                                <th><i class="fas fa-toggle-on"></i> Estado</th>
-                                <th><i class="fas fa-cogs"></i> Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for usuario in usuarios %}
-                            <tr class="clickable-row" data-href="#" style="cursor:pointer;">
-                                <td>{{ usuario.rut }}-{{ usuario.div }}</td>
-                                <td>{{ usuario.nombre }} {{ usuario.apellido_paterno }} {{ usuario.apellido_materno }}</td>
-                                <td>{{ usuario.correo }}</td>
-                                <td>
-                                    {% if usuario.administrativo %}
-                                        <span class="badge bg-secondary">{{ usuario.administrativo.get_rol_display }}</span>
-                                    {% elif usuario.docente %}
-                                        <span class="badge bg-info">Docente</span>
-                                    {% elif usuario.estudiante %}
-                                        <span class="badge bg-primary">Estudiante</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <span class="badge {% if usuario.activador %}bg-success{% else %}bg-danger{% endif %}">
-                                        {% if usuario.activador %}Activo{% else %}Inactivo{% endif %}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-info btn-sm view-user" data-user-id="{{ usuario.auth_user_id }}" title="Ver detalles">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-warning btn-sm edit-user" data-user-id="{{ usuario.auth_user_id }}" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm toggle-user-status {% if usuario.activador %}btn-success{% else %}btn-danger{% endif %}" 
-                                                data-user-id="{{ usuario.auth_user_id }}" 
-                                                data-is-active="{{ usuario.activador|lower }}"
-                                                title="{% if usuario.activador %}Desactivar{% else %}Activar{% endif %}">
-                                            <i class="fas {% if usuario.activador %}fa-user-check{% else %}fa-user-slash{% endif %}"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm delete-user" data-user-id="{{ usuario.auth_user_id }}" title="Eliminar">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6" class="text-center">No hay usuarios registrados</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Cursos Activos -->
-            <div class="container-fluid mb-2">
-                <h5 class="mb-3"><i class="fas fa-book me-2"></i>Cursos Activos</h5>
-                <div class="table-responsive">
-                    <table class="table table-striped align-middle shadow-sm">
-                        <thead>
-                            <tr>
-                                <th><i class="fas fa-chalkboard"></i> Curso</th>
-                                <th><i class="fas fa-user-tie"></i> Profesor Jefe</th>
-                                <th><i class="fas fa-users"></i> Estudiantes</th>
-                                <th><i class="fas fa-toggle-on"></i> Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for curso in cursos %}
-                            <tr>
-                                <td><span class="badge bg-primary">{{ curso.nivel }}°{{ curso.letra }}</span></td>
-                                <td>
-                                    {% if curso.jefatura_actual %}
-                                        <span class="badge bg-info">{{ curso.jefatura_actual.docente.usuario.nombre }} {{ curso.jefatura_actual.docente.usuario.apellido_paterno }}</span>
-                                    {% else %}
-                                        <span class="text-muted">Sin profesor asignado</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <span class="badge bg-info">{{ curso.total_estudiantes }} estudiantes</span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-success">Activo</span>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" class="text-center">No hay cursos registrados</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Asignaturas -->
-            <div class="container-fluid">
-                <h5 class="mb-3"><i class="fas fa-book-open me-2"></i>Asignaturas y Horarios</h5>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle shadow-sm">
-                        <thead>
-                            <tr>
-                                <th><i class="fas fa-barcode"></i> Código</th>
-                                <th><i class="fas fa-book"></i> Nombre</th>
-                                <th><i class="fas fa-chalkboard"></i> Curso</th>
-                                <th><i class="fas fa-user-tie"></i> Profesor</th>
-                                <th><i class="fas fa-calendar-day"></i> Día</th>
-                                <th><i class="fas fa-clock"></i> Horario</th>
-                                <th><i class="fas fa-door-open"></i> Sala</th>
-                                <th><i class="fas fa-toggle-on"></i> Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for asignatura in asignaturas %}
-                                {% for clase in asignatura.clases.all %}
-                                <tr>
-                                    <td><span class="badge bg-secondary">{{ asignatura.codigo }}</span></td>
-                                    <td>{{ asignatura.asignatura.nombre }}</td>
-                                    <td>
-                                        {% if clase.curso %}
-                                            <span class="badge bg-primary">{{ clase.curso.nivel }}°{{ clase.curso.letra }}</span>
-                                        {% else %}
-                                            <span class="badge bg-warning">Electivo</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if asignatura.docente %}
-                                            <span class="badge bg-info">{{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }}</span>
-                                        {% else %}
-                                            <span class="text-danger">Sin profesor</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-info">{{ clase.get_fecha_display }}</span>
-                                    </td>
-                                    <td>
-                                        {% if clase.horario == '1' %}
-                                            <span class="badge bg-success">08:00 - 08:45</span>
-                                        {% elif clase.horario == '2' %}
-                                            <span class="badge bg-success">08:45 - 09:30</span>
-                                        {% elif clase.horario == '3' %}
-                                            <span class="badge bg-success">09:45 - 10:30</span>
-                                        {% elif clase.horario == '4' %}
-                                            <span class="badge bg-success">10:30 - 11:15</span>
-                                        {% elif clase.horario == '5' %}
-                                            <span class="badge bg-success">11:30 - 12:15</span>
-                                        {% elif clase.horario == '6' %}
-                                            <span class="badge bg-success">12:15 - 13:00</span>
-                                        {% elif clase.horario == '7' %}
-                                            <span class="badge bg-success">13:45 - 14:30</span>
-                                        {% elif clase.horario == '8' %}
-                                            <span class="badge bg-success">14:30 - 15:15</span>
-                                        {% elif clase.horario == '9' %}
-                                            <span class="badge bg-success">15:15 - 16:00</span>
-                                        {% elif clase.horario == 'RECREO1' %}
-                                            <span class="badge bg-warning">09:30 - 09:45 (Recreo)</span>
-                                        {% elif clase.horario == 'RECREO2' %}
-                                            <span class="badge bg-warning">11:15 - 11:30 (Recreo)</span>
-                                        {% elif clase.horario == 'ALMUERZO' %}
-                                            <span class="badge bg-warning">13:00 - 13:45 (Almuerzo)</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if clase.sala == 'GIMNASIO' %}
-                                            <span class="badge bg-warning">{{ clase.get_sala_display }}</span>
-                                        {% elif 'LAB_' in clase.sala %}
-                                            <span class="badge bg-info">{{ clase.get_sala_display }}</span>
-                                        {% elif clase.sala == 'SALA_9' or clase.sala == 'SALA_10' %}
-                                            <span class="badge bg-secondary">{{ clase.get_sala_display }} (Electivos)</span>
-                                        {% else %}
-                                            <span class="badge bg-primary">{{ clase.get_sala_display }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if clase.fecha == 'VIERNES' and clase.horario > '6' %}
-                                            <span class="badge bg-danger">Horario no válido</span>
-                                        {% else %}
-                                            <span class="badge bg-success">Activo</span>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            {% empty %}
-                            <tr>
-                                <td colspan="8" class="text-center">No hay asignaturas registradas</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
                 </div>
             </div>
 

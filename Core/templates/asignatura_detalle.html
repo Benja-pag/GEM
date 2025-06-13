@@ -5,92 +5,252 @@
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Detalles de {{ asignatura.asignatura.nombre }}</h2>
-            
-            <!-- Información de la Asignatura -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Información de la Asignatura</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>Nombre:</strong> {{ asignatura.asignatura.nombre }}</p>
-                            <p><strong>Código:</strong> {{ asignatura.asignatura.codigo }}</p>
-                            <p><strong>Profesor:</strong> {{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }} {{ asignatura.docente.usuario.apellido_materno }}</p>
+    <!-- Encabezado visual de la asignatura -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body bg-gradient-dark text-white rounded d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-book fa-3x me-3 text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h2 class="mb-1">{{ asignatura.asignatura.nombre }}</h2>
+                        <p class="mb-0 text-white-75">
+                            <i class="fas fa-chalkboard-teacher me-2"></i>
+                            <strong>Profesor:</strong> {{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }}
+                        </p>
+                    </div>
+                    <div class="flex-shrink-0 ms-4">
+                        <span class="badge bg-primary p-3 fs-5"><i class="fas fa-user-graduate me-2"></i>{{ estudiantes|length }} Estudiantes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs de navegación -->
+    <ul class="nav nav-tabs mb-4" id="asignaturaTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button">
+                <i class="fas fa-info-circle me-2"></i>General
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantes" type="button">
+                <i class="fas fa-user-friends me-2"></i>Estudiantes
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="horario-tab" data-bs-toggle="tab" data-bs-target="#horario" type="button">
+                <i class="fas fa-calendar-alt me-2"></i>Horario
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="materiales-tab" data-bs-toggle="tab" data-bs-target="#materiales" type="button">
+                <i class="fas fa-folder-open me-2"></i>Materiales
+            </button>
+        </li>
+    </ul>
+
+    <!-- Contenido de las pestañas -->
+    <div class="tab-content" id="asignaturaTabsContent">
+        <!-- Pestaña General -->
+        <div class="tab-pane fade show active" id="general">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-info-circle me-2 text-primary"></i>Información de la Asignatura</h5>
+                            <div class="table-responsive">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td class="text-muted" style="width: 40%"><i class="fas fa-hashtag me-2"></i>Código:</td>
+                                        <td><span class="badge bg-light text-primary border border-primary">{{ asignatura.codigo }}</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted"><i class="fas fa-chalkboard-teacher me-2"></i>Profesor:</td>
+                                        <td>{{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted"><i class="fas fa-user-graduate me-2"></i>Total Estudiantes:</td>
+                                        <td>{{ estudiantes|length }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted"><i class="fas fa-clock me-2"></i>Total Clases:</td>
+                                        <td>{{ clases|length }}</td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <p><strong>Total Estudiantes:</strong> {{ estudiantes|length }}</p>
-                            <p><strong>Total Clases:</strong> {{ clases|length }}</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-chart-line me-2 text-success"></i>Estadísticas (Prototipo)</h5>
+                            <div class="row text-center">
+                                <div class="col-6 mb-3">
+                                    <div class="p-3 bg-light rounded">
+                                        <h3 class="text-primary mb-0">85%</h3>
+                                        <small class="text-muted">Asistencia Promedio</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <div class="p-3 bg-light rounded">
+                                        <h3 class="text-success mb-0">6.2</h3>
+                                        <small class="text-muted">Promedio General</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Horario de Clases -->
-            <div class="card mb-4">
+        <!-- Pestaña Estudiantes -->
+        <div class="tab-pane fade" id="estudiantes">
+            <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Horario de Clases</h5>
-                    {% if clases %}
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Día</th>
-                                        <th>Horario</th>
-                                        <th>Sala</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for clase in clases %}
-                                    <tr>
-                                        <td>{{ clase.fecha }}</td>
-                                        <td>{{ clase.horario }}</td>
-                                        <td>{{ clase.sala }}</td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <p>No hay clases registradas para esta asignatura.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Lista de Estudiantes -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Estudiantes Inscritos</h5>
+                    <h5 class="card-title"><i class="fas fa-user-friends me-2 text-primary"></i>Estudiantes Inscritos</h5>
                     {% if estudiantes %}
                         <div class="table-responsive">
-                            <table class="table">
-                                <thead>
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
                                     <tr>
-                                        <th>Nombre</th>
-                                        <th>Curso</th>
-                                        <th>RUT</th>
-                                        <th>Correo Electrónico</th>
+                                        <th><i class="fas fa-user me-2"></i>Nombre</th>
+                                        <th><i class="fas fa-graduation-cap me-2"></i>Curso</th>
+                                        <th><i class="fas fa-id-card me-2"></i>RUT</th>
+                                        <th><i class="fas fa-envelope me-2"></i>Correo Electrónico</th>
+                                        <th><i class="fas fa-chart-line me-2"></i>Rendimiento</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for estudiante in estudiantes %}
                                     <tr>
-                                        <td>{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }} {{ estudiante.usuario.apellido_materno }}</td>
-                                        <td>{{ estudiante.curso }}</td>
-                                        <td>{{ estudiante.usuario.rut }}</td>
+                                        <td>{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }}</td>
+                                        <td><span class="badge bg-info">{{ estudiante.curso }}</span></td>
+                                        <td>{{ estudiante.usuario.rut }}-{{ estudiante.usuario.div }}</td>
                                         <td>{{ estudiante.usuario.email }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
+                                            </div>
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
                     {% else %}
-                        <p>No hay estudiantes inscritos en esta asignatura.</p>
+                        <p class="text-muted">No hay estudiantes inscritos en esta asignatura.</p>
                     {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña Horario -->
+        <div class="tab-pane fade" id="horario">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-calendar-alt me-2 text-primary"></i>Horario de Clases</h5>
+                    {% if clases %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th><i class="fas fa-calendar-day me-2"></i>Día</th>
+                                        <th><i class="fas fa-clock me-2"></i>Horario</th>
+                                        <th><i class="fas fa-door-open me-2"></i>Sala</th>
+                                        <th><i class="fas fa-users me-2"></i>Curso</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for clase in clases %}
+                                    <tr>
+                                        <td><span class="badge bg-info">{{ clase.fecha }}</span></td>
+                                        <td>{{ clase.horario }}</td>
+                                        <td>{{ clase.sala }}</td>
+                                        <td>
+                                            {% if clase.curso %}
+                                                <span class="badge bg-primary">{{ clase.curso.nivel }}°{{ clase.curso.letra }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Electivo</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No hay clases registradas para esta asignatura.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña Materiales -->
+        <div class="tab-pane fade" id="materiales">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-folder-open me-2 text-warning"></i>Materiales de la Asignatura</h5>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-file-pdf me-2 text-danger"></i>Guía 1</h6>
+                                    <p class="text-muted small mb-2">Subido el 15/03/2024</p>
+                                    <button class="btn btn-sm btn-outline-primary w-100">
+                                        <i class="fas fa-download me-2"></i>Descargar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-file-powerpoint me-2 text-warning"></i>Presentación Clase 2</h6>
+                                    <p class="text-muted small mb-2">Subido el 18/03/2024</p>
+                                    <button class="btn btn-sm btn-outline-primary w-100">
+                                        <i class="fas fa-download me-2"></i>Descargar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .bg-gradient-dark {
+        background: linear-gradient(45deg, #2c3e50, #1a252f);
+    }
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.75);
+    }
+    .card {
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    .nav-tabs .nav-link {
+        color: #6c757d;
+    }
+    .nav-tabs .nav-link.active {
+        color: #4e73df;
+        font-weight: 600;
+    }
+    .table > :not(caption) > * > * {
+        padding: 1rem;
+    }
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 10px;
+    }
+</style>
 {% endblock %} 

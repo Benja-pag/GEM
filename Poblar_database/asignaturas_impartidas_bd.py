@@ -156,6 +156,7 @@ asignaturas_impartidas_data = [
     ("ING4B", "Inglés", "17999999", 4, "B", [("MIERCOLES", "4"), ("JUEVES", "3")]),
     ("EDU4B", "Educación Física", "17121212", 4, "B", [("MARTES", "3"), ("JUEVES", "4")]),
     ("FIL4B", "Filosofía", "18913579", 4, "B", [("LUNES", "6"), ("VIERNES", "1")])
+
 ]
 
 # Mapeo de equivalencias entre asignaturas y especialidades
@@ -259,7 +260,7 @@ def crear_asignaturas_impartidas():
             letra = data[4]
             horarios = data[5]
             sala = data[6] if len(data) > 6 else get_sala_por_curso(nivel, letra)
-
+            
             # Verificar especialidad usando el nuevo sistema de equivalencias
             especialidad_docente = docentes_especialidad.get(rut_docente, None)
             if especialidad_docente is None or not verificar_especialidad_docente(nombre_asignatura, especialidad_docente):
@@ -280,7 +281,7 @@ def crear_asignaturas_impartidas():
 
             docente = Docente.objects.get(usuario__rut=rut_docente)
             curso = Curso.objects.get(nivel=nivel, letra=letra)
-
+            
             asignatura_impartida, created = AsignaturaImpartida.objects.get_or_create(
                 codigo=codigo,
                 defaults={
@@ -288,7 +289,7 @@ def crear_asignaturas_impartidas():
                     'docente': docente
                 }
             )
-
+            
             clases_creadas = 0
             for dia, horario in horarios_filtrados:
                 if dia == "VIERNES" and horario in ["7", "8", "9"]:
@@ -307,7 +308,7 @@ def crear_asignaturas_impartidas():
                         clases_creadas += 1
                 else:
                     print(f"⚠️ Conflicto en {codigo}: {mensaje}")
-            
+                    
             if clases_creadas > 0:
                 asignaturas_creadas += 1
                 print(f"✅ Creada asignatura {codigo} ({nombre_asignatura}) con {clases_creadas} clases")

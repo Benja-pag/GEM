@@ -30,7 +30,7 @@ for nombre in especialidades_nombres:
 
 # Crear docentes
 docentes_data = [
-    {'rut': '15345638', 'div': '9','nombre': 'Juan', 'apellido_paterno': 'Perez', 'apellido_materno': 'Lopez','correo': 'juan.perez@gem.cl', 'telefono': '111111111','direccion': 'Calle Falsa 123', 'fecha_nacimiento': date(1980, 5, 10),'especialidad': especialidades[0], 'password': 'JPerez', 'es_profesor_jefe': True},
+    {'rut': '15345638', 'div': '9','nombre': 'Juan', 'apellido_paterno': 'Perez', 'apellido_materno': 'Lopez','correo': 'juan.perez@gem.cl', 'telefono': '111111111','direccion': 'Calle Falsa 123', 'fecha_nacimiento': date(1980, 5, 10),'especialidad': especialidades[2], 'password': 'JPerez', 'es_profesor_jefe': True},
     {'rut': '15456786', 'div': '5','nombre': 'Maria', 'apellido_paterno': 'Gonzalez', 'apellido_materno': 'Ruiz','correo': 'maria.gonzalez@gem.cl', 'telefono': '222222222','direccion': 'Av. Siempre Viva 742', 'fecha_nacimiento': date(1985, 8, 20),'especialidad': especialidades[1], 'password': 'MGonzalez', 'es_profesor_jefe': True},
     {'rut': '15654321', 'div': '2','nombre': 'Pedro', 'apellido_paterno': 'Sanchez', 'apellido_materno': 'Torres','correo': 'pedro.sanchez@gem.cl', 'telefono': '333333333','direccion': 'Calle Uno 111', 'fecha_nacimiento': date(1982, 6, 18),'especialidad': especialidades[1], 'password': 'PSanchez', 'es_profesor_jefe': True},
     {'rut': '15543210', 'div': '4','nombre': 'Lucia', 'apellido_paterno': 'Martinez', 'apellido_materno': 'Diaz','correo': 'lucia.martinez@gem.cl', 'telefono': '444444444','direccion': 'Calle Dos 222', 'fecha_nacimiento': date(1987, 9, 30),'especialidad': especialidades[2], 'password': 'LMartinez', 'es_profesor_jefe': True},

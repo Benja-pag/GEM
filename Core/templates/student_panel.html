@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load horario_tags %}
 
 {% block content %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar-bootstrap5@6.1.10/main.min.css' rel='stylesheet' />
+
 {% if user.is_authenticated %}
 <div class="container-fluid mt-4">
     <!-- Encabezado con información del estudiante -->
@@ -82,6 +85,11 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
+            <button class="nav-link" id="horario-tab" data-bs-toggle="tab" data-bs-target="#horario" type="button">
+                <i class="fas fa-clock me-2"></i>Mi Horario
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
             <button class="nav-link" id="calificaciones-tab" data-bs-toggle="tab" data-bs-target="#calificaciones" type="button">
                 <i class="fas fa-chart-bar me-2"></i>Calificaciones
             </button>
@@ -130,6 +138,184 @@
                     </div>
                 </div>
                 {% endfor %}
+            </div>
+        </div>
+
+        <!-- Pestaña de Horario -->
+        <div class="tab-pane fade" id="horario">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-clock me-2 text-primary"></i>Mi Horario Semanal</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th style="width: 120px;">Horario</th>
+                                    <th>Lunes</th>
+                                    <th>Martes</th>
+                                    <th>Miércoles</th>
+                                    <th>Jueves</th>
+                                    <th>Viernes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Bloque 1: 08:00 - 08:45 -->
+                                <tr>
+                                    <td class="text-center fw-bold bg-light">08:00 - 08:45</td>
+                                    {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                        <td class="text-center">
+                                            {% if horario_estudiante|get_item:dia|get_item:"1" %}
+                                                <div class="clase-item p-2 rounded">
+                                                    <strong>{{ horario_estudiante|get_item:dia|get_item:"1"|get_item:"asignatura" }}</strong><br>
+                                                    <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"1"|get_item:"docente" }}</small><br>
+                                                    <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"1"|get_item:"sala" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <!-- Bloque 2: 08:45 - 09:30 -->
+                                <tr>
+                                    <td class="text-center fw-bold bg-light">08:45 - 09:30</td>
+                                    {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                        <td class="text-center">
+                                            {% if horario_estudiante|get_item:dia|get_item:"2" %}
+                                                <div class="clase-item p-2 rounded">
+                                                    <strong>{{ horario_estudiante|get_item:dia|get_item:"2"|get_item:"asignatura" }}</strong><br>
+                                                    <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"2"|get_item:"docente" }}</small><br>
+                                                    <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"2"|get_item:"sala" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <!-- Recreo 1: 09:30 - 09:45 -->
+                                <tr class="table-warning">
+                                    <td class="text-center fw-bold">09:30 - 09:45</td>
+                                    <td colspan="5" class="text-center fw-bold">RECREO</td>
+                                </tr>
+                                <!-- Bloque 3: 09:45 - 10:30 -->
+                                <tr>
+                                    <td class="text-center fw-bold bg-light">09:45 - 10:30</td>
+                                    {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                        <td class="text-center">
+                                            {% if horario_estudiante|get_item:dia|get_item:"3" %}
+                                                <div class="clase-item p-2 rounded">
+                                                    <strong>{{ horario_estudiante|get_item:dia|get_item:"3"|get_item:"asignatura" }}</strong><br>
+                                                    <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"3"|get_item:"docente" }}</small><br>
+                                                    <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"3"|get_item:"sala" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <!-- Bloque 4: 10:30 - 11:15 -->
+                                <tr>
+                                    <td class="text-center fw-bold bg-light">10:30 - 11:15</td>
+                                    {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                        <td class="text-center">
+                                            {% if horario_estudiante|get_item:dia|get_item:"4" %}
+                                                <div class="clase-item p-2 rounded">
+                                                    <strong>{{ horario_estudiante|get_item:dia|get_item:"4"|get_item:"asignatura" }}</strong><br>
+                                                    <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"4"|get_item:"docente" }}</small><br>
+                                                    <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"4"|get_item:"sala" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <!-- Recreo 2: 11:15 - 11:30 -->
+                                <tr class="table-warning">
+                                    <td class="text-center fw-bold">11:15 - 11:30</td>
+                                    <td colspan="5" class="text-center fw-bold">RECREO</td>
+                                </tr>
+                                <!-- Bloque 5: 11:30 - 12:15 -->
+                                <tr>
+                                    <td class="text-center fw-bold bg-light">11:30 - 12:15</td>
+                                    {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                        <td class="text-center">
+                                            {% if horario_estudiante|get_item:dia|get_item:"5" %}
+                                                <div class="clase-item p-2 rounded">
+                                                    <strong>{{ horario_estudiante|get_item:dia|get_item:"5"|get_item:"asignatura" }}</strong><br>
+                                                    <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"5"|get_item:"docente" }}</small><br>
+                                                    <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"5"|get_item:"sala" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <!-- Bloque 6: 12:15 - 13:00 -->
+                                <tr>
+                                    <td class="text-center fw-bold bg-light">12:15 - 13:00</td>
+                                    {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                        <td class="text-center">
+                                            {% if horario_estudiante|get_item:dia|get_item:"6" %}
+                                                <div class="clase-item p-2 rounded">
+                                                    <strong>{{ horario_estudiante|get_item:dia|get_item:"6"|get_item:"asignatura" }}</strong><br>
+                                                    <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"6"|get_item:"docente" }}</small><br>
+                                                    <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"6"|get_item:"sala" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <!-- Almuerzo: 13:00 - 13:45 -->
+                                <tr class="table-success">
+                                    <td class="text-center fw-bold">13:00 - 13:45</td>
+                                    <td colspan="5" class="text-center fw-bold">ALMUERZO</td>
+                                </tr>
+                                <!-- Bloque 7: 13:45 - 14:30 -->
+                                <tr>
+                                    <td class="text-center fw-bold bg-light">13:45 - 14:30</td>
+                                    {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES"|split:"," %}
+                                        <td class="text-center">
+                                            {% if horario_estudiante|get_item:dia|get_item:"7" %}
+                                                <div class="clase-item p-2 rounded">
+                                                    <strong>{{ horario_estudiante|get_item:dia|get_item:"7"|get_item:"asignatura" }}</strong><br>
+                                                    <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"7"|get_item:"docente" }}</small><br>
+                                                    <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"7"|get_item:"sala" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                    <td class="text-center text-muted">-</td>
+                                </tr>
+                                <!-- Bloque 8: 14:30 - 15:15 -->
+                                <tr>
+                                    <td class="text-center fw-bold bg-light">14:30 - 15:15</td>
+                                    {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES"|split:"," %}
+                                        <td class="text-center">
+                                            {% if horario_estudiante|get_item:dia|get_item:"8" %}
+                                                <div class="clase-item p-2 rounded">
+                                                    <strong>{{ horario_estudiante|get_item:dia|get_item:"8"|get_item:"asignatura" }}</strong><br>
+                                                    <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"8"|get_item:"docente" }}</small><br>
+                                                    <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"8"|get_item:"sala" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                    <td class="text-center text-muted">-</td>
+                                </tr>
+                                <!-- Bloque 9: 15:15 - 16:00 -->
+                                <tr>
+                                    <td class="text-center fw-bold bg-light">15:15 - 16:00</td>
+                                    {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES"|split:"," %}
+                                        <td class="text-center">
+                                            {% if horario_estudiante|get_item:dia|get_item:"9" %}
+                                                <div class="clase-item p-2 rounded">
+                                                    <strong>{{ horario_estudiante|get_item:dia|get_item:"9"|get_item:"asignatura" }}</strong><br>
+                                                    <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"9"|get_item:"docente" }}</small><br>
+                                                    <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"9"|get_item:"sala" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                    <td class="text-center text-muted">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -224,35 +410,93 @@
             </div>
         </div>
 
-        <!-- Pestaña de Calendario -->
+        <!-- Pestaña de Calendario con Calendario Estático Bootstrap -->
         <div class="tab-pane fade" id="calendario">
             <div class="row">
-                <div class="col-md-8">
+                <!-- Columna del Calendario -->
+                <div class="col-lg-9">
                     <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <div id="calendar"></div>
+                        <div class="card-header bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                    <strong>Junio 2024</strong>
+                                </h5>
+                                <div class="btn-group">
+                                    <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-left"></i></button>
+                                    <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-2">
+                            <table class="table table-bordered calendar-table">
+                                <thead class="text-center">
+                                    <tr>
+                                        <th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-muted">27</td><td class="text-muted">28</td><td class="text-muted">29</td><td class="text-muted">30</td><td class="text-muted">31</td><td>1</td><td>2</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td><td>4</td><td>5<div class="calendar-event bg-success">Prueba</div></td><td>6</td><td>7</td><td>8</td><td>9</td>
+                                    </tr>
+                                    <tr>
+                                        <td>10</td><td>11</td><td>12</td><td>13</td><td>14<div class="calendar-event bg-info text-dark">Día del Alumno</div></td><td>15</td><td>16</td>
+                                    </tr>
+                                    <tr>
+                                        <td>17</td><td>18</td><td>19</td><td class="today">20</td><td>21</td><td>22</td><td>23</td>
+                                    </tr>
+                                    <tr>
+                                        <td>24</td><td>25</td><td>26<div class="calendar-event bg-warning text-dark">Entrega Informe</div></td><td>27</td><td>28</td><td>29</td><td>30</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">1</td><td class="text-muted">2</td><td class="text-muted">3</td><td class="text-muted">4</td><td class="text-muted">5</td><td class="text-muted">6</td><td class="text-muted">7</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm mb-3">
+                <!-- Columna de Información Adicional -->
+                <div class="col-lg-3">
+                    <div class="card border-0 shadow-sm mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">Próximos Eventos</h5>
+                            <h5 class="card-title mb-3"><i class="fas fa-star me-2 text-warning"></i>Próximos Eventos</h5>
                             <div class="list-group list-group-flush">
-                                <a href="#" class="list-group-item list-group-item-action">
+                                <a href="#" class="list-group-item list-group-item-action px-0">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">Prueba de Matemáticas</h6>
-                                        <small>22/03</small>
+                                        <h6 class="mb-1">Prueba</h6>
+                                        <small class="text-muted">05/06</small>
                                     </div>
-                                    <small class="text-muted">8:00 - 9:30</small>
+                                    <small class="badge bg-success-soft text-success">Evaluación</small>
                                 </a>
-                                <a href="#" class="list-group-item list-group-item-action">
+                                <a href="#" class="list-group-item list-group-item-action px-0">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">Entrega de Informe</h6>
-                                        <small>25/03</small>
+                                        <h6 class="mb-1">Día del Alumno</h6>
+                                        <small class="text-muted">14/06</small>
                                     </div>
-                                    <small class="text-muted">Fecha límite</small>
+                                    <small class="badge bg-info-soft text-info">Evento</small>
                                 </a>
+                                <a href="#" class="list-group-item list-group-item-action px-0">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Entrega Informe</h6>
+                                        <small class="text-muted">26/06</small>
+                                    </div>
+                                    <small class="badge bg-warning-soft text-warning">Tarea</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3"><i class="fas fa-tags me-2 text-primary"></i>Leyenda</h5>
+                            <div class="d-flex flex-column gap-2">
+                                <div class="d-flex align-items-center"><div class="legend-dot bg-success"></div>Evaluaciones</div>
+                                <div class="d-flex align-items-center"><div class="legend-dot bg-warning"></div>Tareas y Entregas</div>
+                                <div class="d-flex align-items-center"><div class="legend-dot bg-info"></div>Eventos</div>
+                                <div class="d-flex align-items-center"><div class="legend-dot bg-danger"></div>Avisos Importantes</div>
                             </div>
                         </div>
                     </div>
@@ -354,33 +598,109 @@
     .asignatura-bar {
         background: linear-gradient(180deg, #4e73df, #224abe);
     }
+    
+    /* Estilos para el horario */
+    .clase-item {
+        background: linear-gradient(135deg, #4e73df, #224abe);
+        color: white;
+        border-radius: 8px;
+        margin: 2px;
+        transition: all 0.3s ease;
+        min-height: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .clase-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(78, 115, 223, 0.3);
+    }
+    
+    .clase-item strong {
+        font-size: 0.85rem;
+        line-height: 1.2;
+    }
+    
+    .clase-item small {
+        font-size: 0.7rem;
+        opacity: 0.9;
+    }
+    
+    .clase-item .badge {
+        font-size: 0.6rem;
+        margin-top: 2px;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(78, 115, 223, 0.05);
+    }
+    
+    .table-primary th {
+        background-color: #4e73df !important;
+        color: white;
+        border-color: #224abe;
+    }
+    
+    .table-warning {
+        background-color: #fff3cd !important;
+    }
+    
+    .table-success {
+        background-color: #d1edff !important;
+    }
+    
+    .table-bordered td, .table-bordered th {
+        border-color: #dee2e6;
+        vertical-align: middle;
+    }
+    
+    /* Estilos para el calendario estático */
+    .calendar-table { table-layout: fixed; border-color: #f0f2f5; }
+    .calendar-table th { font-weight: 500; color: #6c757d; border-bottom: 2px solid #e9ecef; }
+    .calendar-table td {
+        height: 100px; vertical-align: top; padding: 6px; font-weight: 500; transition: background-color 0.2s ease; border-color: #f0f2f5;
+    }
+    .calendar-table td:hover { background-color: #f8f9fa; }
+    .calendar-table .today {
+        background-color: #e9f0ff; font-weight: 700; color: #4e73df;
+    }
+    .calendar-event {
+        font-size: 0.7rem; padding: 3px 6px; border-radius: 4px; margin-top: 4px; color: white; font-weight: 500; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 10px; }
+    .bg-success-soft { background-color: rgba(40, 167, 69, 0.1); }
+    .text-success { color: #1e7e34 !important; }
+    .bg-info-soft { background-color: rgba(23, 162, 184, 0.1); }
+    .text-info { color: #0c8599 !important; }
+    .bg-warning-soft { background-color: rgba(255, 193, 7, 0.1); }
+    .text-warning { color: #b98500 !important; }
 </style>
 
 <!-- Scripts para el prototipo -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales/es.global.min.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Simulación de gráfico de asistencia
-    const ctx = document.getElementById('asistenciaChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Presente', 'Ausente', 'Justificado'],
-            datasets: [{
-                data: [85, 10, 5],
-                backgroundColor: ['#28a745', '#dc3545', '#ffc107']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-
-    // Inicialización del calendario (simulado)
-    const calendarEl = document.getElementById('calendar');
-    if (calendarEl) {
-        // Aquí iría la inicialización del calendario
-        calendarEl.innerHTML = '<div class="text-center p-5"><i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i><p>Calendario de eventos</p></div>';
+    const ctx = document.getElementById('asistenciaChart');
+    if (ctx) {
+        new Chart(ctx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Presente', 'Ausente', 'Justificado'],
+                datasets: [{
+                    data: [85, 10, 5],
+                    backgroundColor: ['#28a745', '#dc3545', '#ffc107']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
     }
 });
 </script>

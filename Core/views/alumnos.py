@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.http import JsonResponse
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, AsignaturaInscrita
 from django.db.models import Count, Avg
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, DetailView
 from django.utils import timezone
@@ -19,6 +19,47 @@ from Core.servicios.repos.asignaturas import get_asignaturas_estudiante
 from Core.servicios.repos.cursos import get_estudiantes_por_curso
 from datetime import datetime
 
+def get_horario_estudiante(estudiante_id):
+    """
+    Obtiene el horario completo del estudiante basado en sus asignaturas inscritas
+    """
+    # Obtener las asignaturas inscritas del estudiante
+    asignaturas_inscritas = AsignaturaInscrita.objects.filter(
+        estudiante=estudiante_id,
+        validada=True
+    ).select_related(
+        'asignatura_impartida__asignatura',
+        'asignatura_impartida__docente__usuario'
+    )
+    
+    # Obtener todas las clases de las asignaturas inscritas
+    horario = {}
+    dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES']
+    bloques = ['1', '2', 'RECREO1', '3', '4', 'RECREO2', '5', '6', 'ALMUERZO', '7', '8', '9']
+    
+    # Inicializar el horario vacío
+    for dia in dias:
+        horario[dia] = {}
+        for bloque in bloques:
+            horario[dia][bloque] = None
+    
+    # Llenar el horario con las clases
+    for inscripcion in asignaturas_inscritas:
+        clases = Clase.objects.filter(
+            asignatura_impartida=inscripcion.asignatura_impartida
+        ).select_related('asignatura_impartida__asignatura', 'asignatura_impartida__docente__usuario')
+        
+        for clase in clases:
+            if clase.fecha in horario and clase.horario in horario[clase.fecha]:
+                horario[clase.fecha][clase.horario] = {
+                    'asignatura': clase.asignatura_impartida.asignatura.nombre,
+                    'docente': f"{clase.asignatura_impartida.docente.usuario.nombre} {clase.asignatura_impartida.docente.usuario.apellido_paterno}",
+                    'sala': clase.sala,
+                    'codigo': clase.asignatura_impartida.codigo
+                }
+    
+    return horario
+
 @method_decorator(login_required, name='dispatch')
 class EstudiantePanelView(View):
     def get(self, request):
@@ -30,7 +71,8 @@ class EstudiantePanelView(View):
         # asistencias = Asistencia.objects.filter(estudiante=estudiante)
         curso = usuario.estudiante.curso
         estudiantes_curso = get_estudiantes_por_curso(usuario.estudiante.curso_id)
-        asignaturas_estudiante = get_asignaturas_estudiante(usuario.pk)  
+        asignaturas_estudiante = get_asignaturas_estudiante(usuario.pk)
+        horario_estudiante = get_horario_estudiante(usuario.estudiante.usuario.auth_user_id)
         
         context = {
             # 'notas': notas,
@@ -38,7 +80,8 @@ class EstudiantePanelView(View):
             'alumno' : usuario,
             'curso' : curso,
             'estudiantes_curso': estudiantes_curso,
-            'asignaturas_estudiante': asignaturas_estudiante
+            'asignaturas_estudiante': asignaturas_estudiante,
+            'horario_estudiante': horario_estudiante
         }
         
         return render(request, 'student_panel.html', context)

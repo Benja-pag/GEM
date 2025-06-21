@@ -109,6 +109,11 @@
                 <i class="fas fa-comments me-2"></i>Comunicación
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="electivos-tab" data-bs-toggle="tab" data-bs-target="#electivos" type="button">
+                <i class="fas fa-star me-2"></i>Electivos
+            </button>
+        </li>
     </ul>
 
     <!-- Contenido de las pestañas -->
@@ -116,7 +121,7 @@
         <!-- Pestaña de Asignaturas -->
         <div class="tab-pane fade show active" id="asignaturas">
             <div class="row">
-                {% for asignatura in asignaturas_estudiante %}
+                {% for asignatura_inscrita in asignaturas_estudiante %}
                 <div class="col-12 mb-3">
                     <div class="card h-100 border-0 shadow-sm asignatura-card">
                         <div class="card-body d-flex align-items-center">
@@ -124,13 +129,16 @@
                             <div class="flex-grow-1">
                                 <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
                                     <div>
-                                        <h5 class="mb-1 fw-bold text-primary">{{ asignatura.asignatura_impartida.asignatura.nombre }}</h5>
-                                        <span class="badge bg-light text-primary border border-primary">{{ asignatura.asignatura_impartida.codigo }}</span>
+                                        <h5 class="mb-1 fw-bold text-primary">{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}</h5>
+                                        <span class="badge bg-light text-primary border border-primary">{{ asignatura_inscrita.asignatura_impartida.codigo }}</span>
                                     </div>
-                                    <div class="mt-2 mt-md-0">
-                                        <span class="text-muted small">
-                                            Prof. {{ asignatura.asignatura_impartida.docente.usuario.nombre }} {{ asignatura.asignatura_impartida.docente.usuario.apellido_paterno }}
+                                    <div class="mt-2 mt-md-0 d-flex align-items-center">
+                                        <span class="text-muted small me-3">
+                                            Prof. {{ asignatura_inscrita.asignatura_impartida.docente.usuario.nombre }} {{ asignatura_inscrita.asignatura_impartida.docente.usuario.apellido_paterno }}
                                         </span>
+                                        <button class="btn btn-primary btn-sm" onclick="entrarAsignatura('{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}', '{{ asignatura_inscrita.asignatura_impartida.codigo }}')">
+                                            <i class="fas fa-sign-in-alt me-1"></i>Entrar
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -321,51 +329,123 @@
 
         <!-- Pestaña de Calificaciones -->
         <div class="tab-pane fade" id="calificaciones">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Asignatura</th>
-                                    <th>Evaluación</th>
-                                    <th>Fecha</th>
-                                    <th>Nota</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Matemáticas</td>
-                                    <td>Prueba 1</td>
-                                    <td>15/03/2024</td>
-                                    <td>6.5</td>
-                                    <td><span class="badge bg-success">Aprobado</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Lenguaje</td>
-                                    <td>Control de Lectura</td>
-                                    <td>18/03/2024</td>
-                                    <td>7.0</td>
-                                    <td><span class="badge bg-success">Aprobado</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Historia</td>
-                                    <td>Próxima Evaluación</td>
-                                    <td>22/03/2024</td>
-                                    <td>-</td>
-                                    <td><span class="badge bg-warning">Pendiente</span></td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <div class="accordion" id="accordionCalificaciones">
+                {% for asignatura_inscrita in asignaturas_estudiante %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading-{{ forloop.counter }}">
+                            <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse-{{ forloop.counter }}">
+                                <i class="fas fa-book me-2 text-primary"></i>
+                                <strong>{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}</strong>
+                            </button>
+                        </h2>
+                        <div id="collapse-{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading-{{ forloop.counter }}" data-bs-parent="#accordionCalificaciones">
+                            <div class="accordion-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Evaluación</th>
+                                                <th>Fecha</th>
+                                                <th>Nota</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Prueba N°1</td>
+                                                <td>15/04/2024</td>
+                                                <td>
+                                                    <span class="badge bg-success fs-6">6.5</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-success fw-bold">Aprobado</span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Prueba N°2</td>
+                                                <td>10/05/2024</td>
+                                                <td>
+                                                    <span class="badge bg-danger fs-6">3.2</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-danger fw-bold">Reprobado</span>
+                                                </td>
+                                            </tr>
+                                             <tr>
+                                                <td>Trabajo Práctico</td>
+                                                <td>25/05/2024</td>
+                                                <td>
+                                                    <span class="badge bg-success fs-6">7.0</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-success fw-bold">Aprobado</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                {% empty %}
+                     <div class="alert alert-info mt-4" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Aún no tienes asignaturas inscritas.
+                    </div>
+                {% endfor %}
             </div>
         </div>
 
         <!-- Pestaña de Asistencia -->
         <div class="tab-pane fade" id="asistencia">
             <div class="row">
+                <!-- Asistencia por Asignatura -->
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar-check me-2"></i>Asistencia por Asignatura
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for asignatura_inscrita in asignaturas_estudiante %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card h-100 border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary">
+                                                <i class="fas fa-book me-2"></i>
+                                                {{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}
+                                            </h6>
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="text-muted small">Asistencia</span>
+                                                <span class="fw-bold text-success">95%</span>
+                                            </div>
+                                            <div class="progress mb-2" style="height: 8px;">
+                                                <div class="progress-bar bg-success" style="width: 95%"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between small text-muted">
+                                                <span>Presente: 19</span>
+                                                <span>Ausente: 1</span>
+                                            </div>
+                                            <div class="mt-2">
+                                                <small class="text-muted">Última clase: Ayer</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12 text-center text-muted py-4">
+                                    <i class="fas fa-calendar-check fa-3x mb-3"></i>
+                                    <p>No tienes asignaturas inscritas para mostrar asistencia</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registro de Asistencia -->
                 <div class="col-md-8">
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-body">
@@ -507,26 +587,157 @@
         <!-- Pestaña de Comunicación -->
         <div class="tab-pane fade" id="comunicacion">
             <div class="row">
+                <!-- Chats por Asignatura -->
                 <div class="col-md-4">
                     <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-comments me-2"></i>Chats por Asignatura
+                            </h5>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Chats Activos</h5>
+                            <div class="list-group list-group-flush">
+                                {% for asignatura_inscrita in asignaturas_estudiante %}
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-comments text-primary"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}</h6>
+                                            <small class="text-muted">
+                                                Prof. {{ asignatura_inscrita.asignatura_impartida.docente.usuario.nombre }} {{ asignatura_inscrita.asignatura_impartida.docente.usuario.apellido_paterno }}
+                                            </small>
+                                            <br>
+                                            <small class="text-success">Último mensaje: hace 5 min</small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <span class="badge bg-danger rounded-pill">2</span>
+                                        </div>
+                                    </div>
+                                </a>
+                                {% empty %}
+                                <div class="text-center text-muted py-3">
+                                    <i class="fas fa-comments fa-2x mb-2"></i>
+                                    <p>No tienes asignaturas inscritas</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Foros por Asignatura -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-users me-2"></i>Foros por Asignatura
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                {% for asignatura_inscrita in asignaturas_estudiante %}
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-users text-success"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}</h6>
+                                            <small class="text-muted">
+                                                {{ asignatura_inscrita.asignatura_impartida.codigo }}
+                                            </small>
+                                            <br>
+                                            <small class="text-info">3 temas activos • 12 respuestas</small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <span class="badge bg-warning text-dark">Nuevo</span>
+                                        </div>
+                                    </div>
+                                </a>
+                                {% empty %}
+                                <div class="text-center text-muted py-3">
+                                    <i class="fas fa-users fa-2x mb-2"></i>
+                                    <p>No tienes asignaturas inscritas</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comunidad Escolar -->
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-school me-2"></i>Comunidad Escolar
+                            </h5>
+                        </div>
+                        <div class="card-body">
                             <div class="list-group list-group-flush">
                                 <a href="#" class="list-group-item list-group-item-action">
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-comments text-primary me-2"></i>
-                                        <div>
-                                            <h6 class="mb-0">Matemáticas</h6>
-                                            <small class="text-muted">Último mensaje: hace 5 min</small>
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-bullhorn text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">Anuncios Generales</h6>
+                                            <small class="text-muted">Comunicaciones oficiales</small>
+                                            <br>
+                                            <small class="text-info">5 anuncios nuevos</small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <span class="badge bg-danger rounded-pill">5</span>
                                         </div>
                                     </div>
                                 </a>
                                 <a href="#" class="list-group-item list-group-item-action">
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-comments text-primary me-2"></i>
-                                        <div>
-                                            <h6 class="mb-0">Lenguaje</h6>
-                                            <small class="text-muted">Último mensaje: hace 1 hora</small>
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-calendar-alt text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">Eventos Escolares</h6>
+                                            <small class="text-muted">Actividades y celebraciones</small>
+                                            <br>
+                                            <small class="text-info">Próximo: Día del Alumno</small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <span class="badge bg-success">Evento</span>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-question-circle text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">Dudas Generales</h6>
+                                            <small class="text-muted">Consultas sobre el colegio</small>
+                                            <br>
+                                            <small class="text-info">8 temas activos</small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <span class="badge bg-primary">Popular</span>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="fas fa-handshake text-info"></i>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-0">Centro de Estudiantes</h6>
+                                            <small class="text-muted">Representación estudiantil</small>
+                                            <br>
+                                            <small class="text-info">2 propuestas activas</small>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <span class="badge bg-warning text-dark">Votación</span>
                                         </div>
                                     </div>
                                 </a>
@@ -534,25 +745,201 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-8">
-                    <div class="card border-0 shadow-sm">
+            </div>
+        </div>
+
+        <!-- Pestaña de Electivos -->
+        <div class="tab-pane fade" id="electivos">
+            <div class="row">
+                <!-- Electivos Disponibles -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-star me-2"></i>Electivos Disponibles
+                            </h5>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Foros de Discusión</h5>
-                            <div class="list-group">
-                                <a href="#" class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">Dudas sobre Tarea de Matemáticas</h6>
-                                        <small>3 respuestas</small>
+                            <div class="row">
+                                <!-- Electivo 1 -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0 shadow-sm hover-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title text-primary mb-0">Programación Web</h6>
+                                                <span class="badge bg-success">Disponible</span>
+                                            </div>
+                                            <p class="card-text text-muted small">Desarrollo de aplicaciones web modernas</p>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user me-1"></i>Prof. María González
+                                                </small>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>Martes y Jueves 14:30-16:00
+                                                </small>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-users me-1"></i>15/25 cupos disponibles
+                                                </small>
+                                            </div>
+                                            <button class="btn btn-primary btn-sm w-100">
+                                                <i class="fas fa-plus me-1"></i>Inscribirse
+                                            </button>
+                                        </div>
                                     </div>
-                                    <p class="mb-1">Última actualización: hace 2 horas</p>
-                                </a>
-                                <a href="#" class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">Material de Estudio para Prueba</h6>
-                                        <small>5 respuestas</small>
+                                </div>
+
+                                <!-- Electivo 2 -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0 shadow-sm hover-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title text-primary mb-0">Arte Digital</h6>
+                                                <span class="badge bg-success">Disponible</span>
+                                            </div>
+                                            <p class="card-text text-muted small">Creación artística con herramientas digitales</p>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user me-1"></i>Prof. Carlos Ruiz
+                                                </small>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>Lunes y Miércoles 16:00-17:30
+                                                </small>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-users me-1"></i>8/20 cupos disponibles
+                                                </small>
+                                            </div>
+                                            <button class="btn btn-primary btn-sm w-100">
+                                                <i class="fas fa-plus me-1"></i>Inscribirse
+                                            </button>
+                                        </div>
                                     </div>
-                                    <p class="mb-1">Última actualización: hace 1 día</p>
-                                </a>
+                                </div>
+
+                                <!-- Electivo 3 -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0 shadow-sm hover-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title text-primary mb-0">Robótica</h6>
+                                                <span class="badge bg-warning text-dark">Próximamente</span>
+                                            </div>
+                                            <p class="card-text text-muted small">Construcción y programación de robots</p>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user me-1"></i>Prof. Ana Silva
+                                                </small>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>Viernes 13:00-15:30
+                                                </small>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-users me-1"></i>20 cupos disponibles
+                                                </small>
+                                            </div>
+                                            <button class="btn btn-secondary btn-sm w-100" disabled>
+                                                <i class="fas fa-clock me-1"></i>Próximamente
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Electivo 4 -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0 shadow-sm hover-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title text-primary mb-0">Fotografía</h6>
+                                                <span class="badge bg-danger">Completo</span>
+                                            </div>
+                                            <p class="card-text text-muted small">Técnicas de fotografía y edición</p>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user me-1"></i>Prof. Roberto Díaz
+                                                </small>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>Jueves 15:00-17:00
+                                                </small>
+                                            </div>
+                                            <div class="mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-users me-1"></i>0/15 cupos disponibles
+                                                </small>
+                                            </div>
+                                            <button class="btn btn-danger btn-sm w-100" disabled>
+                                                <i class="fas fa-times me-1"></i>Completo
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Lateral -->
+                <div class="col-lg-4">
+                    <!-- Mis Electivos Inscritos -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-check-circle me-2"></i>Mis Electivos
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Programación Web</h6>
+                                        <small class="text-muted">Prof. María González</small>
+                                    </div>
+                                    <span class="badge bg-success">Activo</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Arte Digital</h6>
+                                        <small class="text-muted">Prof. Carlos Ruiz</small>
+                                    </div>
+                                    <span class="badge bg-success">Activo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información Importante -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Información
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                <strong>Período de Inscripción:</strong><br>
+                                Hasta el 30 de junio
+                            </div>
+                            <div class="alert alert-info" role="alert">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                <strong>Recomendación:</strong><br>
+                                Puedes inscribirte en máximo 2 electivos
+                            </div>
+                            <div class="text-center">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-download me-1"></i>Descargar Horarios
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -703,6 +1090,133 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Función para entrar a la asignatura
+function entrarAsignatura(nombreAsignatura, codigoAsignatura) {
+    // Crear el modal dinámicamente
+    const modalHtml = `
+        <div class="modal fade" id="modalEntrarAsignatura" tabindex="-1" aria-labelledby="modalEntrarAsignaturaLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="modalEntrarAsignaturaLabel">
+                            <i class="fas fa-book me-2"></i>${nombreAsignatura}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <h4 class="text-primary mb-3">¿A qué sección quieres acceder?</h4>
+                                <p class="text-muted">Selecciona la opción que deseas explorar en ${nombreAsignatura}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('contenidos')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                                        <h5 class="card-title">Contenidos</h5>
+                                        <p class="card-text text-muted">Material de estudio, apuntes y recursos</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('evaluaciones')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-tasks fa-3x text-warning mb-3"></i>
+                                        <h5 class="card-title">Evaluaciones</h5>
+                                        <p class="card-text text-muted">Pruebas, trabajos y calificaciones</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('chat')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-comments fa-3x text-success mb-3"></i>
+                                        <h5 class="card-title">Chat</h5>
+                                        <p class="card-text text-muted">Comunicación directa con el profesor</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('foro')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-users fa-3x text-info mb-3"></i>
+                                        <h5 class="card-title">Foro</h5>
+                                        <p class="card-text text-muted">Discusiones y consultas con compañeros</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('asistencia')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-check fa-3x text-danger mb-3"></i>
+                                        <h5 class="card-title">Asistencia</h5>
+                                        <p class="card-text text-muted">Control de asistencia y justificaciones</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('horario')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-clock fa-3x text-secondary mb-3"></i>
+                                        <h5 class="card-title">Horario</h5>
+                                        <p class="card-text text-muted">Horarios de clases y actividades</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Información rápida:</strong> ${nombreAsignatura} (${codigoAsignatura}) - Prof. Juan Pérez
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" onclick="navegarSeccion('general')">
+                            <i class="fas fa-home me-1"></i>Página Principal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remover modal anterior si existe
+    const modalAnterior = document.getElementById('modalEntrarAsignatura');
+    if (modalAnterior) {
+        modalAnterior.remove();
+    }
+    
+    // Agregar el nuevo modal al body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('modalEntrarAsignatura'));
+    modal.show();
+}
+
+// Función para navegar a diferentes secciones
+function navegarSeccion(seccion) {
+    // Aquí puedes implementar la navegación real
+    console.log('Navegando a sección:', seccion);
+    
+    // Por ahora, mostrar un mensaje
+    alert(`Navegando a la sección: ${seccion}`);
+    
+    // Cerrar el modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modalEntrarAsignatura'));
+    if (modal) {
+        modal.hide();
+    }
+}
 </script>
 
 {% else %}

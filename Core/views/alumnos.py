@@ -18,6 +18,7 @@ from Core.servicios.helpers import validadores, serializadores
 from Core.servicios.repos.asignaturas import get_asignaturas_estudiante
 from Core.servicios.repos.cursos import get_estudiantes_por_curso
 from datetime import datetime
+from collections import defaultdict
 
 def get_horario_estudiante(estudiante_id):
     """
@@ -67,16 +68,14 @@ class EstudiantePanelView(View):
             messages.error(request, 'No tienes permiso para acceder a esta página')
             return redirect('home')
         usuario = request.user.usuario
-        # notas = Nota.objects.filter(estudiante=estudiante)
-        # asistencias = Asistencia.objects.filter(estudiante=estudiante)
+        estudiante_obj = usuario.estudiante
+
         curso = usuario.estudiante.curso
         estudiantes_curso = get_estudiantes_por_curso(usuario.estudiante.curso_id)
         asignaturas_estudiante = get_asignaturas_estudiante(usuario.pk)
-        horario_estudiante = get_horario_estudiante(usuario.estudiante.usuario.auth_user_id)
+        horario_estudiante = get_horario_estudiante(estudiante_obj.usuario.auth_user_id)
         
         context = {
-            # 'notas': notas,
-            # 'asistencias': asistencias,
             'alumno' : usuario,
             'curso' : curso,
             'estudiantes_curso': estudiantes_curso,

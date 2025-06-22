@@ -73,7 +73,7 @@ class EstudiantePanelView(View):
         curso = usuario.estudiante.curso
         estudiantes_curso = get_estudiantes_por_curso(usuario.estudiante.curso_id)
         asignaturas_estudiante = get_asignaturas_estudiante(usuario.pk)
-        horario_estudiante = get_horario_estudiante(estudiante_obj.usuario.auth_user_id)
+        horario_estudiante = get_horario_estudiante(usuario.auth_user_id)
         
         context = {
             'alumno' : usuario,
@@ -97,7 +97,7 @@ class EstudiantePanelModularView(View):
         curso = usuario.estudiante.curso
         estudiantes_curso = get_estudiantes_por_curso(usuario.estudiante.curso_id)
         asignaturas_estudiante = get_asignaturas_estudiante(usuario.pk)
-        horario_estudiante = get_horario_estudiante(estudiante_obj.usuario.auth_user_id)
+        horario_estudiante = get_horario_estudiante(usuario.auth_user_id)
         
         context = {
             'alumno' : usuario,

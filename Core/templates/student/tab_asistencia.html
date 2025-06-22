@@ -1,0 +1,92 @@
+<!-- Pestaña de Asistencia -->
+<div class="tab-pane fade" id="asistencia">
+    <div class="row">
+        <!-- Asistencia por Asignatura -->
+        <div class="col-12 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-check me-2"></i>Asistencia por Asignatura
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for asignatura_inscrita in asignaturas_estudiante %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title text-primary">{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}</h6>
+                                    <div class="progress mb-2" style="height: 8px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 85%"></div>
+                                    </div>
+                                    <small class="text-muted">85% de asistencia</small>
+                                    <div class="mt-2">
+                                        <span class="badge bg-success me-1">17</span>
+                                        <small class="text-muted">presentes</small>
+                                        <span class="badge bg-danger ms-2 me-1">3</span>
+                                        <small class="text-muted">ausencias</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-info" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No tienes asignaturas inscritas para mostrar asistencia.
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial de Asistencia -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Historial de Asistencia
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Asignatura</th>
+                                    <th>Estado</th>
+                                    <th>Justificación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>18/03/2024</td>
+                                    <td>Matemáticas</td>
+                                    <td><span class="badge bg-success">Presente</span></td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>17/03/2024</td>
+                                    <td>Lenguaje</td>
+                                    <td><span class="badge bg-danger">Ausente</span></td>
+                                    <td>Médico</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Estadísticas</h5>
+                    <canvas id="asistenciaChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

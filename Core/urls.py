@@ -1,8 +1,8 @@
 from django.urls import path
 from Core.views import (
     HomeView, AdminPanelView, UserManagementView, UserCreateView, CalendarioView,
-    UserDetailView, UserUpdateView, UserDeleteView, ProfesorPanelView,
-    EstudiantePanelView, AttendanceView, LoginView, LogoutView,
+    UserDetailView, UserUpdateView, UserDeleteView, ProfesorPanelView, ProfesorPanelModularView,
+    EstudiantePanelView, EstudiantePanelModularView, AttendanceView, LoginView, LogoutView,
     RegisterView, CreateAdminView, ChangePasswordView,
     UserDataView, SurveysView, TasksView, TestsView, ToggleUserStatusView,
     CalendarioEventosView, CalendarioGuardarEventoView, CalendarioEliminarEventoView,
@@ -29,7 +29,9 @@ urlpatterns = [
     path('users/cleanup-auth/', CleanupAuthUsersView.as_view(), name='cleanup_auth_users'),
     
     path('profesor-panel/', ProfesorPanelView.as_view(), name='profesor_panel'),
+    path('profesor-panel-modular/', ProfesorPanelModularView.as_view(), name='profesor_panel_modular'),
     path('estudiante-panel/', EstudiantePanelView.as_view(), name='estudiante_panel'),
+    path('estudiante-panel-modular/', EstudiantePanelModularView.as_view(), name='estudiante_panel_modular'),
     path('attendance/', AttendanceView.as_view(), name='attendance'),
     path('create-admin/', CreateAdminView.as_view(), name='create_admin'),
     

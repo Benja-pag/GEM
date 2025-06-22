@@ -1,0 +1,130 @@
+<!-- Retroalimentación (prototipo) -->
+<div class="tab-pane fade" id="retro">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-comments me-2"></i>Generar Retroalimentación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="retroCurso" class="form-label">Curso</label>
+                                <select class="form-select" id="retroCurso">
+                                    <option>Selecciona un curso</option>
+                                    <option>2°A</option>
+                                    <option>3°B</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="retroAlumno" class="form-label">Estudiante</label>
+                                <select class="form-select" id="retroAlumno">
+                                    <option>Selecciona un estudiante</option>
+                                    <option>Juan Pérez</option>
+                                    <option>María González</option>
+                                    <option>Carlos Rodríguez</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="retroAsignatura" class="form-label">Asignatura</label>
+                            <select class="form-select" id="retroAsignatura">
+                                <option>Selecciona una asignatura</option>
+                                <option>Matemáticas</option>
+                                <option>Lenguaje</option>
+                                <option>Historia</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="retroTipo" class="form-label">Tipo de Retroalimentación</label>
+                            <select class="form-select" id="retroTipo">
+                                <option>Selecciona el tipo</option>
+                                <option>Evaluación específica</option>
+                                <option>Rendimiento general</option>
+                                <option>Comportamiento</option>
+                                <option>Áreas de mejora</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="retroTexto" class="form-label">Retroalimentación Personalizada</label>
+                            <textarea class="form-control" id="retroTexto" rows="4" placeholder="Escribe la retroalimentación personalizada o deja que la IA la genere..."></textarea>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary">
+                                <i class="fas fa-robot me-1"></i> Generar con IA
+                            </button>
+                            <button type="button" class="btn btn-outline-success">
+                                <i class="fas fa-paper-plane me-1"></i> Enviar
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="fas fa-save me-1"></i> Guardar Borrador
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Historial de Retroalimentaciones
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Juan Pérez - Matemáticas</h6>
+                                <small class="text-muted">Hace 2 días</small>
+                            </div>
+                            <p class="mb-1">Excelente progreso en álgebra...</p>
+                            <small class="text-success">Enviada</small>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">María González - Lenguaje</h6>
+                                <small class="text-muted">Hace 1 semana</small>
+                            </div>
+                            <p class="mb-1">Necesita mejorar en comprensión...</p>
+                            <small class="text-success">Enviada</small>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Carlos Rodríguez - Historia</h6>
+                                <small class="text-muted">Hace 2 semanas</small>
+                            </div>
+                            <p class="mb-1">Buen trabajo en el ensayo...</p>
+                            <small class="text-warning">Borrador</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Plantillas de Retroalimentación -->
+            <div class="card border-0 shadow-sm mt-3">
+                <div class="card-header bg-warning text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-copy me-2"></i>Plantillas Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-star me-1"></i>Excelente Trabajo
+                        </button>
+                        <button class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-arrow-up me-1"></i>Área de Mejora
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Necesita Apoyo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

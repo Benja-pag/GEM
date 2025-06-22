@@ -86,6 +86,30 @@ class EstudiantePanelView(View):
         return render(request, 'student_panel.html', context)
 
 @method_decorator(login_required, name='dispatch')
+class EstudiantePanelModularView(View):
+    def get(self, request):
+        if not hasattr(request.user.usuario, 'estudiante'):
+            messages.error(request, 'No tienes permiso para acceder a esta página')
+            return redirect('home')
+        usuario = request.user.usuario
+        estudiante_obj = usuario.estudiante
+
+        curso = usuario.estudiante.curso
+        estudiantes_curso = get_estudiantes_por_curso(usuario.estudiante.curso_id)
+        asignaturas_estudiante = get_asignaturas_estudiante(usuario.pk)
+        horario_estudiante = get_horario_estudiante(estudiante_obj.usuario.auth_user_id)
+        
+        context = {
+            'alumno' : usuario,
+            'curso' : curso,
+            'estudiantes_curso': estudiantes_curso,
+            'asignaturas_estudiante': asignaturas_estudiante,
+            'horario_estudiante': horario_estudiante
+        }
+        
+        return render(request, 'student_panel_modular.html', context)
+
+@method_decorator(login_required, name='dispatch')
 class AttendanceView(View):
     template_name = 'attendance.html'
     

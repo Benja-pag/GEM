@@ -1,0 +1,240 @@
+<!-- Pestaña de Comunicaciones -->
+<div class="tab-pane fade" id="comunicaciones" role="tabpanel" aria-labelledby="comunicaciones-tab">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-bullhorn me-2"></i>Nueva Comunicación</h5>
+                </div>
+                <div class="card-body">
+                    <form class="mt-3">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo de Comunicación</label>
+                                <select class="form-select">
+                                    <option>General</option>
+                                    <option>Urgente</option>
+                                    <option>Informativa</option>
+                                    <option>Recordatorio</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Prioridad</label>
+                                <select class="form-select">
+                                    <option>Baja</option>
+                                    <option>Media</option>
+                                    <option>Alta</option>
+                                    <option>Crítica</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Destinatarios</label>
+                            <select class="form-select" multiple>
+                                <option value="todos">Todos los Usuarios</option>
+                                <option value="estudiantes">Estudiantes</option>
+                                <option value="docentes">Docentes</option>
+                                <option value="administrativos">Administrativos</option>
+                                <option value="apoderados">Apoderados</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Asunto</label>
+                            <input type="text" class="form-control" placeholder="Ingrese el asunto de la comunicación">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mensaje</label>
+                            <textarea class="form-control" rows="5" placeholder="Escriba su mensaje aquí..."></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Programar Envío</label>
+                                <input type="datetime-local" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Adjuntos</label>
+                                <input type="file" class="form-control" multiple>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Enviar Comunicación
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="fas fa-save me-2"></i>Guardar Borrador
+                            </button>
+                            <button type="button" class="btn btn-outline-info">
+                                <i class="fas fa-eye me-2"></i>Vista Previa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-success text-white">
+                    <h6 class="card-title mb-0"><i class="fas fa-history me-2"></i>Comunicaciones Recientes</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Reunión de Apoderados</h6>
+                                <small class="text-danger">Urgente</small>
+                            </div>
+                            <p class="mb-1">Información sobre la próxima reunión...</p>
+                            <small class="text-muted">Enviado a: Todos los Apoderados</small>
+                            <br>
+                            <small class="text-muted">Hace 2 días</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Cambio de Horario</h6>
+                                <small class="text-warning">Media</small>
+                            </div>
+                            <p class="mb-1">Ajustes en el horario de clases...</p>
+                            <small class="text-muted">Enviado a: Docentes</small>
+                            <br>
+                            <small class="text-muted">Hace 5 días</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Mantenimiento Sistema</h6>
+                                <small class="text-info">Baja</small>
+                            </div>
+                            <p class="mb-1">Programado para el fin de semana...</p>
+                            <small class="text-muted">Enviado a: Todos los Usuarios</small>
+                            <br>
+                            <small class="text-muted">Hace 1 semana</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Plantillas de Comunicación -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h6 class="card-title mb-0"><i class="fas fa-copy me-2"></i>Plantillas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-calendar me-1"></i>Reunión de Apoderados
+                        </button>
+                        <button class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-clock me-1"></i>Cambio de Horario
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Emergencia
+                        </button>
+                        <button class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-info-circle me-1"></i>Información General
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Estadísticas de Comunicaciones -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Enviadas</h5>
+                    <h2 class="display-6">156</h2>
+                    <small>Este mes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Leídas</h5>
+                    <h2 class="display-6">142</h2>
+                    <small>91% de lectura</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Pendientes</h5>
+                    <h2 class="display-6">14</h2>
+                    <small>Por leer</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Respuestas</h5>
+                    <h2 class="display-6">23</h2>
+                    <small>Recibidas</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Configuración de Notificaciones -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h6 class="card-title mb-0"><i class="fas fa-bell me-2"></i>Configuración de Notificaciones</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Método de Envío</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" checked>
+                            <label class="form-check-label">Notificación en sistema</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" checked>
+                            <label class="form-check-label">Email</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox">
+                            <label class="form-check-label">SMS</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Horario de Envío</label>
+                        <select class="form-select">
+                            <option>Inmediato</option>
+                            <option>Horario laboral (8:00 - 18:00)</option>
+                            <option>Mañana (8:00 - 12:00)</option>
+                            <option>Tarde (12:00 - 18:00)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h6 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Análisis de Comunicaciones</h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tasa de Lectura por Tipo</label>
+                        <div class="progress mb-2" style="height: 20px;">
+                            <div class="progress-bar bg-primary" style="width: 95%">Generales 95%</div>
+                        </div>
+                        <div class="progress mb-2" style="height: 20px;">
+                            <div class="progress-bar bg-warning" style="width: 88%">Urgentes 88%</div>
+                        </div>
+                        <div class="progress mb-2" style="height: 20px;">
+                            <div class="progress-bar bg-info" style="width: 92%">Informativas 92%</div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <small class="text-muted">Promedio general: 91.7%</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

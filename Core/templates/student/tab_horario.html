@@ -1,0 +1,179 @@
+{% load horario_tags %}
+
+<!-- Pestaña de Horario -->
+<div class="tab-pane fade" id="horario">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-clock me-2 text-primary"></i>Mi Horario Semanal</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-primary">
+                        <tr>
+                            <th style="width: 120px;">Horario</th>
+                            <th>Lunes</th>
+                            <th>Martes</th>
+                            <th>Miércoles</th>
+                            <th>Jueves</th>
+                            <th>Viernes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Bloque 1: 08:00 - 08:45 -->
+                        <tr>
+                            <td class="text-center fw-bold bg-light">08:00 - 08:45</td>
+                            {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                <td class="text-center">
+                                    {% if horario_estudiante|get_item:dia|get_item:"1" %}
+                                        <div class="clase-item p-2 rounded">
+                                            <strong>{{ horario_estudiante|get_item:dia|get_item:"1"|get_item:"asignatura" }}</strong><br>
+                                            <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"1"|get_item:"docente" }}</small><br>
+                                            <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"1"|get_item:"sala" }}</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <!-- Bloque 2: 08:45 - 09:30 -->
+                        <tr>
+                            <td class="text-center fw-bold bg-light">08:45 - 09:30</td>
+                            {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                <td class="text-center">
+                                    {% if horario_estudiante|get_item:dia|get_item:"2" %}
+                                        <div class="clase-item p-2 rounded">
+                                            <strong>{{ horario_estudiante|get_item:dia|get_item:"2"|get_item:"asignatura" }}</strong><br>
+                                            <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"2"|get_item:"docente" }}</small><br>
+                                            <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"2"|get_item:"sala" }}</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <!-- Recreo 1: 09:30 - 09:45 -->
+                        <tr class="table-warning">
+                            <td class="text-center fw-bold">09:30 - 09:45</td>
+                            <td colspan="5" class="text-center fw-bold">RECREO</td>
+                        </tr>
+                        <!-- Bloque 3: 09:45 - 10:30 -->
+                        <tr>
+                            <td class="text-center fw-bold bg-light">09:45 - 10:30</td>
+                            {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                <td class="text-center">
+                                    {% if horario_estudiante|get_item:dia|get_item:"3" %}
+                                        <div class="clase-item p-2 rounded">
+                                            <strong>{{ horario_estudiante|get_item:dia|get_item:"3"|get_item:"asignatura" }}</strong><br>
+                                            <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"3"|get_item:"docente" }}</small><br>
+                                            <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"3"|get_item:"sala" }}</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <!-- Bloque 4: 10:30 - 11:15 -->
+                        <tr>
+                            <td class="text-center fw-bold bg-light">10:30 - 11:15</td>
+                            {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                <td class="text-center">
+                                    {% if horario_estudiante|get_item:dia|get_item:"4" %}
+                                        <div class="clase-item p-2 rounded">
+                                            <strong>{{ horario_estudiante|get_item:dia|get_item:"4"|get_item:"asignatura" }}</strong><br>
+                                            <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"4"|get_item:"docente" }}</small><br>
+                                            <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"4"|get_item:"sala" }}</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <!-- Recreo 2: 11:15 - 11:30 -->
+                        <tr class="table-warning">
+                            <td class="text-center fw-bold">11:15 - 11:30</td>
+                            <td colspan="5" class="text-center fw-bold">RECREO</td>
+                        </tr>
+                        <!-- Bloque 5: 11:30 - 12:15 -->
+                        <tr>
+                            <td class="text-center fw-bold bg-light">11:30 - 12:15</td>
+                            {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                <td class="text-center">
+                                    {% if horario_estudiante|get_item:dia|get_item:"5" %}
+                                        <div class="clase-item p-2 rounded">
+                                            <strong>{{ horario_estudiante|get_item:dia|get_item:"5"|get_item:"asignatura" }}</strong><br>
+                                            <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"5"|get_item:"docente" }}</small><br>
+                                            <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"5"|get_item:"sala" }}</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <!-- Bloque 6: 12:15 - 13:00 -->
+                        <tr>
+                            <td class="text-center fw-bold bg-light">12:15 - 13:00</td>
+                            {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES"|split:"," %}
+                                <td class="text-center">
+                                    {% if horario_estudiante|get_item:dia|get_item:"6" %}
+                                        <div class="clase-item p-2 rounded">
+                                            <strong>{{ horario_estudiante|get_item:dia|get_item:"6"|get_item:"asignatura" }}</strong><br>
+                                            <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"6"|get_item:"docente" }}</small><br>
+                                            <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"6"|get_item:"sala" }}</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <!-- Almuerzo: 13:00 - 13:45 -->
+                        <tr class="table-success">
+                            <td class="text-center fw-bold">13:00 - 13:45</td>
+                            <td colspan="5" class="text-center fw-bold">ALMUERZO</td>
+                        </tr>
+                        <!-- Bloque 7: 13:45 - 14:30 -->
+                        <tr>
+                            <td class="text-center fw-bold bg-light">13:45 - 14:30</td>
+                            {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES"|split:"," %}
+                                <td class="text-center">
+                                    {% if horario_estudiante|get_item:dia|get_item:"7" %}
+                                        <div class="clase-item p-2 rounded">
+                                            <strong>{{ horario_estudiante|get_item:dia|get_item:"7"|get_item:"asignatura" }}</strong><br>
+                                            <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"7"|get_item:"docente" }}</small><br>
+                                            <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"7"|get_item:"sala" }}</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                            <td class="text-center text-muted">-</td>
+                        </tr>
+                        <!-- Bloque 8: 14:30 - 15:15 -->
+                        <tr>
+                            <td class="text-center fw-bold bg-light">14:30 - 15:15</td>
+                            {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES"|split:"," %}
+                                <td class="text-center">
+                                    {% if horario_estudiante|get_item:dia|get_item:"8" %}
+                                        <div class="clase-item p-2 rounded">
+                                            <strong>{{ horario_estudiante|get_item:dia|get_item:"8"|get_item:"asignatura" }}</strong><br>
+                                            <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"8"|get_item:"docente" }}</small><br>
+                                            <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"8"|get_item:"sala" }}</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                            <td class="text-center text-muted">-</td>
+                        </tr>
+                        <!-- Bloque 9: 15:15 - 16:00 -->
+                        <tr>
+                            <td class="text-center fw-bold bg-light">15:15 - 16:00</td>
+                            {% for dia in "LUNES,MARTES,MIERCOLES,JUEVES"|split:"," %}
+                                <td class="text-center">
+                                    {% if horario_estudiante|get_item:dia|get_item:"9" %}
+                                        <div class="clase-item p-2 rounded">
+                                            <strong>{{ horario_estudiante|get_item:dia|get_item:"9"|get_item:"asignatura" }}</strong><br>
+                                            <small class="text-muted">{{ horario_estudiante|get_item:dia|get_item:"9"|get_item:"docente" }}</small><br>
+                                            <span class="badge bg-info">{{ horario_estudiante|get_item:dia|get_item:"9"|get_item:"sala" }}</span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                            <td class="text-center text-muted">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> 

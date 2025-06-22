@@ -1,0 +1,136 @@
+<!-- Evaluaciones (prototipo) -->
+<div class="tab-pane fade" id="evaluaciones">
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-warning text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clipboard-list me-2"></i>Gestión de Evaluaciones
+                </h5>
+                <button class="btn btn-light btn-sm">
+                    <i class="fas fa-plus me-1"></i>Nueva Evaluación
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Asignatura</th>
+                            <th>Evaluación</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Progreso</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Matemáticas</td>
+                            <td>Prueba 1</td>
+                            <td>15/04/2024</td>
+                            <td><span class="badge bg-success">Calificada</span></td>
+                            <td>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                                </div>
+                                <small class="text-muted">100% completado</small>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-pen"></i> Calificar
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i> Ver
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-robot"></i> IA
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Lenguaje</td>
+                            <td>Ensayo</td>
+                            <td>20/04/2024</td>
+                            <td><span class="badge bg-warning">Pendiente</span></td>
+                            <td>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-warning" style="width: 60%"></div>
+                                </div>
+                                <small class="text-muted">60% completado</small>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-pen"></i> Calificar
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i> Ver
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-robot"></i> IA
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Historia</td>
+                            <td>Control de Lectura</td>
+                            <td>25/04/2024</td>
+                            <td><span class="badge bg-info">En Proceso</span></td>
+                            <td>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-info" style="width: 30%"></div>
+                                </div>
+                                <small class="text-muted">30% completado</small>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-pen"></i> Calificar
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-eye"></i> Ver
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-robot"></i> IA
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Estadísticas de Evaluaciones -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-clipboard-check fa-2x text-success mb-2"></i>
+                    <h5>Evaluaciones Completadas</h5>
+                    <h2 class="text-success">12</h2>
+                    <small class="text-muted">Este semestre</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                    <h5>Pendientes de Calificar</h5>
+                    <h2 class="text-warning">3</h2>
+                    <small class="text-muted">Esta semana</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
+                    <h5>Promedio General</h5>
+                    <h2 class="text-info">6.7</h2>
+                    <small class="text-muted">De mis cursos</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

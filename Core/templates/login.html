@@ -26,6 +26,25 @@
 
                     <form method="post">
                         {% csrf_token %}
+                        
+                        <!-- Select para usuarios de prueba -->
+                        <div class="mb-3">
+                            <label for="usuario_prueba" class="form-label">Usuarios de Prueba (Opcional)</label>
+                            <select class="form-select" id="usuario_prueba" onchange="autocompletarUsuario()">
+                                <option value="">Selecciona un usuario para autocompletar</option>
+                                <option value="admin">Admin - admin@gem.cl</option>
+                                <option value="juan">Juan Pérez (Docente) - juan.perez@gem.cl</option>
+                                <option value="jorge1a">Jorge Torres (1°A) - jorge.torres@gem.cl</option>
+                                <option value="gabriel1b">Gabriel Saez (1°B) - gabriel.saeza@gem.cl</option>
+                                <option value="sofia2a">Sofia Ramirez (2°A) - sofia.ramirezL@gem.cl</option>
+                                <option value="diego2b">Diego Contreras (2°B) - diego.contrerasR@gem.cl</option>
+                                <option value="ignacio3a">Ignacio Torres (3°A) - ignacio.torresV@gem.cl</option>
+                                <option value="lucas3b">Lucas Martínez (3°B) - lucas.martinezL@gem.cl</option>
+                                <option value="valentina4a">Valentina Morales (4°A) - valentina.moralesF@gem.cl</option>
+                                <option value="isidora4b">Isidora Castillo (4°B) - isidora.castilloM@gem.cl</option>
+                            </select>
+                        </div>
+
                         <div class="mb-3">
                             <label for="correo" class="form-label">Correo Electrónico</label>
                             <input type="email" class="form-control" id="correo" name="correo" required>
@@ -38,9 +57,153 @@
                             <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
                         </div>
                     </form>
+
+                    <!-- Información de usuarios de prueba -->
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="text-muted mb-2">Información de Usuarios de Prueba:</h6>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <small class="text-muted">
+                                    <strong>Admin:</strong><br>
+                                    admin@gem.cl<br>
+                                    admin123
+                                </small>
+                            </div>
+                            <div class="col-md-3">
+                                <small class="text-muted">
+                                    <strong>Juan Pérez (Docente):</strong><br>
+                                    juan.perez@gem.cl<br>
+                                    JPerez
+                                </small>
+                            </div>
+                            <div class="col-md-3">
+                                <small class="text-muted">
+                                    <strong>Jorge Torres (1°A):</strong><br>
+                                    jorge.torres@gem.cl<br>
+                                    jtorres
+                                </small>
+                            </div>
+                            <div class="col-md-3">
+                                <small class="text-muted">
+                                    <strong>Gabriel Saez (1°B):</strong><br>
+                                    gabriel.saeza@gem.cl<br>
+                                    gsaez
+                                </small>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-3">
+                                <small class="text-muted">
+                                    <strong>Sofia Ramirez (2°A):</strong><br>
+                                    sofia.ramirezL@gem.cl<br>
+                                    sramirez
+                                </small>
+                            </div>
+                            <div class="col-md-3">
+                                <small class="text-muted">
+                                    <strong>Diego Contreras (2°B):</strong><br>
+                                    diego.contrerasR@gem.cl<br>
+                                    dcontreras
+                                </small>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-3">
+                                <small class="text-muted">
+                                    <strong>Ignacio Torres (3°A):</strong><br>
+                                    ignacio.torresV@gem.cl<br>
+                                    itorres
+                                </small>
+                            </div>
+                            <div class="col-md-3">
+                                <small class="text-muted">
+                                    <strong>Lucas Martínez (3°B):</strong><br>
+                                    lucas.martinezL@gem.cl<br>
+                                    lmartinez
+                                </small>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-3">
+                                <small class="text-muted">
+                                    <strong>Valentina Morales (4°A):</strong><br>
+                                    valentina.moralesF@gem.cl<br>
+                                    vmorales
+                                </small>
+                            </div>
+                            <div class="col-md-3">
+                                <small class="text-muted">
+                                    <strong>Isidora Castillo (4°B):</strong><br>
+                                    isidora.castilloM@gem.cl<br>
+                                    icastillo
+                                </small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+function autocompletarUsuario() {
+    const select = document.getElementById('usuario_prueba');
+    const correoInput = document.getElementById('correo');
+    const passwordInput = document.getElementById('password');
+    
+    const usuarios = {
+        'admin': {
+            correo: 'admin@gem.cl',
+            password: 'admin123'
+        },
+        'juan': {
+            correo: 'juan.perez@gem.cl',
+            password: 'JPerez'
+        },
+        'jorge1a': {
+            correo: 'jorge.torres@gem.cl',
+            password: 'jtorres'
+        },
+        'gabriel1b': {
+            correo: 'gabriel.saeza@gem.cl',
+            password: 'gsaez'
+        },
+        'sofia2a': {
+            correo: 'sofia.ramirezL@gem.cl',
+            password: 'sramirez'
+        },
+        'diego2b': {
+            correo: 'diego.contrerasR@gem.cl',
+            password: 'dcontreras'
+        },
+        'ignacio3a': {
+            correo: 'ignacio.torresV@gem.cl',
+            password: 'itorres'
+        },
+        'lucas3b': {
+            correo: 'lucas.martinezL@gem.cl',
+            password: 'lmartinez'
+        },
+        'valentina4a': {
+            correo: 'valentina.moralesF@gem.cl',
+            password: 'vmorales'
+        },
+        'isidora4b': {
+            correo: 'isidora.castilloM@gem.cl',
+            password: 'icastillo'
+        }
+    };
+    
+    const usuarioSeleccionado = select.value;
+    
+    if (usuarioSeleccionado && usuarios[usuarioSeleccionado]) {
+        correoInput.value = usuarios[usuarioSeleccionado].correo;
+        passwordInput.value = usuarios[usuarioSeleccionado].password;
+    } else {
+        correoInput.value = '';
+        passwordInput.value = '';
+    }
+}
+</script>
 {% endblock %}

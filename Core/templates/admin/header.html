@@ -1,0 +1,21 @@
+{% load static %}
+
+<!-- Barra Superior -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <div>
+        <h2 class="h3 mb-1"><i class="fas fa-user-shield me-2 text-primary"></i>Bienvenido {{ user.usuario.nombre }} {{ user.usuario.apellido_paterno }} {{ user.usuario.apellido_materno }}</h2>
+        <p class="text-muted mb-0" style="font-size:1.1rem;">
+            {% if user.is_admin %}
+                <i class="fas fa-crown text-warning me-1"></i> Administrador
+            {% endif %}
+        </p>
+    </div>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <form method="post" action="{% url 'logout' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger shadow-sm">
+                <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+            </button>
+        </form>
+    </div>
+</div> 

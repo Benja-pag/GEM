@@ -1,0 +1,290 @@
+<!-- Estilos personalizados -->
+<style>
+    .asignatura-card {
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .asignatura-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .hover-card {
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    }
+    
+    .clase-item {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+        margin: 2px;
+        font-size: 0.85rem;
+    }
+    
+    .chat-container {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+    
+    .message-content {
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+    
+    .message.sent .message-content {
+        background: linear-gradient(135deg, #007bff, #0056b3) !important;
+    }
+    
+    .message.received .message-content {
+        background: white !important;
+        border: 1px solid #dee2e6;
+    }
+    
+    .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .asignatura-bar {
+        background: linear-gradient(180deg, #4e73df, #224abe);
+    }
+    
+    .progress {
+        border-radius: 10px;
+        background-color: #e9ecef;
+    }
+    
+    .progress-bar {
+        border-radius: 10px;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background-color: #e7f1ff;
+        color: #0c63e4;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+    
+    .badge {
+        font-size: 0.75em;
+    }
+    
+    .card-header {
+        border-bottom: none;
+    }
+    
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+    }
+    
+    .list-group-item:first-child {
+        border-top: none;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+</style>
+
+<!-- Scripts -->
+<script>
+// Función para entrar a una asignatura
+function entrarAsignatura(nombreAsignatura, codigoAsignatura) {
+    // Crear el modal dinámicamente
+    const modalHtml = `
+        <div class="modal fade" id="modalEntrarAsignatura" tabindex="-1" aria-labelledby="modalEntrarAsignaturaLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalEntrarAsignaturaLabel">
+                            <i class="fas fa-book me-2 text-primary"></i>${nombreAsignatura}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('contenidos')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                                        <h5 class="card-title">Contenidos</h5>
+                                        <p class="card-text text-muted">Material de estudio, apuntes y recursos</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('evaluaciones')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-tasks fa-3x text-warning mb-3"></i>
+                                        <h5 class="card-title">Evaluaciones</h5>
+                                        <p class="card-text text-muted">Pruebas, trabajos y calificaciones</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('chat')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-comments fa-3x text-success mb-3"></i>
+                                        <h5 class="card-title">Chat</h5>
+                                        <p class="card-text text-muted">Comunicación directa con el profesor</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('foro')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-users fa-3x text-info mb-3"></i>
+                                        <h5 class="card-title">Foro</h5>
+                                        <p class="card-text text-muted">Discusiones y consultas con compañeros</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('asistencia')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-check fa-3x text-danger mb-3"></i>
+                                        <h5 class="card-title">Asistencia</h5>
+                                        <p class="card-text text-muted">Control de asistencia y justificaciones</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card h-100 border-0 shadow-sm hover-card" onclick="navegarSeccion('material')">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-download fa-3x text-secondary mb-3"></i>
+                                        <h5 class="card-title">Material</h5>
+                                        <p class="card-text text-muted">Descargar archivos y recursos</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remover modal anterior si existe
+    const existingModal = document.getElementById('modalEntrarAsignatura');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Agregar el nuevo modal al body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Mostrar el modal
+    const modal = new bootstrap.Modal(document.getElementById('modalEntrarAsignatura'));
+    modal.show();
+}
+
+// Función para navegar a diferentes secciones
+function navegarSeccion(seccion) {
+    // Aquí puedes implementar la navegación real
+    console.log('Navegando a sección:', seccion);
+    
+    // Por ahora, mostrar un mensaje
+    alert(`Navegando a la sección: ${seccion}`);
+    
+    // Cerrar el modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modalEntrarAsignatura'));
+    if (modal) {
+        modal.hide();
+    }
+}
+
+// Inicializar gráficos cuando se cargue la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Gráfico de asistencia (ejemplo con Chart.js)
+    const asistenciaChart = document.getElementById('asistenciaChart');
+    if (asistenciaChart) {
+        // Aquí puedes inicializar el gráfico con Chart.js
+        console.log('Gráfico de asistencia inicializado');
+    }
+    
+    // Inicializar calendario (ejemplo con FullCalendar)
+    const calendarEl = document.getElementById('calendar');
+    if (calendarEl) {
+        // Aquí puedes inicializar el calendario con FullCalendar
+        console.log('Calendario inicializado');
+    }
+});
+
+// Función para manejar la inscripción a electivos
+function inscribirseElectivo(electivoId) {
+    // Aquí puedes implementar la lógica de inscripción
+    console.log('Inscribiéndose al electivo:', electivoId);
+    alert('Inscripción procesada correctamente');
+}
+
+// Función para enviar mensajes en el chat
+function enviarMensaje() {
+    const input = document.querySelector('.chat-input input');
+    const mensaje = input.value.trim();
+    
+    if (mensaje) {
+        // Aquí puedes implementar la lógica para enviar el mensaje
+        console.log('Mensaje enviado:', mensaje);
+        input.value = '';
+        
+        // Agregar el mensaje al chat (ejemplo)
+        const chatMessages = document.querySelector('.chat-messages');
+        if (chatMessages) {
+            const nuevoMensaje = `
+                <div class="message sent mb-3 text-end">
+                    <div class="message-content bg-primary text-white p-3 rounded d-inline-block">
+                        <p class="mb-1">${mensaje}</p>
+                        <small class="text-white-75">Ahora</small>
+                    </div>
+                </div>
+            `;
+            chatMessages.insertAdjacentHTML('beforeend', nuevoMensaje);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Event listener para el botón de enviar mensaje
+    const sendButton = document.querySelector('.chat-input button');
+    if (sendButton) {
+        sendButton.addEventListener('click', enviarMensaje);
+    }
+    
+    // Event listener para la tecla Enter en el input del chat
+    const chatInput = document.querySelector('.chat-input input');
+    if (chatInput) {
+        chatInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                enviarMensaje();
+            }
+        });
+    }
+    
+    // Event listeners para botones de inscripción a electivos
+    const electivoButtons = document.querySelectorAll('.btn-outline-primary, .btn-outline-warning');
+    electivoButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const electivoId = this.closest('.card').dataset.electivoId;
+            inscribirseElectivo(electivoId);
+        });
+    });
+});
+</script> 

@@ -1,8 +1,9 @@
 import os
 import django
-from datetime import date
 import sys
-import unicodedata
+from datetime import date
+from itertools import product
+
 # Agrega el directorio raíz del proyecto al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -10,247 +11,277 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GEM.settings')
 django.setup()
 
-from django.contrib.auth.hashers import make_password
 from Core.models import (
-    AuthUser, Usuario, Especialidad, Docente, Administrativo, Curso, Estudiante, EvaluacionBase, Asignatura, AsignaturaImpartida, Clase, HorarioCurso
+    Clase, AsignaturaImpartida, Curso, Docente, Asignatura, Especialidad
 )
 
-def normalize_string(s):
-    # Normaliza (quita tildes) y convierte a minúsculas, eliminando espacios extra
-    return unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode('ascii').lower().strip()
-
-def verificar_conflictos(dia, horario, sala, docente, curso):
-    """
-    Verifica si hay conflictos de horario para una clase
-    """
-    # Verificar si el docente ya tiene clase en ese horario
-    clases_docente = Clase.objects.filter(
-        asignatura_impartida__docente=docente,
-        fecha=dia,
-        horario=horario
-    )
-    if clases_docente.exists():
-        return False, f"El docente {docente} ya tiene clase en {dia} horario {horario}"
-
-    # Verificar si la sala está ocupada (solo para salas especiales)
-    if sala in ['GIMNASIO', 'LAB_BIO', 'LAB_QUI', 'LAB_FIS', 'SALA_9', 'SALA_10']:
-        clases_sala = Clase.objects.filter(
-            fecha=dia,
-            horario=horario,
-            sala=sala
-        )
-        if clases_sala.exists():
-            return False, f"La sala {sala} ya está ocupada en {dia} horario {horario}"
-
-    # Verificar si el curso ya tiene clase
-    clases_curso = Clase.objects.filter(
-        curso=curso,
-        fecha=dia,
-        horario=horario
-    )
-    if clases_curso.exists():
-        return False, f"El curso {curso} ya tiene clase en {dia} horario {horario}"
-
-    return True, "No hay conflictos"
-
-def get_sala_por_curso(nivel, letra):
-    """
-    Asigna una sala fija según el nivel y letra del curso
-    """
-    return f"SALA_{(nivel-1)*2 + (1 if letra == 'A' else 2)}"
-
-# Datos de asignaturas impartidas con sus horarios
-asignaturas_impartidas_data = [
-    # 1°A
-    ("LEN1A", "Lenguaje", "15345638", 1, "A", [("LUNES", "6"), ("JUEVES", "1")]),
-    ("MAT1A", "Matemáticas", "15456786", 1, "A", [("JUEVES", "3"), ("MIERCOLES", "6")]),
-    ("HIS1A", "Historia", "16176543", 1, "A", [("MARTES", "3"), ("VIERNES", "6")]),
-    ("BIO1A", "Biología", "16376543", 1, "A", [("VIERNES", "2"), ("MIERCOLES", "1")]),
-    ("FÍS1A", "Física", "16476543", 1, "A", [("MARTES", "1"), ("MIERCOLES", "5")]),
-    ("QUÍ1A", "Química", "17776543", 1, "A", [("MIERCOLES", "4"), ("MARTES", "6")]),
-    ("ING1A", "Inglés", "17888888", 1, "A", [("LUNES", "2"), ("MARTES", "4")]),
-    ("EDU1A", "Educación Física", "17111111", 1, "A", [("MIERCOLES", "3"), ("LUNES", "1")]),
-    ("ART1A", "Arte", "18680246", 1, "A", [("VIERNES", "3"), ("JUEVES", "6")]),
-    ("MÚS1A", "Música", "20579136", 1, "A", [("LUNES", "3"), ("MARTES", "5")]),
-    ("TEC1A", "Tecnología", "18791357", 1, "A", [("LUNES", "5"), ("VIERNES", "1")]),
+def obtener_docentes_por_especialidad():
+    """Obtiene un diccionario con los docentes agrupados por especialidad"""
+    docentes_especialidad = {}
     
-    # 1°B
-    ("LEN1B", "Lenguaje", "15543210", 1, "B", [("LUNES", "1"), ("MIERCOLES", "6")]),
-    ("MAT1B", "Matemáticas", "15654321", 1, "B", [("LUNES", "2"), ("JUEVES", "4")]),
-    ("HIS1B", "Historia", "16176543", 1, "B", [("VIERNES", "1"), ("MARTES", "4")]),
-    ("BIO1B", "Biología", "16376543", 1, "B", [("LUNES", "5"), ("VIERNES", "6")]),
-    ("FÍS1B", "Física", "16476543", 1, "B", [("MIERCOLES", "1"), ("MARTES", "1")]),
-    ("QUÍ1B", "Química", "17776543", 1, "B", [("MARTES", "6"), ("JUEVES", "2")]),
-    ("ING1B", "Inglés", "17888888", 1, "B", [("JUEVES", "1"), ("MIERCOLES", "4")]),
-    ("EDU1B", "Educación Física", "17111111", 1, "B", [("MARTES", "3"), ("VIERNES", "3")]),
-    ("ART1B", "Arte", "18680246", 1, "B", [("MIERCOLES", "2"), ("JUEVES", "6")]),
-    ("MÚS1B", "Música", "20579136", 1, "B", [("LUNES", "6"), ("MIERCOLES", "3")]),
-    ("TEC1B", "Tecnología", "18791357", 1, "B", [("JUEVES", "3"), ("VIERNES", "2")]),
+    for docente in Docente.objects.select_related('especialidad', 'usuario').all():
+        especialidad = docente.especialidad.nombre
+        if especialidad not in docentes_especialidad:
+            docentes_especialidad[especialidad] = []
+        docentes_especialidad[especialidad].append(docente)
     
-    # 2°A
-    ("LEN2A", "Lenguaje", "15345638", 2, "A", [("LUNES", "1"), ("MIERCOLES", "6")]),
-    ("MAT2A", "Matemáticas", "21135792", 2, "A", [("MARTES", "1"), ("JUEVES", "2")]),
-    ("HIS2A", "Historia", "16176543", 2, "A", [("VIERNES", "1"), ("MIERCOLES", "2")]),
-    ("BIO2A", "Biología", "16376543", 2, "A", [("LUNES", "3"), ("VIERNES", "4")]),
-    ("FÍS2A", "Física", "16476543", 2, "A", [("MARTES", "4"), ("MIERCOLES", "1")]),
-    ("QUÍ2A", "Química", "20913579", 2, "A", [("JUEVES", "4"), ("VIERNES", "2")]),
-    ("ING2A", "Inglés", "17888888", 2, "A", [("MIERCOLES", "4"), ("LUNES", "5")]),
-    ("EDU2A", "Educación Física", "17121212", 2, "A", [("MARTES", "3"), ("JUEVES", "6")]),
-    ("ART2A", "Arte", "18680246", 2, "A", [("LUNES", "6"), ("VIERNES", "5")]),
-    ("MÚS2A", "Música", "20579136", 2, "A", [("MIERCOLES", "3"), ("JUEVES", "1")]),
-    ("TEC2A", "Tecnología", "18802468", 2, "A", [("JUEVES", "3"), ("VIERNES", "6")]),
-    
-    # 2°B
-    ("LEN2B", "Lenguaje", "15543210", 2, "B", [("LUNES", "1"), ("MIERCOLES", "6")]),
-    ("MAT2B", "Matemáticas", "15654321", 2, "B", [("MARTES", "1"), ("JUEVES", "2")]),
-    ("HIS2B", "Historia", "16321098", 2, "B", [("MIERCOLES", "1"), ("VIERNES", "2")]),
-    ("BIO2B", "Biología", "20802468", 2, "B", [("LUNES", "2"), ("JUEVES", "4")]),
-    ("FÍS2B", "Física", "16576543", 2, "B", [("MARTES", "4"), ("MIERCOLES", "2")]),
-    ("QUÍ2B", "Química", "17776543", 2, "B", [("VIERNES", "1"), ("MARTES", "3")]),
-    ("ING2B", "Inglés", "17999999", 2, "B", [("MIERCOLES", "4"), ("LUNES", "5")]),
-    ("EDU2B", "Educación Física", "17111111", 2, "B", [("JUEVES", "1"), ("VIERNES", "6")]),
-    ("ART2B", "Arte", "18579135", 2, "B", [("LUNES", "6"), ("VIERNES", "3")]),
-    ("MÚS2B", "Música", "20579136", 2, "B", [("MIERCOLES", "3"), ("JUEVES", "3")]),
-    ("TEC2B", "Tecnología", "18791357", 2, "B", [("JUEVES", "6"), ("VIERNES", "5")]),
-    
-    # 3°A
-    ("LEN3A", "Lenguaje", "15432109", 3, "A", [("LUNES", "1"), ("MIERCOLES", "6")]),
-    ("MAT3A", "Matemáticas", "15654321", 3, "A", [("MARTES", "1"), ("JUEVES", "2")]),
-    ("HIS3A", "Historia", "16321098", 3, "A", [("MIERCOLES", "1"), ("VIERNES", "2")]),
-    ("BIO3A", "Biología", "20802468", 3, "A", [("LUNES", "2"), ("JUEVES", "4")]),
-    ("FÍS3A", "Física", "16576543", 3, "A", [("MARTES", "4"), ("MIERCOLES", "2")]),
-    ("QUÍ3A", "Química", "16676543", 3, "A", [("VIERNES", "1"), ("MARTES", "3")]),
-    ("ING3A", "Inglés", "17999999", 3, "A", [("MIERCOLES", "4"), ("LUNES", "5")]),
-    ("EDU3A", "Educación Física", "17121212", 3, "A", [("JUEVES", "1"), ("VIERNES", "6")]),
-    ("FIL3A", "Filosofía", "18913579", 3, "A", [("LUNES", "6"), ("VIERNES", "3")]),
-    
-    # 3°B
-    ("LEN3B", "Lenguaje", "15432109", 3, "B", [("LUNES", "3"), ("MIERCOLES", "3")]),
-    ("MAT3B", "Matemáticas", "15654321", 3, "B", [("MARTES", "2"), ("JUEVES", "3")]),
-    ("HIS3B", "Historia", "16321098", 3, "B", [("LUNES", "4"), ("VIERNES", "5")]),
-    ("BIO3B", "Biología", "20802468", 3, "B", [("MARTES", "5"), ("MIERCOLES", "5")]),
-    ("FÍS3B", "Física", "16576543", 3, "B", [("LUNES", "5"), ("JUEVES", "5")]),
-    ("QUÍ3B", "Química", "16676543", 3, "B", [("MARTES", "6"), ("VIERNES", "4")]),
-    ("ING3B", "Inglés", "17999999", 3, "B", [("MIERCOLES", "6"), ("JUEVES", "6")]),
-    ("EDU3B", "Educación Física", "17121212", 3, "B", [("VIERNES", "1"), ("VIERNES", "6")]),
-    ("FIL3B", "Filosofía", "18913579", 3, "B", [("JUEVES", "6"), ("VIERNES", "2")]),
-    
-    # 4°A
-    ("LEN4A", "Lenguaje", "15345638", 4, "A", [("LUNES", "1"), ("MIERCOLES", "2")]),
-    ("MAT4A", "Matemáticas", "21135792", 4, "A", [("MARTES", "1"), ("JUEVES", "1")]),
-    ("HIS4A", "Historia", "16176543", 4, "A", [("LUNES", "2"), ("VIERNES", "2")]),
-    ("BIO4A", "Biología", "16376543", 4, "A", [("MIERCOLES", "1"), ("VIERNES", "3")]),
-    ("FIS4A", "Física", "16476543", 4, "A", [("JUEVES", "2"), ("VIERNES", "4")]),
-    ("QUI4A", "Química", "17776543", 4, "A", [("MARTES", "2"), ("VIERNES", "5")]),
-    ("ING4A", "Inglés", "17888888", 4, "A", [("MIERCOLES", "4"), ("JUEVES", "3")]),
-    ("EDU4A", "Educación Física", "17111111", 4, "A", [("MARTES", "3"), ("JUEVES", "4")]),
-    ("FIL4A", "Filosofía", "18913579", 4, "A", [("LUNES", "6"), ("VIERNES", "1")]),
-    
-    # 4°B
-    ("LEN4B", "Lenguaje", "15432109", 4, "B", [("LUNES", "1"), ("MIERCOLES", "2")]),
-    ("MAT4B", "Matemáticas", "15654321", 4, "B", [("MARTES", "1"), ("JUEVES", "1")]),
-    ("HIS4B", "Historia", "16321098", 4, "B", [("LUNES", "2"), ("VIERNES", "2")]),
-    ("BIO4B", "Biología", "16276543", 4, "B", [("MIERCOLES", "1"), ("VIERNES", "3")]),
-    ("FIS4B", "Física", "16576543", 4, "B", [("JUEVES", "2"), ("VIERNES", "4")]),
-    ("QUI4B", "Química", "20913579", 4, "B", [("MARTES", "2"), ("VIERNES", "5")]),
-    ("ING4B", "Inglés", "17999999", 4, "B", [("MIERCOLES", "4"), ("JUEVES", "3")]),
-    ("EDU4B", "Educación Física", "17121212", 4, "B", [("MARTES", "3"), ("JUEVES", "4")]),
-    ("FIL4B", "Filosofía", "18913579", 4, "B", [("LUNES", "6"), ("VIERNES", "1")])
-
-]
-
-# Mapeo de equivalencias entre asignaturas y especialidades
-asignatura_especialidad_equivalencias = {
-    'Lenguaje': ['Lenguaje', 'Literatura y Escritura Creativa'],
-    'Matemáticas': ['Matematicas', 'Matemáticas Discretas', 'Estadística y Análisis de Datos'],
-    'Historia': ['Historia', 'Historia del Arte y Cultura', 'Sociología y Estudios Sociales'],
-    'Biología': ['Biologia', 'Biología Avanzada', 'Ciencias de la Tierra y Medio Ambiente', 'Educación Ambiental y Sostenibilidad'],
-    'Física': ['Fisica', 'Física Aplicada', 'Astronomía y Ciencias del Espacio'],
-    'Química': ['Quimica', 'Química Experimental'],
-    'Inglés': ['Ingles'],
-    'Educación Física': ['Educación Fisica', 'Teatro y Expresión Corporal'],
-    'Arte': ['Arte', 'Historia del Arte y Cultura'],
-    'Música': ['Música y Composición'],
-    'Tecnología': ['Tecnologia', 'Tecnología e Innovación', 'Programación y Robótica'],
-    'Filosofía': ['Filosofía y Ética', 'Taller de Debate y Oratoria'],
-    'Psicología y Desarrollo Humano': ['Psicología y Desarrollo Humano'],
-    'Sociología y Estudios Sociales': ['Sociología y Estudios Sociales'],
-    'Física Aplicada': ['Física Aplicada', 'Fisica'],
-    'Matemática Avanzada': ['Matemáticas Discretas', 'Matematicas'],
-    'Literatura y Escritura Creativa': ['Literatura y Escritura Creativa', 'Lenguaje'],
-    'Biología Avanzada': ['Biología Avanzada', 'Biologia'],
-    'Química Experimental': ['Química Experimental', 'Quimica']
-}
+    return docentes_especialidad
 
 def verificar_especialidad_docente(nombre_asignatura, especialidad_docente):
-    """
-    Verifica si un docente puede impartir una asignatura basado en su especialidad
-    y las equivalencias definidas
-    """
-    nombre_asignatura = normalize_string(nombre_asignatura)
-    especialidad_docente = normalize_string(especialidad_docente)
-    
-    # Si la especialidad coincide exactamente
-    if nombre_asignatura == especialidad_docente:
-        return True
+    """Verifica si un docente puede impartir una asignatura según su especialidad"""
+    equivalencias = {
+        # Especialidades principales
+        "Matematicas": ["Matemáticas", "Matemática Avanzada", "Matemáticas Discretas", "Estadística y Análisis de Datos"],
+        "Matemáticas Discretas": ["Matemáticas", "Matemática Avanzada", "Matemáticas Discretas", "Estadística y Análisis de Datos"],
+        "Estadística y Análisis de Datos": ["Matemáticas", "Matemática Avanzada", "Matemáticas Discretas", "Estadística y Análisis de Datos"],
         
-    # Buscar en las equivalencias
-    for asignatura, especialidades in asignatura_especialidad_equivalencias.items():
-        if normalize_string(asignatura) == nombre_asignatura:
-            return any(normalize_string(esp) == especialidad_docente for esp in especialidades)
+        "Lenguaje": ["Lenguaje", "Literatura y Escritura Creativa"],
+        "Literatura y Escritura Creativa": ["Lenguaje", "Literatura y Escritura Creativa"],
+        
+        "Historia": ["Historia", "Historia del Arte y Cultura", "Sociología y Estudios Sociales"],
+        "Historia del Arte y Cultura": ["Historia", "Historia del Arte y Cultura", "Sociología y Estudios Sociales"],
+        "Sociología y Estudios Sociales": ["Historia", "Historia del Arte y Cultura", "Sociología y Estudios Sociales"],
+        
+        "Biologia": ["Biología", "Biología Avanzada", "Ciencias de la Tierra y Medio Ambiente"],
+        "Biología Avanzada": ["Biología", "Biología Avanzada", "Ciencias de la Tierra y Medio Ambiente"],
+        "Ciencias de la Tierra y Medio Ambiente": ["Biología", "Biología Avanzada", "Ciencias de la Tierra y Medio Ambiente"],
+        
+        "Fisica": ["Física", "Física Aplicada", "Astronomía y Ciencias del Espacio"],
+        "Física Aplicada": ["Física", "Física Aplicada", "Astronomía y Ciencias del Espacio"],
+        "Astronomía y Ciencias del Espacio": ["Física", "Física Aplicada", "Astronomía y Ciencias del Espacio"],
+        
+        "Quimica": ["Química", "Química Experimental"],
+        "Química Experimental": ["Química", "Química Experimental"],
+        
+        "Ingles": ["Inglés"],
+        
+        "Educación Fisica": ["Educación Física"],
+        
+        "Arte": ["Arte", "Historia del Arte y Cultura", "Teatro y Expresión Corporal"],
+        "Historia del Arte y Cultura": ["Arte", "Historia del Arte y Cultura", "Teatro y Expresión Corporal"],
+        "Teatro y Expresión Corporal": ["Arte", "Historia del Arte y Cultura", "Teatro y Expresión Corporal"],
+        
+        "Tecnologia": ["Tecnología", "Tecnología e Innovación", "Programación y Robótica"],
+        "Tecnología e Innovación": ["Tecnología", "Tecnología e Innovación", "Programación y Robótica"],
+        "Programación y Robótica": ["Tecnología", "Tecnología e Innovación", "Programación y Robótica"],
+        
+        "Filosofía y Ética": ["Filosofía", "Filosofía y Ética"],
+        
+        "Psicología y Desarrollo Humano": ["Psicología y Desarrollo Humano"],
+        
+        "Música y Composición": ["Música"],
+        
+        "Investigación Científica y Método Experimental": ["Biología Avanzada", "Química Experimental", "Física Aplicada"],
+    }
+    
+    if especialidad_docente in equivalencias:
+        return nombre_asignatura in equivalencias[especialidad_docente]
     
     return False
 
+def get_sala_por_curso(nivel, letra):
+    """Asigna una sala específica según el curso"""
+    salas_por_curso = {
+        (1, "A"): "SALA_1",
+        (1, "B"): "SALA_2", 
+        (2, "A"): "SALA_3",
+        (2, "B"): "SALA_4",
+        (3, "A"): "SALA_5",
+        (3, "B"): "SALA_6",
+        (4, "A"): "SALA_7",
+        (4, "B"): "SALA_8",
+    }
+    return salas_por_curso.get((nivel, letra), "SALA_1")
+
+def get_sala_especial(asignatura):
+    """Asigna salas especiales según la asignatura"""
+    salas_especiales = {
+        "Educación Física": "GIMNASIO",
+        "Biología": "LAB_CIEN",
+        "Química": "LAB_CIEN", 
+        "Física": "LAB_CIEN",
+        "Tecnología": "LAB_COMP",
+        "Música": "SALA_9",
+        "Arte": "SALA_10"
+    }
+    return salas_especiales.get(asignatura, None)
+
+def verificar_conflictos_bloques_consecutivos(dia, bloque_inicio, docente, curso, sala):
+    """
+    Verifica conflictos para bloques consecutivos (2 bloques seguidos)
+    Retorna (sin_conflictos, mensaje)
+    """
+    # Verificar que el bloque siguiente existe
+    bloque_siguiente = str(int(bloque_inicio) + 1)
+    
+    # Si es viernes, solo hasta bloque 6
+    if dia == "VIERNES" and int(bloque_inicio) >= 6:
+        return False, f"Bloque {bloque_inicio} no válido para viernes"
+    
+    # Verificar conflictos para ambos bloques
+    for bloque in [bloque_inicio, bloque_siguiente]:
+    # Verificar si el docente ya tiene clase en ese horario
+        if Clase.objects.filter(
+        asignatura_impartida__docente=docente,
+        fecha=dia,
+            horario=bloque
+        ).exists():
+            return False, f"Docente ya tiene clase en {dia} bloque {bloque}"
+        
+        # Verificar si el curso ya tiene clase en ese horario
+        if Clase.objects.filter(
+            curso=curso,
+            fecha=dia,
+            horario=bloque
+        ).exists():
+            return False, f"Curso ya tiene clase en {dia} bloque {bloque}"
+        
+        # Verificar si la sala está ocupada (solo para salas especiales)
+        if sala in ['GIMNASIO', 'LAB_BIO', 'LAB_QUI', 'LAB_FIS', 'SALA_9', 'SALA_10', 'LAB_COMP', 'LAB_CIEN']:
+            if Clase.objects.filter(
+        fecha=dia,
+                horario=bloque,
+                sala=sala
+            ).exists():
+                return False, f"Sala {sala} ocupada en {dia} bloque {bloque}"
+    
+    return True, "Sin conflictos"
+
+def obtener_horarios_disponibles_bloques_consecutivos(docente, curso, sala):
+    """
+    Obtiene horarios disponibles para bloques consecutivos
+    """
+    dias = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES']
+    horarios_disponibles = []
+    
+    for dia in dias:
+        # Para viernes solo hasta bloque 5 (para que quepa el 6)
+        max_bloque = 5 if dia == 'VIERNES' else 8
+        
+        for bloque_inicio in range(1, max_bloque + 1):
+            sin_conflictos, _ = verificar_conflictos_bloques_consecutivos(
+                dia, str(bloque_inicio), docente, curso, sala
+            )
+            if sin_conflictos:
+                horarios_disponibles.append((dia, str(bloque_inicio)))
+    
+    return horarios_disponibles
+
+# Datos de asignaturas impartidas con horarios de bloques consecutivos
+# Formato: (codigo, nombre_asignatura, rut_docente, nivel, letra, [horarios_consecutivos])
+asignaturas_impartidas_data = [
+    # 1°A - Bloques consecutivos (1-2, 3-4, 5-6)
+    ("LEN1A", "Lenguaje", "15345638", 1, "A", [("LUNES", "1"), ("MIERCOLES", "3")]),
+    ("MAT1A", "Matemáticas", "15456786", 1, "A", [("MARTES", "1"), ("JUEVES", "3")]),
+    ("HIS1A", "Historia", "16176543", 1, "A", [("LUNES", "5"), ("MIERCOLES", "1")]),
+    ("BIO1A", "Biología", "16376543", 1, "A", [("MARTES", "3"), ("JUEVES", "1")]),
+    ("FÍS1A", "Física", "16476543", 1, "A", [("LUNES", "3"), ("MIERCOLES", "5")]),
+    ("QUÍ1A", "Química", "17776543", 1, "A", [("MARTES", "5"), ("JUEVES", "5")]),
+    ("ING1A", "Inglés", "17888888", 1, "A", [("LUNES", "7"), ("MIERCOLES", "7")]),
+    ("EDU1A", "Educación Física", "17111111", 1, "A", [("MARTES", "7"), ("JUEVES", "7")]),
+    ("ART1A", "Arte", "18680246", 1, "A", [("LUNES", "9"), ("MIERCOLES", "9")]),
+    ("MÚS1A", "Música", "20579136", 1, "A", [("MARTES", "9"), ("JUEVES", "9")]),
+    ("TEC1A", "Tecnología", "18791357", 1, "A", [("LUNES", "11"), ("MIERCOLES", "11")]),
+    
+    # 1°B
+    ("LEN1B", "Lenguaje", "15543210", 1, "B", [("MARTES", "1"), ("JUEVES", "3")]),
+    ("MAT1B", "Matemáticas", "15654321", 1, "B", [("LUNES", "1"), ("MIERCOLES", "3")]),
+    ("HIS1B", "Historia", "16176543", 1, "B", [("LUNES", "5"), ("MIERCOLES", "1")]),
+    ("BIO1B", "Biología", "16376543", 1, "B", [("MARTES", "3"), ("JUEVES", "1")]),
+    ("FÍS1B", "Física", "16476543", 1, "B", [("LUNES", "3"), ("MIERCOLES", "5")]),
+    ("QUÍ1B", "Química", "17776543", 1, "B", [("MARTES", "5"), ("JUEVES", "5")]),
+    ("ING1B", "Inglés", "17888888", 1, "B", [("LUNES", "7"), ("MIERCOLES", "7")]),
+    ("EDU1B", "Educación Física", "17111111", 1, "B", [("MARTES", "7"), ("JUEVES", "7")]),
+    ("ART1B", "Arte", "18680246", 1, "B", [("LUNES", "9"), ("MIERCOLES", "9")]),
+    ("MÚS1B", "Música", "20579136", 1, "B", [("MARTES", "9"), ("JUEVES", "9")]),
+    ("TEC1B", "Tecnología", "18791357", 1, "B", [("LUNES", "11"), ("MIERCOLES", "11")]),
+    
+    # 2°A
+    ("LEN2A", "Lenguaje", "15345638", 2, "A", [("MARTES", "1"), ("JUEVES", "3")]),
+    ("MAT2A", "Matemáticas", "21135792", 2, "A", [("LUNES", "1"), ("MIERCOLES", "3")]),
+    ("HIS2A", "Historia", "16176543", 2, "A", [("LUNES", "5"), ("MIERCOLES", "1")]),
+    ("BIO2A", "Biología", "16376543", 2, "A", [("MARTES", "3"), ("JUEVES", "1")]),
+    ("FÍS2A", "Física", "16476543", 2, "A", [("LUNES", "3"), ("MIERCOLES", "5")]),
+    ("QUÍ2A", "Química", "20913579", 2, "A", [("MARTES", "5"), ("JUEVES", "5")]),
+    ("ING2A", "Inglés", "17888888", 2, "A", [("LUNES", "7"), ("MIERCOLES", "7")]),
+    ("EDU2A", "Educación Física", "17121212", 2, "A", [("MARTES", "7"), ("JUEVES", "7")]),
+    ("ART2A", "Arte", "18680246", 2, "A", [("LUNES", "9"), ("MIERCOLES", "9")]),
+    ("MÚS2A", "Música", "20579136", 2, "A", [("MARTES", "9"), ("JUEVES", "9")]),
+    ("TEC2A", "Tecnología", "18802468", 2, "A", [("LUNES", "11"), ("MIERCOLES", "11")]),
+    
+    # 2°B
+    ("LEN2B", "Lenguaje", "15543210", 2, "B", [("LUNES", "1"), ("MIERCOLES", "3")]),
+    ("MAT2B", "Matemáticas", "15654321", 2, "B", [("MARTES", "1"), ("JUEVES", "3")]),
+    ("HIS2B", "Historia", "16321098", 2, "B", [("LUNES", "5"), ("MIERCOLES", "1")]),
+    ("BIO2B", "Biología", "20802468", 2, "B", [("MARTES", "3"), ("JUEVES", "1")]),
+    ("FÍS2B", "Física", "16576543", 2, "B", [("LUNES", "3"), ("MIERCOLES", "5")]),
+    ("QUÍ2B", "Química", "17776543", 2, "B", [("MARTES", "5"), ("JUEVES", "5")]),
+    ("ING2B", "Inglés", "17999999", 2, "B", [("LUNES", "7"), ("MIERCOLES", "7")]),
+    ("EDU2B", "Educación Física", "17111111", 2, "B", [("MARTES", "7"), ("JUEVES", "7")]),
+    ("ART2B", "Arte", "18579135", 2, "B", [("LUNES", "9"), ("MIERCOLES", "9")]),
+    ("MÚS2B", "Música", "20579136", 2, "B", [("MARTES", "9"), ("JUEVES", "9")]),
+    ("TEC2B", "Tecnología", "18791357", 2, "B", [("LUNES", "11"), ("MIERCOLES", "11")]),
+    
+    # 3°A
+    ("LEN3A", "Lenguaje", "15432109", 3, "A", [("MARTES", "1"), ("JUEVES", "3")]),
+    ("MAT3A", "Matemáticas", "15654321", 3, "A", [("LUNES", "1"), ("MIERCOLES", "3")]),
+    ("HIS3A", "Historia", "16321098", 3, "A", [("LUNES", "5"), ("MIERCOLES", "1")]),
+    ("BIO3A", "Biología", "20802468", 3, "A", [("MARTES", "3"), ("JUEVES", "1")]),
+    ("FÍS3A", "Física", "16576543", 3, "A", [("LUNES", "3"), ("MIERCOLES", "5")]),
+    ("QUÍ3A", "Química", "16676543", 3, "A", [("MARTES", "5"), ("JUEVES", "5")]),
+    ("ING3A", "Inglés", "17999999", 3, "A", [("LUNES", "7"), ("MIERCOLES", "7")]),
+    ("EDU3A", "Educación Física", "17121212", 3, "A", [("MARTES", "7"), ("JUEVES", "7")]),
+    ("FIL3A", "Filosofía", "18913579", 3, "A", [("LUNES", "9"), ("MIERCOLES", "9")]),
+    
+    # 3°B
+    ("LEN3B", "Lenguaje", "15432109", 3, "B", [("LUNES", "1"), ("MIERCOLES", "3")]),
+    ("MAT3B", "Matemáticas", "15654321", 3, "B", [("MARTES", "1"), ("JUEVES", "3")]),
+    ("HIS3B", "Historia", "16321098", 3, "B", [("LUNES", "5"), ("MIERCOLES", "1")]),
+    ("BIO3B", "Biología", "20802468", 3, "B", [("MARTES", "3"), ("JUEVES", "1")]),
+    ("FÍS3B", "Física", "16576543", 3, "B", [("LUNES", "3"), ("MIERCOLES", "5")]),
+    ("QUÍ3B", "Química", "16676543", 3, "B", [("MARTES", "5"), ("JUEVES", "5")]),
+    ("ING3B", "Inglés", "17999999", 3, "B", [("LUNES", "7"), ("MIERCOLES", "7")]),
+    ("EDU3B", "Educación Física", "17121212", 3, "B", [("MARTES", "7"), ("JUEVES", "7")]),
+    ("FIL3B", "Filosofía", "18913579", 3, "B", [("LUNES", "9"), ("MIERCOLES", "9")]),
+    
+    # 4°A
+    ("LEN4A", "Lenguaje", "15345638", 4, "A", [("MARTES", "1"), ("JUEVES", "3")]),
+    ("MAT4A", "Matemáticas", "21135792", 4, "A", [("LUNES", "1"), ("MIERCOLES", "3")]),
+    ("HIS4A", "Historia", "16176543", 4, "A", [("LUNES", "5"), ("MIERCOLES", "1")]),
+    ("BIO4A", "Biología", "16376543", 4, "A", [("MARTES", "3"), ("JUEVES", "1")]),
+    ("FIS4A", "Física", "16476543", 4, "A", [("LUNES", "3"), ("MIERCOLES", "5")]),
+    ("QUI4A", "Química", "17776543", 4, "A", [("MARTES", "5"), ("JUEVES", "5")]),
+    ("ING4A", "Inglés", "17888888", 4, "A", [("LUNES", "7"), ("MIERCOLES", "7")]),
+    ("EDU4A", "Educación Física", "17111111", 4, "A", [("MARTES", "7"), ("JUEVES", "7")]),
+    ("FIL4A", "Filosofía", "18913579", 4, "A", [("LUNES", "9"), ("MIERCOLES", "9")]),
+    
+    # 4°B
+    ("LEN4B", "Lenguaje", "15432109", 4, "B", [("LUNES", "1"), ("MIERCOLES", "3")]),
+    ("MAT4B", "Matemáticas", "15654321", 4, "B", [("MARTES", "1"), ("JUEVES", "3")]),
+    ("HIS4B", "Historia", "16321098", 4, "B", [("LUNES", "5"), ("MIERCOLES", "1")]),
+    ("BIO4B", "Biología", "16276543", 4, "B", [("MARTES", "3"), ("JUEVES", "1")]),
+    ("FIS4B", "Física", "16576543", 4, "B", [("LUNES", "3"), ("MIERCOLES", "5")]),
+    ("QUI4B", "Química", "20913579", 4, "B", [("MARTES", "5"), ("JUEVES", "5")]),
+    ("ING4B", "Inglés", "17999999", 4, "B", [("LUNES", "7"), ("MIERCOLES", "7")]),
+    ("EDU4B", "Educación Física", "17121212", 4, "B", [("MARTES", "7"), ("JUEVES", "7")]),
+    ("FIL4B", "Filosofía", "18913579", 4, "B", [("LUNES", "9"), ("MIERCOLES", "9")])
+]
+
 def crear_asignaturas_impartidas():
-    from Core.models import Especialidad, Asignatura
-    # Crear un mapeo rut -> especialidad_nombre
-    docentes_especialidad = {}
-    for data in [
-        {'rut': '15345638', 'especialidad': 'Lenguaje'},
-        {'rut': '15456786', 'especialidad': 'Matematicas'},
-        {'rut': '15654321', 'especialidad': 'Matematicas'},
-        {'rut': '15543210', 'especialidad': 'Lenguaje'},
-        {'rut': '15432109', 'especialidad': 'Lenguaje'},
-        {'rut': '16321098', 'especialidad': 'Historia'},
-        {'rut': '16176543', 'especialidad': 'Historia'},
-        {'rut': '16276543', 'especialidad': 'Biologia'},
-        {'rut': '16376543', 'especialidad': 'Biologia'},
-        {'rut': '16476543', 'especialidad': 'Fisica'},
-        {'rut': '16576543', 'especialidad': 'Fisica'},
-        {'rut': '16676543', 'especialidad': 'Quimica'},
-        {'rut': '17776543', 'especialidad': 'Quimica'},
-        {'rut': '17888888', 'especialidad': 'Ingles'},
-        {'rut': '17999999', 'especialidad': 'Ingles'},
-        {'rut': '17111111', 'especialidad': 'Educación Fisica'},
-        {'rut': '17121212', 'especialidad': 'Educación Fisica'},
-        {'rut': '18579135', 'especialidad': 'Arte'},
-        {'rut': '18680246', 'especialidad': 'Arte'},
-        {'rut': '18791357', 'especialidad': 'Tecnologia'},
-        {'rut': '18802468', 'especialidad': 'Tecnologia'},
-        {'rut': '18913579', 'especialidad': 'Filosofía y Ética'},
-        {'rut': '19024680', 'especialidad': 'Literatura y Escritura Creativa'},
-        {'rut': '19135791', 'especialidad': 'Historia del Arte y Cultura'},
-        {'rut': '19246802', 'especialidad': 'Psicología y Desarrollo Humano'},
-        {'rut': '19357913', 'especialidad': 'Sociología y Estudios Sociales'},
-        {'rut': '19468024', 'especialidad': 'Teatro y Expresión Corporal'},
-        {'rut': '20579136', 'especialidad': 'Música y Composición'},
-        {'rut': '20680247', 'especialidad': 'Taller de Debate y Oratoria'},
-        {'rut': '20791358', 'especialidad': 'Educación Ambiental y Sostenibilidad'},
-        {'rut': '20802468', 'especialidad': 'Biología Avanzada'},
-        {'rut': '20913579', 'especialidad': 'Química Experimental'},
-        {'rut': '21024680', 'especialidad': 'Física Aplicada'},
-        {'rut': '21135792', 'especialidad': 'Matemáticas Discretas'},
-        {'rut': '21246803', 'especialidad': 'Programación y Robótica'},
-        {'rut': '21357914', 'especialidad': 'Astronomía y Ciencias del Espacio'},
-        {'rut': '21246891', 'especialidad': 'Investigación Científica y Método Experimental'},
-        {'rut': '14257913', 'especialidad': 'Tecnología e Innovación'},
-        {'rut': '13268024', 'especialidad': 'Ciencias de la Tierra y Medio Ambiente'},
-        {'rut': '12279135', 'especialidad': 'Estadística y Análisis de Datos'},
-        {'rut': '11280246', 'especialidad': 'Estadística y Análisis de Datos'}
-    ]:
-        docentes_especialidad[data['rut']] = data['especialidad']
+    """Crea las asignaturas impartidas con horarios de bloques consecutivos"""
+    
+    # Obtener docentes por especialidad
+    docentes_especialidad = obtener_docentes_por_especialidad()
+    
+    # Limpiar asignaturas impartidas existentes
+    AsignaturaImpartida.objects.all().delete()
+    Clase.objects.all().delete()
 
     asignaturas_creadas = 0
+    conflictos_resueltos = 0
+    
+    print("🔄 Creando asignaturas impartidas con bloques consecutivos...")
+    
     for data in asignaturas_impartidas_data:
         try:
             codigo = data[0]
@@ -258,30 +289,27 @@ def crear_asignaturas_impartidas():
             rut_docente = data[2]
             nivel = data[3]
             letra = data[4]
-            horarios = data[5]
-            sala = data[6] if len(data) > 6 else get_sala_por_curso(nivel, letra)
+            horarios_originales = data[5]
             
-            # Verificar especialidad usando el nuevo sistema de equivalencias
-            especialidad_docente = docentes_especialidad.get(rut_docente, None)
-            if especialidad_docente is None or not verificar_especialidad_docente(nombre_asignatura, especialidad_docente):
-                print(f"⛔ Docente {rut_docente} no puede impartir {nombre_asignatura} (especialidad: {especialidad_docente})")
-                continue
-
-            # Verificar si la asignatura es electiva
+            # Verificar que la asignatura no sea electiva
             asignatura_obj = Asignatura.objects.get(nombre=nombre_asignatura, nivel=nivel)
             if getattr(asignatura_obj, 'es_electivo', False):
                 print(f"⛔ Asignatura electiva omitida: {nombre_asignatura} ({codigo})")
                 continue
 
-            # Filtrar horarios: solo bloques 1 a 6
-            horarios_filtrados = [(dia, bloque) for (dia, bloque) in horarios if bloque in ["1","2","3","4","5","6"]]
-            if not horarios_filtrados:
-                print(f"⛔ No hay bloques válidos (1-6) para {codigo} - {nombre_asignatura}")
+            # Verificar especialidad del docente
+            docente = Docente.objects.get(usuario__rut=rut_docente)
+            if not verificar_especialidad_docente(nombre_asignatura, docente.especialidad.nombre):
+                print(f"⛔ Docente {rut_docente} no puede impartir {nombre_asignatura} (especialidad: {docente.especialidad.nombre})")
                 continue
 
-            docente = Docente.objects.get(usuario__rut=rut_docente)
             curso = Curso.objects.get(nivel=nivel, letra=letra)
             
+            # Determinar sala
+            sala_especial = get_sala_especial(nombre_asignatura)
+            sala = sala_especial if sala_especial else get_sala_por_curso(nivel, letra)
+            
+            # Crear asignatura impartida
             asignatura_impartida, created = AsignaturaImpartida.objects.get_or_create(
                 codigo=codigo,
                 defaults={
@@ -291,35 +319,72 @@ def crear_asignaturas_impartidas():
             )
             
             clases_creadas = 0
-            for dia, horario in horarios_filtrados:
-                if dia == "VIERNES" and horario in ["7", "8", "9"]:
-                    print(f"⚠️ Horario {horario} no válido para viernes en {codigo}")
-                    continue
-                sin_conflictos, mensaje = verificar_conflictos(dia, horario, sala, docente, curso)
+            horarios_usados = []
+            
+            # Intentar usar horarios originales primero
+            for dia, bloque_inicio in horarios_originales:
+                sin_conflictos, mensaje = verificar_conflictos_bloques_consecutivos(
+                    dia, bloque_inicio, docente, curso, sala
+                )
+                
                 if sin_conflictos:
+                    # Crear clases para ambos bloques consecutivos
+                    for i in range(2):
+                        bloque = str(int(bloque_inicio) + i)
                     clase, created = Clase.objects.get_or_create(
                         asignatura_impartida=asignatura_impartida,
                         curso=curso,
                         fecha=dia,
-                        horario=horario,
+                            horario=bloque,
                         sala=sala
                     )
                     if created:
                         clases_creadas += 1
-                else:
-                    print(f"⚠️ Conflicto en {codigo}: {mensaje}")
+                    horarios_usados.append((dia, bloque_inicio))
+                    break
+            
+            # Si no se pudo usar horarios originales, buscar alternativos
+            if not horarios_usados:
+                horarios_disponibles = obtener_horarios_disponibles_bloques_consecutivos(docente, curso, sala)
+                
+                for dia, bloque_inicio in horarios_disponibles:
+                    sin_conflictos, _ = verificar_conflictos_bloques_consecutivos(
+                        dia, bloque_inicio, docente, curso, sala
+                    )
+                    
+                    if sin_conflictos:
+                        # Crear clases para ambos bloques consecutivos
+                        for i in range(2):
+                            bloque = str(int(bloque_inicio) + i)
+                            clase, created = Clase.objects.get_or_create(
+                                asignatura_impartida=asignatura_impartida,
+                                curso=curso,
+                                fecha=dia,
+                                horario=bloque,
+                                sala=sala
+                            )
+                            if created:
+                                clases_creadas += 1
+                        horarios_usados.append((dia, bloque_inicio))
+                        conflictos_resueltos += 1
+                        break
                     
             if clases_creadas > 0:
                 asignaturas_creadas += 1
-                print(f"✅ Creada asignatura {codigo} ({nombre_asignatura}) con {clases_creadas} clases")
+                horarios_str = ", ".join([f"{dia} {bloque}-{int(bloque)+1}" for dia, bloque in horarios_usados])
+                print(f"✅ {codigo} ({nombre_asignatura}): {clases_creadas} clases en {horarios_str}")
+            else:
+                print(f"❌ No se pudo crear {codigo} ({nombre_asignatura}) - sin horarios disponibles")
             
         except Exception as e:
-            print(f"Error al crear asignatura impartida {codigo}: {str(e)}")
+            print(f"❌ Error al crear {codigo}: {str(e)}")
 
-    print(f"\n✅ Proceso completado:")
+    print(f"\n📊 Resumen:")
     print(f"- Total de asignaturas impartidas creadas: {asignaturas_creadas}")
+    print(f"- Conflictos resueltos automáticamente: {conflictos_resueltos}")
+    print(f"- Asignaturas electivas omitidas: ✓")
+    print(f"- Bloques consecutivos implementados: ✓")
+    print(f"- Verificación de especialidades: ✓")
 
 if __name__ == "__main__":
     crear_asignaturas_impartidas()
-
-print("✅ Asignaturas impartidas y clases creadas exitosamente")

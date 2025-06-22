@@ -1,0 +1,161 @@
+<!-- Mensajes (prototipo) -->
+<div class="tab-pane fade" id="mensajes">
+    <div class="row">
+        <div class="col-lg-4">
+            <!-- Lista de Conversaciones -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-envelope me-2"></i>Conversaciones
+                        </h6>
+                        <button class="btn btn-light btn-sm">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action active">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Coordinación Académica</h6>
+                                <small>Hace 10 min</small>
+                            </div>
+                            <p class="mb-1">Reunión de apoderados el viernes...</p>
+                            <small><i class="fas fa-circle text-success"></i> En línea</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Apoderado - Juan Pérez</h6>
+                                <small>Hace 1 hora</small>
+                            </div>
+                            <p class="mb-1">Consulta sobre tarea de matemáticas...</p>
+                            <small class="text-muted">2 mensajes sin leer</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Directora</h6>
+                                <small>Hace 2 horas</small>
+                            </div>
+                            <p class="mb-1">Información sobre nueva política...</p>
+                            <small class="text-muted">Leído</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Apoderado - María González</h6>
+                                <small>Ayer</small>
+                            </div>
+                            <p class="mb-1">Solicitud de reunión personal...</p>
+                            <small class="text-muted">Leído</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Profesor de Historia</h6>
+                                <small>Hace 2 días</small>
+                            </div>
+                            <p class="mb-1">Coordinación de proyecto interdisciplinario...</p>
+                            <small class="text-muted">Leído</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <!-- Área de Chat -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-comments me-2"></i>Coordinación Académica
+                            </h6>
+                            <small><i class="fas fa-circle text-success"></i> En línea</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-light btn-sm me-2">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-video"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body" style="height: 400px; overflow-y: auto;">
+                    <!-- Mensajes -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-start">
+                            <div class="bg-light rounded p-3" style="max-width: 70%;">
+                                <small class="text-muted">Coordinación Académica - Hace 10 min</small>
+                                <p class="mb-0">Hola profesor, necesitamos coordinar la reunión de apoderados del viernes. ¿Podrías confirmar tu disponibilidad?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-end">
+                            <div class="bg-primary text-white rounded p-3" style="max-width: 70%;">
+                                <small class="text-white-75">Tú - Hace 8 min</small>
+                                <p class="mb-0">Hola, sí estoy disponible. ¿A qué hora sería la reunión?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-start">
+                            <div class="bg-light rounded p-3" style="max-width: 70%;">
+                                <small class="text-muted">Coordinación Académica - Hace 5 min</small>
+                                <p class="mb-0">Perfecto, sería a las 15:00 hrs en la sala de profesores. También necesitamos que prepares un breve informe sobre el rendimiento de tu curso.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-end">
+                            <div class="bg-primary text-white rounded p-3" style="max-width: 70%;">
+                                <small class="text-white-75">Tú - Hace 2 min</small>
+                                <p class="mb-0">Entendido, tendré listo el informe para el viernes. ¿Hay algún formato específico que deba seguir?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Escribe tu mensaje...">
+                        <button class="btn btn-primary" type="button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mensajes Importantes -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-warning text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Mensajes Importantes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-bell me-2"></i>Nueva Política de Evaluación</h6>
+                                <p class="mb-2">Se ha actualizado la política de evaluación para el segundo semestre. Revisa los cambios en el portal docente.</p>
+                                <small class="text-muted">Enviado por: Dirección - Hace 2 días</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-calendar-check me-2"></i>Reunión de Coordinación</h6>
+                                <p class="mb-2">Reunión de coordinación docente programada para el próximo lunes a las 14:00 hrs.</p>
+                                <small class="text-muted">Enviado por: Coordinación - Hace 1 día</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

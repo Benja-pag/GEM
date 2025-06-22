@@ -1,0 +1,81 @@
+<!-- Cursos Jefe (funcional) -->
+<div class="tab-pane fade" id="cursos">
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title"><i class="fas fa-user-tie me-2 text-primary"></i>Cursos como Profesor Jefe</h5>
+            {% if cursos_profesor_jefe %}
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Curso</th>
+                            <th>Total Estudiantes</th>
+                            <th>Promedio General</th>
+                            <th>Asistencia Promedio</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for curso in cursos_profesor_jefe %}
+                        <tr>
+                            <td class="fw-bold">{{ curso.nivel }}°{{ curso.letra }}</td>
+                            <td>{{ curso.total_estudiantes }}</td>
+                            <td>
+                                <span class="badge bg-success">6.8</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">92%</span>
+                            </td>
+                            <td>
+                                <a href="{% url 'curso_detalle' curso.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye me-1"></i>Ver Detalles
+                                </a>
+                                <button class="btn btn-sm btn-outline-success ms-1">
+                                    <i class="fas fa-chart-bar me-1"></i>Reportes
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No eres profesor jefe de ningún curso.</p>
+                <small class="text-muted">Los cursos jefe se asignan desde la administración.</small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Estadísticas de Cursos -->
+    {% if cursos_profesor_jefe %}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Distribución de Estudiantes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="estudiantesChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-trending-up me-2"></i>Rendimiento por Curso
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="rendimientoChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div> 

@@ -1,0 +1,107 @@
+<!-- Resumen (funcional) -->
+<div class="tab-pane fade show active" id="resumen">
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                    <h5>Cursos como Jefe</h5>
+                    <h2 class="text-primary">{{ cursos_profesor_jefe|length }}</h2>
+                    <small class="text-muted">Total de cursos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-book-open fa-2x text-success mb-2"></i>
+                    <h5>Asignaturas que Imparte</h5>
+                    <h2 class="text-success">{{ asignaturas|length }}</h2>
+                    <small class="text-muted">Total de asignaturas</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-bell fa-2x text-danger mb-2"></i>
+                    <h5>Notificaciones</h5>
+                    <h2 class="text-danger">3</h2>
+                    <small class="text-muted">Sin leer</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Actividad Reciente -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Actividad Reciente
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Evaluación calificada - Matemáticas 2°A</h6>
+                                <small class="text-muted">Prueba N°1 completada</small>
+                            </div>
+                            <small class="text-muted">Hace 2 horas</small>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Asistencia registrada - Lenguaje 3°B</h6>
+                                <small class="text-muted">Clase del día 15/04/2024</small>
+                            </div>
+                            <small class="text-muted">Hace 4 horas</small>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Material subido - Historia 1°A</h6>
+                                <small class="text-muted">Presentación sobre Revolución Industrial</small>
+                            </div>
+                            <small class="text-muted">Ayer</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tasks me-2"></i>Próximas Tareas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Calificar ensayos</h6>
+                                <small class="text-danger">Mañana</small>
+                            </div>
+                            <small class="text-muted">Lenguaje 3°B</small>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Reunión de apoderados</h6>
+                                <small class="text-warning">Viernes</small>
+                            </div>
+                            <small class="text-muted">2°A - 15:00 hrs</small>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Preparar evaluación</h6>
+                                <small class="text-info">Lunes</small>
+                            </div>
+                            <small class="text-muted">Matemáticas 2°A</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

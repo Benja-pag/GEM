@@ -1,0 +1,37 @@
+<!-- Pestaña de Asignaturas -->
+<div class="tab-pane fade show active" id="asignaturas">
+    <div class="row">
+        {% for asignatura_inscrita in asignaturas_estudiante %}
+        <div class="col-12 mb-3">
+            <div class="card h-100 border-0 shadow-sm asignatura-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="asignatura-bar me-3" style="width: 6px; height: 48px; border-radius: 4px; background: linear-gradient(180deg, #4e73df, #224abe);"></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                            <div>
+                                <h5 class="mb-1 fw-bold text-primary">{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}</h5>
+                                <span class="badge bg-light text-primary border border-primary">{{ asignatura_inscrita.asignatura_impartida.codigo }}</span>
+                            </div>
+                            <div class="mt-2 mt-md-0 d-flex align-items-center">
+                                <span class="text-muted small me-3">
+                                    Prof. {{ asignatura_inscrita.asignatura_impartida.docente.usuario.nombre }} {{ asignatura_inscrita.asignatura_impartida.docente.usuario.apellido_paterno }}
+                                </span>
+                                <button class="btn btn-primary btn-sm" onclick="entrarAsignatura('{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}', '{{ asignatura_inscrita.asignatura_impartida.codigo }}')">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Entrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                Aún no tienes asignaturas inscritas.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div> 

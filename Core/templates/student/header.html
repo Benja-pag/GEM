@@ -1,0 +1,27 @@
+{% load static %}
+
+<!-- Encabezado con información del estudiante -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body bg-gradient-dark text-white rounded">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-user-graduate fa-3x me-3 text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h2 class="mb-1 text-warning">{{ alumno.nombre }} {{ alumno.apellido_paterno }}</h2>
+                        <p class="mb-0 text-white-75"><i class="fas fa-id-card me-2"></i>RUT: <span class="text-white">{{ alumno.rut }}</span></p>
+                        <p class="mb-0 text-white-75"><i class="fas fa-envelope me-2"></i><span class="text-white">{{ alumno.correo }}</span></p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <span class="badge bg-warning text-dark p-2">
+                            <i class="fas fa-graduation-cap me-1"></i>
+                            {{ curso }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

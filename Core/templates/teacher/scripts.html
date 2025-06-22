@@ -1,0 +1,236 @@
+<!-- Scripts y Estilos para el Panel del Docente -->
+<style>
+    .bg-gradient-dark {
+        background: linear-gradient(45deg, #2c3e50, #1a252f);
+    }
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.75);
+    }
+    .asignatura-card {
+        transition: box-shadow 0.2s;
+        border-left: 6px solid #4e73df;
+        background: #fff;
+    }
+    .asignatura-card:hover {
+        box-shadow: 0 4px 16px rgba(78, 115, 223, 0.15);
+        border-left: 6px solid #224abe;
+    }
+    .asignatura-bar {
+        background: linear-gradient(180deg, #4e73df, #224abe);
+    }
+    .card-title i {
+        vertical-align: middle;
+    }
+    
+    /* Estilos específicos para el panel del docente */
+    .teacher-stats-card {
+        transition: transform 0.2s;
+    }
+    .teacher-stats-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .evaluation-progress {
+        height: 6px;
+        border-radius: 3px;
+    }
+    
+    .chat-message {
+        max-width: 70%;
+        word-wrap: break-word;
+    }
+    
+    .material-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+    
+    .calendar-day {
+        min-height: 80px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .calendar-day:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .calendar-day.has-event {
+        background-color: #e3f2fd;
+        border-left: 3px solid #2196f3;
+    }
+</style>
+
+<script>
+// Funcionalidad para las pestañas del panel del docente
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips de Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Funcionalidad para el filtro de estudiantes en retroalimentación
+    const retroCursoSelect = document.getElementById('retroCurso');
+    const retroAlumnoSelect = document.getElementById('retroAlumno');
+    
+    if (retroCursoSelect && retroAlumnoSelect) {
+        retroCursoSelect.addEventListener('change', function() {
+            // Simular carga de estudiantes según el curso seleccionado
+            const curso = this.value;
+            retroAlumnoSelect.innerHTML = '<option>Selecciona un estudiante</option>';
+            
+            if (curso === '2°A') {
+                retroAlumnoSelect.innerHTML += `
+                    <option>Juan Pérez</option>
+                    <option>María González</option>
+                    <option>Carlos Rodríguez</option>
+                `;
+            } else if (curso === '3°B') {
+                retroAlumnoSelect.innerHTML += `
+                    <option>Ana Silva</option>
+                    <option>Pedro López</option>
+                    <option>Carmen Torres</option>
+                `;
+            }
+        });
+    }
+    
+    // Funcionalidad para generar retroalimentación con IA
+    const generateIAButton = document.querySelector('button:contains("Generar con IA")');
+    if (generateIAButton) {
+        generateIAButton.addEventListener('click', function() {
+            // Simular generación de retroalimentación
+            const retroTexto = document.getElementById('retroTexto');
+            if (retroTexto) {
+                retroTexto.value = 'Generando retroalimentación personalizada con IA...';
+                setTimeout(() => {
+                    retroTexto.value = 'El estudiante ha mostrado un excelente progreso en la asignatura. Sus fortalezas incluyen la comprensión de conceptos fundamentales y la participación activa en clase. Se recomienda continuar con el mismo nivel de dedicación.';
+                }, 2000);
+            }
+        });
+    }
+    
+    // Funcionalidad para el calendario
+    const calendarDays = document.querySelectorAll('.calendar-day');
+    calendarDays.forEach(day => {
+        day.addEventListener('click', function() {
+            // Simular apertura de modal de eventos del día
+            console.log('Día seleccionado:', this.textContent);
+        });
+    });
+    
+    // Funcionalidad para filtros de calendario
+    const calendarFilters = document.querySelectorAll('input[type="checkbox"]');
+    calendarFilters.forEach(filter => {
+        filter.addEventListener('change', function() {
+            // Simular filtrado de eventos
+            console.log('Filtro cambiado:', this.id, this.checked);
+        });
+    });
+    
+    // Funcionalidad para subir materiales
+    const uploadButton = document.querySelector('button:contains("Subir Material")');
+    if (uploadButton) {
+        uploadButton.addEventListener('click', function() {
+            // Simular modal de subida de material
+            alert('Funcionalidad de subida de materiales en desarrollo');
+        });
+    }
+    
+    // Funcionalidad para mensajes
+    const messageInput = document.querySelector('input[placeholder="Escribe tu mensaje..."]');
+    const sendButton = document.querySelector('button:contains("paper-plane")');
+    
+    if (messageInput && sendButton) {
+        sendButton.addEventListener('click', function() {
+            const message = messageInput.value.trim();
+            if (message) {
+                // Simular envío de mensaje
+                console.log('Mensaje enviado:', message);
+                messageInput.value = '';
+            }
+        });
+        
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+    }
+    
+    // Funcionalidad para evaluaciones
+    const evaluationButtons = document.querySelectorAll('button:contains("Calificar")');
+    evaluationButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Simular apertura de modal de calificación
+            alert('Sistema de calificación en desarrollo');
+        });
+    });
+    
+    // Funcionalidad para asistencia
+    const attendanceButtons = document.querySelectorAll('button:contains("Registrar")');
+    attendanceButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Simular registro de asistencia
+            alert('Sistema de registro de asistencia en desarrollo');
+        });
+    });
+    
+    // Animaciones para las tarjetas de estadísticas
+    const statsCards = document.querySelectorAll('.teacher-stats-card');
+    statsCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Funcionalidad para descargar reportes
+    const reportButtons = document.querySelectorAll('button:contains("Reporte")');
+    reportButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Simular descarga de reporte
+            alert('Descargando reporte...');
+        });
+    });
+    
+    // Funcionalidad para plantillas de retroalimentación
+    const templateButtons = document.querySelectorAll('button:contains("Excelente Trabajo"), button:contains("Área de Mejora"), button:contains("Necesita Apoyo")');
+    templateButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const retroTexto = document.getElementById('retroTexto');
+            if (retroTexto) {
+                const template = this.textContent.trim();
+                if (template === 'Excelente Trabajo') {
+                    retroTexto.value = 'El estudiante ha demostrado un excelente desempeño en esta evaluación. Su comprensión de los conceptos es sobresaliente y su dedicación al trabajo es admirable. Continúa con este nivel de compromiso.';
+                } else if (template === 'Área de Mejora') {
+                    retroTexto.value = 'El estudiante ha mostrado progreso, pero hay áreas específicas que requieren mayor atención. Se recomienda reforzar los conceptos fundamentales y practicar más ejercicios.';
+                } else if (template === 'Necesita Apoyo') {
+                    retroTexto.value = 'El estudiante requiere apoyo adicional para alcanzar los objetivos de aprendizaje. Se sugiere programar una reunión para discutir estrategias de mejora y brindar el apoyo necesario.';
+                }
+            }
+        });
+    });
+});
+
+// Función para actualizar estadísticas en tiempo real
+function updateTeacherStats() {
+    // Simular actualización de estadísticas
+    const statsElements = document.querySelectorAll('.teacher-stats-card h2');
+    statsElements.forEach(element => {
+        const currentValue = parseInt(element.textContent);
+        const newValue = currentValue + Math.floor(Math.random() * 3);
+        element.textContent = newValue;
+    });
+}
+
+// Actualizar estadísticas cada 30 segundos
+setInterval(updateTeacherStats, 30000);
+</script> 

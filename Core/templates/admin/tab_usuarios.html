@@ -1,0 +1,106 @@
+<!-- Pestaña de Usuarios -->
+<div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle shadow-sm">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-id-card"></i> RUT</th>
+                    <th><i class="fas fa-user"></i> Nombre</th>
+                    <th><i class="fas fa-envelope"></i> Correo</th>
+                    <th><i class="fas fa-user-tag"></i> Tipo</th>
+                    <th><i class="fas fa-toggle-on"></i> Estado</th>
+                    <th><i class="fas fa-cogs"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr class="clickable-row" data-href="#" style="cursor:pointer;">
+                    <td>{{ usuario.rut }}-{{ usuario.div }}</td>
+                    <td>{{ usuario.nombre }} {{ usuario.apellido_paterno }} {{ usuario.apellido_materno }}</td>
+                    <td>{{ usuario.correo }}</td>
+                    <td>
+                        {% if usuario.administrativo %}
+                            <span class="badge bg-secondary">{{ usuario.administrativo.get_rol_display }}</span>
+                        {% elif usuario.docente %}
+                            <span class="badge bg-info">Docente</span>
+                        {% elif usuario.estudiante %}
+                            <span class="badge bg-primary">Estudiante</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge {% if usuario.activador %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if usuario.activador %}Activo{% else %}Inactivo{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info btn-sm view-user" data-user-id="{{ usuario.auth_user_id }}" title="Ver detalles">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-warning btn-sm edit-user" data-user-id="{{ usuario.auth_user_id }}" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm toggle-user-status {% if usuario.activador %}btn-success{% else %}btn-danger{% endif %}" 
+                                    data-user-id="{{ usuario.auth_user_id }}" 
+                                    data-is-active="{{ usuario.activador|lower }}"
+                                    title="{% if usuario.activador %}Desactivar{% else %}Activar{% endif %}">
+                                <i class="fas {% if usuario.activador %}fa-user-check{% else %}fa-user-slash{% endif %}"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-user" data-user-id="{{ usuario.auth_user_id }}" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No hay usuarios registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Filtros y Búsqueda -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-filter me-2"></i>Filtros</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">Tipo de Usuario</label>
+                            <select class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="estudiante">Estudiantes</option>
+                                <option value="docente">Docentes</option>
+                                <option value="administrativo">Administrativos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="activo">Activos</option>
+                                <option value="inactivo">Inactivos</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="fas fa-search me-2"></i>Búsqueda Avanzada</h6>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar por nombre, RUT o correo...">
+                        <button class="btn btn-outline-primary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

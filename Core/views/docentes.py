@@ -45,3 +45,33 @@ class ProfesorPanelView(View):
         }
         return render(request, 'teacher_panel.html', context)
 
+@method_decorator(login_required, name='dispatch')
+class ProfesorPanelModularView(View):
+    def get(self, request):
+        if not hasattr(request.user.usuario, 'docente'):
+            messages.error(request, 'No tienes permiso para acceder a esta página')
+            return redirect('home')
+        
+        docente = request.user.usuario.docente
+        
+        # Obtener cursos donde el docente es profesor jefe
+        cursos_profesor_jefe = Curso.objects.filter(
+            jefatura_actual__docente=docente
+        ).select_related('jefatura_actual__docente__usuario').annotate(
+            total_estudiantes=Count('estudiantes')
+        )
+        
+        # Obtener asignaturas que imparte el docente
+        asignaturas = AsignaturaImpartida.objects.filter(
+            docente=docente
+        ).select_related(
+            'asignatura',
+            'docente__usuario'
+        ).prefetch_related('clases')
+        
+        context = {
+            'cursos_profesor_jefe': cursos_profesor_jefe,
+            'asignaturas': asignaturas
+        }
+        return render(request, 'teacher_panel_modular.html', context)
+

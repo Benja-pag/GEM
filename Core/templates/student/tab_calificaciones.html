@@ -1,0 +1,68 @@
+<!-- Pestaña de Calificaciones -->
+<div class="tab-pane fade" id="calificaciones">
+    <div class="accordion" id="accordionCalificaciones">
+        {% for asignatura_inscrita in asignaturas_estudiante %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-{{ forloop.counter }}">
+                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse-{{ forloop.counter }}">
+                        <i class="fas fa-book me-2 text-primary"></i>
+                        <strong>{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}</strong>
+                    </button>
+                </h2>
+                <div id="collapse-{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading-{{ forloop.counter }}" data-bs-parent="#accordionCalificaciones">
+                    <div class="accordion-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Evaluación</th>
+                                        <th>Fecha</th>
+                                        <th>Nota</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Prueba N°1</td>
+                                        <td>15/04/2024</td>
+                                        <td>
+                                            <span class="badge bg-success fs-6">6.5</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-success fw-bold">Aprobado</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Prueba N°2</td>
+                                        <td>10/05/2024</td>
+                                        <td>
+                                            <span class="badge bg-danger fs-6">3.2</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-danger fw-bold">Reprobado</span>
+                                        </td>
+                                    </tr>
+                                     <tr>
+                                        <td>Trabajo Práctico</td>
+                                        <td>25/05/2024</td>
+                                        <td>
+                                            <span class="badge bg-success fs-6">7.0</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-success fw-bold">Aprobado</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+             <div class="alert alert-info mt-4" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                Aún no tienes asignaturas inscritas.
+            </div>
+        {% endfor %}
+    </div>
+</div> 

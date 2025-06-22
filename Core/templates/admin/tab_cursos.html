@@ -1,0 +1,100 @@
+<!-- Pestaña de Cursos -->
+<div class="tab-pane fade" id="cursos" role="tabpanel" aria-labelledby="cursos-tab">
+    <div class="table-responsive">
+        <table class="table table-striped align-middle shadow-sm">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-chalkboard"></i> Curso</th>
+                    <th><i class="fas fa-user-tie"></i> Profesor Jefe</th>
+                    <th><i class="fas fa-users"></i> Estudiantes</th>
+                    <th><i class="fas fa-book"></i> Asignaturas</th>
+                    <th><i class="fas fa-toggle-on"></i> Estado</th>
+                    <th><i class="fas fa-cogs"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for curso in cursos %}
+                <tr>
+                    <td><span class="badge bg-primary">{{ curso.nivel }}°{{ curso.letra }}</span></td>
+                    <td>
+                        {% if curso.jefatura_actual %}
+                            <span class="badge bg-info">{{ curso.jefatura_actual.docente.usuario.nombre }} {{ curso.jefatura_actual.docente.usuario.apellido_paterno }}</span>
+                        {% else %}
+                            <span class="text-muted">Sin profesor asignado</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge bg-info">{{ curso.total_estudiantes }} estudiantes</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-warning">{{ curso.total_asignaturas }} asignaturas</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-success">Activo</span>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info btn-sm" title="Ver detalles">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button type="button" class="btn btn-warning btn-sm" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm" title="Asignar Profesor">
+                                <i class="fas fa-user-plus"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No hay cursos registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Estadísticas de Cursos -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Cursos</h5>
+                    <h2 class="display-6">{{ total_cursos }}</h2>
+                    <small>Activos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Con Profesor Jefe</h5>
+                    <h2 class="display-6">{{ cursos_con_jefe }}</h2>
+                    <small>Asignados</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Sin Profesor Jefe</h5>
+                    <h2 class="display-6">{{ cursos_sin_jefe }}</h2>
+                    <small>Pendientes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Promedio Estudiantes</h5>
+                    <h2 class="display-6">{{ promedio_estudiantes }}</h2>
+                    <small>Por curso</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

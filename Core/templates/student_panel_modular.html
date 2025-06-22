@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load horario_tags %}
+
+{% block content %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar-bootstrap5@6.1.10/main.min.css' rel='stylesheet' />
+
+{% if user.is_authenticated %}
+<div class="container-fluid mt-4">
+    <!-- Incluir encabezado del estudiante -->
+    {% include 'student/header.html' %}
+    
+    <!-- Incluir tarjetas de resumen -->
+    {% include 'student/summary_cards.html' %}
+    
+    <!-- Incluir pestañas de navegación -->
+    {% include 'student/navigation_tabs.html' %}
+
+    <!-- Contenido de las pestañas -->
+    <div class="tab-content" id="studentTabsContent">
+        <!-- Incluir pestaña de asignaturas -->
+        {% include 'student/tab_asignaturas.html' %}
+        
+        <!-- Incluir pestaña de horario -->
+        {% include 'student/tab_horario.html' %}
+        
+        <!-- Incluir pestaña de calificaciones -->
+        {% include 'student/tab_calificaciones.html' %}
+        
+        <!-- Incluir pestaña de asistencia -->
+        {% include 'student/tab_asistencia.html' %}
+        
+        <!-- Incluir pestaña de calendario -->
+        {% include 'student/tab_calendario.html' %}
+        
+        <!-- Incluir pestaña de comunicación -->
+        {% include 'student/tab_comunicacion.html' %}
+        
+        <!-- Incluir pestaña de electivos -->
+        {% include 'student/tab_electivos.html' %}
+    </div>
+</div>
+
+<!-- Incluir scripts y estilos -->
+{% include 'student/scripts.html' %}
+
+{% else %}
+<div class="alert alert-danger mt-4" role="alert">
+    <i class="fas fa-exclamation-circle me-2"></i>
+    Debes iniciar sesión para acceder a este panel.
+</div>
+{% endif %}
+{% endblock %} 

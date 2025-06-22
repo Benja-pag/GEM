@@ -1,0 +1,295 @@
+<!-- Pestaña de Calendario -->
+<div class="tab-pane fade" id="calendario" role="tabpanel" aria-labelledby="calendario-tab">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0"><i class="fas fa-calendar-alt me-2"></i>Calendario Escolar</h5>
+                        <div class="btn-group">
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-plus me-2"></i>Nuevo Evento
+                            </button>
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-sync-alt me-2"></i>Actualizar
+                            </button>
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-download me-2"></i>Exportar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="calendar" style="height: 600px;">
+                        <!-- Calendario Interactivo -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-alt fa-4x text-primary mb-3"></i>
+                            <h4>Calendario Escolar Interactivo</h4>
+                            <p class="text-muted mb-4">Aquí podrás gestionar todos los eventos académicos, reuniones y actividades del colegio.</p>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-graduation-cap fa-2x text-primary mb-2"></i>
+                                            <h6>Eventos Académicos</h6>
+                                            <small class="text-muted">Evaluaciones, exámenes</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-users fa-2x text-success mb-2"></i>
+                                            <h6>Reuniones</h6>
+                                            <small class="text-muted">Apoderados, docentes</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-trophy fa-2x text-warning mb-2"></i>
+                                            <h6>Actividades</h6>
+                                            <small class="text-muted">Deportes, culturales</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card border-0 bg-light">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-tools fa-2x text-info mb-2"></i>
+                                            <h6>Mantenimiento</h6>
+                                            <small class="text-muted">Sistema, infraestructura</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <!-- Próximos Eventos -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-warning text-white">
+                    <h6 class="card-title mb-0"><i class="fas fa-list me-2"></i>Próximos Eventos</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Reunión de Apoderados 2°A</h6>
+                                <small class="text-danger">Mañana</small>
+                            </div>
+                            <p class="mb-1">15:00 - 16:30 hrs</p>
+                            <small class="text-muted">Sala de Reuniones</small>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Evaluación Matemáticas 3°B</h6>
+                                <small class="text-warning">Viernes</small>
+                            </div>
+                            <p class="mb-1">08:00 - 09:30 hrs</p>
+                            <small class="text-muted">Sala 305</small>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Mantenimiento Sistema</h6>
+                                <small class="text-info">Sábado</small>
+                            </div>
+                            <p class="mb-1">22:00 - 02:00 hrs</p>
+                            <small class="text-muted">Sistema Principal</small>
+                        </div>
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Torneo Deportivo</h6>
+                                <small class="text-success">Lunes</small>
+                            </div>
+                            <p class="mb-1">14:00 - 17:00 hrs</p>
+                            <small class="text-muted">Gimnasio</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filtros de Calendario -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-info text-white">
+                    <h6 class="card-title mb-0"><i class="fas fa-filter me-2"></i>Filtros</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="filtroAcademico" checked>
+                        <label class="form-check-label" for="filtroAcademico">
+                            <i class="fas fa-graduation-cap text-primary me-1"></i>Eventos Académicos
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="filtroReuniones" checked>
+                        <label class="form-check-label" for="filtroReuniones">
+                            <i class="fas fa-users text-success me-1"></i>Reuniones
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="filtroActividades" checked>
+                        <label class="form-check-label" for="filtroActividades">
+                            <i class="fas fa-trophy text-warning me-1"></i>Actividades
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="filtroMantenimiento" checked>
+                        <label class="form-check-label" for="filtroMantenimiento">
+                            <i class="fas fa-tools text-info me-1"></i>Mantenimiento
+                        </label>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <label for="filtroCurso" class="form-label">Filtrar por Curso</label>
+                        <select class="form-select form-select-sm" id="filtroCurso">
+                            <option>Todos los cursos</option>
+                            <option>1°A</option>
+                            <option>1°B</option>
+                            <option>2°A</option>
+                            <option>2°B</option>
+                            <option>3°A</option>
+                            <option>3°B</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Estadísticas del Mes -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h6 class="card-title mb-0"><i class="fas fa-chart-pie me-2"></i>Estadísticas del Mes</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">12</h4>
+                            <small class="text-muted">Eventos</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">8</h4>
+                            <small class="text-muted">Completados</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-2">
+                        <small class="text-muted">Eventos por tipo:</small>
+                        <div class="progress mb-1" style="height: 6px;">
+                            <div class="progress-bar bg-primary" style="width: 40%"></div>
+                        </div>
+                        <small class="text-muted">Académicos: 5</small>
+                    </div>
+                    <div class="mb-2">
+                        <div class="progress mb-1" style="height: 6px;">
+                            <div class="progress-bar bg-success" style="width: 30%"></div>
+                        </div>
+                        <small class="text-muted">Reuniones: 4</small>
+                    </div>
+                    <div class="mb-2">
+                        <div class="progress mb-1" style="height: 6px;">
+                            <div class="progress-bar bg-warning" style="width: 20%"></div>
+                        </div>
+                        <small class="text-muted">Actividades: 2</small>
+                    </div>
+                    <div class="mb-2">
+                        <div class="progress mb-1" style="height: 6px;">
+                            <div class="progress-bar bg-info" style="width: 10%"></div>
+                        </div>
+                        <small class="text-muted">Mantenimiento: 1</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Vista de Mes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-calendar me-2"></i>Vista Mensual - Abril 2024
+                        </h6>
+                        <div>
+                            <button class="btn btn-light btn-sm me-2">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-light btn-sm">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Lunes</th>
+                                    <th>Martes</th>
+                                    <th>Miércoles</th>
+                                    <th>Jueves</th>
+                                    <th>Viernes</th>
+                                    <th>Sábado</th>
+                                    <th>Domingo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted">1</td>
+                                    <td class="text-muted">2</td>
+                                    <td class="text-muted">3</td>
+                                    <td class="text-muted">4</td>
+                                    <td class="text-muted">5</td>
+                                    <td class="text-muted">6</td>
+                                    <td class="text-muted">7</td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td>9</td>
+                                    <td>10</td>
+                                    <td>11</td>
+                                    <td>12</td>
+                                    <td>13</td>
+                                    <td>14</td>
+                                </tr>
+                                <tr>
+                                    <td>15</td>
+                                    <td>16</td>
+                                    <td>17</td>
+                                    <td>18</td>
+                                    <td>19</td>
+                                    <td>20</td>
+                                    <td>21</td>
+                                </tr>
+                                <tr>
+                                    <td>22</td>
+                                    <td>23</td>
+                                    <td>24</td>
+                                    <td>25</td>
+                                    <td>26</td>
+                                    <td>27</td>
+                                    <td>28</td>
+                                </tr>
+                                <tr>
+                                    <td>29</td>
+                                    <td>30</td>
+                                    <td class="text-muted">1</td>
+                                    <td class="text-muted">2</td>
+                                    <td class="text-muted">3</td>
+                                    <td class="text-muted">4</td>
+                                    <td class="text-muted">5</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Panel del Profesor - Modular{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <!-- Incluir encabezado del docente -->
+    {% include 'teacher/header.html' %}
+    
+    <!-- Incluir pestañas de navegación -->
+    {% include 'teacher/navigation_tabs.html' %}
+    
+    <!-- Contenido de las pestañas -->
+    <div class="tab-content" id="teacherTabsContent">
+        <!-- Incluir pestaña de resumen -->
+        {% include 'teacher/tab_resumen.html' %}
+        
+        <!-- Incluir pestaña de cursos jefe -->
+        {% include 'teacher/tab_cursos.html' %}
+        
+        <!-- Incluir pestaña de asignaturas -->
+        {% include 'teacher/tab_asignaturas.html' %}
+        
+        <!-- Incluir pestaña de evaluaciones -->
+        {% include 'teacher/tab_evaluaciones.html' %}
+        
+        <!-- Incluir pestaña de retroalimentación -->
+        {% include 'teacher/tab_retroalimentacion.html' %}
+        
+        <!-- Incluir pestaña de asistencia -->
+        {% include 'teacher/tab_asistencia.html' %}
+        
+        <!-- Incluir pestaña de calendario -->
+        {% include 'teacher/tab_calendario.html' %}
+        
+        <!-- Incluir pestaña de mensajes -->
+        {% include 'teacher/tab_mensajes.html' %}
+        
+        <!-- Incluir pestaña de materiales -->
+        {% include 'teacher/tab_materiales.html' %}
+    </div>
+</div>
+
+<!-- Incluir scripts y estilos -->
+{% include 'teacher/scripts.html' %}
+{% endblock %} 

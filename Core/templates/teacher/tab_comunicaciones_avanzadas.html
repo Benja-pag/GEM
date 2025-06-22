@@ -1,0 +1,340 @@
+<!-- Pestaña de Comunicaciones Avanzadas -->
+<div class="tab-pane fade" id="comunicaciones-avanzadas">
+    <div class="row">
+        <!-- Panel Principal -->
+        <div class="col-lg-8">
+            <!-- Crear Nueva Comunicación -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-envelope me-2"></i>Crear Nueva Comunicación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tipo de Comunicación</label>
+                                <select class="form-select">
+                                    <option>Mensaje General</option>
+                                    <option>Anuncio Importante</option>
+                                    <option>Recordatorio</option>
+                                    <option>Comunicación con Padres</option>
+                                    <option>Mensaje a Colegas</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Prioridad</label>
+                                <select class="form-select">
+                                    <option>Baja</option>
+                                    <option>Normal</option>
+                                    <option>Alta</option>
+                                    <option>Urgente</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Destinatarios</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="estudiantes">
+                                        <label class="form-check-label" for="estudiantes">
+                                            <i class="fas fa-user-graduate text-primary me-1"></i>Estudiantes
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="padres">
+                                        <label class="form-check-label" for="padres">
+                                            <i class="fas fa-users text-success me-1"></i>Padres/Apoderados
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="colegas">
+                                        <label class="form-check-label" for="colegas">
+                                            <i class="fas fa-chalkboard-teacher text-info me-1"></i>Colegas
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Asunto</label>
+                            <input type="text" class="form-control" placeholder="Ej: Recordatorio - Prueba de Matemáticas">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Mensaje</label>
+                            <textarea class="form-control" rows="6" placeholder="Escribe tu mensaje aquí..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Archivos Adjuntos</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" multiple>
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-paperclip"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha de Envío</label>
+                                <input type="datetime-local" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="programar">
+                                    <label class="form-check-label" for="programar">
+                                        Programar envío
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="fas fa-eye me-2"></i>Vista Previa
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Enviar Comunicación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Comunicaciones Enviadas -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-inbox me-2"></i>Comunicaciones Enviadas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <i class="fas fa-bullhorn text-warning me-2"></i>
+                                        Recordatorio - Prueba de Matemáticas
+                                    </h6>
+                                    <p class="mb-1 text-muted">Mensaje enviado a estudiantes y padres</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>Enviado hace 2 horas
+                                        <span class="badge bg-success ms-2">25 leídos</span>
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-warning">Alta</span>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-chart-bar"></i> Estadísticas
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <i class="fas fa-info-circle text-info me-2"></i>
+                                        Información Reunión de Apoderados
+                                    </h6>
+                                    <p class="mb-1 text-muted">Comunicación enviada solo a padres</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>Enviado ayer
+                                        <span class="badge bg-success ms-2">18 leídos</span>
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-info">Normal</span>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-chart-bar"></i> Estadísticas
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                                        Urgente - Cambio de Horario
+                                    </h6>
+                                    <p class="mb-1 text-muted">Mensaje enviado a todos los destinatarios</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>Enviado hace 3 días
+                                        <span class="badge bg-success ms-2">30 leídos</span>
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-danger">Urgente</span>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-chart-bar"></i> Estadísticas
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="col-lg-4">
+            <!-- Estadísticas de Comunicación -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-info text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Estadísticas de Comunicación
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h4 class="text-primary">45</h4>
+                            <small class="text-muted">Mensajes Enviados</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success">89%</h4>
+                            <small class="text-muted">Tasa de Lectura</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-warning">12</h4>
+                            <small class="text-muted">Pendientes</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-info">3</h4>
+                            <small class="text-muted">Programados</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plantillas de Mensajes -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-warning text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-copy me-2"></i>Plantillas de Mensajes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <button class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Recordatorio de Prueba</h6>
+                            <small class="text-muted">Plantilla para recordar evaluaciones</small>
+                        </button>
+                        <button class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Comunicación con Padres</h6>
+                            <small class="text-muted">Formato para apoderados</small>
+                        </button>
+                        <button class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Anuncio de Actividad</h6>
+                            <small class="text-muted">Para eventos y actividades</small>
+                        </button>
+                        <button class="list-group-item list-group-item-action">
+                            <h6 class="mb-1">Mensaje a Colegas</h6>
+                            <small class="text-muted">Comunicación entre docentes</small>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensajes Recibidos -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-secondary text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-inbox-in me-2"></i>Mensajes Recibidos
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Consulta sobre tarea</h6>
+                            <small class="text-muted">De: Ana González (Estudiante)</small>
+                            <br>
+                            <small class="text-danger">Hace 1 hora</small>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Confirmación reunión</h6>
+                            <small class="text-muted">De: María Silva (Apoderada)</small>
+                            <br>
+                            <small class="text-warning">Hace 3 horas</small>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Coordinación departamento</h6>
+                            <small class="text-muted">De: Prof. Carlos López</small>
+                            <br>
+                            <small class="text-info">Ayer</small>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-inbox me-1"></i>Ver Todos los Mensajes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración de Notificaciones -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-dark text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-cog me-2"></i>Configuración de Notificaciones
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="notifEmail" checked>
+                        <label class="form-check-label" for="notifEmail">
+                            <i class="fas fa-envelope text-primary me-1"></i>Notificaciones por Email
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="notifSMS" checked>
+                        <label class="form-check-label" for="notifSMS">
+                            <i class="fas fa-sms text-success me-1"></i>Notificaciones SMS
+                        </label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="notifPush">
+                        <label class="form-check-label" for="notifPush">
+                            <i class="fas fa-bell text-warning me-1"></i>Notificaciones Push
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="notifWhatsapp">
+                        <label class="form-check-label" for="notifWhatsapp">
+                            <i class="fab fa-whatsapp text-success me-1"></i>Notificaciones WhatsApp
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

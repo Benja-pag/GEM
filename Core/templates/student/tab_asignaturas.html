@@ -16,9 +16,9 @@
                                 <span class="text-muted small me-3">
                                     Prof. {{ asignatura_inscrita.asignatura_impartida.docente.usuario.nombre }} {{ asignatura_inscrita.asignatura_impartida.docente.usuario.apellido_paterno }}
                                 </span>
-                                <button class="btn btn-primary btn-sm" onclick="entrarAsignatura('{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}', '{{ asignatura_inscrita.asignatura_impartida.codigo }}')">
+                                <a href="{% url 'asignatura_detalle_estudiante' asignatura_inscrita.asignatura_impartida.id %}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-sign-in-alt me-1"></i>Entrar
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>

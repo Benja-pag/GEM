@@ -1,0 +1,350 @@
+<!-- Pestaña de Asistencia Avanzada -->
+<div class="tab-pane fade" id="asistencia-avanzada">
+    <div class="row">
+        <!-- Panel Principal -->
+        <div class="col-lg-8">
+            <!-- Registro de Asistencia -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-check me-2"></i>Registro de Asistencia
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Asignatura</label>
+                            <select class="form-select">
+                                <option>Matemáticas</option>
+                                <option>Lenguaje</option>
+                                <option>Historia</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha</label>
+                            <input type="date" class="form-control" value="2024-04-24">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Bloque</label>
+                            <select class="form-select">
+                                <option>Bloque 1 (8:00 - 9:15)</option>
+                                <option>Bloque 2 (9:30 - 10:45)</option>
+                                <option>Bloque 3 (11:00 - 12:15)</option>
+                                <option>Bloque 4 (14:00 - 15:15)</option>
+                                <option>Bloque 5 (15:30 - 16:45)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>Estado</th>
+                                    <th>Justificación</th>
+                                    <th>Observaciones</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ana González</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="presente" selected>Presente</option>
+                                            <option value="ausente">Ausente</option>
+                                            <option value="tardanza">Tardanza</option>
+                                            <option value="justificado">Justificado</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Opcional">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Observaciones">
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-save"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Carlos Ramírez</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="presente">Presente</option>
+                                            <option value="ausente" selected>Ausente</option>
+                                            <option value="tardanza">Tardanza</option>
+                                            <option value="justificado">Justificado</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Opcional">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Observaciones">
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-save"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>María Silva</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="presente">Presente</option>
+                                            <option value="ausente">Ausente</option>
+                                            <option value="tardanza" selected>Tardanza</option>
+                                            <option value="justificado">Justificado</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Opcional">
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Observaciones">
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-save"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-3">
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-undo me-2"></i>Deshacer Cambios
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Guardar Asistencia
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reporte de Asistencia -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Reporte de Asistencia
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Período</label>
+                            <select class="form-select">
+                                <option>Última Semana</option>
+                                <option>Último Mes</option>
+                                <option>Primer Semestre</option>
+                                <option>Segundo Semestre</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Asignatura</label>
+                            <select class="form-select">
+                                <option>Todas las Asignaturas</option>
+                                <option>Matemáticas</option>
+                                <option>Lenguaje</option>
+                                <option>Historia</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Estudiante</label>
+                            <select class="form-select">
+                                <option>Todos los Estudiantes</option>
+                                <option>Ana González</option>
+                                <option>Carlos Ramírez</option>
+                                <option>María Silva</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Generar Reporte
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>Asignatura</th>
+                                    <th>Total Clases</th>
+                                    <th>Presente</th>
+                                    <th>Ausente</th>
+                                    <th>Tardanzas</th>
+                                    <th>Porcentaje</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ana González</td>
+                                    <td>Matemáticas</td>
+                                    <td>45</td>
+                                    <td><span class="badge bg-success">42</span></td>
+                                    <td><span class="badge bg-danger">2</span></td>
+                                    <td><span class="badge bg-warning">1</span></td>
+                                    <td><span class="badge bg-info">93%</span></td>
+                                    <td><span class="badge bg-success">Excelente</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Carlos Ramírez</td>
+                                    <td>Matemáticas</td>
+                                    <td>45</td>
+                                    <td><span class="badge bg-success">38</span></td>
+                                    <td><span class="badge bg-danger">5</span></td>
+                                    <td><span class="badge bg-warning">2</span></td>
+                                    <td><span class="badge bg-warning">84%</span></td>
+                                    <td><span class="badge bg-warning">Regular</span></td>
+                                </tr>
+                                <tr>
+                                    <td>María Silva</td>
+                                    <td>Matemáticas</td>
+                                    <td>45</td>
+                                    <td><span class="badge bg-success">40</span></td>
+                                    <td><span class="badge bg-danger">3</span></td>
+                                    <td><span class="badge bg-warning">2</span></td>
+                                    <td><span class="badge bg-info">89%</span></td>
+                                    <td><span class="badge bg-success">Bueno</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="col-lg-4">
+            <!-- Estadísticas Rápidas -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-info text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Estadísticas de Asistencia
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success">89%</h4>
+                            <small class="text-muted">Asistencia Promedio</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-danger">11%</h4>
+                            <small class="text-muted">Ausentismo</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-warning">5%</h4>
+                            <small class="text-muted">Tardanzas</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-info">25</h4>
+                            <small class="text-muted">Total Estudiantes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas de Asistencia -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-warning text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Alertas de Asistencia
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-user-times me-1"></i>Carlos Ramírez
+                        </h6>
+                        <p class="mb-1">3 ausencias consecutivas</p>
+                        <small>Requiere atención inmediata</small>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-clock me-1"></i>María Silva
+                        </h6>
+                        <p class="mb-1">2 tardanzas esta semana</p>
+                        <small>Monitorear comportamiento</small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-arrow-up me-1"></i>Mejora General
+                        </h6>
+                        <p class="mb-1">Asistencia mejoró 5% este mes</p>
+                        <small>¡Excelente trabajo!</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>Acciones Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-copy me-1"></i>Copiar Asistencia Anterior
+                        </button>
+                        <button class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-download me-1"></i>Exportar Reporte PDF
+                        </button>
+                        <button class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-envelope me-1"></i>Enviar Reporte a Padres
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-bell me-1"></i>Configurar Alertas
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Próximas Clases -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-secondary text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-calendar me-2"></i>Próximas Clases
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Matemáticas</h6>
+                            <small class="text-primary">Hoy - 10:00 AM</small>
+                            <br>
+                            <small class="text-muted">Bloque 2</small>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Lenguaje</h6>
+                            <small class="text-warning">Mañana - 8:00 AM</small>
+                            <br>
+                            <small class="text-muted">Bloque 1</small>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Historia</h6>
+                            <small class="text-info">En 2 días - 2:00 PM</small>
+                            <br>
+                            <small class="text-muted">Bloque 4</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

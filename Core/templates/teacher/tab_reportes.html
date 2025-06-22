@@ -1,0 +1,412 @@
+<!-- Pestaña de Reportes -->
+<div class="tab-pane fade" id="reportes">
+    <div class="row">
+        <!-- Panel Principal -->
+        <div class="col-lg-8">
+            <!-- Reporte de Asistencia General -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Reporte de Asistencia General
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Período</label>
+                            <select class="form-select">
+                                <option>Última Semana</option>
+                                <option>Último Mes</option>
+                                <option>Primer Semestre</option>
+                                <option>Segundo Semestre</option>
+                                <option>Año Completo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Asignatura</label>
+                            <select class="form-select">
+                                <option>Todas las Asignaturas</option>
+                                <option>Matemáticas</option>
+                                <option>Lenguaje</option>
+                                <option>Historia</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-primary w-100">
+                                <i class="fas fa-search me-2"></i>Generar Reporte
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Asignatura</th>
+                                    <th>Curso</th>
+                                    <th>Total Clases</th>
+                                    <th>Asistencia Promedio</th>
+                                    <th>Estudiantes en Riesgo</th>
+                                    <th>Tendencia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Matemáticas</td>
+                                    <td>2°A</td>
+                                    <td>45</td>
+                                    <td><span class="badge bg-success">88%</span></td>
+                                    <td><span class="badge bg-danger">3</span></td>
+                                    <td><i class="fas fa-arrow-up text-success"></i></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Lenguaje</td>
+                                    <td>2°A</td>
+                                    <td>42</td>
+                                    <td><span class="badge bg-warning">82%</span></td>
+                                    <td><span class="badge bg-danger">5</span></td>
+                                    <td><i class="fas fa-arrow-down text-danger"></i></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Lenguaje</td>
+                                    <td>3°B</td>
+                                    <td>40</td>
+                                    <td><span class="badge bg-info">85%</span></td>
+                                    <td><span class="badge bg-warning">2</span></td>
+                                    <td><i class="fas fa-minus text-muted"></i></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Historia</td>
+                                    <td>2°A</td>
+                                    <td>38</td>
+                                    <td><span class="badge bg-success">90%</span></td>
+                                    <td><span class="badge bg-success">0</span></td>
+                                    <td><i class="fas fa-arrow-up text-success"></i></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reporte de Rendimiento -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Reporte de Rendimiento Académico
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Período</label>
+                            <select class="form-select">
+                                <option>Primer Semestre</option>
+                                <option>Segundo Semestre</option>
+                                <option>Año Completo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Tipo de Reporte</label>
+                            <select class="form-select">
+                                <option>Promedios Generales</option>
+                                <option>Evaluaciones</option>
+                                <option>Progreso por Unidad</option>
+                                <option>Comparativo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <button class="btn btn-success w-100">
+                                <i class="fas fa-chart-bar me-2"></i>Generar Reporte
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Asignatura</th>
+                                    <th>Curso</th>
+                                    <th>Promedio General</th>
+                                    <th>Evaluaciones</th>
+                                    <th>Aprobación</th>
+                                    <th>Estudiantes Destacados</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Matemáticas</td>
+                                    <td>2°A</td>
+                                    <td><span class="badge bg-success">7.2</span></td>
+                                    <td>8/10</td>
+                                    <td><span class="badge bg-success">92%</span></td>
+                                    <td><span class="badge bg-info">5</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-chart-bar"></i> Gráficos
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Lenguaje</td>
+                                    <td>2°A</td>
+                                    <td><span class="badge bg-warning">6.5</span></td>
+                                    <td>6/8</td>
+                                    <td><span class="badge bg-warning">78%</span></td>
+                                    <td><span class="badge bg-info">3</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-chart-bar"></i> Gráficos
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Lenguaje</td>
+                                    <td>3°B</td>
+                                    <td><span class="badge bg-info">6.9</span></td>
+                                    <td>7/9</td>
+                                    <td><span class="badge bg-success">85%</span></td>
+                                    <td><span class="badge bg-info">4</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-chart-bar"></i> Gráficos
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Historia</td>
+                                    <td>2°A</td>
+                                    <td><span class="badge bg-success">7.1</span></td>
+                                    <td>9/10</td>
+                                    <td><span class="badge bg-success">95%</span></td>
+                                    <td><span class="badge bg-info">6</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-chart-bar"></i> Gráficos
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos de Rendimiento -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-area me-2"></i>Gráficos de Rendimiento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <h6 class="text-primary mb-3">Evolución de Promedios</h6>
+                            <div class="bg-light p-4 rounded text-center">
+                                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Gráfico de evolución de promedios</p>
+                                <small class="text-muted">(Próximamente con Chart.js)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <h6 class="text-success mb-3">Distribución de Notas</h6>
+                            <div class="bg-light p-4 rounded text-center">
+                                <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Gráfico de distribución de notas</p>
+                                <small class="text-muted">(Próximamente con Chart.js)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <h6 class="text-warning mb-3">Asistencia por Mes</h6>
+                            <div class="bg-light p-4 rounded text-center">
+                                <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Gráfico de asistencia mensual</p>
+                                <small class="text-muted">(Próximamente con Chart.js)</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <h6 class="text-info mb-3">Comparativo entre Cursos</h6>
+                            <div class="bg-light p-4 rounded text-center">
+                                <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">Comparativo de rendimiento</p>
+                                <small class="text-muted">(Próximamente con Chart.js)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="col-lg-4">
+            <!-- Exportación de Reportes -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-warning text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-download me-2"></i>Exportar Reportes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Formato</label>
+                        <select class="form-select">
+                            <option>PDF</option>
+                            <option>Excel</option>
+                            <option>Word</option>
+                            <option>CSV</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Incluir</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="incluirGraficos" checked>
+                            <label class="form-check-label" for="incluirGraficos">Gráficos</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="incluirTablas" checked>
+                            <label class="form-check-label" for="incluirTablas">Tablas de Datos</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="incluirRecomendaciones">
+                            <label class="form-check-label" for="incluirRecomendaciones">Recomendaciones</label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-file-pdf me-1"></i>Exportar PDF
+                        </button>
+                        <button class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-file-excel me-1"></i>Exportar Excel
+                        </button>
+                        <button class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-envelope me-1"></i>Enviar por Email
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alertas y Recomendaciones -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-danger text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Alertas del Sistema
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-arrow-down me-1"></i>Bajo Rendimiento en Lenguaje 2°A
+                        </h6>
+                        <p class="mb-1">Promedio bajo 6.5</p>
+                        <small>Recomendación: Revisar estrategias de enseñanza</small>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-user-clock me-1"></i>Asistencia Irregular
+                        </h6>
+                        <p class="mb-1">5 estudiantes con asistencia bajo 70%</p>
+                        <small>Requieren intervención inmediata</small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-arrow-up me-1"></i>Mejora en Matemáticas
+                        </h6>
+                        <p class="mb-1">Incremento de 0.4 puntos</p>
+                        <small>¡Excelente progreso!</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reportes Programados -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-secondary text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-clock me-2"></i>Reportes Programados
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Reporte Semanal</h6>
+                            <small class="text-primary">Cada lunes - 8:00 AM</small>
+                            <br>
+                            <small class="text-muted">Enviado a coordinación</small>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Reporte Mensual</h6>
+                            <small class="text-warning">Primer día del mes</small>
+                            <br>
+                            <small class="text-muted">Enviado a dirección</small>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Reporte Trimestral</h6>
+                            <small class="text-info">Cada 3 meses</small>
+                            <br>
+                            <small class="text-muted">Enviado a apoderados</small>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-cog me-1"></i>Configurar Reportes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>Acciones Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-chart-line me-1"></i>Generar Reporte IA
+                        </button>
+                        <button class="btn btn-outline-success btn-sm">
+                            <i class="fas fa-users me-1"></i>Reporte para Apoderados
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm">
+                            <i class="fas fa-exclamation-triangle me-1"></i>Reporte de Riesgo
+                        </button>
+                        <button class="btn btn-outline-info btn-sm">
+                            <i class="fas fa-trophy me-1"></i>Reporte de Destacados
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

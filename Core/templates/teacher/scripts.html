@@ -1,4 +1,7 @@
+{% load static %}
 <!-- Scripts y Estilos para el Panel del Docente -->
+<link rel="stylesheet" href="{% static 'css/teacher_advanced.css' %}">
+
 <style>
     .bg-gradient-dark {
         background: linear-gradient(45deg, #2c3e50, #1a252f);
@@ -281,6 +284,52 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Función para mostrar la pestaña de asignaturas
+    window.mostrarPestanaAsignaturas = function() {
+        const asignaturasTab = document.getElementById('asignaturas-tab');
+        const asignaturasContent = document.getElementById('asignaturas');
+        
+        if (asignaturasTab && asignaturasContent) {
+            // Remover clase active de todas las pestañas
+            document.querySelectorAll('.nav-link').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-pane').forEach(content => {
+                content.classList.remove('show', 'active');
+            });
+            
+            // Activar la pestaña de asignaturas
+            asignaturasTab.classList.add('active');
+            asignaturasContent.classList.add('show', 'active');
+            
+            // Scroll suave hacia la pestaña
+            asignaturasTab.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    };
+    
+    // Función para mostrar la pestaña de reportes
+    window.mostrarPestanaReportes = function() {
+        const reportesTab = document.getElementById('reportes-tab');
+        const reportesContent = document.getElementById('reportes');
+        
+        if (reportesTab && reportesContent) {
+            // Remover clase active de todas las pestañas
+            document.querySelectorAll('.nav-link').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-pane').forEach(content => {
+                content.classList.remove('show', 'active');
+            });
+            
+            // Activar la pestaña de reportes
+            reportesTab.classList.add('active');
+            reportesContent.classList.add('show', 'active');
+            
+            // Scroll suave hacia la pestaña
+            reportesTab.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    };
 });
 
 // Función para actualizar estadísticas en tiempo real

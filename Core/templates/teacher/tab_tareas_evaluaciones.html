@@ -1,0 +1,244 @@
+<!-- Pestaña de Tareas y Evaluaciones Avanzadas -->
+<div class="tab-pane fade" id="tareas-evaluaciones">
+    <div class="row">
+        <!-- Panel Principal -->
+        <div class="col-lg-8">
+            <!-- Crear Nueva Tarea/Evaluación -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Crear Nueva Tarea o Evaluación
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tipoActividad" id="tarea" checked>
+                                <label class="form-check-label" for="tarea">
+                                    <i class="fas fa-tasks text-primary me-2"></i>Tarea
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="tipoActividad" id="evaluacion">
+                                <label class="form-check-label" for="evaluacion">
+                                    <i class="fas fa-clipboard-check text-success me-2"></i>Evaluación
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form>
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Título</label>
+                                <input type="text" class="form-control" placeholder="Ej: Análisis de texto literario">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Asignatura</label>
+                                <select class="form-select">
+                                    <option>Matemáticas</option>
+                                    <option>Lenguaje</option>
+                                    <option>Historia</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textarea class="form-control" rows="4" placeholder="Describe la tarea o evaluación..."></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha de Entrega</label>
+                                <input type="datetime-local" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ponderación (%)</label>
+                                <input type="number" class="form-control" min="0" max="100" value="20">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Archivos Adjuntos</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" multiple>
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-upload"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Puedes subir documentos, rúbricas, o material de apoyo</small>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="habilitarEntrega">
+                                <label class="form-check-label" for="habilitarEntrega">
+                                    Habilitar entrega de respuestas en la plataforma
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-outline-primary">
+                                <i class="fas fa-magic me-2"></i>Asistencia IA
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Crear Actividad
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de Tareas y Evaluaciones -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>Actividades Creadas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <i class="fas fa-tasks text-primary me-2"></i>
+                                        Análisis de texto literario
+                                    </h6>
+                                    <p class="mb-1 text-muted">Asignatura: Lenguaje | Entrega: 25/04/2024</p>
+                                    <small class="text-muted">15 entregas recibidas de 25 estudiantes</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-warning">Pendiente</span>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver Entregas
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-pen"></i> Calificar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <i class="fas fa-clipboard-check text-success me-2"></i>
+                                        Prueba N°2 - Álgebra
+                                    </h6>
+                                    <p class="mb-1 text-muted">Asignatura: Matemáticas | Entrega: 20/04/2024</p>
+                                    <small class="text-muted">25 entregas recibidas de 25 estudiantes</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-success">Completada</span>
+                                    <div class="mt-2">
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> Ver Resultados
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-chart-bar"></i> Estadísticas
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="col-lg-4">
+            <!-- Asistencia IA -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-warning text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-robot me-2"></i>Asistencia IA
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-primary">Sugerencias de Retroalimentación</h6>
+                        <div class="alert alert-info">
+                            <small>
+                                <i class="fas fa-lightbulb me-1"></i>
+                                "Considera incluir ejemplos específicos para mejorar la comprensión"
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="text-success">Preguntas Sugeridas</h6>
+                        <ul class="list-unstyled">
+                            <li><small>• ¿Cuál es el tema principal del texto?</small></li>
+                            <li><small>• Identifica los elementos literarios presentes</small></li>
+                            <li><small>• Analiza el contexto histórico</small></li>
+                        </ul>
+                    </div>
+                    
+                    <button class="btn btn-outline-warning btn-sm w-100">
+                        <i class="fas fa-magic me-1"></i>Generar con IA
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estadísticas Rápidas -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-success text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Estadísticas Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <h4 class="text-primary">8</h4>
+                            <small class="text-muted">Tareas Activas</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-success">12</h4>
+                            <small class="text-muted">Evaluaciones</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-warning">85%</h4>
+                            <small class="text-muted">Tasa de Entrega</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <h4 class="text-info">6.8</h4>
+                            <small class="text-muted">Promedio General</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Próximas Entregas -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-danger text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-clock me-2"></i>Próximas Entregas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Análisis de texto</h6>
+                            <small class="text-danger">Mañana - 10:00 AM</small>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <h6 class="mb-1">Prueba de Matemáticas</h6>
+                            <small class="text-warning">En 2 días - 2:00 PM</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

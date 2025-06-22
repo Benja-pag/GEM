@@ -66,6 +66,38 @@ class AsignaturaDetalleView(View):
         }
         return render(request, 'teacher/asignatura_detalle.html', context)
 
+@method_decorator(login_required, name='dispatch')
+class AsignaturaDetalleEstudianteView(View):
+    def get(self, request, asignatura_id):
+        asignatura = get_object_or_404(AsignaturaImpartida, id=asignatura_id)
+        
+        # Verificar que el estudiante esté inscrito en esta asignatura
+        if not hasattr(request.user.usuario, 'estudiante'):
+            messages.error(request, 'No tienes permiso para acceder a esta página')
+            return redirect('estudiante_panel')
+        
+        estudiante = request.user.usuario.estudiante
+        inscripcion = estudiante.asignaturas_inscritas.filter(
+            asignatura_impartida=asignatura,
+            validada=True
+        ).first()
+        
+        if not inscripcion:
+            messages.error(request, 'No estás inscrito en esta asignatura')
+            return redirect('estudiante_panel')
+        
+        # Obtener clases de la asignatura
+        clases = Clase.objects.filter(
+            asignatura_impartida=asignatura
+        ).order_by('fecha', 'horario')
+        
+        context = {
+            'asignatura': asignatura,
+            'clases': clases,
+            'estudiante': estudiante
+        }
+        return render(request, 'student/asignatura_detalle.html', context)
+
 # from django.shortcuts import render, redirect, get_object_or_404
 # from django.views import View
 # from django.contrib import messages

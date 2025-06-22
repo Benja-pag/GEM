@@ -41,6 +41,9 @@
             <button class="nav-link" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantes" type="button"><i class="fas fa-user-friends me-2"></i>Estudiantes</button>
         </li>
         <li class="nav-item" role="presentation">
+            <button class="nav-link" id="rendimiento-tab" data-bs-toggle="tab" data-bs-target="#rendimiento" type="button"><i class="fas fa-chart-line me-2"></i>Rendimiento</button>
+        </li>
+        <li class="nav-item" role="presentation">
             <button class="nav-link" id="asignaturas-tab" data-bs-toggle="tab" data-bs-target="#asignaturas" type="button"><i class="fas fa-book me-2"></i>Asignaturas</button>
         </li>
         <li class="nav-item" role="presentation">
@@ -210,6 +213,266 @@
                                     <p><strong>Asistencia:</strong> 85%</p>
                                     <p><strong>Observaciones:</strong> Necesita mejorar la puntualidad.</p>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Rendimiento: Análisis detallado por asignatura -->
+        <div class="tab-pane fade" id="rendimiento">
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Rendimiento por Asignatura -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-gradient-success text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-book me-2"></i>Rendimiento por Asignatura
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Asignatura</th>
+                                            <th>Profesor</th>
+                                            <th>Promedio</th>
+                                            <th>Asistencia</th>
+                                            <th>Estudiantes en Riesgo</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Matemáticas</td>
+                                            <td>Prof. Juan Pérez</td>
+                                            <td><span class="badge bg-success">7.2</span></td>
+                                            <td>88%</td>
+                                            <td><span class="badge bg-danger">3</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> Ver Detalles
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Lenguaje</td>
+                                            <td>Prof. María González</td>
+                                            <td><span class="badge bg-warning">6.5</span></td>
+                                            <td>82%</td>
+                                            <td><span class="badge bg-danger">5</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> Ver Detalles
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Historia</td>
+                                            <td>Prof. Carlos López</td>
+                                            <td><span class="badge bg-info">6.9</span></td>
+                                            <td>85%</td>
+                                            <td><span class="badge bg-warning">2</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> Ver Detalles
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ranking de Estudiantes -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-gradient-info text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-trophy me-2"></i>Ranking de Estudiantes del Curso
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Posición</th>
+                                            <th>Estudiante</th>
+                                            <th>Promedio General</th>
+                                            <th>Asistencia</th>
+                                            <th>Mejor Asignatura</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><span class="badge bg-warning">1°</span></td>
+                                            <td>Ana González</td>
+                                            <td><span class="badge bg-success">7.8</span></td>
+                                            <td>95%</td>
+                                            <td>Matemáticas (8.2)</td>
+                                            <td><span class="badge bg-success">Excelente</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-user"></i> Perfil
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-secondary">2°</span></td>
+                                            <td>Carlos Ramírez</td>
+                                            <td><span class="badge bg-success">7.5</span></td>
+                                            <td>92%</td>
+                                            <td>Historia (8.0)</td>
+                                            <td><span class="badge bg-success">Bueno</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-user"></i> Perfil
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="badge bg-info">3°</span></td>
+                                            <td>María Silva</td>
+                                            <td><span class="badge bg-warning">7.2</span></td>
+                                            <td>88%</td>
+                                            <td>Lenguaje (7.8)</td>
+                                            <td><span class="badge bg-warning">Regular</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-user"></i> Perfil
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr class="table-danger">
+                                            <td><span class="badge bg-danger">25°</span></td>
+                                            <td>Pedro López</td>
+                                            <td><span class="badge bg-danger">4.2</span></td>
+                                            <td>65%</td>
+                                            <td>Educación Física (5.5)</td>
+                                            <td><span class="badge bg-danger">En Riesgo</span></td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-exclamation-triangle"></i> Intervenir
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Herramientas IA -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-gradient-warning text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-robot me-2"></i>Herramientas IA
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-primary">Generar Reporte Específico</h6>
+                                <select class="form-select mb-2">
+                                    <option>Reporte de Rendimiento</option>
+                                    <option>Reporte de Asistencia</option>
+                                    <option>Reporte de Comportamiento</option>
+                                    <option>Reporte para Apoderados</option>
+                                </select>
+                                <button class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-magic me-1"></i>Generar con IA
+                                </button>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-success">Sugerencias de Intervención</h6>
+                                <div class="alert alert-info">
+                                    <small>
+                                        <i class="fas fa-lightbulb me-1"></i>
+                                        "3 estudiantes requieren atención inmediata en Matemáticas"
+                                    </small>
+                                </div>
+                                <button class="btn btn-outline-success btn-sm w-100">
+                                    <i class="fas fa-comments me-1"></i>Ver Sugerencias
+                                </button>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6 class="text-warning">Comunicación Asistida</h6>
+                                <button class="btn btn-outline-warning btn-sm w-100 mb-2">
+                                    <i class="fas fa-envelope me-1"></i>Generar Comunicación
+                                </button>
+                                <button class="btn btn-outline-info btn-sm w-100">
+                                    <i class="fas fa-bullhorn me-1"></i>Anuncio al Curso
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas y Recomendaciones -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-gradient-danger text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Alertas y Recomendaciones
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-danger">
+                                <h6 class="alert-heading">Intervención Requerida</h6>
+                                <p class="mb-1">3 estudiantes requieren atención inmediata en Matemáticas</p>
+                                <small>Recomendación: Reunión individual</small>
+                            </div>
+                            <div class="alert alert-warning">
+                                <h6 class="alert-heading">Mejora Detectada</h6>
+                                <p class="mb-1">Asistencia mejoró 5% este mes</p>
+                                <small>¡Excelente progreso!</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comunicación Rápida -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-gradient-primary text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-envelope me-2"></i>Comunicación Rápida
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Destinatarios</label>
+                                <select class="form-select">
+                                    <option>Todos los Estudiantes</option>
+                                    <option>Todos los Apoderados</option>
+                                    <option>Estudiantes en Riesgo</option>
+                                    <option>Estudiantes Destacados</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Tipo de Mensaje</label>
+                                <select class="form-select">
+                                    <option>Recordatorio</option>
+                                    <option>Anuncio Importante</option>
+                                    <option>Felicitación</option>
+                                    <option>Convocatoria</option>
+                                </select>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-paper-plane me-1"></i>Enviar Mensaje
+                                </button>
+                                <button class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-calendar me-1"></i>Programar Reunión
+                                </button>
+                                <button class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-phone me-1"></i>Llamar Apoderados
+                                </button>
                             </div>
                         </div>
                     </div>

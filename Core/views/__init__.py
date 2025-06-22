@@ -12,7 +12,7 @@ from .usuarios import UserManagementView, UserCreateView, UserDetailView, UserUp
 from .docentes import ProfesorPanelView
 from .alumnos import EstudiantePanelView, AttendanceView
 from .auth import LoginView, LogoutView, RegisterView, ChangePasswordView
-from .cursos import CursoDetalleView, AsignaturaDetalleView
+from .cursos import CursoDetalleView, AsignaturaDetalleView, AsignaturaDetalleEstudianteView
 
 __all__ = [
     'HomeView',
@@ -36,5 +36,6 @@ __all__ = [
     'TestsView',
     'AttendanceView',
     'CursoDetalleView',
-    'AsignaturaDetalleView'
+    'AsignaturaDetalleView',
+    'AsignaturaDetalleEstudianteView'
 ]

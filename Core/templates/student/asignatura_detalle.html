@@ -5,62 +5,402 @@
 
 {% block extra_css %}
 <style>
+    /* Variables CSS personalizadas */
     :root {
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         --info-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
         --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
         --card-shadow-hover: 0 20px 40px rgba(0,0,0,0.15);
         --border-radius: 15px;
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
-    .container { max-width: 1400px; }
-    .asignatura-header { background: var(--primary-gradient); border-radius: var(--border-radius); padding: 2rem; margin-bottom: 2rem; box-shadow: var(--card-shadow); position: relative; overflow: hidden; }
-    .asignatura-header::before { content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); animation: float 6s ease-in-out infinite; }
-    @keyframes float { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-20px) rotate(180deg); } }
-    .asignatura-icon { width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3); }
-    .nav-tabs { border: none; background: white; border-radius: var(--border-radius); padding: 0.5rem; box-shadow: var(--card-shadow); margin-bottom: 2rem; }
-    .nav-tabs .nav-link { border: none; border-radius: 10px; margin: 0 0.25rem; padding: 0.75rem 1.5rem; color: #6c757d; font-weight: 500; transition: var(--transition); position: relative; overflow: hidden; }
-    .nav-tabs .nav-link::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: var(--primary-gradient); transition: var(--transition); z-index: -1; }
-    .nav-tabs .nav-link:hover::before, .nav-tabs .nav-link.active::before { left: 0; }
-    .nav-tabs .nav-link:hover, .nav-tabs .nav-link.active { color: white; transform: translateY(-2px); }
-    .card { border: none; border-radius: var(--border-radius); box-shadow: var(--card-shadow); transition: var(--transition); overflow: hidden; }
-    .card:hover { transform: translateY(-5px); box-shadow: var(--card-shadow-hover); }
-    .card-header { background: var(--primary-gradient); color: white; border: none; padding: 1.5rem; }
-    .stats-card { background: white; border-radius: var(--border-radius); padding: 1.5rem; text-align: center; box-shadow: var(--card-shadow); transition: var(--transition); position: relative; overflow: hidden; }
-    .stats-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--primary-gradient); }
-    .stats-card:hover { transform: translateY(-3px); box-shadow: var(--card-shadow-hover); }
-    .stats-number { font-size: 2.5rem; font-weight: 700; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
-    .progress { height: 12px; border-radius: 10px; background: #e9ecef; overflow: hidden; }
-    .progress-bar { background: var(--success-gradient); border-radius: 10px; transition: width 1s ease-in-out; }
-    .badge { padding: 0.5rem 1rem; border-radius: 20px; font-weight: 500; font-size: 0.85rem; }
-    .badge-primary { background: var(--primary-gradient); }
-    .badge-success { background: var(--success-gradient); }
-    .badge-warning { background: var(--warning-gradient); }
-    .badge-info { background: var(--info-gradient); }
-    .btn { border-radius: 25px; padding: 0.75rem 1.5rem; font-weight: 500; transition: var(--transition); border: none; position: relative; overflow: hidden; }
-    .btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
-    .btn:hover::before { left: 100%; }
-    .btn-primary { background: var(--primary-gradient); }
-    .btn-success { background: var(--success-gradient); }
-    .btn-warning { background: var(--warning-gradient); }
-    .list-group-item { border: none; border-radius: 10px; margin-bottom: 0.5rem; padding: 1rem; transition: var(--transition); background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .list-group-item:hover { transform: translateX(5px); box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-    .material-card { background: white; border-radius: var(--border-radius); padding: 1.5rem; text-align: center; transition: var(--transition); position: relative; overflow: hidden; }
-    .material-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--primary-gradient); opacity: 0; transition: var(--transition); z-index: -1; }
-    .material-card:hover::before { opacity: 0.05; }
-    .material-card:hover { transform: translateY(-5px); box-shadow: var(--card-shadow-hover); }
-    .material-icon { font-size: 3rem; margin-bottom: 1rem; transition: var(--transition); }
-    .material-card:hover .material-icon { transform: scale(1.1); }
-    .form-control { border-radius: 10px; border: 2px solid #e9ecef; padding: 0.75rem 1rem; transition: var(--transition); }
-    .form-control:focus { border-color: #667eea; box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25); }
-    .loading { opacity: 0.7; pointer-events: none; }
-    .fade-in { animation: fadeIn 0.5s ease-in; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @media (max-width: 768px) { .asignatura-header { padding: 1.5rem; } .nav-tabs .nav-link { padding: 0.5rem 1rem; font-size: 0.9rem; } .stats-number { font-size: 2rem; } }
-    ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; } ::-webkit-scrollbar-thumb { background: var(--primary-gradient); border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #5a6fd8 0%, #6a4c93 100%); }
+
+    /* Estilos generales */
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 1400px;
+    }
+
+    /* Header de la asignatura */
+    .asignatura-header {
+        background: var(--primary-gradient);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .asignatura-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .asignatura-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    /* Tabs mejorados */
+    .nav-tabs {
+        border: none;
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 0.5rem;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 2rem;
+    }
+
+    .nav-tabs .nav-link {
+        border: none;
+        border-radius: 10px;
+        margin: 0 0.25rem;
+        padding: 0.75rem 1.5rem;
+        color: #6c757d;
+        font-weight: 500;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .nav-tabs .nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        transition: var(--transition);
+        z-index: -1;
+    }
+
+    .nav-tabs .nav-link:hover::before,
+    .nav-tabs .nav-link.active::before {
+        left: 0;
+    }
+
+    .nav-tabs .nav-link:hover,
+    .nav-tabs .nav-link.active {
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Cards mejoradas */
+    .card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .card-header {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 1.5rem;
+    }
+
+    /* Stats cards */
+    .stats-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+    }
+
+    .stats-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Progress bars mejorados */
+    .progress {
+        height: 12px;
+        border-radius: 10px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        background: var(--success-gradient);
+        border-radius: 10px;
+        transition: width 1s ease-in-out;
+    }
+
+    /* Badges mejorados */
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .badge-primary {
+        background: var(--primary-gradient);
+    }
+
+    .badge-success {
+        background: var(--success-gradient);
+    }
+
+    .badge-warning {
+        background: var(--warning-gradient);
+    }
+
+    .badge-info {
+        background: var(--info-gradient);
+    }
+
+    /* Botones mejorados */
+    .btn {
+        border-radius: 25px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: var(--transition);
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+    }
+
+    .btn-success {
+        background: var(--success-gradient);
+    }
+
+    .btn-warning {
+        background: var(--warning-gradient);
+    }
+
+    /* Lista de elementos */
+    .list-group-item {
+        border: none;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        padding: 1rem;
+        transition: var(--transition);
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .list-group-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Materiales grid */
+    .material-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        text-align: center;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .material-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--primary-gradient);
+        opacity: 0;
+        transition: var(--transition);
+        z-index: -1;
+    }
+
+    .material-card:hover::before {
+        opacity: 0.05;
+    }
+
+    .material-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .material-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        transition: var(--transition);
+    }
+
+    .material-card:hover .material-icon {
+        transform: scale(1.1);
+    }
+
+    /* Chat y mensajes */
+    .message {
+        margin-bottom: 1rem;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message-content {
+        border-radius: 15px;
+        padding: 1rem;
+        position: relative;
+    }
+
+    .message.received .message-content {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom-left-radius: 5px;
+    }
+
+    .message.sent .message-content {
+        background: var(--primary-gradient);
+        color: white;
+        border-bottom-right-radius: 5px;
+    }
+
+    /* Formularios mejorados */
+    .form-control {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: var(--transition);
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    /* Animaciones de carga */
+    .loading {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .asignatura-header {
+            padding: 1.5rem;
+        }
+        
+        .nav-tabs .nav-link {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+        }
+    }
+
+    /* Scrollbar personalizada */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--primary-gradient);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #5a6fd8 0%, #6a4c93 100%);
+    }
 </style>
 {% endblock %}
 
@@ -97,8 +437,8 @@
                     </div>
                     <div class="col-md-4">
                         <div class="d-flex align-items-center">
-                            <i class="fas fa-user-graduate me-2"></i>
-                            <span>{{ estudiantes|length }} estudiantes</span>
+                            <i class="fas fa-clock me-2"></i>
+                            <span>{{ clases|length }} clases</span>
                         </div>
                     </div>
                 </div>
@@ -120,8 +460,8 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantes" type="button">
-                <i class="fas fa-user-friends me-2"></i>Estudiantes
+            <button class="nav-link" id="comunicacion-tab" data-bs-toggle="tab" data-bs-target="#comunicacion" type="button">
+                <i class="fas fa-comments me-2"></i>Comunicación
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -145,11 +485,6 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="comunicacion-tab" data-bs-toggle="tab" data-bs-target="#comunicacion" type="button">
-                <i class="fas fa-comments me-2"></i>Comunicación
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
             <button class="nav-link" id="foro-tab" data-bs-toggle="tab" data-bs-target="#foro" type="button">
                 <i class="fas fa-users me-2"></i>Foro
             </button>
@@ -165,7 +500,7 @@
                     <div class="card mb-4">
                         <div class="card-header">
                             <h5 class="card-title mb-0">
-                                <i class="fas fa-chart-line me-2"></i>Estadísticas del Curso
+                                <i class="fas fa-chart-line me-2"></i>Mi Progreso en el Curso
                             </h5>
                         </div>
                         <div class="card-body">
@@ -173,19 +508,19 @@
                                 <div class="col-md-4">
                                     <div class="stats-card">
                                         <div class="stats-number text-success">85%</div>
-                                        <small class="text-muted">Asistencia Promedio</small>
+                                        <small class="text-muted">Asistencia</small>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="stats-card">
                                         <div class="stats-number text-primary">6.2</div>
-                                        <small class="text-muted">Promedio General</small>
+                                        <small class="text-muted">Promedio</small>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="stats-card">
                                         <div class="stats-number text-warning">75%</div>
-                                        <small class="text-muted">Avance del Curso</small>
+                                        <small class="text-muted">Progreso</small>
                                     </div>
                                 </div>
                             </div>
@@ -231,51 +566,65 @@
             </div>
         </div>
 
-        <!-- Pestaña Estudiantes -->
-        <div class="tab-pane fade fade-in" id="estudiantes">
+        <!-- Pestaña Comunicación -->
+        <div class="tab-pane fade fade-in" id="comunicacion">
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-user-friends me-2"></i>Estudiantes Inscritos
+                        <i class="fas fa-comments me-2"></i>Comunicaciones del Profesor
                     </h5>
                 </div>
                 <div class="card-body">
-                    {% if estudiantes %}
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th><i class="fas fa-user me-2"></i>Nombre</th>
-                                        <th><i class="fas fa-graduation-cap me-2"></i>Curso</th>
-                                        <th><i class="fas fa-id-card me-2"></i>RUT</th>
-                                        <th><i class="fas fa-envelope me-2"></i>Correo Electrónico</th>
-                                        <th><i class="fas fa-chart-line me-2"></i>Rendimiento</th>
-                                        <th><i class="fas fa-eye me-2"></i>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for estudiante in estudiantes %}
-                                    <tr>
-                                        <td>{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }}</td>
-                                        <td><span class="badge badge-info">{{ estudiante.curso }}</span></td>
-                                        <td>{{ estudiante.usuario.rut }}-{{ estudiante.usuario.div }}</td>
-                                        <td>{{ estudiante.usuario.email }}</td>
-                                        <td>
-                                            <div class="progress" style="height: 6px;">
-                                                <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver</button>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">
+                                            <i class="fas fa-exclamation-circle text-warning me-2"></i>
+                                            Recordatorio: Prueba N°2
+                                        </h6>
+                                        <small class="text-muted">Hace 2 días</small>
+                                    </div>
+                                    <p class="mb-1">Estimados estudiantes, les recuerdo que la Prueba N°2 será el próximo lunes. Revisen el material de estudio.</p>
+                                    <small class="text-muted">Prof. {{ asignatura.docente.usuario.nombre }}</small>
+                                </div>
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">
+                                            <i class="fas fa-file-alt text-info me-2"></i>
+                                            Nuevo material disponible
+                                        </h6>
+                                        <small class="text-muted">Hace 1 semana</small>
+                                    </div>
+                                    <p class="mb-1">He subido la guía de estudio para el próximo tema. Descárguenla desde la sección de materiales.</p>
+                                    <small class="text-muted">Prof. {{ asignatura.docente.usuario.nombre }}</small>
+                                </div>
+                            </div>
                         </div>
-                    {% else %}
-                        <p class="text-muted">No hay estudiantes inscritos en esta asignatura.</p>
-                    {% endif %}
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-paper-plane me-2"></i>Enviar mensaje al profesor
+                                    </h6>
+                                    <form>
+                                        <div class="mb-3">
+                                            <label for="asunto" class="form-label">Asunto</label>
+                                            <input type="text" class="form-control" id="asunto" placeholder="Asunto del mensaje">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="mensaje" class="form-label">Mensaje</label>
+                                            <textarea class="form-control" id="mensaje" rows="4" placeholder="Escribe tu mensaje aquí..."></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-paper-plane me-1"></i>Enviar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -297,7 +646,7 @@
                                         <th><i class="fas fa-calendar-day me-2"></i>Día</th>
                                         <th><i class="fas fa-clock me-2"></i>Horario</th>
                                         <th><i class="fas fa-door-open me-2"></i>Sala</th>
-                                        <th><i class="fas fa-users me-2"></i>Curso</th>
+                                        <th><i class="fas fa-info-circle me-2"></i>Estado</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -307,11 +656,7 @@
                                         <td>{{ clase.horario }}</td>
                                         <td>{{ clase.sala }}</td>
                                         <td>
-                                            {% if clase.curso %}
-                                                <span class="badge badge-primary">{{ clase.curso.nivel }}°{{ clase.curso.letra }}</span>
-                                            {% else %}
-                                                <span class="badge badge-secondary">Electivo</span>
-                                            {% endif %}
+                                            <span class="badge badge-success">Próxima</span>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -331,20 +676,39 @@
         <!-- Pestaña Materiales -->
         <div class="tab-pane fade fade-in" id="materiales">
             <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-folder-open me-2"></i>Materiales de la Asignatura
                     </h5>
-                    <button class="btn btn-success btn-sm"><i class="fas fa-upload me-1"></i>Subir Material</button>
                 </div>
                 <div class="card-body">
+                    <!-- Materiales de texto -->
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-file-text me-2"></i>Información Importante
+                        </h6>
+                        <div class="card bg-light border-0">
+                            <div class="card-body">
+                                <h6>Programa del Curso</h6>
+                                <p class="mb-2">Este curso cubre los fundamentos de la asignatura. Se evaluará mediante pruebas, tareas y un proyecto final.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Actualizado: 15/03/2024</small>
+                                    <button class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-download me-1"></i>Descargar PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Archivos descargables -->
                     <div class="row">
                         <div class="col-md-4 mb-3">
                             <div class="material-card">
                                 <i class="fas fa-file-pdf material-icon text-danger"></i>
                                 <h6 class="card-title">Guía de Estudio</h6>
                                 <p class="card-text small text-muted">Material de apoyo para el estudio</p>
-                                <button class="btn btn-outline-primary btn-sm w-100">
+                                <button class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-download me-1"></i>Descargar
                                 </button>
                             </div>
@@ -354,7 +718,7 @@
                                 <i class="fas fa-file-word material-icon text-primary"></i>
                                 <h6 class="card-title">Ejercicios Prácticos</h6>
                                 <p class="card-text small text-muted">Ejercicios para practicar</p>
-                                <button class="btn btn-outline-primary btn-sm w-100">
+                                <button class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-download me-1"></i>Descargar
                                 </button>
                             </div>
@@ -364,7 +728,7 @@
                                 <i class="fas fa-video material-icon text-success"></i>
                                 <h6 class="card-title">Video Clase</h6>
                                 <p class="card-text small text-muted">Grabación de la última clase</p>
-                                <button class="btn btn-outline-success btn-sm w-100">
+                                <button class="btn btn-outline-success btn-sm">
                                     <i class="fas fa-play me-1"></i>Ver
                                 </button>
                             </div>
@@ -377,11 +741,10 @@
         <!-- Pestaña Evaluaciones -->
         <div class="tab-pane fade fade-in" id="evaluaciones">
             <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-clipboard-check me-2"></i>Evaluaciones
+                        <i class="fas fa-clipboard-check me-2"></i>Mis Evaluaciones
                     </h5>
-                    <button class="btn btn-success btn-sm"><i class="fas fa-plus me-1"></i>Crear Evaluación</button>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -391,9 +754,8 @@
                                     <th><i class="fas fa-clipboard me-2"></i>Evaluación</th>
                                     <th><i class="fas fa-calendar me-2"></i>Fecha</th>
                                     <th><i class="fas fa-percentage me-2"></i>Ponderación</th>
-                                    <th><i class="fas fa-star me-2"></i>Promedio</th>
+                                    <th><i class="fas fa-star me-2"></i>Nota</th>
                                     <th><i class="fas fa-info-circle me-2"></i>Estado</th>
-                                    <th><i class="fas fa-eye me-2"></i>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -403,10 +765,6 @@
                                     <td>25%</td>
                                     <td><span class="badge badge-success">6.5</span></td>
                                     <td><span class="badge badge-success">Calificada</span></td>
-                                    <td>
-                                        <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver</button>
-                                        <button class="btn btn-outline-success btn-sm"><i class="fas fa-pen"></i> Calificar</button>
-                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Prueba N°2</td>
@@ -414,10 +772,6 @@
                                     <td>25%</td>
                                     <td><span class="badge badge-warning">Pendiente</span></td>
                                     <td><span class="badge badge-warning">Pendiente</span></td>
-                                    <td>
-                                        <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver</button>
-                                        <button class="btn btn-outline-success btn-sm"><i class="fas fa-pen"></i> Calificar</button>
-                                    </td>
                                 </tr>
                                 <tr>
                                     <td>Ensayo Final</td>
@@ -425,10 +779,6 @@
                                     <td>50%</td>
                                     <td><span class="badge badge-secondary">-</span></td>
                                     <td><span class="badge badge-info">Programada</span></td>
-                                    <td>
-                                        <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver</button>
-                                        <button class="btn btn-outline-success btn-sm"><i class="fas fa-pen"></i> Calificar</button>
-                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -440,11 +790,10 @@
         <!-- Pestaña Tareas -->
         <div class="tab-pane fade fade-in" id="tareas">
             <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-tasks me-2"></i>Tareas
+                        <i class="fas fa-tasks me-2"></i>Mis Tareas
                     </h5>
-                    <button class="btn btn-success btn-sm"><i class="fas fa-plus me-1"></i>Crear Tarea</button>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -461,8 +810,9 @@
                                     <p class="mb-1">Realizar un análisis crítico del texto proporcionado en clase.</p>
                                     <small class="text-muted">Fecha de entrega: 18/04/2024</small>
                                     <div class="mt-2">
-                                        <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver Entregas</button>
-                                        <button class="btn btn-outline-success btn-sm"><i class="fas fa-pen"></i> Calificar</button>
+                                        <button class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-upload me-1"></i>Entregar
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="list-group-item">
@@ -474,11 +824,7 @@
                                         <span class="badge badge-success">Completada</span>
                                     </div>
                                     <p class="mb-1">Investigación sobre el tema visto en clase.</p>
-                                    <small class="text-muted">Entregada: 10/04/2024</small>
-                                    <div class="mt-2">
-                                        <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver Entregas</button>
-                                        <button class="btn btn-outline-success btn-sm"><i class="fas fa-pen"></i> Calificar</button>
-                                    </div>
+                                    <small class="text-muted">Entregada: 10/04/2024 - Nota: 7.0</small>
                                 </div>
                             </div>
                         </div>
@@ -510,73 +856,12 @@
             </div>
         </div>
 
-        <!-- Pestaña Comunicación -->
-        <div class="tab-pane fade fade-in" id="comunicacion">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-comments me-2"></i>Comunicaciones a Estudiantes
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="list-group list-group-flush">
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">
-                                            <i class="fas fa-bullhorn text-warning me-2"></i>
-                                            Aviso: Prueba N°2
-                                        </h6>
-                                        <small class="text-muted">Hace 2 días</small>
-                                    </div>
-                                    <p class="mb-1">Recuerden que la Prueba N°2 será el próximo lunes. Revisen el material de estudio.</p>
-                                </div>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">
-                                            <i class="fas fa-file-alt text-info me-2"></i>
-                                            Nuevo material subido
-                                        </h6>
-                                        <small class="text-muted">Hace 1 semana</small>
-                                    </div>
-                                    <p class="mb-1">Se ha subido la guía de estudio para el próximo tema.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">
-                                        <i class="fas fa-paper-plane me-2"></i>Enviar comunicación
-                                    </h6>
-                                    <form>
-                                        <div class="mb-3">
-                                            <label for="asunto" class="form-label">Asunto</label>
-                                            <input type="text" class="form-control" id="asunto" placeholder="Asunto del mensaje">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="mensaje" class="form-label">Mensaje</label>
-                                            <textarea class="form-control" id="mensaje" rows="4" placeholder="Escribe tu mensaje aquí..."></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary w-100">
-                                            <i class="fas fa-paper-plane me-1"></i>Enviar
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Pestaña Foro -->
         <div class="tab-pane fade fade-in" id="foro">
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-users me-2"></i>Foro de la Asignatura
+                        <i class="fas fa-users me-2"></i>Foro de Discusión
                     </h5>
                 </div>
                 <div class="card-body">
@@ -587,11 +872,11 @@
                                     <div class="d-flex w-100 justify-content-between">
                                         <h6 class="mb-1">
                                             <i class="fas fa-question-circle text-info me-2"></i>
-                                            Duda de estudiante
+                                            Duda sobre el tema de la clase
                                         </h6>
                                         <small class="text-muted">Hace 1 hora</small>
                                     </div>
-                                    <p class="mb-1">¿Profesor, puede explicar mejor el concepto visto hoy?</p>
+                                    <p class="mb-1">¿Alguien puede explicarme mejor el concepto que vimos hoy?</p>
                                     <small class="text-muted">Por: María González</small>
                                     <div class="mt-2">
                                         <span class="badge badge-info me-2">3 respuestas</span>
@@ -604,7 +889,7 @@
                                     <div class="d-flex w-100 justify-content-between">
                                         <h6 class="mb-1">
                                             <i class="fas fa-lightbulb text-warning me-2"></i>
-                                            Material recomendado
+                                            Material adicional recomendado
                                         </h6>
                                         <small class="text-muted">Hace 2 días</small>
                                     </div>
@@ -647,17 +932,19 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
 <script>
+    // Animaciones al cambiar de pestaña
     document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
         tab.addEventListener('shown.bs.tab', function (e) {
             const target = document.querySelector(e.target.getAttribute('data-bs-target'));
             target.classList.add('fade-in');
         });
     });
+
+    // Efecto de carga en botones
     document.querySelectorAll('.btn').forEach(btn => {
         btn.addEventListener('click', function() {
             this.classList.add('loading');
@@ -666,6 +953,8 @@
             }, 1000);
         });
     });
+
+    // Animación de progreso
     const progressBar = document.querySelector('.progress-bar');
     if (progressBar) {
         setTimeout(() => {

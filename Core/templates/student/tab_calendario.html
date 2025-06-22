@@ -1,66 +1,90 @@
 <!-- Pestaña de Calendario -->
 <div class="tab-pane fade" id="calendario">
     <div class="row">
-        <div class="col-lg-8">
+        <!-- Columna del Calendario -->
+        <div class="col-lg-9">
             <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-calendar-alt me-2 text-primary"></i>Calendario Escolar</h5>
-                    <div id="calendar"></div>
+                <div class="card-header bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-alt text-primary me-2"></i>
+                            <strong>Junio 2024</strong>
+                        </h5>
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-left"></i></button>
+                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-2">
+                    <table class="table table-bordered calendar-table">
+                        <thead class="text-center">
+                            <tr>
+                                <th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-muted">27</td><td class="text-muted">28</td><td class="text-muted">29</td><td class="text-muted">30</td><td class="text-muted">31</td><td>1</td><td>2</td>
+                            </tr>
+                            <tr>
+                                <td>3</td><td>4</td><td>5<div class="calendar-event bg-success">Prueba</div></td><td>6</td><td>7</td><td>8</td><td>9</td>
+                            </tr>
+                            <tr>
+                                <td>10</td><td>11</td><td>12</td><td>13</td><td>14<div class="calendar-event bg-info text-dark">Día del Alumno</div></td><td>15</td><td>16</td>
+                            </tr>
+                            <tr>
+                                <td>17</td><td>18</td><td>19</td><td class="today">20</td><td>21</td><td>22</td><td>23</td>
+                            </tr>
+                            <tr>
+                                <td>24</td><td>25</td><td>26<div class="calendar-event bg-warning text-dark">Entrega Informe</div></td><td>27</td><td>28</td><td>29</td><td>30</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">1</td><td class="text-muted">2</td><td class="text-muted">3</td><td class="text-muted">4</td><td class="text-muted">5</td><td class="text-muted">6</td><td class="text-muted">7</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4">
-            <!-- Próximos Eventos -->
+        <!-- Columna de Información Adicional -->
+        <div class="col-lg-3">
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-calendar-day me-2"></i>Próximos Eventos
-                    </h5>
-                </div>
                 <div class="card-body">
+                    <h5 class="card-title mb-3"><i class="fas fa-star me-2 text-warning"></i>Próximos Eventos</h5>
                     <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-start">
-                            <div class="ms-2 me-auto">
-                                <div class="fw-bold">Prueba de Matemáticas</div>
-                                <small class="text-muted">15 de Abril, 2024</small>
+                        <a href="#" class="list-group-item list-group-item-action px-0">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Prueba</h6>
+                                <small class="text-muted">05/06</small>
                             </div>
-                            <span class="badge bg-primary rounded-pill">Evaluación</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-start">
-                            <div class="ms-2 me-auto">
-                                <div class="fw-bold">Reunión de Apoderados</div>
-                                <small class="text-muted">20 de Abril, 2024</small>
+                            <small class="badge bg-success-soft text-success">Evaluación</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action px-0">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Día del Alumno</h6>
+                                <small class="text-muted">14/06</small>
                             </div>
-                            <span class="badge bg-info rounded-pill">Evento</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-start">
-                            <div class="ms-2 me-auto">
-                                <div class="fw-bold">Entrega Trabajo Historia</div>
-                                <small class="text-muted">25 de Abril, 2024</small>
+                            <small class="badge bg-info-soft text-info">Evento</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action px-0">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Entrega Informe</h6>
+                                <small class="text-muted">26/06</small>
                             </div>
-                            <span class="badge bg-warning rounded-pill">Trabajo</span>
-                        </div>
+                            <small class="badge bg-warning-soft text-warning">Tarea</small>
+                        </a>
                     </div>
                 </div>
             </div>
-
-            <!-- Fechas Importantes -->
             <div class="card border-0 shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-star me-2"></i>Fechas Importantes
-                    </h5>
-                </div>
                 <div class="card-body">
-                    <div class="alert alert-warning" role="alert">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Período de Evaluaciones:</strong><br>
-                        Del 15 al 30 de Abril
-                    </div>
-                    <div class="alert alert-info" role="alert">
-                        <i class="fas fa-info-circle me-2"></i>
-                        <strong>Vacaciones de Invierno:</strong><br>
-                        Del 10 al 25 de Julio
+                    <h5 class="card-title mb-3"><i class="fas fa-tags me-2 text-primary"></i>Leyenda</h5>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex align-items-center"><div class="legend-dot bg-success"></div>Evaluaciones</div>
+                        <div class="d-flex align-items-center"><div class="legend-dot bg-warning"></div>Tareas y Entregas</div>
+                        <div class="d-flex align-items-center"><div class="legend-dot bg-info"></div>Eventos</div>
+                        <div class="d-flex align-items-center"><div class="legend-dot bg-danger"></div>Avisos Importantes</div>
                     </div>
                 </div>
             </div>

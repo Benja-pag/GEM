@@ -1,0 +1,161 @@
+<!-- Modal de Creación de Estudiante -->
+<div class="modal fade" id="crearEstudianteModal" tabindex="-1" aria-labelledby="crearEstudianteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearEstudianteModalLabel">Crear Nuevo Estudiante</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="crearEstudianteForm" method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="crear_estudiante">
+                    
+                    <!-- Alertas de error -->
+                    <div class="alert alert-danger" id="errorAlertEstudiante" style="display: none;">
+                        <ul id="errorListEstudiante"></ul>
+                    </div>
+
+                    <!-- Información Personal -->
+                    <h6 class="mb-3">Información Personal</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="estudiante_nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="estudiante_nombre" name="nombre" required 
+                                   pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios permitidos">
+                            <div class="invalid-feedback">
+                                Por favor ingrese un nombre válido
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="estudiante_apellido_paterno" class="form-label">Apellido Paterno</label>
+                            <input type="text" class="form-control" id="estudiante_apellido_paterno" name="apellido_paterno" required
+                                   pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios permitidos">
+                            <div class="invalid-feedback">
+                                Por favor ingrese un apellido paterno válido
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="estudiante_apellido_materno" class="form-label">Apellido Materno</label>
+                            <input type="text" class="form-control" id="estudiante_apellido_materno" name="apellido_materno" required
+                                   pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios permitidos">
+                            <div class="invalid-feedback">
+                                Por favor ingrese un apellido materno válido
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RUT y DV -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="estudiante_rut" class="form-label">RUT (sin puntos ni guión)</label>
+                            <input type="text" class="form-control" id="estudiante_rut" name="rut" required
+                                   pattern="[0-9]{7,8}" title="7 u 8 dígitos sin puntos ni guión">
+                            <div class="invalid-feedback">
+                                Por favor ingrese un RUT válido (7 u 8 dígitos)
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="estudiante_div" class="form-label">Dígito Verificador</label>
+                            <input type="text" class="form-control" id="estudiante_div" name="div" maxlength="1" required
+                                   pattern="[0-9Kk]" title="Número del 0 al 9 o letra K">
+                            <div class="invalid-feedback">
+                                DV inválido (0-9 o K)
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contacto -->
+                    <h6 class="mb-3">Información de Contacto</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="estudiante_correo" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="estudiante_correo" name="correo" required>
+                            <div class="invalid-feedback">
+                                Por favor ingrese un correo electrónico válido
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="estudiante_telefono" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="estudiante_telefono" name="telefono" required
+                                   pattern="[0-9]{9}" title="9 dígitos">
+                            <div class="invalid-feedback">
+                                Por favor ingrese un número de teléfono válido (9 dígitos)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="estudiante_direccion" class="form-label">Dirección</label>
+                        <textarea class="form-control" id="estudiante_direccion" name="direccion" rows="2" required></textarea>
+                        <div class="invalid-feedback">
+                            Por favor ingrese una dirección
+                        </div>
+                    </div>
+
+                    <!-- Información Académica -->
+                    <h6 class="mb-3">Información Académica</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="estudiante_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="estudiante_fecha_nacimiento" name="fecha_nacimiento" required>
+                            <div class="invalid-feedback">
+                                Por favor seleccione una fecha de nacimiento
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="estudiante_curso" class="form-label">Curso</label>
+                            <select class="form-select" id="estudiante_curso" name="curso" required>
+                                <option value="">Seleccione un curso</option>
+                                {% for curso in cursos %}
+                                    <option value="{{ curso.id }}">{{ curso }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor seleccione un curso
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contacto de Emergencia -->
+                    <h6 class="mb-3">Contacto de Emergencia</h6>
+                    <div class="mb-3">
+                        <label for="estudiante_contacto_emergencia" class="form-label">Nombre y Teléfono de Contacto</label>
+                        <input type="text" class="form-control" id="estudiante_contacto_emergencia" 
+                               name="contacto_emergencia" required
+                               placeholder="Ej: María (Madre) - 912345678">
+                        <div class="invalid-feedback">
+                            Por favor ingrese un contacto de emergencia
+                        </div>
+                    </div>
+
+                    <!-- Contraseña -->
+                    <h6 class="mb-3">Credenciales de Acceso</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="estudiante_password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="estudiante_password" name="password" required
+                                   pattern=".{8,}" title="Mínimo 8 caracteres">
+                            <div class="invalid-feedback">
+                                La contraseña debe tener al menos 8 caracteres
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="estudiante_confirm_password" class="form-label">Confirmar Contraseña</label>
+                            <input type="password" class="form-control" id="estudiante_confirm_password" 
+                                   name="confirm_password" required>
+                            <div class="invalid-feedback">
+                                Las contraseñas no coinciden
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear Estudiante</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 

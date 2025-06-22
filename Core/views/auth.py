@@ -14,7 +14,7 @@ from django.contrib import messages
 
 
 class LoginView(View):
-    template_name = 'login.html'
+    template_name = 'base/login.html'
 
     def get(self, request):
         return render(request, self.template_name)
@@ -51,12 +51,12 @@ class LoginView(View):
             messages.error(
                 None, 'Usuario desactivado. Por favor comuníquese con un administrador.'
             )
-            return False, 'login.html'
+            return False, 'base/login.html'
         if not usuario.activador:
             messages.error(
                 None, 'Su cuenta está inactiva. Por favor comuníquese con un administrador.'
             )
-            return False, 'login.html'
+            return False, 'base/login.html'
         return True, None
 
     def redirect_by_role( self, usuario, auth_user):

@@ -21,6 +21,10 @@ Este directorio contiene los componentes modulares del panel del docente, organi
 - **`tab_mensajes.html`** - Sistema de mensajería y comunicación
 - **`tab_materiales.html`** - Gestión de materiales educativos
 
+### Vistas de Detalle
+- **`curso_detalle.html`** - Vista detallada de un curso específico (múltiples pestañas)
+- **`asignatura_detalle.html`** - Vista detallada de una asignatura específica (múltiples pestañas)
+
 ### Archivo Principal
 - **`teacher_panel_modular.html`** - Template principal que incluye todos los componentes
 
@@ -86,6 +90,39 @@ Este directorio contiene los componentes modulares del panel del docente, organi
 - Categorización por tipo de material
 - Control de espacio de almacenamiento
 
+## Vistas de Detalle
+
+### 🎓 Curso Detalle (`curso_detalle.html`)
+**Acceso**: Desde panel del docente → Cursos → "Ver Detalles"
+**Funcionalidades**:
+- Información general del curso (nivel, letra, profesor jefe)
+- Lista de estudiantes con información de contacto
+- Asignaturas del curso con enlaces a detalles
+- Comunicaciones y herramientas IA (prototipo)
+- Estadísticas de asistencia y rendimiento por estudiante
+- Fichas de estudiantes con observaciones
+
+### 📖 Asignatura Detalle (`asignatura_detalle.html`)
+**Acceso**: Desde panel del docente → Asignaturas → "Ver Detalles"
+**Funcionalidades**:
+- Información general de la asignatura (código, profesor, estadísticas)
+- Lista de estudiantes inscritos con información detallada
+- Horario de clases con días, horarios y salas
+- Materiales de la asignatura (archivos, presentaciones)
+- Estadísticas de asistencia y promedio general
+
+## URLs de Acceso a Vistas de Detalle
+
+### Curso Detalle
+- **URL**: `/curso/<int:curso_id>/`
+- **Vista**: `CursoDetalleView`
+- **Template**: `teacher/curso_detalle.html`
+
+### Asignatura Detalle
+- **URL**: `/asignatura/<int:asignatura_id>/`
+- **Vista**: `AsignaturaDetalleView`
+- **Template**: `teacher/asignatura_detalle.html`
+
 ## Ventajas de la Modularización
 
 ### 🔧 Mantenimiento
@@ -121,11 +158,13 @@ Este directorio contiene los componentes modulares del panel del docente, organi
 1. **Modificar una pestaña**: Edita el archivo correspondiente en `Core/templates/teacher/`
 2. **Agregar nueva funcionalidad**: Crea un nuevo archivo de pestaña y inclúyelo en `teacher_panel_modular.html`
 3. **Personalizar estilos**: Modifica `scripts.html` para cambios de diseño
+4. **Vistas de detalle**: Los templates de detalle están organizados en esta carpeta para mantener coherencia
 
 ### Para Usuarios
 1. **Acceso**: Los docentes pueden acceder al panel modular desde `/profesor-panel-modular/`
 2. **Navegación**: Usar las pestañas para acceder a diferentes funcionalidades
 3. **Funcionalidades**: Todas las funcionalidades del panel original están disponibles
+4. **Detalles**: Acceder a vistas detalladas desde los listados de cursos y asignaturas
 
 ## Tecnologías Utilizadas
 

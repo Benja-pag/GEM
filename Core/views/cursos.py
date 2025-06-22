@@ -41,7 +41,7 @@ class CursoDetalleView(View):
             'asignaturas': asignaturas,
             'profesor_jefe': profesor_jefe
         }
-        return render(request, 'curso_detalle.html', context)
+        return render(request, 'teacher/curso_detalle.html', context)
 
 @method_decorator(login_required, name='dispatch')
 class AsignaturaDetalleView(View):
@@ -64,7 +64,7 @@ class AsignaturaDetalleView(View):
             'estudiantes': estudiantes,
             'clases': clases
         }
-        return render(request, 'asignatura_detalle.html', context)
+        return render(request, 'teacher/asignatura_detalle.html', context)
 
 # from django.shortcuts import render, redirect, get_object_or_404
 # from django.views import View

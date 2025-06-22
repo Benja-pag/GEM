@@ -1,0 +1,62 @@
+<!-- Modal Crear Curso -->
+<div class="modal fade" id="crearCursoModal" tabindex="-1" aria-labelledby="crearCursoModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearCursoModalLabel">Crear Nuevo Curso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="crearCursoForm" method="post" action="{% url 'admin_panel_modular' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="crear_curso">
+                    
+                    <!-- Contenedor de errores -->
+                    <div class="alert alert-danger mb-3" style="display: none;"></div>
+                    
+                    <div class="mb-3">
+                        <label for="nivel" class="form-label">Nivel</label>
+                        <input type="number" class="form-control" id="nivel" name="nivel" min="1" max="12" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="letra" class="form-label">Letra</label>
+                        <input type="text" class="form-control" id="letra" name="letra" maxlength="1" required>
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="profesor_jefe_id" class="form-label">Profesor Jefe</label>
+                        <select class="form-select" id="profesor_jefe_id" name="profesor_jefe_id" required>
+                            <option value="">-- Seleccione un profesor jefe --</option>
+                            {% if docentes %}
+                                {% for docente in docentes %}
+                                    {% if docente.usuario %}
+                                        <option value="{{ docente.usuario.auth_user_id }}" 
+                                                data-nombre="{{ docente.usuario.nombre }} {{ docente.usuario.apellido_paterno }}"
+                                                {% if docente.jefaturas.exists %}disabled{% endif %}>
+                                            {{ docente.usuario.nombre }} {{ docente.usuario.apellido_paterno }}
+                                            {% if docente.jefaturas.exists %}
+                                                (Ya es profesor jefe de otro curso)
+                                            {% endif %}
+                                            {% if docente.es_profesor_jefe %}
+                                                (Marcado como profesor jefe)
+                                            {% endif %}
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <option value="" disabled>No hay docentes disponibles</option>
+                            {% endif %}
+                        </select>
+                        <div class="invalid-feedback">Por favor seleccione un profesor jefe</div>
+                        <small class="text-muted">Los profesores que ya son jefes de otro curso aparecen deshabilitados</small>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="crearCursoBtn">Crear</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 

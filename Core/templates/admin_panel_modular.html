@@ -1,0 +1,243 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block extra_js %}
+{{ block.super }}
+<!-- Scripts específicos -->
+<script src="{% static 'js/estudiante_form.js' %}"></script>
+<script src="{% static 'js/docente_form.js' %}"></script>
+<script src="{% static 'js/user_actions.js' %}"></script>
+<script src="{% static 'js/user_edit.js' %}"></script>
+<script src="{% static 'js/user_details.js' %}"></script>
+<script src="{% static 'js/curso_form.js' %}"></script>
+<script>
+    // Agregar el atributo data-is-admin al body
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.setAttribute('data-is-admin', '{% if user.is_admin %}true{% else %}false{% endif %}');
+        
+        // Hacer las filas de la tabla clickeables
+        const rows = document.querySelectorAll('.clickable-row');
+        rows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                // No redirigir si se hizo clic en un botón de acción
+                if (!e.target.closest('.btn-group')) {
+                    window.location.href = this.dataset.href;
+                }
+            });
+        });
+
+        // Variable global para controlar la inicialización
+        window.dataTablesInitialized = false;
+
+        function initializeDataTables() {
+            if (window.dataTablesInitialized) {
+                return;
+            }
+
+            try {
+                // Configuración de DataTables
+                $.extend(true, $.fn.dataTable.defaults, {
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Todos"]],
+                    responsive: true,
+                    destroy: true,
+                    retrieve: true
+                });
+
+                // Inicializar DataTables
+                $('.table').each(function() {
+                    try {
+                        if (!$.fn.DataTable.isDataTable(this)) {
+                            $(this).DataTable({
+                                language: {
+                                    "decimal": "",
+                                    "emptyTable": "No hay datos disponibles en la tabla",
+                                    "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                                    "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                                    "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                                    "infoPostFix": "",
+                                    "thousands": ",",
+                                    "lengthMenu": "Mostrar _MENU_ registros",
+                                    "loadingRecords": "Cargando...",
+                                    "processing": "Procesando...",
+                                    "search": "Buscar:",
+                                    "zeroRecords": "No se encontraron registros coincidentes",
+                                    "paginate": {
+                                        "first": "Primero",
+                                        "last": "Último",
+                                        "next": "Siguiente",
+                                        "previous": "Anterior"
+                                    },
+                                    "aria": {
+                                        "sortAscending": ": activar para ordenar columna ascendente",
+                                        "sortDescending": ": activar para ordenar columna descendente"
+                                    }
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        console.warn('Error al inicializar DataTable en una tabla específica:', e);
+                    }
+                });
+
+                window.dataTablesInitialized = true;
+            } catch (e) {
+                console.error('Error al inicializar DataTables:', e);
+            }
+        }
+
+        // Inicializar cuando el documento esté listo
+        setTimeout(initializeDataTables, 100);
+
+        // Reinicializar después de cargar contenido dinámico
+        $(document).ajaxComplete(function() {
+            setTimeout(initializeDataTables, 100);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_panel.css' %}">
+<link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+{% if user.is_authenticated %}
+<div class="container-fluid">
+    <!-- Contenedor de alertas -->
+    <div id="alertContainer" class="position-fixed top-0 end-0 p-3" style="z-index: 1050"></div>
+    
+    <div class="row">
+        <!-- Contenido Principal -->
+        <main class="col-12 px-md-4">
+            <!-- Incluir Header -->
+            {% include 'admin/header.html' %}
+
+            {% if user.is_admin %}
+            <!-- Incluir Estadísticas -->
+            {% include 'admin/stats_cards.html' %}
+
+            <!-- Incluir Botones de Creación -->
+            {% include 'admin/create_buttons.html' %}
+
+            <!-- Incluir Pestañas de Navegación -->
+            {% include 'admin/navigation_tabs.html' %}
+
+            <div class="tab-content" id="adminTabsContent">
+                <!-- Incluir Pestaña de Usuarios -->
+                {% include 'admin/tab_usuarios.html' %}
+
+                <!-- Incluir Pestaña de Cursos -->
+                {% include 'admin/tab_cursos.html' %}
+
+                <!-- Incluir Pestaña de Asignaturas -->
+                {% include 'admin/tab_asignaturas.html' %}
+
+                <!-- Incluir Pestaña de Reportes -->
+                {% include 'admin/tab_reportes.html' %}
+
+                <!-- Incluir Pestaña de Comunicaciones -->
+                {% include 'admin/tab_comunicaciones.html' %}
+
+                <!-- Incluir Pestaña de Calendario -->
+                {% include 'admin/tab_calendario.html' %}
+
+                <!-- Pestaña de Configuración -->
+                <div class="tab-pane fade" id="configuracion" role="tabpanel" aria-labelledby="configuracion-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-secondary text-white">
+                                    <h6 class="card-title mb-0"><i class="fas fa-cogs me-2"></i>Configuración del Sistema</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nombre del Colegio</label>
+                                        <input type="text" class="form-control" value="Colegio GEM" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Año Académico</label>
+                                        <select class="form-select">
+                                            <option>2024</option>
+                                            <option>2025</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Período Actual</label>
+                                        <select class="form-select">
+                                            <option>Primer Semestre</option>
+                                            <option>Segundo Semestre</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Guardar Cambios
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-dark text-white">
+                                    <h6 class="card-title mb-0"><i class="fas fa-shield-alt me-2"></i>Configuración de Seguridad</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Política de Contraseñas</label>
+                                        <select class="form-select">
+                                            <option>Mínimo 8 caracteres</option>
+                                            <option>Mínimo 10 caracteres</option>
+                                            <option>Mínimo 12 caracteres</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Sesión de Usuario</label>
+                                        <select class="form-select">
+                                            <option>30 minutos</option>
+                                            <option>1 hora</option>
+                                            <option>2 horas</option>
+                                            <option>Sin límite</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" checked>
+                                            <label class="form-check-label">Requerir cambio de contraseña</label>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-warning">
+                                        <i class="fas fa-lock me-2"></i>Aplicar Configuración
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modales para crear registros -->
+            {% include 'admin/forms/form_crear_estudiante.html' %}
+            {% include 'admin/forms/form_crear_docente.html' %}
+            {% include 'admin/forms/form_crear_admin.html' %}
+            {% include 'admin/forms/form_crear_curso.html' %}
+            {% include 'admin/forms/form_crear_asignatura.html' %}
+
+            {% else %}
+            <div class="alert alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                No tienes permisos de administrador para acceder a este panel.
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+{% else %}
+<div class="container mt-5">
+    <div class="alert alert-danger" role="alert">
+        <i class="fas fa-lock me-2"></i>
+        Debes iniciar sesión para acceder a esta página.
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

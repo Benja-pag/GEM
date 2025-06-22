@@ -1,11 +1,10 @@
 from django.urls import path
 from Core.views import (
-    HomeView, AdminPanelView, UserManagementView, UserCreateView, CalendarioView,
+    HomeView, AdminPanelView, AdminPanelModularView, UserManagementView, UserCreateView,
     UserDetailView, UserUpdateView, UserDeleteView, ProfesorPanelView, ProfesorPanelModularView,
     EstudiantePanelView, EstudiantePanelModularView, AttendanceView, LoginView, LogoutView,
     RegisterView, CreateAdminView, ChangePasswordView,
     UserDataView, SurveysView, TasksView, TestsView, ToggleUserStatusView,
-    CalendarioEventosView, CalendarioGuardarEventoView, CalendarioEliminarEventoView,
     CursoDetalleView, AsignaturaDetalleView, CleanupAuthUsersView
 )
 
@@ -19,6 +18,7 @@ urlpatterns = [
     # URLs principales
     path('', HomeView.as_view(), name='home'),
     path('admin-panel/', AdminPanelView.as_view(), name='admin_panel'),
+    path('admin-panel-modular/', AdminPanelModularView.as_view(), name='admin_panel_modular'),
     path('users/', UserManagementView.as_view(), name='users'),
     path('users/create/', UserCreateView.as_view(), name='user_create'),
     path('users/<int:user_id>/', UserDetailView.as_view(), name='user_detail'),
@@ -39,12 +39,6 @@ urlpatterns = [
     path('tasks/', TasksView.as_view(), name='tasks'),
     path('tests/', TestsView.as_view(), name='tests'),
     path('core/stats/', AdminPanelView.as_view(), name='core_stats'),
-
-    # URLs del Calendario
-    path('calendar/', CalendarioView.as_view(), name='calendar'),
-    path('calendar/events/', CalendarioEventosView.as_view(), name='calendar_events'),
-    path('calendar/save-event/', CalendarioGuardarEventoView.as_view(), name='calendar_save_event'),
-    path('calendar/delete-event/', CalendarioEliminarEventoView.as_view(), name='calendar_delete_event'),
 
     # URLs de cursos y asignaturas
     path('curso/<int:curso_id>/', CursoDetalleView.as_view(), name='curso_detalle'),

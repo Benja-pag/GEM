@@ -1,0 +1,61 @@
+<!-- Modal de Creación de Asignatura -->
+<div class="modal fade" id="crearAsignaturaModal" tabindex="-1" aria-labelledby="crearAsignaturaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crearAsignaturaModalLabel">Crear Nueva Asignatura</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{% url 'admin_panel_modular' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="crear_asignatura">
+                    
+                    <div class="mb-3">
+                        <label for="codigo" class="form-label">Código de la Asignatura</label>
+                        <input type="text" class="form-control" id="codigo" name="codigo" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre de la Asignatura</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="curso" class="form-label">Curso</label>
+                        <select class="form-select" id="curso" name="curso" required>
+                            <option value="">Seleccione un curso</option>
+                            {% for curso in cursos %}
+                                <option value="{{ curso.id }}">{{ curso.nivel }}°{{ curso.letra }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="profesor" class="form-label">Profesor</label>
+                        <select class="form-select" id="profesor" name="profesor">
+                            <option value="">Seleccione un profesor (opcional)</option>
+                            {% for docente in docentes %}
+                                {% if docente.usuario %}
+                                    <option value="{{ docente.usuario.auth_user_id }}">
+                                        {{ docente.usuario.nombre }} {{ docente.usuario.apellido_paterno }}
+                                    </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear Asignatura</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 

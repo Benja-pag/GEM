@@ -9,12 +9,12 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
-                <div class="card-body bg-gradient-dark text-white rounded d-flex align-items-center">
+                <div class="card-body bg-gradient-primary text-white rounded d-flex align-items-center">
                     <div class="flex-shrink-0">
-                        <i class="fas fa-users fa-3x me-3 text-primary"></i>
+                        <i class="fas fa-users fa-3x me-3 text-white"></i>
                     </div>
                     <div class="flex-grow-1">
-                        <h2 class="mb-1">Curso {{ curso.nivel }}°{{ curso.letra }}</h2>
+                        <h2 class="mb-1 text-white">Curso {{ curso.nivel }}°{{ curso.letra }}</h2>
                         <p class="mb-0 text-white-75"><i class="fas fa-user-tie me-2"></i>
                             <strong>Profesor Jefe:</strong>
                             {% if profesor_jefe %}
@@ -25,7 +25,7 @@
                         </p>
                     </div>
                     <div class="flex-shrink-0 ms-4">
-                        <span class="badge bg-primary p-3 fs-5"><i class="fas fa-user-graduate me-2"></i>{{ estudiantes|length }} Estudiantes</span>
+                        <span class="badge bg-white text-primary p-3 fs-5"><i class="fas fa-user-graduate me-2"></i>{{ estudiantes|length }} Estudiantes</span>
                     </div>
                 </div>
             </div>
@@ -44,10 +44,16 @@
             <button class="nav-link" id="rendimiento-tab" data-bs-toggle="tab" data-bs-target="#rendimiento" type="button"><i class="fas fa-chart-line me-2"></i>Rendimiento</button>
         </li>
         <li class="nav-item" role="presentation">
+            <button class="nav-link" id="asistencia-tab" data-bs-toggle="tab" data-bs-target="#asistencia" type="button"><i class="fas fa-calendar-check me-2"></i>Asistencia</button>
+        </li>
+        <li class="nav-item" role="presentation">
             <button class="nav-link" id="asignaturas-tab" data-bs-toggle="tab" data-bs-target="#asignaturas" type="button"><i class="fas fa-book me-2"></i>Asignaturas</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="comunicaciones-tab" data-bs-toggle="tab" data-bs-target="#comunicaciones" type="button"><i class="fas fa-envelope-open-text me-2"></i>Comunicaciones</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="reportes-tab" data-bs-toggle="tab" data-bs-target="#reportes" type="button"><i class="fas fa-file-alt me-2"></i>Reportes</button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="ia-tab" data-bs-toggle="tab" data-bs-target="#ia" type="button"><i class="fas fa-robot me-2"></i>Herramientas IA</button>
@@ -479,6 +485,182 @@
                 </div>
             </div>
         </div>
+        <!-- Asistencia: Control detallado de asistencia -->
+        <div class="tab-pane fade" id="asistencia">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-warning text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-calendar-check me-2"></i>Control de Asistencia
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>Total Clases</th>
+                                    <th>Presente</th>
+                                    <th>Ausente</th>
+                                    <th>Tardanzas</th>
+                                    <th>Porcentaje</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ana González</td>
+                                    <td>45</td>
+                                    <td><span class="badge bg-success">42</span></td>
+                                    <td><span class="badge bg-danger">2</span></td>
+                                    <td><span class="badge bg-warning">1</span></td>
+                                    <td><span class="badge bg-info">93%</span></td>
+                                    <td><span class="badge bg-success">Excelente</span></td>
+                                </tr>
+                                <tr class="table-danger">
+                                    <td>Pedro López</td>
+                                    <td>45</td>
+                                    <td><span class="badge bg-success">29</span></td>
+                                    <td><span class="badge bg-danger">14</span></td>
+                                    <td><span class="badge bg-warning">2</span></td>
+                                    <td><span class="badge bg-danger">65%</span></td>
+                                    <td><span class="badge bg-danger">En Riesgo</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Carlos Ramírez</td>
+                                    <td>45</td>
+                                    <td><span class="badge bg-success">41</span></td>
+                                    <td><span class="badge bg-danger">3</span></td>
+                                    <td><span class="badge bg-warning">1</span></td>
+                                    <td><span class="badge bg-info">91%</span></td>
+                                    <td><span class="badge bg-success">Bueno</span></td>
+                                </tr>
+                                <tr>
+                                    <td>María Silva</td>
+                                    <td>45</td>
+                                    <td><span class="badge bg-success">39</span></td>
+                                    <td><span class="badge bg-danger">4</span></td>
+                                    <td><span class="badge bg-warning">2</span></td>
+                                    <td><span class="badge bg-warning">87%</span></td>
+                                    <td><span class="badge bg-warning">Regular</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registro de Asistencia -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-gradient-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-plus me-2"></i>Registrar Asistencia
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Fecha</label>
+                            <input type="date" class="form-control" value="2024-04-22">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Asignatura</label>
+                            <select class="form-select">
+                                <option>Matemáticas</option>
+                                <option>Lenguaje</option>
+                                <option>Historia</option>
+                                <option>Ciencias</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Hora</label>
+                            <input type="time" class="form-control" value="08:00">
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>Estado</th>
+                                    <th>Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Ana González</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="presente" selected>Presente</option>
+                                            <option value="ausente">Ausente</option>
+                                            <option value="tardanza">Tardanza</option>
+                                            <option value="justificado">Justificado</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Observación opcional">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Pedro López</td>
+                                    <td>
+                                        <select class="form-select form-select-sm">
+                                            <option value="presente">Presente</option>
+                                            <option value="ausente" selected>Ausente</option>
+                                            <option value="tardanza">Tardanza</option>
+                                            <option value="justificado">Justificado</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" class="form-control form-control-sm" placeholder="Observación opcional">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="text-end mt-3">
+                        <button class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Guardar Asistencia
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reportes de Asistencia -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-info text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Reportes de Asistencia
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card border">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-pie fa-2x text-primary mb-2"></i>
+                                    <h6>Reporte Mensual</h6>
+                                    <p class="text-muted">Análisis de asistencia del mes</p>
+                                    <button class="btn btn-outline-primary btn-sm">Generar</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card border">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-file-excel fa-2x text-success mb-2"></i>
+                                    <h6>Exportar Excel</h6>
+                                    <p class="text-muted">Descargar datos de asistencia</p>
+                                    <button class="btn btn-outline-success btn-sm">Exportar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Asignaturas: Asignaturas, Evaluaciones -->
         <div class="tab-pane fade" id="asignaturas">
             <div class="card border-0 shadow-sm mb-4">
@@ -549,43 +731,246 @@
         </div>
         <!-- Comunicaciones: Comunicaciones, Documentos, Calendario -->
         <div class="tab-pane fade" id="comunicaciones">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-envelope-open-text me-2 text-danger"></i>Comunicaciones y Circulares (Prototipo)</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Circular 01 - Reunión de Apoderados
-                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> Ver</button>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Mensaje enviado a apoderados
-                            <button class="btn btn-sm btn-outline-info"><i class="fas fa-envelope"></i> Ver</button>
-                        </li>
-                    </ul>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-gradient-primary text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-envelope me-2"></i>Comunicación con el Curso
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form>
+                                <div class="mb-3">
+                                    <label class="form-label">Destinatarios</label>
+                                    <select class="form-select">
+                                        <option>Todos los Estudiantes</option>
+                                        <option>Todos los Apoderados</option>
+                                        <option>Estudiantes en Riesgo</option>
+                                        <option>Estudiantes Destacados</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Asunto</label>
+                                    <input type="text" class="form-control" placeholder="Asunto del mensaje">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Mensaje</label>
+                                    <textarea class="form-control" rows="6" placeholder="Escribe tu mensaje aquí..."></textarea>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <button type="button" class="btn btn-outline-secondary">
+                                        <i class="fas fa-eye me-2"></i>Vista Previa
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane me-2"></i>Enviar Mensaje
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-gradient-danger text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-envelope-open-text me-2"></i>Comunicaciones y Circulares
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Circular 01 - Reunión de Apoderados</h6>
+                                        <small class="text-muted">Enviado hace 2 días</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> Ver</button>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Mensaje enviado a apoderados</h6>
+                                        <small class="text-muted">Enviado ayer</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-info"><i class="fas fa-envelope"></i> Ver</button>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Recordatorio Evaluación</h6>
+                                        <small class="text-muted">Enviado hace 1 semana</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-warning"><i class="fas fa-bell"></i> Ver</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-gradient-success text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-history me-2"></i>Mensajes Recientes
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item px-0">
+                                    <h6 class="mb-1">Recordatorio Evaluación</h6>
+                                    <small class="text-muted">Enviado hace 2 horas</small>
+                                    <br>
+                                    <small class="text-success">25 leídos</small>
+                                </div>
+                                <div class="list-group-item px-0">
+                                    <h6 class="mb-1">Reunión de Apoderados</h6>
+                                    <small class="text-muted">Enviado ayer</small>
+                                    <br>
+                                    <small class="text-success">18 leídos</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-gradient-warning text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-folder-open me-2"></i>Documentos y Materiales
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Reglamento Interno</h6>
+                                        <small class="text-muted">PDF - 2.3 MB</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Circular de Seguridad</h6>
+                                        <small class="text-muted">PDF - 1.1 MB</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">Calendario Escolar</h6>
+                                        <small class="text-muted">PDF - 0.8 MB</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-gradient-info text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>Próximas Actividades
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item px-0">
+                                    <h6 class="mb-1">Reunión de Apoderados</h6>
+                                    <small class="text-danger">Mañana - 19:00 PM</small>
+                                    <br>
+                                    <small class="text-muted">Sala de Reuniones</small>
+                                </div>
+                                <div class="list-group-item px-0">
+                                    <h6 class="mb-1">Evaluación Matemáticas</h6>
+                                    <small class="text-warning">En 2 días - 10:00 AM</small>
+                                    <br>
+                                    <small class="text-muted">Prof. Juan Pérez</small>
+                                </div>
+                                <div class="list-group-item px-0">
+                                    <h6 class="mb-1">Actividad de Historia</h6>
+                                    <small class="text-info">En 1 semana - 14:00 PM</small>
+                                    <br>
+                                    <small class="text-muted">Prof. Carlos López</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-folder-open me-2 text-warning"></i>Documentos y Materiales (Prototipo)</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Reglamento Interno
-                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i> Descargar</button>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Circular de Seguridad
-                            <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i> Descargar</button>
-                        </li>
-                    </ul>
+        </div>
+        <!-- Reportes: Generación de reportes del curso -->
+        <div class="tab-pane fade" id="reportes">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-gradient-info text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-file-alt me-2"></i>Generar Reportes del Curso
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-chart-bar fa-2x text-primary mb-2"></i>
+                                            <h6>Reporte de Rendimiento</h6>
+                                            <p class="text-muted">Análisis completo del rendimiento académico</p>
+                                            <button class="btn btn-outline-primary btn-sm">Generar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-calendar-check fa-2x text-success mb-2"></i>
+                                            <h6>Reporte de Asistencia</h6>
+                                            <p class="text-muted">Estadísticas detalladas de asistencia</p>
+                                            <button class="btn btn-outline-success btn-sm">Generar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-users fa-2x text-warning mb-2"></i>
+                                            <h6>Reporte para Apoderados</h6>
+                                            <p class="text-muted">Información para padres y apoderados</p>
+                                            <button class="btn btn-outline-warning btn-sm">Generar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
+                                            <h6>Reporte de Riesgo</h6>
+                                            <p class="text-muted">Estudiantes que requieren atención</p>
+                                            <button class="btn btn-outline-danger btn-sm">Generar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-calendar-alt me-2 text-primary"></i>Calendario de Actividades (Prototipo)</h5>
-                    <div class="p-4 text-center text-muted">
-                        <i class="fas fa-calendar-alt fa-3x mb-3"></i>
-                        <p>Próxima reunión de apoderados: 25/04/2024</p>
-                        <p>Salida pedagógica: 10/05/2024</p>
+
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-gradient-secondary text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-download me-2"></i>Exportar Reportes
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-file-pdf me-1"></i>Exportar PDF
+                                </button>
+                                <button class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-file-excel me-1"></i>Exportar Excel
+                                </button>
+                                <button class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-envelope me-1"></i>Enviar por Email
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -607,14 +992,199 @@
 </div>
 
 <style>
-    .bg-gradient-dark {
-        background: linear-gradient(45deg, #2c3e50, #1a252f);
+    .bg-gradient-primary {
+        background: linear-gradient(45deg, #4e73df, #224abe);
     }
+    .bg-gradient-success {
+        background: linear-gradient(45deg, #1cc88a, #13855c);
+    }
+    .bg-gradient-info {
+        background: linear-gradient(45deg, #36b9cc, #258391);
+    }
+    .bg-gradient-warning {
+        background: linear-gradient(45deg, #f6c23e, #dda20a);
+    }
+    .bg-gradient-danger {
+        background: linear-gradient(45deg, #e74a3b, #be2617);
+    }
+    .bg-gradient-secondary {
+        background: linear-gradient(45deg, #858796, #6e707e);
+    }
+    
     .text-white-75 {
-        color: rgba(255, 255, 255, 0.75);
+        color: rgba(255, 255, 255, 0.9) !important;
     }
+    
     .card-title i {
         vertical-align: middle;
+    }
+    
+    /* Mejorar contraste de badges */
+    .badge.bg-success {
+        background-color: #1cc88a !important;
+        color: white !important;
+    }
+    .badge.bg-warning {
+        background-color: #f6c23e !important;
+        color: #2c3e50 !important;
+    }
+    .badge.bg-danger {
+        background-color: #e74a3b !important;
+        color: white !important;
+    }
+    .badge.bg-info {
+        background-color: #36b9cc !important;
+        color: white !important;
+    }
+    .badge.bg-primary {
+        background-color: #4e73df !important;
+        color: white !important;
+    }
+    .badge.bg-secondary {
+        background-color: #858796 !important;
+        color: white !important;
+    }
+    
+    /* Mejorar contraste de tablas */
+    .table-light {
+        background-color: #f8f9fc !important;
+    }
+    .table-light th {
+        color: #5a5c69 !important;
+        font-weight: 600;
+    }
+    
+    /* Mejorar contraste de formularios */
+    .form-control, .form-select {
+        border-color: #d1d3e2;
+        color: #5a5c69;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+    
+    /* Mejorar contraste de botones */
+    .btn-outline-primary {
+        color: #4e73df;
+        border-color: #4e73df;
+    }
+    .btn-outline-primary:hover {
+        background-color: #4e73df;
+        border-color: #4e73df;
+        color: white;
+    }
+    
+    .btn-outline-success {
+        color: #1cc88a;
+        border-color: #1cc88a;
+    }
+    .btn-outline-success:hover {
+        background-color: #1cc88a;
+        border-color: #1cc88a;
+        color: white;
+    }
+    
+    .btn-outline-warning {
+        color: #f6c23e;
+        border-color: #f6c23e;
+    }
+    .btn-outline-warning:hover {
+        background-color: #f6c23e;
+        border-color: #f6c23e;
+        color: #2c3e50;
+    }
+    
+    .btn-outline-danger {
+        color: #e74a3b;
+        border-color: #e74a3b;
+    }
+    .btn-outline-danger:hover {
+        background-color: #e74a3b;
+        border-color: #e74a3b;
+        color: white;
+    }
+    
+    .btn-outline-info {
+        color: #36b9cc;
+        border-color: #36b9cc;
+    }
+    .btn-outline-info:hover {
+        background-color: #36b9cc;
+        border-color: #36b9cc;
+        color: white;
+    }
+    
+    /* Mejorar contraste de alertas */
+    .alert-danger {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        color: #721c24;
+    }
+    
+    .alert-warning {
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+        color: #856404;
+    }
+    
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+    
+    /* Mejorar contraste de listas */
+    .list-group-item {
+        border-color: #e3e6f0;
+        color: #5a5c69;
+    }
+    
+    /* Mejorar contraste de texto */
+    .text-muted {
+        color: #858796 !important;
+    }
+    
+    /* Mejorar contraste de encabezados de tarjetas */
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,.125);
+    }
+    
+    /* Mejorar contraste de navegación */
+    .nav-tabs .nav-link {
+        color: #5a5c69;
+    }
+    .nav-tabs .nav-link.active {
+        color: #4e73df;
+        background-color: #fff;
+        border-color: #dee2e6 #dee2e6 #fff;
+    }
+    
+    /* Mejorar contraste de estadísticas */
+    .stats-number {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+    
+    /* Mejorar contraste de iconos */
+    .fa-2x, .fa-3x {
+        color: #4e73df;
+    }
+    
+    /* Mejorar contraste de bordes */
+    .card {
+        border: 1px solid #e3e6f0;
+    }
+    
+    /* Mejorar contraste de sombras */
+    .shadow-sm {
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
     }
 </style>
 {% endblock %} 

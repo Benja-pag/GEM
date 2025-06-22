@@ -15,10 +15,18 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
 
-    # URLs principales
+    # URLs principales (paneles modulares)
     path('', HomeView.as_view(), name='home'),
-    path('admin-panel/', AdminPanelView.as_view(), name='admin_panel'),
-    path('admin-panel-modular/', AdminPanelModularView.as_view(), name='admin_panel_modular'),
+    path('admin-panel/', AdminPanelModularView.as_view(), name='admin_panel'),
+    path('profesor-panel/', ProfesorPanelModularView.as_view(), name='profesor_panel'),
+    path('estudiante-panel/', EstudiantePanelModularView.as_view(), name='estudiante_panel'),
+    
+    # URLs alternativas para paneles antiguos
+    path('admin-panel-antiguo/', AdminPanelView.as_view(), name='admin_panel_antiguo'),
+    path('profesor-panel-antiguo/', ProfesorPanelView.as_view(), name='profesor_panel_antiguo'),
+    path('estudiante-panel-antiguo/', EstudiantePanelView.as_view(), name='estudiante_panel_antiguo'),
+    
+    # URLs de gestión de usuarios
     path('users/', UserManagementView.as_view(), name='users'),
     path('users/create/', UserCreateView.as_view(), name='user_create'),
     path('users/<int:user_id>/', UserDetailView.as_view(), name='user_detail'),
@@ -28,17 +36,13 @@ urlpatterns = [
     path('users/<int:user_id>/data/', UserDataView.as_view(), name='user_data'),
     path('users/cleanup-auth/', CleanupAuthUsersView.as_view(), name='cleanup_auth_users'),
     
-    path('profesor-panel/', ProfesorPanelView.as_view(), name='profesor_panel'),
-    path('profesor-panel-modular/', ProfesorPanelModularView.as_view(), name='profesor_panel_modular'),
-    path('estudiante-panel/', EstudiantePanelView.as_view(), name='estudiante_panel'),
-    path('estudiante-panel-modular/', EstudiantePanelModularView.as_view(), name='estudiante_panel_modular'),
     path('attendance/', AttendanceView.as_view(), name='attendance'),
     path('create-admin/', CreateAdminView.as_view(), name='create_admin'),
     
     path('surveys/', SurveysView.as_view(), name='surveys'),
     path('tasks/', TasksView.as_view(), name='tasks'),
     path('tests/', TestsView.as_view(), name='tests'),
-    path('core/stats/', AdminPanelView.as_view(), name='core_stats'),
+    path('core/stats/', AdminPanelModularView.as_view(), name='core_stats'),
 
     # URLs de cursos y asignaturas
     path('curso/<int:curso_id>/', CursoDetalleView.as_view(), name='curso_detalle'),

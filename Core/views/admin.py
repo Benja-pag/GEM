@@ -527,7 +527,7 @@ class AdminPanelModularView(View):
                             })
                         for error in errores:
                             messages.error(request, error)
-                        return redirect('admin_panel_modular')
+                        return redirect('admin_panel')
                     
                     with transaction.atomic():
                         # Crear el curso
@@ -553,7 +553,7 @@ class AdminPanelModularView(View):
                             })
                         
                         messages.success(request, f'Curso {curso.nivel}°{curso.letra} creado exitosamente')
-                        return redirect('admin_panel_modular')
+                        return redirect('admin_panel')
                         
                 except Exception as e:
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -562,7 +562,7 @@ class AdminPanelModularView(View):
                             'errors': [str(e)]
                         })
                     messages.error(request, f'Error al crear curso: {str(e)}')
-                    return redirect('admin_panel_modular')
+                    return redirect('admin_panel')
             
             elif action == 'crear_estudiante':
                 data = {
@@ -590,7 +590,7 @@ class AdminPanelModularView(View):
                         })
                     for error in errores:
                         messages.error(request, error)
-                    return redirect('admin_panel_modular')
+                    return redirect('admin_panel')
                 
                 try:
                     usuario = crear_usuario(data, 'ESTUDIANTE')
@@ -600,7 +600,7 @@ class AdminPanelModularView(View):
                 
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({'success': True})
-                return redirect('admin_panel_modular')
+                return redirect('admin_panel')
             
             elif action == 'crear_docente':
                 data = {
@@ -627,7 +627,7 @@ class AdminPanelModularView(View):
                         })
                     for error in errores:
                         messages.error(request, error)
-                    return redirect('admin_panel_modular')
+                    return redirect('admin_panel')
                 
                 try:
                     usuario = crear_usuario(data, 'DOCENTE')
@@ -637,7 +637,7 @@ class AdminPanelModularView(View):
                 
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({'success': True})
-                return redirect('admin_panel_modular')
+                return redirect('admin_panel')
             
             elif action == 'crear_administrador':
                 data = {
@@ -664,7 +664,7 @@ class AdminPanelModularView(View):
                         })
                     for error in errores:
                         messages.error(request, error)
-                    return redirect('admin_panel_modular')
+                    return redirect('admin_panel')
                 
                 try:
                     usuario = crear_usuario(data, 'ADMINISTRATIVO')
@@ -674,7 +674,7 @@ class AdminPanelModularView(View):
                 
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({'success': True})
-                return redirect('admin_panel_modular')
+                return redirect('admin_panel')
             
             elif action == 'crear_asignatura':
                 try:
@@ -700,7 +700,7 @@ class AdminPanelModularView(View):
                             })
                         for error in errores:
                             messages.error(request, error)
-                        return redirect('admin_panel_modular')
+                        return redirect('admin_panel')
                     
                     # Crear la asignatura
                     asignatura = Asignatura.objects.create(
@@ -727,7 +727,7 @@ class AdminPanelModularView(View):
                         })
                     
                     messages.success(request, f'Asignatura {asignatura.nombre} creada exitosamente')
-                    return redirect('admin_panel_modular')
+                    return redirect('admin_panel')
                     
                 except Exception as e:
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -736,12 +736,12 @@ class AdminPanelModularView(View):
                             'errors': [str(e)]
                         })
                     messages.error(request, f'Error al crear asignatura: {str(e)}')
-                    return redirect('admin_panel_modular')
+                    return redirect('admin_panel')
             
             else:
                 messages.error(request, 'Acción no válida')
-                return redirect('admin_panel_modular')
+                return redirect('admin_panel')
                 
         except Exception as e:
             messages.error(request, f'Error en el panel de administrador: {str(e)}')
-            return redirect('admin_panel_modular')
+            return redirect('admin_panel')

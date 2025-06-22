@@ -7,7 +7,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="crearAdminForm" method="post" action="{% url 'admin_panel_modular' %}" class="needs-validation" novalidate>
+                <form id="crearAdminForm" method="post" action="{% url 'admin_panel' %}" class="needs-validation" novalidate>
                     {% csrf_token %}
                     <input type="hidden" name="action" value="crear_administrador">
                     

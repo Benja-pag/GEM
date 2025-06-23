@@ -6,6 +6,7 @@ from .calendarios import *
 from .academico import *
 from .administrativo import *
 from .colegio import *
+from .comunicaciones import *
 
 __all__ = [
     # Modelos de Usuarios
@@ -30,5 +31,8 @@ __all__ = [
     'ConfiguracionColegio', 'LogActividad',
     
     # Modelo de Colegio
-    'Colegio'
+    'Colegio',
+
+    # Modelos de Comunicaciones
+    'Comunicacion', 'AdjuntoComunicacion',
 ]

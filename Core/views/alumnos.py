@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.http import JsonResponse
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, AsignaturaInscrita, Evaluacion, AlumnoEvaluacion, EvaluacionBase, HorarioCurso
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, AsignaturaInscrita, Evaluacion, AlumnoEvaluacion, EvaluacionBase, HorarioCurso, Comunicacion
 from django.db.models import Count, Avg, Q
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, DetailView
 from django.utils import timezone
@@ -137,6 +137,25 @@ def get_asistencia_estudiante(estudiante_id):
     else:
         ultimo_dia = date(primer_dia.year, primer_dia.month + 1, 1) - timedelta(days=1)
     
+    # Obtener todas las asignaturas inscritas del estudiante
+    asignaturas_inscritas = AsignaturaInscrita.objects.filter(
+        estudiante_id=estudiante_id,
+        validada=True
+    ).select_related('asignatura_impartida__asignatura')
+    
+    # Inicializar diccionario con todas las asignaturas
+    asistencia_por_asignatura = {}
+    for inscripcion in asignaturas_inscritas:
+        asignatura_nombre = inscripcion.asignatura_impartida.asignatura.nombre
+        asistencia_por_asignatura[asignatura_nombre] = {
+            'total': 0,
+            'presentes': 0,
+            'ausentes': 0,
+            'justificados': 0,
+            'porcentaje': 0.0,
+            'sin_registro': True  # Marcar como sin registro inicialmente
+        }
+    
     # Obtener asistencias del estudiante para el mes
     asistencias = Asistencia.objects.filter(
         estudiante_id=estudiante_id,
@@ -144,28 +163,20 @@ def get_asistencia_estudiante(estudiante_id):
         fecha_registro__date__lte=ultimo_dia
     ).select_related('clase__asignatura_impartida__asignatura')
     
-    # Agrupar por asignatura
-    asistencia_por_asignatura = {}
+    # Procesar las asistencias existentes
     for asistencia in asistencias:
         asignatura_nombre = asistencia.clase.asignatura_impartida.asignatura.nombre
-        if asignatura_nombre not in asistencia_por_asignatura:
-            asistencia_por_asignatura[asignatura_nombre] = {
-                'total': 0,
-                'presentes': 0,
-                'ausentes': 0,
-                'justificados': 0,
-                'porcentaje': 0.0
-            }
-        
-        asistencia_por_asignatura[asignatura_nombre]['total'] += 1
-        if asistencia.presente:
-            asistencia_por_asignatura[asignatura_nombre]['presentes'] += 1
-        else:
-            asistencia_por_asignatura[asignatura_nombre]['ausentes'] += 1
-            if asistencia.justificado:
-                asistencia_por_asignatura[asignatura_nombre]['justificados'] += 1
+        if asignatura_nombre in asistencia_por_asignatura:
+            asistencia_por_asignatura[asignatura_nombre]['sin_registro'] = False
+            asistencia_por_asignatura[asignatura_nombre]['total'] += 1
+            if asistencia.presente:
+                asistencia_por_asignatura[asignatura_nombre]['presentes'] += 1
+            else:
+                asistencia_por_asignatura[asignatura_nombre]['ausentes'] += 1
+                if asistencia.justificado:
+                    asistencia_por_asignatura[asignatura_nombre]['justificados'] += 1
     
-    # Calcular porcentajes
+    # Calcular porcentajes solo para asignaturas con registros
     for asignatura in asistencia_por_asignatura.values():
         if asignatura['total'] > 0:
             asignatura['porcentaje'] = (asignatura['presentes'] / asignatura['total']) * 100
@@ -311,6 +322,28 @@ class EstudiantePanelView(View):
         promedio_estudiante = get_promedio_estudiante(estudiante_obj.pk)
         asistencia_estudiante = get_asistencia_estudiante(estudiante_obj.pk)
         
+        # Calcular datos generales para las tarjetas de resumen
+        # Datos generales de asistencia
+        asistencia_general = {
+            'total': 0,
+            'presentes': 0,
+            'porcentaje': 0.0
+        }
+        for asignatura_data in asistencia_estudiante.values():
+            asistencia_general['total'] += asignatura_data['total']
+            asistencia_general['presentes'] += asignatura_data['presentes']
+        
+        if asistencia_general['total'] > 0:
+            asistencia_general['porcentaje'] = (asistencia_general['presentes'] / asistencia_general['total']) * 100
+        
+        # Calcular evaluaciones pendientes (evaluaciones futuras)
+        evaluaciones_pendientes = 0
+        evaluaciones_data = get_evaluaciones_estudiante(estudiante_obj.pk)
+        for asignatura_evaluaciones in evaluaciones_data.values():
+            for evaluacion in asignatura_evaluaciones:
+                if evaluacion['fecha'] > date.today():
+                    evaluaciones_pendientes += 1
+        
         context = {
             'alumno' : usuario,
             'curso' : curso,
@@ -319,7 +352,12 @@ class EstudiantePanelView(View):
             'horario_estudiante': horario_estudiante,
             'evaluaciones_estudiante': evaluaciones_estudiante,
             'promedio_estudiante': promedio_estudiante,
-            'asistencia_estudiante': asistencia_estudiante
+            'asistencia_estudiante': asistencia_general,
+            'evaluaciones_estudiante': {
+                'pendientes': evaluaciones_pendientes,
+                'detalle': evaluaciones_data
+            },
+            'eventos_calendario': get_eventos_calendario(estudiante_obj.pk),
         }
         
         return render(request, 'student_panel.html', context)
@@ -379,20 +417,54 @@ class EstudiantePanelModularView(View):
         evaluaciones_estudiante = get_evaluaciones_estudiante(estudiante_obj.pk)
         promedio_estudiante = get_promedio_estudiante(estudiante_obj.pk)
         asistencia_estudiante = get_asistencia_estudiante(estudiante_obj.pk)
+        evaluaciones_data = get_evaluaciones_estudiante(estudiante_obj.pk)
         
+        # Calcular datos generales para las tarjetas de resumen
+        # Datos generales de asistencia
+        asistencia_general = {
+            'total': 0,
+            'presentes': 0,
+            'porcentaje': 0.0
+        }
+        for asignatura_data in asistencia_estudiante.values():
+            asistencia_general['total'] += asignatura_data['total']
+            asistencia_general['presentes'] += asignatura_data['presentes']
+        
+        if asistencia_general['total'] > 0:
+            asistencia_general['porcentaje'] = (asistencia_general['presentes'] / asistencia_general['total']) * 100
+        
+        # Calcular evaluaciones pendientes (evaluaciones futuras)
+        evaluaciones_pendientes = 0
+        for asignatura_evaluaciones in evaluaciones_data.values():
+            for evaluacion in asignatura_evaluaciones:
+                if evaluacion['fecha'] > date.today():
+                    evaluaciones_pendientes += 1
+        
+        # Obtener temas del foro
+        temas_foro = Foro.objects.all().order_by('-fecha', '-hora')[:5] # Obtener los 5 más recientes
+
+        # Obtener las últimas comunicaciones no leídas
+        comunicaciones_no_leidas = Comunicacion.objects.filter(
+            Q(destinatarios_usuarios=request.user) | Q(destinatarios_cursos=estudiante_obj.curso)
+        ).exclude(leido_por=request.user).distinct().order_by('-fecha_envio')[:5]
+
         context = {
             'alumno' : usuario,
             'curso' : curso,
             'estudiantes_curso': estudiantes_curso,
             'asignaturas_estudiante': asignaturas_estudiante,
             'horario_estudiante': horario_estudiante,
-            'evaluaciones_estudiante': evaluaciones_estudiante,
+            'evaluaciones_estudiante': evaluaciones_data,  # Datos originales para las pestañas
             'promedio_estudiante': promedio_estudiante,
-            'asistencia_estudiante': asistencia_estudiante,
+            'asistencia_estudiante': asistencia_estudiante,  # Datos originales para las pestañas
+            'asistencia_general': asistencia_general,  # Datos generales para las tarjetas
+            'evaluaciones_pendientes': evaluaciones_pendientes,  # Para las tarjetas
             'eventos_calendario': get_eventos_calendario(estudiante_obj.pk),
             'electivos_disponibles': electivos_disponibles,
             'mostrar_electivos': mostrar_electivos,
             'electivos_inscritos': electivos_inscritos,
+            'temas_foro': temas_foro,
+            'comunicaciones_no_leidas': comunicaciones_no_leidas,
         }
         
         return render(request, 'student_panel_modular.html', context)

@@ -1,78 +1,36 @@
 <!-- Pestaña de Comunicaciones Oficiales -->
 <div class="tab-pane fade" id="comunicacion">
-    <div class="row">
-        <!-- Columna de la lista de comunicaciones (Bandeja de Entrada) -->
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0"><i class="fas fa-inbox me-2"></i>Bandeja de Entrada</h6>
-                </div>
-                <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
-                    <!-- Ejemplo de Comunicación Leída -->
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">Dirección Académica</h6>
-                            <small class="text-muted">Ayer</small>
-                        </div>
-                        <p class="mb-1">Información Matrícula 2026</p>
-                        <small class="text-muted">
-                            <i class="fas fa-paperclip me-1"></i> 2 Archivos Adjuntos
-                        </small>
-                    </a>
-                    <!-- Ejemplo de Comunicación No Leída (más reciente) -->
-                    <a href="#" class="list-group-item list-group-item-action active">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1">Prof. Jefe: C. Bravo</h6>
-                            <small>Hoy</small>
-                        </div>
-                        <p class="mb-1">Autorización Salida Pedagógica</p>
-                        <small><i class="fas fa-paperclip me-1"></i> 1 Archivo Adjunto</small>
-                    </a>
-                    <!-- Más ejemplos... -->
-                </div>
-            </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-bullhorn me-2"></i>Comunicaciones Recientes
+            </h5>
+            <a href="{% url 'bandeja_entrada' %}" class="btn btn-light btn-sm">
+                Ver bandeja de entrada <i class="fas fa-arrow-right ms-1"></i>
+            </a>
         </div>
-
-        <!-- Columna de lectura y respuesta -->
-        <div class="col-md-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <!-- Cabecera del Mensaje -->
-                    <h4 class="mb-1">Autorización Salida Pedagógica</h4>
-                    <p class="text-muted border-bottom pb-2">
-                        De: <strong>Prof. Jefe: C. Bravo</strong> | Para: <strong>Curso 3°A</strong>
-                    </p>
-                    
-                    <!-- Cuerpo del Mensaje -->
-                    <p>Estimados apoderados y estudiantes,</p>
-                    <p>Junto con saludar, adjunto la autorización que deben traer firmada para la salida pedagógica al Museo de Historia Natural, que se realizará la próxima semana.</p>
-                    <p>La fecha límite para entregar el documento es este viernes.</p>
-                    <p>Saludos cordiales.</p>
-
-                    <!-- Archivos Adjuntos -->
-                    <h6 class="mt-4"><i class="fas fa-paperclip me-2"></i>Archivos Adjuntos para Descargar</h6>
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="fas fa-file-pdf text-danger me-2"></i>
-                                Autorizacion_Salida_Museo.pdf
+        <div class="card-body">
+            {% if comunicaciones_no_leidas %}
+                <div class="list-group list-group-flush">
+                    {% for comunicacion in comunicaciones_no_leidas %}
+                        <a href="{% url 'detalle_comunicacion' comunicacion.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1 text-primary">{{ comunicacion.asunto }}</h6>
+                                <small class="text-muted">{{ comunicacion.fecha_envio|date:"d M, Y" }}</small>
                             </div>
-                            <a href="#" class="btn btn-sm btn-outline-primary"><i class="fas fa-download me-2"></i>Descargar</a>
-                        </li>
-                    </ul>
-
-                    <!-- Responder y Cargar Archivos -->
-                    <h6 class="mt-4 pt-3 border-top"><i class="fas fa-upload me-2"></i>Responder o Cargar Documento</h6>
-                    <div class="mb-3">
-                        <textarea class="form-control" rows="3" placeholder="Escribe un mensaje de respuesta (opcional)..."></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="formFile" class="form-label">Adjuntar documento firmado:</label>
-                        <input class="form-control" type="file" id="formFile">
-                    </div>
-                    <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane me-2"></i>Enviar Respuesta</button>
+                            <p class="mb-1">De: {{ comunicacion.autor.usuario.nombre }} {{ comunicacion.autor.usuario.apellido_paterno }}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-paperclip me-1"></i> {{ comunicacion.adjuntos.count }} adjuntos
+                            </small>
+                        </a>
+                    {% endfor %}
                 </div>
-            </div>
+            {% else %}
+                <div class="alert alert-success text-center">
+                    <i class="fas fa-check-circle me-2"></i>
+                    ¡Estás al día! No tienes comunicaciones nuevas.
+                </div>
+            {% endif %}
         </div>
     </div>
 </div> 

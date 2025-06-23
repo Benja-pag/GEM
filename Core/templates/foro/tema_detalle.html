@@ -1,0 +1,80 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Mensajes de Alerta -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Tarjeta del Tema Principal -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">{{ tema.titulo }}</h4>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ tema.contenido|linebreaksbr }}</p>
+        </div>
+        <div class="card-footer text-muted d-flex justify-content-between">
+            <span>
+                Publicado por: <strong>{{ tema.autor.nombre }} {{ tema.autor.apellido_paterno }}</strong>
+            </span>
+            <span>{{ tema.fecha|date:"d M, Y" }} a las {{ tema.hora|time:"H:i" }}</span>
+        </div>
+    </div>
+
+    <!-- Respuestas del Foro -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-reply me-2"></i>Respuestas ({{ mensajes.count }})</h5>
+        </div>
+        <div class="card-body">
+            {% for mensaje in mensajes %}
+                <div class="d-flex mb-3">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                    </div>
+                    <div class="ms-3 flex-grow-1">
+                        <div class="fw-bold">{{ mensaje.autor.nombre }} {{ mensaje.autor.apellido_paterno }}</div>
+                        <p>{{ mensaje.contenido|linebreaksbr }}</p>
+                        <small class="text-muted">{{ mensaje.fecha|date:"d M, Y, H:i" }}</small>
+                    </div>
+                </div>
+                {% if not forloop.last %}<hr>{% endif %}
+            {% empty %}
+                <p class.text-center text-muted">Aún no hay respuestas. ¡Sé el primero en responder!</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Formulario para Nueva Respuesta -->
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">Escribe tu respuesta</h5>
+        </div>
+        <div class="card-body">
+            <form action="{% url 'ver_tema_foro' tema.id %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <textarea class="form-control" id="contenido" name="contenido" rows="4" placeholder="Escribe tu respuesta aquí..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane me-2"></i>Publicar Respuesta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'foro_general' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver al Foro
+        </a>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,38 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-inbox me-2"></i>Bandeja de Entrada de Comunicaciones</h4>
+        </div>
+        <div class="card-body">
+            <div class="list-group list-group-flush">
+                {% for comunicacion in comunicaciones %}
+                    <a href="{% url 'detalle_comunicacion' comunicacion.id %}" 
+                       class="list-group-item list-group-item-action {% if request.user not in comunicacion.leido_por.all %}list-group-item-primary fw-bold{% endif %}">
+                        <div class="d-flex w-100 justify-content-between">
+                            <p class="mb-1">
+                                <i class="fas fa-user-tie me-2"></i>
+                                De: {{ comunicacion.autor.usuario.nombre }} {{ comunicacion.autor.usuario.apellido_paterno }}
+                            </p>
+                            <small class="text-muted">{{ comunicacion.fecha_envio|date:"d M, Y H:i" }}</small>
+                        </div>
+                        <h5 class="mb-1">{{ comunicacion.asunto }}</h5>
+                        <small>
+                            <i class="fas fa-paperclip me-1"></i>
+                            {{ comunicacion.adjuntos.count }} Archivos Adjuntos
+                        </small>
+                    </a>
+                {% empty %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        No tienes comunicaciones en tu bandeja de entrada.
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

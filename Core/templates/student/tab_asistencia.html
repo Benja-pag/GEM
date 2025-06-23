@@ -51,9 +51,11 @@
                         <h5 class="mb-0">
                             <i class="fas fa-table me-2 text-primary"></i>Detalle de Asistencia
                         </h5>
-                        <button class="btn btn-outline-primary btn-sm" onclick="exportarAsistencia()">
-                            <i class="fas fa-download me-1"></i>Exportar
-                        </button>
+                        <div>
+                            <a href="{% url 'descargar_asistencia_pdf' %}" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="fas fa-file-pdf me-1"></i>Descargar PDF
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -106,23 +108,39 @@
                                             </div>
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-secondary fs-6">{{ datos.total }}</span>
+                                            {% if datos.sin_registro %}
+                                                <span class="badge bg-secondary fs-6">Sin registro</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary fs-6">{{ datos.total }}</span>
+                                            {% endif %}
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-success fs-6">{{ datos.presentes }}</span>
+                                            {% if datos.sin_registro %}
+                                                <span class="text-muted">-</span>
+                                            {% else %}
+                                                <span class="badge bg-success fs-6">{{ datos.presentes }}</span>
+                                            {% endif %}
                                         </td>
                                         <td class="text-center">
-                                            <span class="badge bg-danger fs-6">{{ datos.ausentes }}</span>
+                                            {% if datos.sin_registro %}
+                                                <span class="text-muted">-</span>
+                                            {% else %}
+                                                <span class="badge bg-danger fs-6">{{ datos.ausentes }}</span>
+                                            {% endif %}
                                         </td>
                                         <td class="text-center">
-                                            {% if datos.justificados > 0 %}
+                                            {% if datos.sin_registro %}
+                                                <span class="text-muted">-</span>
+                                            {% elif datos.justificados > 0 %}
                                                 <span class="badge bg-info fs-6">{{ datos.justificados }}</span>
                                             {% else %}
                                                 <span class="text-muted">-</span>
                                             {% endif %}
                                         </td>
                                         <td class="text-center">
-                                            {% if datos.porcentaje >= 90 %}
+                                            {% if datos.sin_registro %}
+                                                <span class="badge bg-secondary fs-6">Sin clase aún</span>
+                                            {% elif datos.porcentaje >= 90 %}
                                                 <span class="badge bg-success fs-6">{{ datos.porcentaje|floatformat:1 }}%</span>
                                             {% elif datos.porcentaje >= 80 %}
                                                 <span class="badge bg-warning fs-6">{{ datos.porcentaje|floatformat:1 }}%</span>
@@ -131,7 +149,11 @@
                                             {% endif %}
                                         </td>
                                         <td class="text-center">
-                                            {% if datos.porcentaje >= 90 %}
+                                            {% if datos.sin_registro %}
+                                                <span class="badge bg-secondary-subtle text-secondary">
+                                                    <i class="fas fa-clock me-1"></i>Pendiente
+                                                </span>
+                                            {% elif datos.porcentaje >= 90 %}
                                                 <span class="badge bg-success-subtle text-success">
                                                     <i class="fas fa-star me-1"></i>Excelente
                                                 </span>
@@ -184,10 +206,12 @@
 .bg-danger-subtle {
     background-color: rgba(220, 53, 69, 0.1);
 }
+
+.bg-secondary-subtle {
+    background-color: rgba(108, 117, 125, 0.1);
+}
 </style>
 
 <script>
-function exportarAsistencia() {
-    alert('Función de exportación en desarrollo');
-}
+// La función exportarAsistencia ha sido eliminada.
 </script> 

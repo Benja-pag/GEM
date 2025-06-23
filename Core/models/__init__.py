@@ -12,7 +12,7 @@ __all__ = [
     'AuthUser', 'Usuario', 'Administrativo', 'Docente', 'Estudiante', 'ProfesorJefe', 'Especialidad',
     
     # Modelos de Cursos
-    'Asignatura', 'AsignaturaImpartida', 'AsignaturaInscrita', 'Clase', 'Curso', 'Asistencia',
+    'Asignatura', 'AsignaturaImpartida', 'AsignaturaInscrita', 'Clase', 'Curso', 'Asistencia', 'HorarioCurso',
     
     # Modelos de Notas
     'EvaluacionBase', 'Evaluacion', 'AlumnoEvaluacion',

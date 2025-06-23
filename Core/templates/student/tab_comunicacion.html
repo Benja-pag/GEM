@@ -1,112 +1,76 @@
-<!-- Pestaña de Comunicación -->
+<!-- Pestaña de Comunicaciones Oficiales -->
 <div class="tab-pane fade" id="comunicacion">
     <div class="row">
-        <!-- Chat con Profesores -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
+        <!-- Columna de la lista de comunicaciones (Bandeja de Entrada) -->
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-comments me-2"></i>Chat con Profesores
-                    </h5>
+                    <h6 class="mb-0"><i class="fas fa-inbox me-2"></i>Bandeja de Entrada</h6>
                 </div>
-                <div class="card-body">
-                    <div class="chat-container" style="height: 400px; overflow-y: auto;">
-                        <div class="chat-messages">
-                            <div class="message received mb-3">
-                                <div class="message-content bg-light p-3 rounded">
-                                    <strong>Prof. Juan Pérez:</strong>
-                                    <p class="mb-1">Hola, ¿tienes alguna duda sobre la tarea de matemáticas?</p>
-                                    <small class="text-muted">Hoy 14:30</small>
-                                </div>
-                            </div>
-                            <div class="message sent mb-3 text-end">
-                                <div class="message-content bg-primary text-white p-3 rounded d-inline-block">
-                                    <p class="mb-1">Sí, tengo una duda sobre el ejercicio 5</p>
-                                    <small class="text-white-75">Hoy 14:32</small>
-                                </div>
-                            </div>
-                            <div class="message received mb-3">
-                                <div class="message-content bg-light p-3 rounded">
-                                    <strong>Prof. Juan Pérez:</strong>
-                                    <p class="mb-1">Perfecto, ¿qué parte no entiendes?</p>
-                                    <small class="text-muted">Hoy 14:33</small>
-                                </div>
-                            </div>
+                <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
+                    <!-- Ejemplo de Comunicación Leída -->
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Dirección Académica</h6>
+                            <small class="text-muted">Ayer</small>
                         </div>
-                    </div>
-                    <div class="chat-input mt-3">
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Escribe tu mensaje...">
-                            <button class="btn btn-primary" type="button">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
+                        <p class="mb-1">Información Matrícula 2026</p>
+                        <small class="text-muted">
+                            <i class="fas fa-paperclip me-1"></i> 2 Archivos Adjuntos
+                        </small>
+                    </a>
+                    <!-- Ejemplo de Comunicación No Leída (más reciente) -->
+                    <a href="#" class="list-group-item list-group-item-action active">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">Prof. Jefe: C. Bravo</h6>
+                            <small>Hoy</small>
                         </div>
-                    </div>
+                        <p class="mb-1">Autorización Salida Pedagógica</p>
+                        <small><i class="fas fa-paperclip me-1"></i> 1 Archivo Adjunto</small>
+                    </a>
+                    <!-- Más ejemplos... -->
                 </div>
             </div>
         </div>
 
-        <!-- Panel Lateral -->
-        <div class="col-lg-4">
-            <!-- Profesores Online -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-user-check me-2"></i>Profesores Online
-                    </h5>
-                </div>
+        <!-- Columna de lectura y respuesta -->
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex align-items-center">
-                            <div class="avatar me-3">
-                                <i class="fas fa-user-circle fa-2x text-success"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1">Prof. Juan Pérez</h6>
-                                <small class="text-muted">Matemáticas</small>
-                            </div>
-                            <span class="badge bg-success">Online</span>
-                        </div>
-                        <div class="list-group-item d-flex align-items-center">
-                            <div class="avatar me-3">
-                                <i class="fas fa-user-circle fa-2x text-secondary"></i>
-                            </div>
-                            <div class="flex-grow-1">
-                                <h6 class="mb-1">Prof. María González</h6>
-                                <small class="text-muted">Lenguaje</small>
-                            </div>
-                            <span class="badge bg-secondary">Offline</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    <!-- Cabecera del Mensaje -->
+                    <h4 class="mb-1">Autorización Salida Pedagógica</h4>
+                    <p class="text-muted border-bottom pb-2">
+                        De: <strong>Prof. Jefe: C. Bravo</strong> | Para: <strong>Curso 3°A</strong>
+                    </p>
+                    
+                    <!-- Cuerpo del Mensaje -->
+                    <p>Estimados apoderados y estudiantes,</p>
+                    <p>Junto con saludar, adjunto la autorización que deben traer firmada para la salida pedagógica al Museo de Historia Natural, que se realizará la próxima semana.</p>
+                    <p>La fecha límite para entregar el documento es este viernes.</p>
+                    <p>Saludos cordiales.</p>
 
-            <!-- Foros de Discusión -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-users me-2"></i>Foros de Discusión
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Dudas sobre Matemáticas</h6>
-                                <small class="text-muted">3 respuestas</small>
+                    <!-- Archivos Adjuntos -->
+                    <h6 class="mt-4"><i class="fas fa-paperclip me-2"></i>Archivos Adjuntos para Descargar</h6>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="fas fa-file-pdf text-danger me-2"></i>
+                                Autorizacion_Salida_Museo.pdf
                             </div>
-                            <p class="mb-1">¿Alguien puede explicarme el ejercicio 3?</p>
-                            <small class="text-muted">Por: Carlos López - Hace 2 horas</small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Trabajo Grupal Historia</h6>
-                                <small class="text-muted">5 respuestas</small>
-                            </div>
-                            <p class="mb-1">¿Cuándo nos reunimos para el trabajo?</p>
-                            <small class="text-muted">Por: Ana Martínez - Hace 1 día</small>
-                        </a>
+                            <a href="#" class="btn btn-sm btn-outline-primary"><i class="fas fa-download me-2"></i>Descargar</a>
+                        </li>
+                    </ul>
+
+                    <!-- Responder y Cargar Archivos -->
+                    <h6 class="mt-4 pt-3 border-top"><i class="fas fa-upload me-2"></i>Responder o Cargar Documento</h6>
+                    <div class="mb-3">
+                        <textarea class="form-control" rows="3" placeholder="Escribe un mensaje de respuesta (opcional)..."></textarea>
                     </div>
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Adjuntar documento firmado:</label>
+                        <input class="form-control" type="file" id="formFile">
+                    </div>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane me-2"></i>Enviar Respuesta</button>
                 </div>
             </div>
         </div>

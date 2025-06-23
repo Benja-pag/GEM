@@ -1,93 +1,237 @@
 <!-- Pestaña de Calendario -->
 <div class="tab-pane fade" id="calendario">
-    <div class="row">
+    <div class="row g-4"> <!-- Espaciado entre columnas (gutter) -->
         <!-- Columna del Calendario -->
-        <div class="col-lg-9">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-calendar-alt text-primary me-2"></i>
-                            <strong>Junio 2024</strong>
-                        </h5>
-                        <div class="btn-group">
-                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-left"></i></button>
-                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body p-2">
-                    <table class="table table-bordered calendar-table">
-                        <thead class="text-center">
-                            <tr>
-                                <th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-muted">27</td><td class="text-muted">28</td><td class="text-muted">29</td><td class="text-muted">30</td><td class="text-muted">31</td><td>1</td><td>2</td>
-                            </tr>
-                            <tr>
-                                <td>3</td><td>4</td><td>5<div class="calendar-event bg-success">Prueba</div></td><td>6</td><td>7</td><td>8</td><td>9</td>
-                            </tr>
-                            <tr>
-                                <td>10</td><td>11</td><td>12</td><td>13</td><td>14<div class="calendar-event bg-info text-dark">Día del Alumno</div></td><td>15</td><td>16</td>
-                            </tr>
-                            <tr>
-                                <td>17</td><td>18</td><td>19</td><td class="today">20</td><td>21</td><td>22</td><td>23</td>
-                            </tr>
-                            <tr>
-                                <td>24</td><td>25</td><td>26<div class="calendar-event bg-warning text-dark">Entrega Informe</div></td><td>27</td><td>28</td><td>29</td><td>30</td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted">1</td><td class="text-muted">2</td><td class="text-muted">3</td><td class="text-muted">4</td><td class="text-muted">5</td><td class="text-muted">6</td><td class="text-muted">7</td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div id='calendar'></div>
                 </div>
             </div>
         </div>
-        <!-- Columna de Información Adicional -->
-        <div class="col-lg-3">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title mb-3"><i class="fas fa-star me-2 text-warning"></i>Próximos Eventos</h5>
-                    <div class="list-group list-group-flush">
-                        <a href="#" class="list-group-item list-group-item-action px-0">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Prueba</h6>
-                                <small class="text-muted">05/06</small>
-                            </div>
-                            <small class="badge bg-success-soft text-success">Evaluación</small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action px-0">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Día del Alumno</h6>
-                                <small class="text-muted">14/06</small>
-                            </div>
-                            <small class="badge bg-info-soft text-info">Evento</small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action px-0">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Entrega Informe</h6>
-                                <small class="text-muted">26/06</small>
-                            </div>
-                            <small class="badge bg-warning-soft text-warning">Tarea</small>
-                        </a>
-                    </div>
+        <!-- Columna de Resumen de Eventos -->
+        <div class="col-lg-4">
+            <!-- Card para Eventos del Día Seleccionado -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="card-title mb-0" id="selected-day-title"><i class="fas fa-calendar-day me-2"></i>Eventos de Hoy</h6>
+                </div>
+                <div class="card-body p-0" id="selected-day-body" style="max-height: 280px; overflow-y: auto;">
+                    <div class="p-4 text-center text-muted">Selecciona un día para ver sus eventos.</div>
                 </div>
             </div>
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title mb-3"><i class="fas fa-tags me-2 text-primary"></i>Leyenda</h5>
-                    <div class="d-flex flex-column gap-2">
-                        <div class="d-flex align-items-center"><div class="legend-dot bg-success"></div>Evaluaciones</div>
-                        <div class="d-flex align-items-center"><div class="legend-dot bg-warning"></div>Tareas y Entregas</div>
-                        <div class="d-flex align-items-center"><div class="legend-dot bg-info"></div>Eventos</div>
-                        <div class="d-flex align-items-center"><div class="legend-dot bg-danger"></div>Avisos Importantes</div>
-                    </div>
+            <!-- Card para Eventos del Mes -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light text-dark">
+                    <h6 class="card-title mb-0"><i class="fas fa-calendar-alt me-2"></i>Próximos Eventos del Mes</h6>
+                </div>
+                <div class="card-body p-0" id="monthly-events-body" style="max-height: 280px; overflow-y: auto;">
+                    <div class="p-4 text-center text-muted">Cargando...</div>
                 </div>
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+<style>
+/* Punto de evento en el calendario */
+.fc-daygrid-day-frame {
+    position: relative;
+}
+.fc-day-event-dot {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--bs-primary);
+}
+
+/* Estilo para la lista de eventos */
+.event-list-item {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.event-list-item:last-child {
+    border-bottom: none;
+}
+.event-list-item:hover {
+    background-color: #f8f9fa;
+}
+.event-list-item .event-title {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+.event-list-item .event-details {
+    display: none;
+    padding-top: 0.5rem;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+.event-list-item.active .event-details {
+    display: block;
+}
+.event-list-item.active {
+    background-color: #e9f5ff;
+}
+.event-icon {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendarTab = document.getElementById('calendario-tab');
+    var calendarInstance = null;
+    var allEvents = [];
+
+    var selectedDayTitle = document.getElementById('selected-day-title');
+    var selectedDayBody = document.getElementById('selected-day-body');
+    var monthlyEventsBody = document.getElementById('monthly-events-body');
+
+    function initializeCalendar() {
+        if (calendarInstance) return;
+
+        allEvents = JSON.parse('{{ eventos_calendario|safe }}');
+
+        calendarInstance = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth'
+            },
+            events: allEvents,
+            eventDisplay: 'block',
+            dateClick: function(info) {
+                updateSelectedDayList(info.date);
+            },
+            eventClick: function(info) {
+                updateSelectedDayList(info.event.start);
+                highlightEvent(info.event.id, true);
+            },
+            dayCellDidMount: function(info) {
+                var hasEvents = allEvents.some(event => 
+                    new Date(event.start).toDateString() === info.date.toDateString()
+                );
+                if (hasEvents) {
+                    let dot = document.createElement('div');
+                    dot.className = 'fc-day-event-dot';
+                    info.el.querySelector('.fc-daygrid-day-frame').appendChild(dot);
+                }
+            }
+        });
+
+        calendarInstance.render();
+        updateSelectedDayList(new Date());
+        updateMonthlyList();
+    }
+    
+    function populateEventList(container, titleElement, titleText, events, showDate) {
+        if (titleElement) titleElement.innerHTML = `<i class="fas fa-calendar-day me-2"></i> ${titleText}`;
+        container.innerHTML = '';
+
+        if (events.length === 0) {
+            container.innerHTML = '<div class="p-4 text-center text-muted">No hay eventos programados.</div>';
+            return;
+        }
+
+        events.sort((a, b) => new Date(a.start) - new Date(b.start));
+        
+        events.forEach(event => {
+            var eventEl = document.createElement('div');
+            var eventId = event.id;
+            eventEl.className = 'event-list-item';
+            eventEl.id = `event-${eventId}`;
+            
+            var eventDate = new Date(event.start);
+            var eventTime = eventDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            var dateString = showDate ? `<strong>${eventDate.getDate()}/${eventDate.getMonth()+1}</strong>` : `<strong>${eventTime}</strong>`;
+            var icon = getEventIcon(event.extendedProps.type);
+            var props = event.extendedProps;
+
+            eventEl.innerHTML = `
+                <div class="event-title">
+                    <i class="${icon} event-icon"></i>
+                    <span>${dateString} - ${event.title}</span>
+                </div>
+                <div class="event-details">
+                    <hr class="my-2">
+                    ${props.description ? `<div>${props.description}</div>` : ''}
+                    ${props.docente ? `<div><strong>Docente:</strong> ${props.docente}</div>` : ''}
+                    ${props.sala ? `<div><strong>Sala:</strong> ${props.sala}</div>` : ''}
+                    ${props.encargado ? `<div><strong>Encargado:</strong> ${props.encargado}</div>` : ''}
+                    ${props.ubicacion ? `<div><strong>Ubicación:</strong> ${props.ubicacion}</div>` : ''}
+                </div>
+            `;
+            
+            eventEl.onclick = () => highlightEvent(eventId);
+            container.appendChild(eventEl);
+        });
+    }
+    
+    function updateSelectedDayList(date) {
+        var selectedDate = new Date(date);
+        var title = selectedDate.toDateString() === new Date().toDateString() 
+            ? 'Eventos para Hoy' 
+            : `Eventos del ${selectedDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`;
+        
+        var eventsOnDay = allEvents.filter(e => new Date(e.start).toDateString() === selectedDate.toDateString());
+        populateEventList(selectedDayBody, selectedDayTitle, title, eventsOnDay, false);
+    }
+    
+    function updateMonthlyList() {
+        var today = new Date();
+        var startOfMonth = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        var endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+        
+        var upcomingEvents = allEvents.filter(e => {
+            var eventDate = new Date(e.start);
+            return eventDate >= startOfMonth && eventDate <= endOfMonth;
+        });
+        
+        populateEventList(monthlyEventsBody, null, '', upcomingEvents, true);
+    }
+
+    function getEventIcon(type) {
+        switch(type) {
+            case 'Colegio': return 'fas fa-school text-primary';
+            case 'Asignatura': return 'fas fa-book-open text-success';
+            case 'Clase': return 'fas fa-chalkboard-teacher text-secondary';
+            default: return 'fas fa-calendar-day text-muted';
+        }
+    }
+
+    function highlightEvent(eventId, ensureVisible = false) {
+        let eventEl = document.querySelector(`#selected-day-body #event-${eventId}`) || document.querySelector(`#monthly-events-body #event-${eventId}`);
+        if (!eventEl) return;
+
+        if (eventEl.classList.contains('active')) {
+            eventEl.classList.remove('active');
+        } else {
+            eventEl.parentElement.querySelectorAll('.event-list-item.active').forEach(el => el.classList.remove('active'));
+            eventEl.classList.add('active');
+        }
+
+        if (ensureVisible) {
+            eventEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    if (calendarTab) {
+        calendarTab.addEventListener('shown.bs.tab', initializeCalendar);
+    }
+    if (document.querySelector('#calendario').classList.contains('active')) {
+        initializeCalendar();
+    }
+});
+</script> 

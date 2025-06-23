@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.http import JsonResponse
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, AsignaturaInscrita, Evaluacion, AlumnoEvaluacion, EvaluacionBase
-from django.db.models import Count, Avg
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, AsignaturaInscrita, Evaluacion, AlumnoEvaluacion, EvaluacionBase, HorarioCurso
+from django.db.models import Count, Avg, Q
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, DetailView
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
@@ -19,6 +19,8 @@ from Core.servicios.repos.asignaturas import get_asignaturas_estudiante
 from Core.servicios.repos.cursos import get_estudiantes_por_curso
 from datetime import datetime, date, timedelta
 from collections import defaultdict
+import json
+import calendar
 
 def get_horario_estudiante(estudiante_id):
     """
@@ -170,6 +172,128 @@ def get_asistencia_estudiante(estudiante_id):
     
     return asistencia_por_asignatura
 
+def get_eventos_calendario(estudiante_id):
+    """
+    Obtiene los eventos del calendario para un estudiante.
+    Incluye eventos del colegio, de las asignaturas inscritas y el horario de clases.
+    """
+    try:
+        estudiante = Estudiante.objects.get(pk=estudiante_id)
+        
+        # --- Obtener eventos de CalendarioClase y CalendarioColegio ---
+        asignaturas_ids = AsignaturaInscrita.objects.filter(
+            estudiante=estudiante
+        ).values_list('asignatura_impartida__asignatura_id', flat=True)
+
+        eventos = []
+        # Eventos del colegio
+        eventos_colegio = CalendarioColegio.objects.all()
+        for evento in eventos_colegio:
+            eventos.append({
+                'id': f'colegio_{evento.pk}',
+                'title': evento.nombre_actividad,
+                'start': f'{evento.fecha}T{evento.hora}',
+                'description': evento.descripcion,
+                'color': '#0dcaf0', # Azul claro para eventos del colegio
+                'extendedProps': {
+                    'type': 'Colegio',
+                    'encargado': evento.encargado,
+                    'ubicacion': evento.ubicacion,
+                }
+            })
+
+        # Eventos de las clases del estudiante, filtrando por los IDs de asignatura
+        eventos_clase = CalendarioClase.objects.filter(
+            asignatura_id__in=list(asignaturas_ids)
+        )
+        for evento in eventos_clase:
+            eventos.append({
+                'id': f'clase_{evento.pk}',
+                'title': f"{evento.nombre_actividad} - {evento.asignatura.nombre}",
+                'start': f'{evento.fecha}T{evento.hora if evento.hora else "00:00:00"}',
+                'description': evento.descripcion,
+                'color': '#198754', # Verde para evaluaciones
+                'extendedProps': {
+                    'type': 'Asignatura',
+                    'materia': evento.asignatura.nombre
+                }
+            })
+        
+        # --- Generar eventos recurrentes del horario de clases (deshabilitado) ---
+        # if estudiante.curso:
+        #     hoy = date.today()
+        #     # Generar eventos para el mes actual, el anterior y el siguiente
+        #     for i in range(-1, 2):
+        #         mes = hoy.month + i
+        #         año = hoy.year
+        #         if mes == 0:
+        #             mes = 12
+        #             año -= 1
+        #         elif mes == 13:
+        #             mes = 1
+        #             año += 1
+                
+        #         # Obtener todos los días del mes
+        #         dias_del_mes = calendar.monthrange(año, mes)[1]
+        #         for dia_num in range(1, dias_del_mes + 1):
+        #             fecha_actual = date(año, mes, dia_num)
+        #             dia_semana_num = fecha_actual.weekday() # Lunes=0, Domingo=6
+        #             dias_semana = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO']
+        #             dia_semana_str = dias_semana[dia_semana_num]
+
+        #             # Obtener las clases del estudiante para ese día de la semana
+        #             clases_del_dia = Clase.objects.filter(
+        #                 asignatura_impartida__inscripciones__estudiante=estudiante,
+        #                 asignatura_impartida__inscripciones__validada=True,
+        #                 fecha=dia_semana_str
+        #             ).select_related(
+        #                 'asignatura_impartida__asignatura',
+        #                 'asignatura_impartida__docente__usuario'
+        #             ).distinct()
+
+        #             for clase in clases_del_dia:
+        #                 # Mapear el número de bloque a la hora real usando HorarioCurso
+        #                 try:
+        #                     bloque_numero = clase.horario
+        #                     # Buscar el bloque correspondiente en HorarioCurso
+        #                     bloque_info = HorarioCurso.objects.filter(
+        #                         bloque=bloque_numero,
+        #                         dia=dia_semana_str,
+        #                         actividad='CLASE'
+        #                     ).first()
+                            
+        #                     if bloque_info:
+        #                         # Extraer la hora de inicio del bloque (formato: "08:00 - 08:45")
+        #                         hora_inicio = bloque_info.get_bloque_display().split(' - ')[0]
+        #                     else:
+        #                         # Si no encuentra el bloque, usar un mapeo por defecto
+        #                         mapeo_bloques = {
+        #                             '1': '08:00', '2': '08:45', '3': '09:45', '4': '10:30',
+        #                             '5': '11:30', '6': '12:15', '7': '13:45', '8': '14:30', '9': '15:15'
+        #                         }
+        #                         hora_inicio = mapeo_bloques.get(bloque_numero, '08:00')
+        #                 except:
+        #                     hora_inicio = "08:00"  # Hora por defecto
+                        
+        #                 eventos.append({
+        #                     'title': f"{clase.asignatura_impartida.asignatura.nombre} - {clase.sala}",
+        #                     'start': f'{fecha_actual}T{hora_inicio}:00',
+        #                     'allDay': False,
+        #                     'display': 'block',
+        #                     'color': '#6c757d', # Gris para las clases regulares
+        #                     'extendedProps': {
+        #                         'type': 'Clase',
+        #                         'docente': f"{clase.asignatura_impartida.docente.usuario.nombre} {clase.asignatura_impartida.docente.usuario.apellido_paterno}",
+        #                         'sala': clase.sala,
+        #                         'asignatura': clase.asignatura_impartida.asignatura.nombre
+        #                     }
+        #                 })
+
+        return json.dumps(eventos)
+
+    except Estudiante.DoesNotExist:
+        return json.dumps([])
+
 @method_decorator(login_required, name='dispatch')
 class EstudiantePanelView(View):
     def get(self, request):
@@ -225,7 +349,8 @@ class EstudiantePanelModularView(View):
             'horario_estudiante': horario_estudiante,
             'evaluaciones_estudiante': evaluaciones_estudiante,
             'promedio_estudiante': promedio_estudiante,
-            'asistencia_estudiante': asistencia_estudiante
+            'asistencia_estudiante': asistencia_estudiante,
+            'eventos_calendario': get_eventos_calendario(estudiante_obj.pk),
         }
         
         return render(request, 'student_panel_modular.html', context)

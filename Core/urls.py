@@ -7,6 +7,7 @@ from Core.views import (
     UserDataView, SurveysView, TasksView, TestsView, ToggleUserStatusView,
     CursoDetalleView, AsignaturaDetalleView, AsignaturaDetalleEstudianteView, CleanupAuthUsersView
 )
+from Core.views.alumnos import InscribirElectivoView, InscribirElectivosLoteView, BorrarInscripcionElectivosView
 
 urlpatterns = [
     # URLs de autenticación
@@ -48,5 +49,11 @@ urlpatterns = [
     path('curso/<int:curso_id>/', CursoDetalleView.as_view(), name='curso_detalle'),
     path('asignatura/<int:asignatura_id>/', AsignaturaDetalleView.as_view(), name='asignatura_detalle'),
     path('asignatura-estudiante/<int:asignatura_id>/', AsignaturaDetalleEstudianteView.as_view(), name='asignatura_detalle_estudiante'),
+]
+
+urlpatterns += [
+    path('inscribir-electivo/', InscribirElectivoView.as_view(), name='inscribir_electivo'),
+    path('inscribir-electivos-lote/', InscribirElectivosLoteView.as_view(), name='inscribir_electivos_lote'),
+    path('borrar-inscripcion-electivos/', BorrarInscripcionElectivosView.as_view(), name='borrar_inscripcion_electivos'),
 ]
 

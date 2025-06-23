@@ -1,198 +1,574 @@
+{% load horario_tags %}
 <!-- Pestaña de Electivos -->
-<div class="tab-pane fade" id="electivos">
-    <div class="row">
-        <!-- Electivos Disponibles -->
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-star me-2"></i>Electivos Disponibles
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Electivo 1 -->
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-0 shadow-sm hover-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h6 class="card-title text-primary mb-0">Programación Web</h6>
-                                        <span class="badge bg-success">Disponible</span>
-                                    </div>
-                                    <p class="card-text text-muted small">Desarrollo de aplicaciones web modernas</p>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-user me-1"></i>Prof. María González
-                                        </small>
-                                    </div>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock me-1"></i>Martes y Jueves 15:00-16:30
-                                        </small>
-                                    </div>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-users me-1"></i>12/20 cupos disponibles
-                                        </small>
-                                    </div>
-                                    <button class="btn btn-outline-primary btn-sm w-100">
-                                        <i class="fas fa-plus me-1"></i>Inscribirse
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+<div class="tab-pane fade" id="electivos" role="tabpanel" aria-labelledby="electivos-tab">
 
-                        <!-- Electivo 2 -->
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-0 shadow-sm hover-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h6 class="card-title text-primary mb-0">Arte Digital</h6>
-                                        <span class="badge bg-success">Disponible</span>
-                                    </div>
-                                    <p class="card-text text-muted small">Creación artística con herramientas digitales</p>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-user me-1"></i>Prof. Carlos Ruiz
-                                        </small>
-                                    </div>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock me-1"></i>Lunes y Miércoles 16:00-17:30
-                                        </small>
-                                    </div>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-users me-1"></i>8/20 cupos disponibles
-                                        </small>
-                                    </div>
-                                    <button class="btn btn-outline-primary btn-sm w-100">
-                                        <i class="fas fa-plus me-1"></i>Inscribirse
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Electivo 3 -->
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-0 shadow-sm hover-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h6 class="card-title text-primary mb-0">Robótica</h6>
-                                        <span class="badge bg-warning">Cupo Limitado</span>
-                                    </div>
-                                    <p class="card-text text-muted small">Construcción y programación de robots</p>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-user me-1"></i>Prof. Diego Silva
-                                        </small>
-                                    </div>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock me-1"></i>Viernes 14:00-16:00
-                                        </small>
-                                    </div>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-users me-1"></i>3/15 cupos disponibles
-                                        </small>
-                                    </div>
-                                    <button class="btn btn-outline-warning btn-sm w-100">
-                                        <i class="fas fa-plus me-1"></i>Inscribirse
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Electivo 4 -->
-                        <div class="col-md-6 mb-3">
-                            <div class="card h-100 border-0 shadow-sm hover-card">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h6 class="card-title text-primary mb-0">Música Digital</h6>
-                                        <span class="badge bg-danger">Completo</span>
-                                    </div>
-                                    <p class="card-text text-muted small">Composición musical con software</p>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-user me-1"></i>Prof. Ana Morales
-                                        </small>
-                                    </div>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock me-1"></i>Miércoles 15:00-17:00
-                                        </small>
-                                    </div>
-                                    <div class="mb-2">
-                                        <small class="text-muted">
-                                            <i class="fas fa-users me-1"></i>0/18 cupos disponibles
-                                        </small>
-                                    </div>
-                                    <button class="btn btn-outline-secondary btn-sm w-100" disabled>
-                                        <i class="fas fa-times me-1"></i>Completo
-                                    </button>
-                                </div>
-                            </div>
+    {% if not electivos_inscritos %}
+        <!-- =============================================================== -->
+        <!-- VISTA DE SELECCIÓN DE ELECTIVOS (SI NO ESTÁ INSCRITO)           -->
+        <!-- =============================================================== -->
+        <div class="row">
+            <!-- Electivos Disponibles -->
+            <div class="col-lg-8" id="panel-seleccion-electivos">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-light-subtle d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0 text-body-emphasis">
+                            <i class="fas fa-star me-2 text-warning"></i>Electivos Disponibles para {{ curso.nivel }}° Medio
+                        </h5>
+                        <div class="fw-bold">
+                            Seleccionados: <span id="contador-electivos">0</span> / 4
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Panel Lateral -->
-        <div class="col-lg-4">
-            <!-- Mis Electivos Inscritos -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-check-circle me-2"></i>Mis Electivos
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1">Programación Web</h6>
-                                <small class="text-muted">Prof. María González</small>
-                            </div>
-                            <span class="badge bg-success">Activo</span>
+                    <div class="card-body">
+                        <div class="row">
+                            {% if electivos_disponibles %}
+                                {% for electivo in electivos_disponibles %}
+                                {% with primera_clase=electivo.imparticiones.first.clases.first %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100 border-0 shadow-sm hover-card card-electivo" data-id-electivo="{{ electivo.id }}" data-dia-clase="{{ primera_clase.fecha }}">
+                                        <div class="card-body d-flex flex-column">
+                                            <div class="form-check">
+                                                <input class="form-check-input check-electivo" type="checkbox" value="{{ electivo.id }}" id="electivo-{{ electivo.id }}">
+                                                <label class="form-check-label stretched-link" for="electivo-{{ electivo.id }}">
+                                                    <h6 class="card-title text-primary mb-0">{{ electivo.nombre }}</h6>
+                                                </label>
+                                            </div>
+                                            <hr>
+                                            <p class="card-text text-muted small">Asignatura electiva de {{ electivo.nivel }}° medio</p>
+                                            
+                                            <div class="mt-auto">
+                                                <div class="mb-2">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-chalkboard-teacher me-1"></i>
+                                                        Profesor: 
+                                                        {% for impartida in electivo.imparticiones.all %}
+                                                            {{ impartida.docente.usuario.nombre }} {{ impartida.docente.usuario.apellido_paterno }}
+                                                        {% empty %}
+                                                            No asignado
+                                                        {% endfor %}
+                                                    </small>
+                                                </div>
+                                                
+                                                {% if primera_clase %}
+                                                <div class="mb-2">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-calendar-day me-1"></i>
+                                                        Horario: {{ primera_clase.get_fecha_display }}
+                                                    </small>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-clock me-1"></i>
+                                                        Horario: {% get_hora_inicio_bloque 7 primera_clase.fecha %} - {% get_hora_fin_bloque 9 primera_clase.fecha %}
+                                                    </small>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                                        Sala: {{ primera_clase.get_sala_display }}
+                                                    </small>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endwith %}
+                                {% endfor %}
+                            {% else %}
+                                <div class="col-12">
+                                    <div class="alert alert-info text-center">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        No hay asignaturas electivas disponibles para tu nivel en este momento.
+                                    </div>
+                                </div>
+                            {% endif %}
                         </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1">Arte Digital</h6>
-                                <small class="text-muted">Prof. Carlos Ruiz</small>
-                            </div>
-                            <span class="badge bg-success">Activo</span>
-                        </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Información Importante -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-info-circle me-2"></i>Información
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-warning" role="alert">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        <strong>Período de Inscripción:</strong><br>
-                        Hasta el 30 de junio
-                    </div>
-                    <div class="alert alert-info" role="alert">
-                        <i class="fas fa-lightbulb me-2"></i>
-                        <strong>Recomendación:</strong><br>
-                        Puedes inscribirte en máximo 2 electivos
-                    </div>
-                    <div class="text-center">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-download me-1"></i>Descargar Horarios
+                    <div class="card-footer text-center">
+                        <button class="btn btn-primary btn-lg" id="btn-confirmar-electivos" disabled>
+                            <i class="fas fa-check-circle me-2"></i>Confirmar Mis 4 Electivos
                         </button>
                     </div>
                 </div>
             </div>
+
+            <!-- Panel Lateral (Mis Electivos) -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-check-circle me-2"></i>Mis Electivos Inscritos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush" id="lista-mis-electivos">
+                            {% if electivos_inscritos %}
+                                {% for inscripcion in electivos_inscritos %}
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ inscripcion.asignatura_impartida.asignatura.nombre }}</h6>
+                                            <small class="text-muted">Prof. {{ inscripcion.asignatura_impartida.docente.usuario.nombre }} {{ inscripcion.asignatura_impartida.docente.usuario.apellido_paterno }}</small>
+                                        </div>
+                                        <span class="badge bg-success rounded-pill">Inscrito</span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="list-group-item text-center text-muted">
+                                    <p class="mb-1">Aún no has confirmado tu selección de electivos.</p>
+                                    <small>Escoge 4 y haz clic en "Confirmar".</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Importante -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Información
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Período de Inscripción:</strong><br>
+                            Próximamente se anunciarán las fechas.
+                        </div>
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Importante:</strong><br>
+                            Asegúrate de cumplir los pre-requisitos si los hubiera.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</div> 
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const panelElectivos = document.getElementById('panel-seleccion-electivos');
+                if (!panelElectivos) return;
+
+                const checkboxes = panelElectivos.querySelectorAll('.check-electivo');
+                const contadorSpan = document.getElementById('contador-electivos');
+                const btnConfirmar = document.getElementById('btn-confirmar-electivos');
+
+                function actualizarEstado() {
+                    const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
+                    const diasSeleccionados = new Set(seleccionados.map(cb => cb.closest('.card-electivo').dataset.diaClase));
+
+                    // Actualizar contador
+                    contadorSpan.textContent = seleccionados.length;
+
+                    // Validar y actualizar estado de los checkboxes y tarjetas
+                    checkboxes.forEach(cb => {
+                        const tarjeta = cb.closest('.card-electivo');
+                        const diaTarjeta = tarjeta.dataset.diaClase;
+                        
+                        if (cb.checked) {
+                            tarjeta.classList.add('border-primary');
+                        } else {
+                            tarjeta.classList.remove('border-primary');
+                            // Si el día de esta tarjeta ya fue seleccionado por otro, deshabilitarla
+                            if (diasSeleccionados.has(diaTarjeta)) {
+                                cb.disabled = true;
+                                tarjeta.classList.add('disabled', 'bg-light');
+                            } else {
+                                cb.disabled = false;
+                                tarjeta.classList.remove('disabled', 'bg-light');
+                            }
+                        }
+                    });
+                    
+                    // Si hay más de 4, no debería pasar con la lógica de abajo, pero es un seguro
+                    if (seleccionados.length > 4) {
+                         // this.checked = false; // 'this' no está en este contexto, se maneja en el listener
+                    }
+                    
+                    // Habilitar checkboxes no seleccionados si se libera su día
+                    const todosLosDias = new Set(Array.from(checkboxes).map(cb => cb.closest('.card-electivo').dataset.diaClase));
+                    todosLosDias.forEach(dia => {
+                        if (!diasSeleccionados.has(dia)) {
+                            checkboxes.forEach(cb => {
+                                if (cb.closest('.card-electivo').dataset.diaClase === dia && !cb.checked) {
+                                     cb.disabled = false;
+                                     cb.closest('.card-electivo').classList.remove('disabled', 'bg-light');
+                                }
+                            });
+                        }
+                    });
+
+                    // Habilitar o deshabilitar el botón de confirmar
+                    btnConfirmar.disabled = seleccionados.length !== 4;
+                }
+
+                checkboxes.forEach(cb => {
+                    cb.addEventListener('change', function() {
+                        const seleccionados = Array.from(checkboxes).filter(c => c.checked);
+                        if (seleccionados.length > 4) {
+                            this.checked = false; // Prevenir seleccionar más de 4
+                            alert('No puedes seleccionar más de 4 electivos.');
+                        }
+                        actualizarEstado();
+                    });
+                });
+
+                btnConfirmar.addEventListener('click', function() {
+                    const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
+                    if (seleccionados.length !== 4) {
+                        alert('Debes seleccionar exactamente 4 electivos.');
+                        return;
+                    }
+
+                    const idsElectivos = seleccionados.map(cb => cb.value);
+                    const formData = new FormData();
+                    idsElectivos.forEach(id => formData.append('electivos[]', id));
+                    
+                    // CSRF Token (si es necesario, aunque la vista está exenta)
+                    // const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                    this.disabled = true;
+                    this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Inscribiendo...';
+
+                    fetch("{% url 'inscribir_electivos_lote' %}", {
+                        method: 'POST',
+                        body: formData,
+                        // headers: { 'X-CSRFToken': csrfToken }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            window.location.reload();
+                        } else {
+                            alert('Error: ' + data.error);
+                            this.disabled = false;
+                            this.innerHTML = '<i class="fas fa-check-circle me-2"></i>Confirmar Mis 4 Electivos';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error en la petición:', error);
+                        alert('Ocurrió un error de conexión. Inténtalo de nuevo.');
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-check-circle me-2"></i>Confirmar Mis 4 Electivos';
+                    });
+                });
+
+                // Estado inicial al cargar
+                actualizarEstado();
+            });
+        </script>
+    
+    {% else %}
+        <!-- =============================================================== -->
+        <!-- VISTA DE RESUMEN DE ELECTIVOS MEJORADA (SI YA ESTÁ INSCRITO)    -->
+        <!-- =============================================================== -->
+        <div class="container-fluid py-4">
+            <!-- Header con estadísticas -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-3">
+                        <div>
+                            <h3 class="mb-1 text-primary">
+                                <i class="fas fa-graduation-cap me-2"></i>Mis Electivos Inscritos
+                            </h3>
+                            <p class="text-muted mb-0">Resumen de tu selección para el año académico {{ curso.anio }}</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="text-center">
+                                <div class="h4 mb-0 text-success">{{ electivos_inscritos|length }}</div>
+                                <small class="text-muted">Electivos</small>
+                            </div>
+                            <form action="{% url 'borrar_inscripcion_electivos' %}" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres borrar tu selección? Deberás volver a escoger tus 4 electivos.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger">
+                                    <i class="fas fa-edit me-2"></i>Modificar Selección
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjetas de electivos mejoradas -->
+            <div class="row">
+                {% for inscripcion in electivos_inscritos %}
+                    {% with impartida=inscripcion.asignatura_impartida primera_clase=impartida.clases.first %}
+                    <div class="col-lg-6 col-xl-4 mb-4">
+                        <div class="card h-100 border-0 shadow-sm hover-card">
+                            <!-- Header de la tarjeta -->
+                            <div class="card-header bg-gradient-primary text-white position-relative">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="card-title mb-1">{{ impartida.asignatura.nombre }}</h5>
+                                        <small class="opacity-75">
+                                            <i class="fas fa-layer-group me-1"></i>{{ impartida.asignatura.nivel }}° Medio
+                                        </small>
+                                    </div>
+                                    <span class="badge bg-light text-dark">
+                                        <i class="fas fa-users me-1"></i>{{ inscripcion.cupos_actuales }}
+                                    </span>
+                                </div>
+                                <!-- Indicador de día -->
+                                {% if primera_clase %}
+                                <div class="position-absolute top-0 end-0 mt-2 me-2">
+                                    <span class="badge bg-warning text-dark">
+                                        <i class="fas fa-calendar-day me-1"></i>{{ primera_clase.get_fecha_display|slice:":3" }}
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-body">
+                                <!-- Información del profesor -->
+                                <div class="mb-3 p-3 bg-light rounded">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center">
+                                                <i class="fas fa-chalkboard-teacher"></i>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <h6 class="mb-1">Profesor</h6>
+                                            <p class="mb-0 text-muted">{{ impartida.docente.usuario.nombre }} {{ impartida.docente.usuario.apellido_paterno }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Información del horario -->
+                                {% if primera_clase %}
+                                <div class="mb-3">
+                                    <h6 class="text-primary mb-2">
+                                        <i class="fas fa-clock me-2"></i>Horario
+                                    </h6>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="p-2 bg-light rounded">
+                                                <small class="text-muted d-block">Día</small>
+                                                <strong>{{ primera_clase.get_fecha_display }}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="p-2 bg-light rounded">
+                                                <small class="text-muted d-block">Horas</small>
+                                                <strong>{% get_hora_inicio_bloque 7 primera_clase.fecha %} - {% get_hora_fin_bloque 9 primera_clase.fecha %}</strong>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="p-2 bg-light rounded">
+                                                <small class="text-muted d-block">Sala</small>
+                                                <strong><i class="fas fa-map-marker-alt me-1 text-danger"></i>{{ primera_clase.get_sala_display }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+
+                                <!-- Lista de compañeros mejorada -->
+                                <div class="mt-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="text-primary mb-0">
+                                            <i class="fas fa-users me-2"></i>Compañeros
+                                        </h6>
+                                        <span class="badge bg-info">{{ inscripcion.cupos_actuales }} inscritos</span>
+                                    </div>
+                                    
+                                    {% if inscripcion.compañeros %}
+                                        <div class="compañeros-list" style="max-height: 120px; overflow-y: auto;">
+                                            {% for companero_insc in inscripcion.compañeros %}
+                                                <div class="d-flex align-items-center p-2 border-bottom">
+                                                    <div class="avatar-xs bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2">
+                                                        <i class="fas fa-user"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <small class="fw-medium">{{ companero_insc.estudiante.usuario.nombre }} {{ companero_insc.estudiante.usuario.apellido_paterno }}</small>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="text-center p-3 bg-light rounded">
+                                            <i class="fas fa-user-plus text-muted mb-2" style="font-size: 2rem;"></i>
+                                            <p class="text-muted mb-0">Eres el primero en inscribirte</p>
+                                            <small class="text-muted">¡Anima a tus compañeros a unirse!</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Footer con acciones -->
+                            <div class="card-footer bg-transparent border-top-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-check-circle text-success me-1"></i>Inscripción confirmada
+                                    </small>
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-star me-1"></i>Electivo
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+
+            <!-- Información adicional -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="alert alert-info border-0 shadow-sm">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle fa-2x text-info"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="alert-heading">Información Importante</h6>
+                                <p class="mb-2">Has completado exitosamente tu selección de electivos. Recuerda que:</p>
+                                <ul class="mb-0">
+                                    <li>Los horarios están sujetos a cambios según la disponibilidad de salas</li>
+                                    <li>Puedes modificar tu selección hasta el cierre del período de inscripción</li>
+                                    <li>Los electivos comenzarán según el calendario académico</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+/* Estilos adicionales para mejorar el diseño */
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+}
+
+.avatar-xs {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+}
+
+.hover-card {
+    transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+}
+
+.compañeros-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.compañeros-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+}
+
+.compañeros-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2px;
+}
+
+.compañeros-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const panelElectivos = document.getElementById('panel-seleccion-electivos');
+    if (!panelElectivos) return;
+
+    const checkboxes = panelElectivos.querySelectorAll('.check-electivo');
+    const contadorSpan = document.getElementById('contador-electivos');
+    const btnConfirmar = document.getElementById('btn-confirmar-electivos');
+
+    function actualizarEstado() {
+        const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
+        const diasSeleccionados = new Set(seleccionados.map(cb => cb.closest('.card-electivo').dataset.diaClase));
+        contadorSpan.textContent = seleccionados.length;
+        checkboxes.forEach(cb => {
+            const tarjeta = cb.closest('.card-electivo');
+            const diaTarjeta = tarjeta.dataset.diaClase;
+            if (cb.checked) {
+                tarjeta.classList.add('border-primary');
+            } else {
+                tarjeta.classList.remove('border-primary');
+                if (diasSeleccionados.has(diaTarjeta)) {
+                    cb.disabled = true;
+                    tarjeta.classList.add('disabled', 'bg-light');
+                } else {
+                    cb.disabled = false;
+                    tarjeta.classList.remove('disabled', 'bg-light');
+                }
+            }
+        });
+        const todosLosDias = new Set(Array.from(checkboxes).map(cb => cb.closest('.card-electivo').dataset.diaClase));
+        todosLosDias.forEach(dia => {
+            if (!diasSeleccionados.has(dia)) {
+                checkboxes.forEach(cb => {
+                    if (cb.closest('.card-electivo').dataset.diaClase === dia && !cb.checked) {
+                         cb.disabled = false;
+                         cb.closest('.card-electivo').classList.remove('disabled', 'bg-light');
+                    }
+                });
+            }
+        });
+        btnConfirmar.disabled = seleccionados.length !== 4;
+    }
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+            const seleccionados = Array.from(checkboxes).filter(c => c.checked);
+            if (seleccionados.length > 4) {
+                this.checked = false;
+                alert('No puedes seleccionar más de 4 electivos.');
+            }
+            actualizarEstado();
+        });
+    });
+    btnConfirmar.addEventListener('click', function() {
+        const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
+        if (seleccionados.length !== 4) {
+            alert('Debes seleccionar exactamente 4 electivos.');
+            return;
+        }
+        const idsElectivos = seleccionados.map(cb => cb.value);
+        const formData = new FormData();
+        idsElectivos.forEach(id => formData.append('electivos[]', id));
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Inscribiendo...';
+        fetch("{% url 'inscribir_electivos_lote' %}", {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert('Error: ' + data.error);
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-check-circle me-2"></i>Confirmar Mis 4 Electivos';
+            }
+        })
+        .catch(error => {
+            console.error('Error en la petición:', error);
+            alert('Ocurrió un error de conexión. Inténtalo de nuevo.');
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-check-circle me-2"></i>Confirmar Mis 4 Electivos';
+        });
+    });
+    actualizarEstado();
+});
+</script> 

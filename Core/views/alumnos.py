@@ -332,8 +332,41 @@ class EstudiantePanelModularView(View):
             return redirect('home')
         usuario = request.user.usuario
         estudiante_obj = usuario.estudiante
-
         curso = usuario.estudiante.curso
+
+        # Lógica para obtener electivos y decidir si se muestra la pestaña
+        electivos_disponibles = []
+        mostrar_electivos = False
+        if curso and curso.nivel in [3, 4]:
+            mostrar_electivos = True
+            electivos_disponibles = Asignatura.objects.filter(
+                es_electivo=True,
+                nivel=curso.nivel
+            ).prefetch_related('imparticiones__docente__usuario', 'imparticiones__clases')
+
+        # Obtener los electivos en los que el estudiante ya está inscrito
+        electivos_inscritos = AsignaturaInscrita.objects.filter(
+            estudiante=estudiante_obj,
+            asignatura_impartida__asignatura__es_electivo=True,
+            validada=True
+        ).select_related(
+            'asignatura_impartida__asignatura', 
+            'asignatura_impartida__docente__usuario'
+        ).prefetch_related(
+            'asignatura_impartida__clases'
+        )
+        
+        # Si hay electivos inscritos, obtener compañeros y contar cupos
+        if electivos_inscritos:
+            for inscripcion in electivos_inscritos:
+                impartida = inscripcion.asignatura_impartida
+                # Contar cupos
+                inscripcion.cupos_actuales = AsignaturaInscrita.objects.filter(asignatura_impartida=impartida, validada=True).count()
+                # Obtener compañeros (excluyendo al propio estudiante)
+                inscripcion.compañeros = AsignaturaInscrita.objects.filter(
+                    asignatura_impartida=impartida, validada=True
+                ).exclude(estudiante=estudiante_obj).select_related('estudiante__usuario')
+
         estudiantes_curso = get_estudiantes_por_curso(usuario.estudiante.curso_id)
         asignaturas_estudiante = get_asignaturas_estudiante(usuario.pk)
         horario_estudiante = get_horario_estudiante(usuario.auth_user_id)
@@ -351,6 +384,9 @@ class EstudiantePanelModularView(View):
             'promedio_estudiante': promedio_estudiante,
             'asistencia_estudiante': asistencia_estudiante,
             'eventos_calendario': get_eventos_calendario(estudiante_obj.pk),
+            'electivos_disponibles': electivos_disponibles,
+            'mostrar_electivos': mostrar_electivos,
+            'electivos_inscritos': electivos_inscritos,
         }
         
         return render(request, 'student_panel_modular.html', context)
@@ -484,4 +520,129 @@ class AttendanceView(View):
         
         messages.success(request, 'Asistencia registrada exitosamente')
         return redirect('attendance')
+
+@method_decorator(csrf_exempt, name='dispatch')
+class InscribirElectivoView(View):
+    def post(self, request):
+        if not hasattr(request.user.usuario, 'estudiante'):
+            return JsonResponse({'success': False, 'error': 'No autorizado'}, status=403)
+        usuario = request.user.usuario
+        estudiante = usuario.estudiante
+        asignatura_id = request.POST.get('asignatura_id')
+        accion = request.POST.get('accion')  # 'inscribir' o 'desinscribir'
+        if not asignatura_id or accion not in ['inscribir', 'desinscribir']:
+            return JsonResponse({'success': False, 'error': 'Datos incompletos'})
+        try:
+            asignatura = Asignatura.objects.get(pk=asignatura_id, es_electivo=True, nivel=estudiante.curso.nivel)
+        except Asignatura.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Electivo no válido para tu nivel'})
+        # Buscar la AsignaturaImpartida (puede haber varias, tomamos la primera)
+        impartida = asignatura.imparticiones.first()
+        if not impartida:
+            return JsonResponse({'success': False, 'error': 'No hay grupo disponible para este electivo'})
+        if accion == 'inscribir':
+            # Contar electivos inscritos
+            electivos_actuales = AsignaturaInscrita.objects.filter(
+                estudiante=estudiante,
+                asignatura_impartida__asignatura__es_electivo=True,
+                validada=True
+            ).count()
+            if electivos_actuales >= 3:
+                return JsonResponse({'success': False, 'error': 'Ya tienes 3 electivos inscritos'})
+            # Inscribir si no está inscrito
+            insc, created = AsignaturaInscrita.objects.get_or_create(
+                estudiante=estudiante,
+                asignatura_impartida=impartida,
+                defaults={'validada': True}
+            )
+            if not created and not insc.validada:
+                insc.validada = True
+                insc.save()
+            return JsonResponse({'success': True, 'accion': 'inscrito'})
+        else:  # desinscribir
+            try:
+                insc = AsignaturaInscrita.objects.get(
+                    estudiante=estudiante,
+                    asignatura_impartida=impartida,
+                    validada=True
+                )
+                insc.validada = False
+                insc.save()
+                return JsonResponse({'success': True, 'accion': 'desinscrito'})
+            except AsignaturaInscrita.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'No estabas inscrito en este electivo'})
+
+@method_decorator(csrf_exempt, name='dispatch')
+class InscribirElectivosLoteView(View):
+    @transaction.atomic
+    def post(self, request):
+        if not hasattr(request.user.usuario, 'estudiante'):
+            return JsonResponse({'success': False, 'error': 'No autorizado'}, status=403)
+
+        estudiante = request.user.usuario.estudiante
+        ids_electivos_str = request.POST.getlist('electivos[]')
+
+        # 1. Validación de cantidad
+        if len(ids_electivos_str) != 4:
+            return JsonResponse({'success': False, 'error': f'Debes seleccionar exactamente 4 electivos. Has seleccionado {len(ids_electivos_str)}.'})
+
+        # 2. Validación de IDs y obtención de horarios
+        dias_seleccionados = set()
+        electivos_a_inscribir = []
+        
+        try:
+            ids_electivos = [int(id_str) for id_str in ids_electivos_str]
+            asignaturas = Asignatura.objects.filter(pk__in=ids_electivos, es_electivo=True, nivel=estudiante.curso.nivel)
+
+            if asignaturas.count() != 4:
+                return JsonResponse({'success': False, 'error': 'Alguno de los electivos seleccionados no es válido para tu nivel.'})
+
+            for asignatura in asignaturas:
+                clase_info = Clase.objects.filter(asignatura_impartida__asignatura=asignatura).first()
+                if not clase_info:
+                    return JsonResponse({'success': False, 'error': f'El electivo "{asignatura.nombre}" no tiene un horario definido.'})
+
+                if clase_info.fecha in dias_seleccionados:
+                    return JsonResponse({'success': False, 'error': f'Hay un choque de horario. Tienes más de un electivo seleccionado el día {clase_info.get_fecha_display()}.'})
+                
+                dias_seleccionados.add(clase_info.fecha)
+                impartida = AsignaturaImpartida.objects.get(asignatura=asignatura)
+                electivos_a_inscribir.append(impartida)
+
+        except (ValueError, AsignaturaImpartida.DoesNotExist):
+            return JsonResponse({'success': False, 'error': 'Ocurrió un error con los datos enviados.'})
+
+        # 3. Proceso de inscripción (atómico gracias al decorador)
+        # Borrar inscripciones de electivos anteriores
+        AsignaturaInscrita.objects.filter(
+            estudiante=estudiante,
+            asignatura_impartida__asignatura__es_electivo=True
+        ).delete()
+
+        # Inscribir los nuevos
+        for impartida in electivos_a_inscribir:
+            AsignaturaInscrita.objects.create(
+                estudiante=estudiante,
+                asignatura_impartida=impartida,
+                validada=True
+            )
+
+        return JsonResponse({'success': True, 'message': '¡Felicitaciones! Has sido inscrito en tus 4 electivos.'})
+
+@method_decorator(csrf_exempt, name='dispatch')
+class BorrarInscripcionElectivosView(View):
+    def post(self, request):
+        if not hasattr(request.user.usuario, 'estudiante'):
+            return redirect('home') # O mostrar un error
+
+        estudiante = request.user.usuario.estudiante
+        
+        # Borrar todas las inscripciones a electivos
+        AsignaturaInscrita.objects.filter(
+            estudiante=estudiante,
+            asignatura_impartida__asignatura__es_electivo=True
+        ).delete()
+
+        messages.success(request, 'Tu selección de electivos ha sido reiniciada. Ahora puedes volver a escoger.')
+        return redirect('estudiante_panel')
 

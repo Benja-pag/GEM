@@ -1,3 +1,134 @@
+/* Definición de Variables de Color para Temas */
+:root {
+    --bg-color: #f8f9fa; /* Fondo general claro */
+    --card-bg: #ffffff; /* Fondo de tarjetas */
+    --text-color: #212529; /* Texto principal oscuro */
+    --text-muted-color: #6c757d;
+    --border-color: #dee2e6;
+    --primary-color: #0d6efd;
+    --header-icon-color: #856404;
+    --header-title-color: #856404;
+    --course-badge-bg: #fff3cd;
+    --course-badge-text: #856404;
+}
+
+[data-theme="dark"] {
+    --bg-color: #121212; /* Fondo general oscuro */
+    --card-bg: #1e1e1e; /* Fondo de tarjetas más claro */
+    --text-color: #e9ecef; /* Texto principal claro */
+    --text-muted-color: #adb5bd;
+    --border-color: #495057;
+    --primary-color: #0d6efd;
+    --header-icon-color: #ffc107;
+    --header-title-color: #ffc107;
+    --course-badge-bg: #343a40;
+    --course-badge-text: #ffc107;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* --- Aplicación Global de Variables de Tema --- */
+
+/* Tarjetas y Contenedores */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+.card-header, .card-footer {
+    border-color: var(--border-color);
+    background-color: transparent;
+}
+.list-group-item {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+.list-group-item-action:hover {
+    background-color: var(--bg-color);
+}
+
+/* Pestañas de Navegación */
+.nav-tabs .nav-link {
+    background-color: transparent;
+    border-color: var(--border-color);
+    color: var(--text-muted-color);
+}
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+    color: var(--primary-color);
+    background-color: var(--card-bg);
+    border-color: var(--border-color) var(--border-color) var(--card-bg);
+    font-weight: 500;
+}
+.nav-tabs .nav-link:hover {
+    border-color: var(--primary-color);
+}
+
+/* Textos y Badges */
+.text-muted {
+    color: var(--text-muted-color) !important;
+}
+.badge {
+    border: 1px solid transparent;
+}
+
+/* Formularios */
+.form-control {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+.form-control:focus {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--primary-color);
+    box-shadow: none;
+}
+
+/* Tablas */
+.table {
+    color: var(--text-color);
+}
+.table > :not(caption) > * > * {
+    background-color: var(--card-bg);
+    border-bottom-width: 1px;
+    border-color: var(--border-color);
+}
+.table-hover > tbody > tr:hover > * {
+    background-color: var(--bg-color);
+}
+
+/* --- Estilos Específicos de Componentes --- */
+
+/* Header del Estudiante */
+.student-header .header-icon, .student-header .header-title {
+    color: var(--header-title-color);
+}
+.student-header .header-text {
+    color: var(--text-color);
+    font-weight: 500;
+}
+.student-header .course-badge {
+    background-color: var(--course-badge-bg);
+    color: var(--course-badge-text);
+}
+.theme-switcher-btn {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+.theme-switcher-btn:hover {
+    background-color: var(--bg-color);
+}
+
 /* Estilos generales */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

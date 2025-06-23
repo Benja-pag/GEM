@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.http import JsonResponse
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, AsignaturaInscrita
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, AsignaturaInscrita, Evaluacion, AlumnoEvaluacion, EvaluacionBase
 from django.db.models import Count, Avg
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, DetailView
 from django.utils import timezone
@@ -17,7 +17,7 @@ from Core.servicios.repos import usuarios
 from Core.servicios.helpers import validadores, serializadores
 from Core.servicios.repos.asignaturas import get_asignaturas_estudiante
 from Core.servicios.repos.cursos import get_estudiantes_por_curso
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from collections import defaultdict
 
 def get_horario_estudiante(estudiante_id):
@@ -61,6 +61,115 @@ def get_horario_estudiante(estudiante_id):
     
     return horario
 
+def get_evaluaciones_estudiante(estudiante_id):
+    """
+    Obtiene todas las evaluaciones y notas del estudiante
+    """
+    evaluaciones_estudiante = AlumnoEvaluacion.objects.filter(
+        estudiante_id=estudiante_id
+    ).select_related(
+        'evaluacion__evaluacion_base__asignatura',
+        'evaluacion__clase__asignatura_impartida__asignatura',
+        'evaluacion__clase__curso'
+    ).order_by(
+        'evaluacion__evaluacion_base__asignatura__nombre',
+        'evaluacion__evaluacion_base__nombre',
+        'evaluacion__fecha'
+    )
+    
+    # Agrupar por asignatura y tipo de evaluación para evitar duplicados
+    evaluaciones_por_asignatura = {}
+    for evaluacion in evaluaciones_estudiante:
+        asignatura_nombre = evaluacion.evaluacion.evaluacion_base.asignatura.nombre
+        tipo_evaluacion = evaluacion.evaluacion.evaluacion_base.nombre
+        
+        if asignatura_nombre not in evaluaciones_por_asignatura:
+            evaluaciones_por_asignatura[asignatura_nombre] = {}
+        
+        # Solo agregar si no existe ya este tipo de evaluación para esta asignatura
+        if tipo_evaluacion not in evaluaciones_por_asignatura[asignatura_nombre]:
+            evaluaciones_por_asignatura[asignatura_nombre][tipo_evaluacion] = {
+                'nombre': evaluacion.evaluacion.evaluacion_base.nombre,
+                'fecha': evaluacion.evaluacion.fecha,
+                'nota': evaluacion.nota,
+                'ponderacion': evaluacion.evaluacion.evaluacion_base.ponderacion,
+                'estado': 'Aprobado' if evaluacion.nota >= 4.0 else 'Reprobado',
+                'observaciones': evaluacion.observaciones
+            }
+    
+    # Convertir el diccionario anidado a una lista plana para cada asignatura
+    resultado = {}
+    for asignatura, evaluaciones in evaluaciones_por_asignatura.items():
+        resultado[asignatura] = list(evaluaciones.values())
+    
+    return resultado
+
+def get_promedio_estudiante(estudiante_id):
+    """
+    Calcula el promedio general del estudiante
+    """
+    promedio = AlumnoEvaluacion.objects.filter(
+        estudiante_id=estudiante_id
+    ).aggregate(
+        promedio=Avg('nota')
+    )['promedio']
+    
+    return promedio if promedio else 0.0
+
+def get_asistencia_estudiante(estudiante_id):
+    """
+    Obtiene los datos de asistencia del estudiante para el mes actual
+    """
+    # Obtener fechas del mes actual
+    hoy = date.today()
+    primer_dia = date(hoy.year, hoy.month, 1)
+    
+    # Si estamos en el primer día del mes, usar el mes anterior
+    if hoy.day <= 5:
+        primer_dia = primer_dia - timedelta(days=30)
+        primer_dia = date(primer_dia.year, primer_dia.month, 1)
+    
+    # Obtener el último día del mes
+    if primer_dia.month == 12:
+        ultimo_dia = date(primer_dia.year + 1, 1, 1) - timedelta(days=1)
+    else:
+        ultimo_dia = date(primer_dia.year, primer_dia.month + 1, 1) - timedelta(days=1)
+    
+    # Obtener asistencias del estudiante para el mes
+    asistencias = Asistencia.objects.filter(
+        estudiante_id=estudiante_id,
+        fecha_registro__date__gte=primer_dia,
+        fecha_registro__date__lte=ultimo_dia
+    ).select_related('clase__asignatura_impartida__asignatura')
+    
+    # Agrupar por asignatura
+    asistencia_por_asignatura = {}
+    for asistencia in asistencias:
+        asignatura_nombre = asistencia.clase.asignatura_impartida.asignatura.nombre
+        if asignatura_nombre not in asistencia_por_asignatura:
+            asistencia_por_asignatura[asignatura_nombre] = {
+                'total': 0,
+                'presentes': 0,
+                'ausentes': 0,
+                'justificados': 0,
+                'porcentaje': 0.0
+            }
+        
+        asistencia_por_asignatura[asignatura_nombre]['total'] += 1
+        if asistencia.presente:
+            asistencia_por_asignatura[asignatura_nombre]['presentes'] += 1
+        else:
+            asistencia_por_asignatura[asignatura_nombre]['ausentes'] += 1
+            if asistencia.justificado:
+                asistencia_por_asignatura[asignatura_nombre]['justificados'] += 1
+    
+    # Calcular porcentajes
+    for asignatura in asistencia_por_asignatura.values():
+        if asignatura['total'] > 0:
+            asignatura['porcentaje'] = (asignatura['presentes'] / asignatura['total']) * 100
+    
+    return asistencia_por_asignatura
+
 @method_decorator(login_required, name='dispatch')
 class EstudiantePanelView(View):
     def get(self, request):
@@ -74,13 +183,19 @@ class EstudiantePanelView(View):
         estudiantes_curso = get_estudiantes_por_curso(usuario.estudiante.curso_id)
         asignaturas_estudiante = get_asignaturas_estudiante(usuario.pk)
         horario_estudiante = get_horario_estudiante(usuario.auth_user_id)
+        evaluaciones_estudiante = get_evaluaciones_estudiante(estudiante_obj.pk)
+        promedio_estudiante = get_promedio_estudiante(estudiante_obj.pk)
+        asistencia_estudiante = get_asistencia_estudiante(estudiante_obj.pk)
         
         context = {
             'alumno' : usuario,
             'curso' : curso,
             'estudiantes_curso': estudiantes_curso,
             'asignaturas_estudiante': asignaturas_estudiante,
-            'horario_estudiante': horario_estudiante
+            'horario_estudiante': horario_estudiante,
+            'evaluaciones_estudiante': evaluaciones_estudiante,
+            'promedio_estudiante': promedio_estudiante,
+            'asistencia_estudiante': asistencia_estudiante
         }
         
         return render(request, 'student_panel.html', context)
@@ -98,13 +213,19 @@ class EstudiantePanelModularView(View):
         estudiantes_curso = get_estudiantes_por_curso(usuario.estudiante.curso_id)
         asignaturas_estudiante = get_asignaturas_estudiante(usuario.pk)
         horario_estudiante = get_horario_estudiante(usuario.auth_user_id)
+        evaluaciones_estudiante = get_evaluaciones_estudiante(estudiante_obj.pk)
+        promedio_estudiante = get_promedio_estudiante(estudiante_obj.pk)
+        asistencia_estudiante = get_asistencia_estudiante(estudiante_obj.pk)
         
         context = {
             'alumno' : usuario,
             'curso' : curso,
             'estudiantes_curso': estudiantes_curso,
             'asignaturas_estudiante': asignaturas_estudiante,
-            'horario_estudiante': horario_estudiante
+            'horario_estudiante': horario_estudiante,
+            'evaluaciones_estudiante': evaluaciones_estudiante,
+            'promedio_estudiante': promedio_estudiante,
+            'asistencia_estudiante': asistencia_estudiante
         }
         
         return render(request, 'student_panel_modular.html', context)

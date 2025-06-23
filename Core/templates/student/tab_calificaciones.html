@@ -1,5 +1,50 @@
+{% load evaluacion_tags %}
+
 <!-- Pestaña de Calificaciones -->
 <div class="tab-pane fade" id="calificaciones">
+
+    <!-- Resumen Académico -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3"><i class="fas fa-chart-line me-2 text-primary"></i>Resumen Académico</h4>
+        </div>
+        <!-- Card Promedio General -->
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-primary fw-bold">{{ promedio_estudiante|floatformat:1 }}</div>
+                    <h6 class="text-muted mt-2">Promedio General</h6>
+                </div>
+            </div>
+        </div>
+        <!-- Card Asignaturas -->
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-success fw-bold">{{ asignaturas_estudiante|length }}</div>
+                    <h6 class="text-muted mt-2">Asignaturas Inscritas</h6>
+                </div>
+            </div>
+        </div>
+        <!-- Card Rendimiento -->
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    {% if promedio_estudiante >= 6.0 %}
+                        <div class="display-4 text-success"><i class="fas fa-star"></i></div>
+                        <h6 class="text-muted mt-2">Rendimiento Excelente</h6>
+                    {% elif promedio_estudiante >= 4.0 %}
+                        <div class="display-4 text-warning"><i class="fas fa-check-circle"></i></div>
+                        <h6 class="text-muted mt-2">Rendimiento Aprobatorio</h6>
+                    {% else %}
+                        <div class="display-4 text-danger"><i class="fas fa-exclamation-triangle"></i></div>
+                        <h6 class="text-muted mt-2">Necesita Mejorar</h6>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="accordion" id="accordionCalificaciones">
         {% for asignatura_inscrita in asignaturas_estudiante %}
             <div class="accordion-item">
@@ -17,44 +62,67 @@
                                     <tr>
                                         <th>Evaluación</th>
                                         <th>Fecha</th>
+                                        <th>Ponderación</th>
                                         <th>Nota</th>
                                         <th>Estado</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>Prueba N°1</td>
-                                        <td>15/04/2024</td>
-                                        <td>
-                                            <span class="badge bg-success fs-6">6.5</span>
-                                        </td>
-                                        <td>
-                                            <span class="text-success fw-bold">Aprobado</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Prueba N°2</td>
-                                        <td>10/05/2024</td>
-                                        <td>
-                                            <span class="badge bg-danger fs-6">3.2</span>
-                                        </td>
-                                        <td>
-                                            <span class="text-danger fw-bold">Reprobado</span>
-                                        </td>
-                                    </tr>
-                                     <tr>
-                                        <td>Trabajo Práctico</td>
-                                        <td>25/05/2024</td>
-                                        <td>
-                                            <span class="badge bg-success fs-6">7.0</span>
-                                        </td>
-                                        <td>
-                                            <span class="text-success fw-bold">Aprobado</span>
-                                        </td>
-                                    </tr>
+                                    {% with evaluaciones_asignatura=evaluaciones_estudiante|get_evaluaciones_asignatura:asignatura_inscrita.asignatura_impartida.asignatura.nombre %}
+                                        {% for evaluacion in evaluaciones_asignatura %}
+                                            <tr>
+                                                <td>{{ evaluacion.nombre }}</td>
+                                                <td>{{ evaluacion.fecha|date:"d/m/Y" }}</td>
+                                                <td>{{ evaluacion.ponderacion }}%</td>
+                                                <td>
+                                                    {% if evaluacion.estado == 'Aprobado' %}
+                                                        <span class="badge bg-success fs-6">{{ evaluacion.nota }}</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger fs-6">{{ evaluacion.nota }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if evaluacion.estado == 'Aprobado' %}
+                                                        <span class="text-success fw-bold">{{ evaluacion.estado }}</span>
+                                                    {% else %}
+                                                        <span class="text-danger fw-bold">{{ evaluacion.estado }}</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">
+                                                    <i class="fas fa-info-circle me-2"></i>
+                                                    No hay evaluaciones registradas para esta asignatura.
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endwith %}
                                 </tbody>
                             </table>
                         </div>
+                        
+                        <!-- Promedio de la asignatura -->
+                        {% with evaluaciones_asignatura=evaluaciones_estudiante|get_evaluaciones_asignatura:asignatura_inscrita.asignatura_impartida.asignatura.nombre %}
+                            {% if evaluaciones_asignatura %}
+                                <div class="mt-3 p-3 bg-light rounded">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <strong>Promedio:</strong>
+                                            <span class="badge bg-info fs-6">{{ evaluaciones_asignatura|calcular_promedio_asignatura }}</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Aprobadas:</strong>
+                                            <span class="badge bg-success">{{ evaluaciones_asignatura|contar_evaluaciones_aprobadas }}/{{ evaluaciones_asignatura|length }}</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong>Aprobación:</strong>
+                                            <span class="badge bg-primary">{{ evaluaciones_asignatura|porcentaje_aprobacion }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
                     </div>
                 </div>
             </div>

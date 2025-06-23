@@ -6,7 +6,7 @@
                 <div class="card-header bg-success text-white">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">
-                            <i class="fas fa-calendar-check me-2"></i>Registro de Asistencia
+                            <i class="fas fa-calendar-check me-2"></i>Estadísticas de Asistencia (Mes Actual)
                         </h5>
                         <button class="btn btn-light btn-sm">
                             <i class="fas fa-plus me-1"></i>Nuevo Registro
@@ -14,68 +14,63 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Curso</th>
-                                    <th>Asignatura</th>
-                                    <th>Presentes</th>
-                                    <th>Ausentes</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>15/04/2024</td>
-                                    <td>2°A</td>
-                                    <td>Matemáticas</td>
-                                    <td><span class="badge bg-success">28</span></td>
-                                    <td><span class="badge bg-danger">2</span></td>
-                                    <td><span class="badge bg-success">Completado</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i> Ver
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-secondary">
-                                            <i class="fas fa-edit"></i> Editar
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>15/04/2024</td>
-                                    <td>3°B</td>
-                                    <td>Lenguaje</td>
-                                    <td><span class="badge bg-success">25</span></td>
-                                    <td><span class="badge bg-danger">5</span></td>
-                                    <td><span class="badge bg-success">Completado</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i> Ver
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-secondary">
-                                            <i class="fas fa-edit"></i> Editar
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>16/04/2024</td>
-                                    <td>2°A</td>
-                                    <td>Historia</td>
-                                    <td><span class="badge bg-warning">-</span></td>
-                                    <td><span class="badge bg-warning">-</span></td>
-                                    <td><span class="badge bg-warning">Pendiente</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-success">
-                                            <i class="fas fa-check"></i> Registrar
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    {% if estadisticas_asistencia %}
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Asignatura</th>
+                                        <th>Curso</th>
+                                        <th>Total Clases</th>
+                                        <th>Presentes</th>
+                                        <th>Ausentes</th>
+                                        <th>Justificados</th>
+                                        <th>Porcentaje</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for clave, stats in estadisticas_asistencia.items %}
+                                    <tr>
+                                        <td><strong>{{ stats.asignatura }}</strong></td>
+                                        <td>{{ stats.curso }}</td>
+                                        <td>{{ stats.total }}</td>
+                                        <td><span class="badge bg-success">{{ stats.presentes }}</span></td>
+                                        <td><span class="badge bg-danger">{{ stats.ausentes }}</span></td>
+                                        <td>
+                                            {% if stats.justificados > 0 %}
+                                                <span class="badge bg-info">{{ stats.justificados }}</span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if stats.porcentaje >= 90 %}
+                                                <span class="badge bg-success">{{ stats.porcentaje|floatformat:1 }}%</span>
+                                            {% elif stats.porcentaje >= 80 %}
+                                                <span class="badge bg-warning">{{ stats.porcentaje|floatformat:1 }}%</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ stats.porcentaje|floatformat:1 }}%</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if stats.total > 0 %}
+                                                <span class="badge bg-success">Completado</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Pendiente</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                            <p>No hay datos de asistencia disponibles para este mes.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -88,20 +83,43 @@
                     </h6>
                 </div>
                 <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-6">
-                            <h4 class="text-success">94%</h4>
-                            <small class="text-muted">Asistencia Promedio</small>
+                    {% if estadisticas_asistencia %}
+                        {% for clave, stats in estadisticas_asistencia.items %}
+                            {% if forloop.first %}
+                                {% with total_registros=stats.total total_presentes=stats.presentes %}
+                                {% if total_registros > 0 %}
+                                    {% widthratio total_presentes total_registros 100 as porcentaje_promedio %}
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <h4 class="text-success">{{ porcentaje_promedio|floatformat:1 }}%</h4>
+                                            <small class="text-muted">Asistencia Promedio</small>
+                                        </div>
+                                        <div class="col-6">
+                                            <h4 class="text-danger">{{ 100|add:"-"|add:porcentaje_promedio|floatformat:1 }}%</h4>
+                                            <small class="text-muted">Inasistencia</small>
+                                        </div>
+                                    </div>
+                                    <div class="progress mt-3" style="height: 8px;">
+                                        <div class="progress-bar bg-success" style="width: {{ porcentaje_promedio }}%"></div>
+                                        <div class="progress-bar bg-danger" style="width: {{ 100|add:"-"|add:porcentaje_promedio }}%"></div>
+                                    </div>
+                                {% else %}
+                                    <div class="text-center text-muted">
+                                        <p>Sin datos disponibles</p>
+                                    </div>
+                                {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        {% empty %}
+                            <div class="text-center text-muted">
+                                <p>Sin datos disponibles</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-muted">
+                            <p>Sin datos disponibles</p>
                         </div>
-                        <div class="col-6">
-                            <h4 class="text-danger">6%</h4>
-                            <small class="text-muted">Inasistencia</small>
-                        </div>
-                    </div>
-                    <div class="progress mt-3" style="height: 8px;">
-                        <div class="progress-bar bg-success" style="width: 94%"></div>
-                        <div class="progress-bar bg-danger" style="width: 6%"></div>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
             
@@ -114,27 +132,19 @@
                 </div>
                 <div class="card-body">
                     <div class="list-group list-group-flush">
+                        {% for asignatura in asignaturas|slice:":3" %}
                         <div class="list-group-item">
                             <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Matemáticas 2°A</h6>
-                                <small class="text-muted">Mañana 8:00</small>
+                                <h6 class="mb-1">{{ asignatura.asignatura.nombre }}</h6>
+                                <small class="text-muted">Próxima</small>
                             </div>
-                            <small class="text-muted">Sala 201</small>
+                            <small class="text-muted">{{ asignatura.clases.first.sala|default:"Sala por definir" }}</small>
                         </div>
-                        <div class="list-group-item">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Lenguaje 3°B</h6>
-                                <small class="text-muted">Mañana 10:30</small>
-                            </div>
-                            <small class="text-muted">Sala 305</small>
+                        {% empty %}
+                        <div class="text-center text-muted">
+                            <p>No hay clases programadas</p>
                         </div>
-                        <div class="list-group-item">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Historia 2°A</h6>
-                                <small class="text-muted">Tarde 14:00</small>
-                            </div>
-                            <small class="text-muted">Sala 201</small>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>

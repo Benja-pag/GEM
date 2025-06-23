@@ -1,4 +1,6 @@
-<!-- Evaluaciones (prototipo) -->
+{% load evaluacion_tags %}
+
+<!-- Evaluaciones -->
 <div class="tab-pane fade" id="evaluaciones">
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-header bg-warning text-white">
@@ -18,82 +20,70 @@
                         <tr>
                             <th>Asignatura</th>
                             <th>Evaluación</th>
+                            <th>Curso</th>
                             <th>Fecha</th>
+                            <th>Promedio</th>
                             <th>Estado</th>
                             <th>Progreso</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Matemáticas</td>
-                            <td>Prueba 1</td>
-                            <td>15/04/2024</td>
-                            <td><span class="badge bg-success">Calificada</span></td>
-                            <td>
-                                <div class="progress" style="height: 6px;">
-                                    <div class="progress-bar bg-success" style="width: 100%"></div>
-                                </div>
-                                <small class="text-muted">100% completado</small>
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-info">
-                                    <i class="fas fa-pen"></i> Calificar
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-eye"></i> Ver
-                                </button>
-                                <button class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-robot"></i> IA
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Lenguaje</td>
-                            <td>Ensayo</td>
-                            <td>20/04/2024</td>
-                            <td><span class="badge bg-warning">Pendiente</span></td>
-                            <td>
-                                <div class="progress" style="height: 6px;">
-                                    <div class="progress-bar bg-warning" style="width: 60%"></div>
-                                </div>
-                                <small class="text-muted">60% completado</small>
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-info">
-                                    <i class="fas fa-pen"></i> Calificar
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-eye"></i> Ver
-                                </button>
-                                <button class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-robot"></i> IA
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Historia</td>
-                            <td>Control de Lectura</td>
-                            <td>25/04/2024</td>
-                            <td><span class="badge bg-info">En Proceso</span></td>
-                            <td>
-                                <div class="progress" style="height: 6px;">
-                                    <div class="progress-bar bg-info" style="width: 30%"></div>
-                                </div>
-                                <small class="text-muted">30% completado</small>
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-info">
-                                    <i class="fas fa-pen"></i> Calificar
-                                </button>
-                                <button class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-eye"></i> Ver
-                                </button>
-                                <button class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-robot"></i> IA
-                                </button>
-                            </td>
-                        </tr>
+                        {% for asignatura_nombre, evaluaciones in evaluaciones_docente.items %}
+                            {% for evaluacion in evaluaciones %}
+                                <tr>
+                                    <td>{{ asignatura_nombre }}</td>
+                                    <td>{{ evaluacion.nombre }}</td>
+                                    <td>{{ evaluacion.curso }}</td>
+                                    <td>{{ evaluacion.fecha|date:"d/m/Y" }}</td>
+                                    <td>
+                                        {% if evaluacion.promedio > 0 %}
+                                            <span class="badge bg-success">{{ evaluacion.promedio|floatformat:1 }}</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if evaluacion.estado == 'Calificada' %}
+                                            <span class="badge bg-success">{{ evaluacion.estado }}</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">{{ evaluacion.estado }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if evaluacion.total_estudiantes > 0 %}
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-success" style="width: 100%"></div>
+                                            </div>
+                                            <small class="text-muted">{{ evaluacion.total_estudiantes }} estudiantes</small>
+                                        {% else %}
+                                            <div class="progress" style="height: 6px;">
+                                                <div class="progress-bar bg-warning" style="width: 0%"></div>
+                                            </div>
+                                            <small class="text-muted">Sin calificar</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info">
+                                            <i class="fas fa-pen"></i> Calificar
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-robot"></i> IA
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    No hay evaluaciones registradas.
+                                </td>
+                            </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -106,8 +96,8 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body text-center">
                     <i class="fas fa-clipboard-check fa-2x text-success mb-2"></i>
-                    <h5>Evaluaciones Completadas</h5>
-                    <h2 class="text-success">12</h2>
+                    <h5>Evaluaciones Creadas</h5>
+                    <h2 class="text-success">{{ estadisticas_docente.total_evaluaciones }}</h2>
                     <small class="text-muted">Este semestre</small>
                 </div>
             </div>
@@ -117,7 +107,7 @@
                 <div class="card-body text-center">
                     <i class="fas fa-clock fa-2x text-warning mb-2"></i>
                     <h5>Pendientes de Calificar</h5>
-                    <h2 class="text-warning">3</h2>
+                    <h2 class="text-warning">{{ estadisticas_docente.total_evaluaciones|add:"-"|add:estadisticas_docente.evaluaciones_calificadas }}</h2>
                     <small class="text-muted">Esta semana</small>
                 </div>
             </div>
@@ -127,7 +117,7 @@
                 <div class="card-body text-center">
                     <i class="fas fa-chart-line fa-2x text-info mb-2"></i>
                     <h5>Promedio General</h5>
-                    <h2 class="text-info">6.7</h2>
+                    <h2 class="text-info">{{ estadisticas_docente.promedio_general|floatformat:1 }}</h2>
                     <small class="text-muted">De mis cursos</small>
                 </div>
             </div>

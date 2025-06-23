@@ -24,7 +24,10 @@
                                 {% for electivo in electivos_disponibles %}
                                 {% with primera_clase=electivo.imparticiones.first.clases.first %}
                                 <div class="col-md-6 mb-3">
-                                    <div class="card h-100 border-0 shadow-sm hover-card card-electivo" data-id-electivo="{{ electivo.id }}" data-dia-clase="{{ primera_clase.fecha }}">
+                                    <div class="card h-100 border-0 shadow-sm hover-card card-electivo" 
+                                         data-id-electivo="{{ electivo.id }}" 
+                                         data-dia-clase="{{ primera_clase.fecha }}"
+                                         data-bloque-clase="{{ primera_clase.horario }}">
                                         <div class="card-body d-flex flex-column">
                                             <div class="form-check">
                                                 <input class="form-check-input check-electivo" type="checkbox" value="{{ electivo.id }}" id="electivo-{{ electivo.id }}">
@@ -36,12 +39,16 @@
                                             <p class="card-text text-muted small">Asignatura electiva de {{ electivo.nivel }}° medio</p>
                                             
                                             <div class="mt-auto">
+                                                <!-- Información del profesor -->
                                                 <div class="mb-2">
                                                     <small class="text-muted">
                                                         <i class="fas fa-chalkboard-teacher me-1"></i>
-                                                        Profesor: 
+                                                        <strong>Profesor:</strong> 
                                                         {% for impartida in electivo.imparticiones.all %}
                                                             {{ impartida.docente.usuario.nombre }} {{ impartida.docente.usuario.apellido_paterno }}
+                                                            {% if impartida.docente.especialidad %}
+                                                                ({{ impartida.docente.especialidad.nombre }})
+                                                            {% endif %}
                                                         {% empty %}
                                                             No asignado
                                                         {% endfor %}
@@ -49,22 +56,39 @@
                                                 </div>
                                                 
                                                 {% if primera_clase %}
+                                                <!-- Información del horario -->
                                                 <div class="mb-2">
                                                     <small class="text-muted">
                                                         <i class="fas fa-calendar-day me-1"></i>
-                                                        Horario: {{ primera_clase.get_fecha_display }}
+                                                        <strong>Día:</strong> {{ primera_clase.get_fecha_display }}
                                                     </small>
                                                 </div>
                                                 <div class="mb-2">
                                                     <small class="text-muted">
                                                         <i class="fas fa-clock me-1"></i>
-                                                        Horario: {% get_hora_inicio_bloque 7 primera_clase.fecha %} - {% get_hora_fin_bloque 9 primera_clase.fecha %}
+                                                        <strong>Horario:</strong> 
+                                                        {% if primera_clase.horario == '7' %}
+                                                            13:45 - 14:30
+                                                        {% elif primera_clase.horario == '8' %}
+                                                            14:30 - 15:15
+                                                        {% elif primera_clase.horario == '9' %}
+                                                            15:15 - 16:00
+                                                        {% else %}
+                                                            Bloque {{ primera_clase.horario }}
+                                                        {% endif %}
                                                     </small>
                                                 </div>
                                                 <div class="mb-2">
                                                     <small class="text-muted">
                                                         <i class="fas fa-map-marker-alt me-1"></i>
-                                                        Sala: {{ primera_clase.get_sala_display }}
+                                                        <strong>Sala:</strong> {{ primera_clase.get_sala_display }}
+                                                    </small>
+                                                </div>
+                                                {% else %}
+                                                <div class="mb-2">
+                                                    <small class="text-danger">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                                        Horario no asignado
                                                     </small>
                                                 </div>
                                                 {% endif %}
@@ -140,6 +164,11 @@
                             <strong>Importante:</strong><br>
                             Asegúrate de cumplir los pre-requisitos si los hubiera.
                         </div>
+                        <div class="alert alert-warning" role="alert">
+                            <i class="fas fa-clock me-2"></i>
+                            <strong>Validación de Horarios:</strong><br>
+                            No se pueden seleccionar electivos que se impartan en el mismo día y bloque horario.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -155,22 +184,60 @@
 
                 function actualizarEstado() {
                     const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
-                    const diasSeleccionados = new Set(seleccionados.map(cb => cb.closest('.card-electivo').dataset.diaClase));
 
                     // Actualizar contador
                     contadorSpan.textContent = seleccionados.length;
 
+                    // Crear mapa de horarios seleccionados para detectar conflictos
+                    const horariosSeleccionados = new Map(); // clave: "dia-bloque", valor: electivo
+                    const conflictos = [];
+
+                    seleccionados.forEach(cb => {
+                        const tarjeta = cb.closest('.card-electivo');
+                        const dia = tarjeta.dataset.diaClase;
+                        const bloque = tarjeta.dataset.bloqueClase;
+                        const clave = `${dia}-${bloque}`;
+                        
+                        if (horariosSeleccionados.has(clave)) {
+                            conflictos.push({
+                                electivo1: horariosSeleccionados.get(clave),
+                                electivo2: cb.value,
+                                dia: dia,
+                                bloque: bloque
+                            });
+                        } else {
+                            horariosSeleccionados.set(clave, cb.value);
+                        }
+                    });
+
                     // Validar y actualizar estado de los checkboxes y tarjetas
                     checkboxes.forEach(cb => {
                         const tarjeta = cb.closest('.card-electivo');
-                        const diaTarjeta = tarjeta.dataset.diaClase;
+                        const dia = tarjeta.dataset.diaClase;
+                        const bloque = tarjeta.dataset.bloqueClase;
+                        const clave = `${dia}-${bloque}`;
                         
                         if (cb.checked) {
                             tarjeta.classList.add('border-primary');
+                            // Verificar si hay conflicto con este electivo
+                            const tieneConflicto = conflictos.some(c => 
+                                c.electivo1 === cb.value || c.electivo2 === cb.value
+                            );
+                            if (tieneConflicto) {
+                                tarjeta.classList.add('border-danger');
+                                tarjeta.classList.remove('border-primary');
+                            }
                         } else {
-                            tarjeta.classList.remove('border-primary');
-                            // Si el día de esta tarjeta ya fue seleccionado por otro, deshabilitarla
-                            if (diasSeleccionados.has(diaTarjeta)) {
+                            tarjeta.classList.remove('border-primary', 'border-danger');
+                            
+                            // Deshabilitar si hay conflicto potencial
+                            const horarioOcupado = seleccionados.some(seleccionado => {
+                                const tarjetaSeleccionada = seleccionado.closest('.card-electivo');
+                                return tarjetaSeleccionada.dataset.diaClase === dia && 
+                                       tarjetaSeleccionada.dataset.bloqueClase === bloque;
+                            });
+                            
+                            if (horarioOcupado) {
                                 cb.disabled = true;
                                 tarjeta.classList.add('disabled', 'bg-light');
                             } else {
@@ -180,26 +247,23 @@
                         }
                     });
                     
-                    // Si hay más de 4, no debería pasar con la lógica de abajo, pero es un seguro
-                    if (seleccionados.length > 4) {
-                         // this.checked = false; // 'this' no está en este contexto, se maneja en el listener
+                    // Mostrar advertencia de conflictos
+                    if (conflictos.length > 0) {
+                        const conflictosInfo = conflictos.map(c => 
+                            `• Conflicto: ${c.dia} bloque ${c.bloque}`
+                        ).join('\n');
+                        console.warn('Conflictos de horario detectados:\n' + conflictosInfo);
                     }
                     
-                    // Habilitar checkboxes no seleccionados si se libera su día
-                    const todosLosDias = new Set(Array.from(checkboxes).map(cb => cb.closest('.card-electivo').dataset.diaClase));
-                    todosLosDias.forEach(dia => {
-                        if (!diasSeleccionados.has(dia)) {
-                            checkboxes.forEach(cb => {
-                                if (cb.closest('.card-electivo').dataset.diaClase === dia && !cb.checked) {
-                                     cb.disabled = false;
-                                     cb.closest('.card-electivo').classList.remove('disabled', 'bg-light');
-                                }
-                            });
-                        }
-                    });
-
                     // Habilitar o deshabilitar el botón de confirmar
-                    btnConfirmar.disabled = seleccionados.length !== 4;
+                    const tieneConflictos = conflictos.length > 0;
+                    btnConfirmar.disabled = seleccionados.length !== 4 || tieneConflictos;
+                    
+                    if (tieneConflictos) {
+                        btnConfirmar.title = 'No se puede confirmar: hay conflictos de horario';
+                    } else {
+                        btnConfirmar.title = '';
+                    }
                 }
 
                 checkboxes.forEach(cb => {
@@ -208,10 +272,46 @@
                         if (seleccionados.length > 4) {
                             this.checked = false; // Prevenir seleccionar más de 4
                             alert('No puedes seleccionar más de 4 electivos.');
+                            return;
                         }
+                        
+                        // Verificar conflictos de horario
+                        const conflictos = detectarConflictos(seleccionados);
+                        if (conflictos.length > 0 && this.checked) {
+                            const conflictosInfo = conflictos.map(c => 
+                                `• ${c.dia} bloque ${c.bloque}`
+                            ).join('\n');
+                            alert(`⚠️ Conflicto de horario detectado:\n\n${conflictosInfo}\n\nNo puedes seleccionar electivos que se impartan en el mismo día y bloque.`);
+                            this.checked = false;
+                            return;
+                        }
+                        
                         actualizarEstado();
                     });
                 });
+
+                function detectarConflictos(seleccionados) {
+                    const horariosSeleccionados = new Map();
+                    const conflictos = [];
+                    
+                    seleccionados.forEach(cb => {
+                        const tarjeta = cb.closest('.card-electivo');
+                        const dia = tarjeta.dataset.diaClase;
+                        const bloque = tarjeta.dataset.bloqueClase;
+                        const clave = `${dia}-${bloque}`;
+                        
+                        if (horariosSeleccionados.has(clave)) {
+                            conflictos.push({
+                                dia: dia,
+                                bloque: bloque
+                            });
+                        } else {
+                            horariosSeleccionados.set(clave, cb.value);
+                        }
+                    });
+                    
+                    return conflictos;
+                }
 
                 btnConfirmar.addEventListener('click', function() {
                     const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
@@ -495,16 +595,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function actualizarEstado() {
         const seleccionados = Array.from(checkboxes).filter(cb => cb.checked);
-        const diasSeleccionados = new Set(seleccionados.map(cb => cb.closest('.card-electivo').dataset.diaClase));
+
+        // Actualizar contador
         contadorSpan.textContent = seleccionados.length;
+
+        // Crear mapa de horarios seleccionados para detectar conflictos
+        const horariosSeleccionados = new Map(); // clave: "dia-bloque", valor: electivo
+        const conflictos = [];
+
+        seleccionados.forEach(cb => {
+            const tarjeta = cb.closest('.card-electivo');
+            const dia = tarjeta.dataset.diaClase;
+            const bloque = tarjeta.dataset.bloqueClase;
+            const clave = `${dia}-${bloque}`;
+            
+            if (horariosSeleccionados.has(clave)) {
+                conflictos.push({
+                    electivo1: horariosSeleccionados.get(clave),
+                    electivo2: cb.value,
+                    dia: dia,
+                    bloque: bloque
+                });
+            } else {
+                horariosSeleccionados.set(clave, cb.value);
+            }
+        });
+
+        // Validar y actualizar estado de los checkboxes y tarjetas
         checkboxes.forEach(cb => {
             const tarjeta = cb.closest('.card-electivo');
-            const diaTarjeta = tarjeta.dataset.diaClase;
+            const dia = tarjeta.dataset.diaClase;
+            const bloque = tarjeta.dataset.bloqueClase;
+            const clave = `${dia}-${bloque}`;
+            
             if (cb.checked) {
                 tarjeta.classList.add('border-primary');
+                // Verificar si hay conflicto con este electivo
+                const tieneConflicto = conflictos.some(c => 
+                    c.electivo1 === cb.value || c.electivo2 === cb.value
+                );
+                if (tieneConflicto) {
+                    tarjeta.classList.add('border-danger');
+                    tarjeta.classList.remove('border-primary');
+                }
             } else {
-                tarjeta.classList.remove('border-primary');
-                if (diasSeleccionados.has(diaTarjeta)) {
+                tarjeta.classList.remove('border-primary', 'border-danger');
+                
+                // Deshabilitar si hay conflicto potencial
+                const horarioOcupado = seleccionados.some(seleccionado => {
+                    const tarjetaSeleccionada = seleccionado.closest('.card-electivo');
+                    return tarjetaSeleccionada.dataset.diaClase === dia && 
+                           tarjetaSeleccionada.dataset.bloqueClase === bloque;
+                });
+                
+                if (horarioOcupado) {
                     cb.disabled = true;
                     tarjeta.classList.add('disabled', 'bg-light');
                 } else {
@@ -513,18 +657,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        const todosLosDias = new Set(Array.from(checkboxes).map(cb => cb.closest('.card-electivo').dataset.diaClase));
-        todosLosDias.forEach(dia => {
-            if (!diasSeleccionados.has(dia)) {
-                checkboxes.forEach(cb => {
-                    if (cb.closest('.card-electivo').dataset.diaClase === dia && !cb.checked) {
-                         cb.disabled = false;
-                         cb.closest('.card-electivo').classList.remove('disabled', 'bg-light');
-                    }
-                });
-            }
-        });
-        btnConfirmar.disabled = seleccionados.length !== 4;
+        
+        // Mostrar advertencia de conflictos
+        if (conflictos.length > 0) {
+            const conflictosInfo = conflictos.map(c => 
+                `• Conflicto: ${c.dia} bloque ${c.bloque}`
+            ).join('\n');
+            console.warn('Conflictos de horario detectados:\n' + conflictosInfo);
+        }
+        
+        // Habilitar o deshabilitar el botón de confirmar
+        const tieneConflictos = conflictos.length > 0;
+        btnConfirmar.disabled = seleccionados.length !== 4 || tieneConflictos;
+        
+        if (tieneConflictos) {
+            btnConfirmar.title = 'No se puede confirmar: hay conflictos de horario';
+        } else {
+            btnConfirmar.title = '';
+        }
     }
     checkboxes.forEach(cb => {
         cb.addEventListener('change', function() {

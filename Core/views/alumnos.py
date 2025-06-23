@@ -341,8 +341,14 @@ class EstudiantePanelModularView(View):
             mostrar_electivos = True
             electivos_disponibles = Asignatura.objects.filter(
                 es_electivo=True,
-                nivel=curso.nivel
-            ).prefetch_related('imparticiones__docente__usuario', 'imparticiones__clases')
+                nivel=curso.nivel,
+                imparticiones__isnull=False,
+                imparticiones__docente__isnull=False,
+                imparticiones__clases__isnull=False
+            ).distinct().prefetch_related(
+                'imparticiones__docente__usuario', 
+                'imparticiones__clases'
+            )
 
         # Obtener los electivos en los que el estudiante ya está inscrito
         electivos_inscritos = AsignaturaInscrita.objects.filter(
@@ -587,7 +593,7 @@ class InscribirElectivosLoteView(View):
             return JsonResponse({'success': False, 'error': f'Debes seleccionar exactamente 4 electivos. Has seleccionado {len(ids_electivos_str)}.'})
 
         # 2. Validación de IDs y obtención de horarios
-        dias_seleccionados = set()
+        horarios_seleccionados = set()
         electivos_a_inscribir = []
         
         try:
@@ -602,10 +608,12 @@ class InscribirElectivosLoteView(View):
                 if not clase_info:
                     return JsonResponse({'success': False, 'error': f'El electivo "{asignatura.nombre}" no tiene un horario definido.'})
 
-                if clase_info.fecha in dias_seleccionados:
-                    return JsonResponse({'success': False, 'error': f'Hay un choque de horario. Tienes más de un electivo seleccionado el día {clase_info.get_fecha_display()}.'})
+                # Crear clave única para día y bloque
+                horario_clave = f"{clase_info.fecha}-{clase_info.horario}"
+                if horario_clave in horarios_seleccionados:
+                    return JsonResponse({'success': False, 'error': f'Hay un choque de horario. Tienes más de un electivo seleccionado el {clase_info.get_fecha_display()} en el bloque {clase_info.horario}.'})
                 
-                dias_seleccionados.add(clase_info.fecha)
+                horarios_seleccionados.add(horario_clave)
                 impartida = AsignaturaImpartida.objects.get(asignatura=asignatura)
                 electivos_a_inscribir.append(impartida)
 

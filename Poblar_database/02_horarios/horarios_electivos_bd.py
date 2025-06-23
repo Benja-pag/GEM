@@ -1,66 +1,85 @@
+#!/usr/bin/env python
+"""
+Script para poblar horarios de asignaturas electivas
+Crea horarios para electivos en bloques de tarde (7, 8, 9) sin conflictos
+"""
+
 import os
-import django
 import sys
+import django
 import random
 from datetime import date, time
 
-# Agrega el directorio raíz del proyecto al path (sube dos niveles desde subcarpeta)
+# Agregar el directorio raíz del proyecto al path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-# Configuración de Django
+# Configurar Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GEM.settings')
 django.setup()
 
-from Core.models import AsignaturaImpartida, Clase
+from Core.models import AsignaturaImpartida, Clase, Asignatura
 
 def poblar_horarios_electivos():
-    print("🧹 Limpiando horarios de clases electivas anteriores...")
-    # Elimina solo las clases asociadas a asignaturas electivas para evitar duplicados
+    """Pobla horarios para asignaturas electivas"""
+    print("🧹 Limpiando horarios de electivos anteriores...")
+    # Eliminar solo las clases de electivos
     Clase.objects.filter(asignatura_impartida__asignatura__es_electivo=True).delete()
     
     print("📚 Obteniendo electivos con profesor asignado...")
-    electivos_impartidos = AsignaturaImpartida.objects.filter(asignatura__es_electivo=True).select_related('asignatura')
-
+    electivos_impartidos = AsignaturaImpartida.objects.filter(
+        asignatura__es_electivo=True
+    ).select_related('asignatura', 'docente__usuario')
+    
     if not electivos_impartidos.exists():
-        print("⚠️ No hay asignaturas electivas impartidas para crear horarios. Finalizando.")
+        print("⚠️ No hay asignaturas electivas impartidas para crear horarios.")
         return
-
-    # Bloques y días disponibles para los electivos
-    dias_semana = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES'] # Viernes tarde libre
-    bloques_tarde = ['7', '8', '9']
-    salas_disponibles = [sala[0] for sala in Clase.SALA_CHOICES if 'SALA' in sala[0]]
-
-    # Barajamos los días para que la asignación sea variada en cada ejecución
-    random.shuffle(dias_semana)
     
-    print("🗓️ Creando horarios para los electivos en bloques 7, 8 y 9...")
-
-    # Distribuir electivos en los días para evitar choques de horario
-    # Esto es una simplificación, asume que no hay más electivos que cupos
+    # Configuración de horarios para electivos
+    dias_semana = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES']  # Viernes tarde libre
+    bloques_tarde = ['7', '8', '9']  # Bloques de tarde
+    salas_disponibles = ['SALA_1', 'SALA_2', 'SALA_3', 'SALA_4', 'SALA_5', 'SALA_6', 'SALA_7', 'SALA_8']
     
-    horarios_creados = 0
-    # Asignamos un día y un bloque a cada electivo
+    # Distribuir electivos por días para evitar conflictos
+    electivos_por_dia = {}
     for i, impartida in enumerate(electivos_impartidos):
-        # Asignar día de forma cíclica
         dia_asignado = dias_semana[i % len(dias_semana)]
+        if dia_asignado not in electivos_por_dia:
+            electivos_por_dia[dia_asignado] = []
+        electivos_por_dia[dia_asignado].append(impartida)
+    
+    print("🗓️ Creando horarios para electivos...")
+    horarios_creados = 0
+    
+    for dia, impartidas_dia in electivos_por_dia.items():
+        print(f"\n📅 Asignando electivos para el {dia}:")
         
-        # Asignar sala aleatoria
-        sala_asignada = random.choice(salas_disponibles)
-
-        # Asignar a los 3 bloques de la tarde
-        for bloque in bloques_tarde:
-            Clase.objects.create(
-                asignatura_impartida=impartida,
-                curso=None,  # Los electivos no tienen un curso único
-                fecha=dia_asignado,
-                horario=bloque,
-                sala=sala_asignada
-            )
+        # Horarios y salas ya usados en este día
+        horarios_usados = set() # Por ejemplo: "7", "8", "9"
         
-        horarios_creados += len(bloques_tarde)
-        print(f"  ✅ Horario para '{impartida.asignatura.nombre}' creado el {dia_asignado} en sala {sala_asignada} (bloques 7, 8, 9)")
+        for impartida in impartidas_dia:
+            # Los electivos son de 3 bloques, así que siempre ocupan 7, 8, 9
+            # Esta lógica asume que el script `electivos_bd.py` se asegura
+            # de que no haya más de un electivo por día y nivel.
+            
+            # Asignar sala aleatoria (la misma para los 3 bloques)
+            sala = random.choice(salas_disponibles)
+            
+            # Crear las 3 clases para el electivo
+            for bloque in bloques_tarde:
+                Clase.objects.create(
+                    asignatura_impartida=impartida,
+                    curso=None,  # Los electivos no tienen curso específico
+                    fecha=dia,
+                    horario=bloque,
+                    sala=sala
+                )
+            
+            horarios_creados += 3
+            print(f"  ✅ {impartida.asignatura.nombre} - Bloques 7, 8, 9 - Sala {sala} - Prof. {impartida.docente.usuario.nombre} {impartida.docente.usuario.apellido_paterno}")
 
-    print(f"\n🎉 ¡Proceso completado! Se han creado {horarios_creados} bloques de clase para los electivos.")
+    print(f"\n🎉 ¡Proceso completado!")
+    print(f"📊 Total de clases de electivos creadas: {horarios_creados}")
+    print(f"📚 Total de asignaturas electivas con horario: {electivos_impartidos.count()}")
 
 if __name__ == '__main__':
     poblar_horarios_electivos() 

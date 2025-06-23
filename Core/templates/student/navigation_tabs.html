@@ -35,9 +35,11 @@
             <i class="fas fa-users me-2"></i>Foro del Colegio
         </button>
     </li>
+    {% if alumno.estudiante.curso.nivel == 3 or alumno.estudiante.curso.nivel == 4 %}
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="electivos-tab" data-bs-toggle="tab" data-bs-target="#electivos" type="button">
             <i class="fas fa-star me-2"></i>Electivos
         </button>
     </li>
+    {% endif %}
 </ul> 

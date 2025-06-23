@@ -3,9 +3,12 @@ import django
 import sys
 import random
 from collections import defaultdict
+from datetime import date, time
+
+# Agrega el directorio raíz del proyecto al path (sube dos niveles desde subcarpeta)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # Configurar Django
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GEM.settings')
 django.setup()
 

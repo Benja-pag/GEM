@@ -13,33 +13,61 @@ call python manage.py migrate
 
 echo Poblando la base de datos...
 
+REM 1. Datos base
 echo 1. Creando administrador...
-call python Poblar_database\administrador_bd.py
+call python Poblar_database\01_datos_base\administrador_bd.py
 
-echo 2. Creando asignaturas base...
-call python Poblar_database\asignaturas_bd.py
+echo 2. Creando cursos...
+call python Poblar_database\01_datos_base\cursos_bd.py
 
-echo 3. Creando cursos...
-call python Poblar_database\cursos_bd.py
+echo 3. Creando docentes...
+call python Poblar_database\01_datos_base\docente_bd.py
 
-echo 4. Creando docentes...
-call python Poblar_database\docente_bd.py
+echo 4. Creando asignaturas base...
+call python Poblar_database\01_datos_base\asignaturas_bd.py
 
-echo 5. Creando horarios base...
-call python Poblar_database\horario_bd.py
+echo 5. Creando alumnos...
+call python Poblar_database\01_datos_base\alumnos_bd.py
 
-echo 6. Asignando asignaturas con horario completo (todos los cursos)...
-call python Poblar_database\asignacion_horarios_completa.py
+REM 2. Horarios
+echo 6. Poblando horarios (V3)...
+call python Poblar_database\02_horarios\asignacion_horarios_unicos_v3.py
 
-REM echo 7. Resolviendo conflictos de horarios...
-REM call python Poblar_database\solucionador_conflictos.py
+REM 3. Evaluaciones y notas
+echo 7. Inscribiendo alumnos...
+call python Poblar_database\03_evaluaciones\inscribir_alumnos_automatico.py
 
-echo 7. Creando alumnos...
-call python Poblar_database\alumnos_bd.py
+echo 8. Creando evaluaciones y notas...
+call python Poblar_database\03_evaluaciones\poblar_evaluaciones_notas.py
 
-call python Poblar_database\asignaturas_inscritas.py
+REM 4. Asistencia
+echo 9. Poblando asistencia del mes...
+call python Poblar_database\04_asistencia\poblar_asistencia_mes.py
 
-echo Base de datos poblada exitosamente!
+REM 5. Eventos del calendario
+echo 10. Creando eventos del calendario...
+call python Poblar_database\05_eventos\eventos_calendario_bd.py
 
-echo Iniciando servidor...
-call python manage.py runserver 
+REM 6. Verificaciones
+echo 11. Verificando horarios...
+call python Poblar_database\06_verificacion\verificar_horario.py
+
+echo 12. Verificando evaluaciones...
+call python Poblar_database\06_verificacion\verificar_evaluaciones.py
+
+echo 13. Verificando consistencia de docentes...
+call python Poblar_database\06_verificacion\verificar_consistencia_docentes.py
+
+echo.
+echo ✅ Proyecto GEM completamente poblado y listo para usar.
+echo 📊 Se han creado:
+echo    - Datos base (admin, cursos, docentes, asignaturas, alumnos)
+echo    - Horarios con docentes por especialidad
+echo    - Evaluaciones y notas
+echo    - Asistencia del mes
+echo    - Eventos del calendario
+echo    - Verificaciones de consistencia
+echo.
+REM echo Iniciando servidor...
+REM call python manage.py runserver
+pause 

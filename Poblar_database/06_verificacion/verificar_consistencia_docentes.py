@@ -2,9 +2,10 @@ import os
 import django
 import sys
 from collections import defaultdict
+from datetime import date, time
 
-# Agrega el directorio raíz del proyecto al path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Agrega el directorio raíz del proyecto al path (sube dos niveles desde subcarpeta)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 # Configura el módulo de settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GEM.settings')

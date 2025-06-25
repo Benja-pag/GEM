@@ -13,6 +13,39 @@ class CalendarioClase(models.Model):
 
     def __str__(self):
         return f'{self.nombre_actividad} - {self.asignatura} ({self.fecha} {self.hora})'
+
+class ClaseCancelada(models.Model):
+    """
+    Modelo para registrar las clases canceladas por los docentes
+    """
+    MOTIVO_CHOICES = [
+        ('ENFERMEDAD', 'Enfermedad del docente'),
+        ('PERSONAL', 'Motivos personales'),
+        ('CAPACITACION', 'Capacitación o perfeccionamiento'),
+        ('REUNION', 'Reunión institucional'),
+        ('ACTIVIDAD_COLEGIO', 'Actividad del colegio'),
+        ('EMERGENCIA', 'Emergencia'),
+        ('OTRO', 'Otro motivo'),
+    ]
+
+    docente = models.ForeignKey('Docente', on_delete=models.CASCADE)
+    asignatura_impartida = models.ForeignKey('AsignaturaImpartida', on_delete=models.CASCADE)
+    fecha_cancelacion = models.DateField()  # Fecha de la clase cancelada
+    hora_cancelacion = models.TimeField()  # Hora de la clase cancelada
+    motivo = models.CharField(max_length=20, choices=MOTIVO_CHOICES)
+    descripcion = models.TextField(blank=True, null=True)  # Descripción adicional del motivo
+    fecha_registro = models.DateTimeField(auto_now_add=True)  # Cuándo se registró la cancelación
+    notificado_estudiantes = models.BooleanField(default=False)  # Si ya se notificó a los estudiantes
+    clase_recuperada = models.BooleanField(default=False)  # Si la clase ya fue recuperada
+    fecha_recuperacion = models.DateField(blank=True, null=True)  # Fecha de recuperación programada
+
+    def __str__(self):
+        return f'Cancelación: {self.asignatura_impartida.asignatura.nombre} - {self.fecha_cancelacion}'
+
+    class Meta:
+        verbose_name = 'Clase Cancelada'
+        verbose_name_plural = 'Clases Canceladas'
+        unique_together = ['asignatura_impartida', 'fecha_cancelacion', 'hora_cancelacion']
     
 class CalendarioColegio(models.Model):
     nombre_actividad = models.CharField(max_length=100)  # Nombre de la actividad

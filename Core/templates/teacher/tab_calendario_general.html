@@ -1,440 +1,1096 @@
-<!-- Pestaña de Calendario General -->
+<!-- Pestaña de Calendario General para Docentes -->
 <div class="tab-pane fade" id="calendario-general">
-    <div class="row">
-        <!-- Panel Principal -->
+    <div class="row g-4">
+        <!-- Panel Principal del Calendario -->
         <div class="col-lg-8">
-            <!-- Calendario Principal -->
+            <!-- Calendario Principal Dinámico -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-primary text-white">
+                <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-calendar-alt me-2"></i>Calendario General - Abril 2024
+                        <i class="fas fa-calendar-alt me-2"></i>Calendario General de Actividades
                     </h5>
-                </div>
-                <div class="card-body">
-                    <!-- Navegación del Calendario -->
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <button class="btn btn-outline-primary">
-                            <i class="fas fa-chevron-left me-2"></i>Mes Anterior
-                        </button>
-                        <h4 class="mb-0">Abril 2024</h4>
-                        <button class="btn btn-outline-primary">
-                            Mes Siguiente<i class="fas fa-chevron-right ms-2"></i>
-                        </button>
-                    </div>
-                    
-                    <!-- Calendario -->
-                    <div class="table-responsive">
-                        <table class="table table-bordered calendar-table">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">Lun</th>
-                                    <th class="text-center">Mar</th>
-                                    <th class="text-center">Mié</th>
-                                    <th class="text-center">Jue</th>
-                                    <th class="text-center">Vie</th>
-                                    <th class="text-center">Sáb</th>
-                                    <th class="text-center">Dom</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="calendar-day">
-                                        <div class="d-flex justify-content-between">
-                                            <span>1</span>
-                                            <span class="badge bg-primary">Inicio</span>
-                                        </div>
-                                        <div class="calendar-event bg-primary">Inicio de Clases</div>
-                                        <div class="calendar-event bg-success">Matemáticas 2°A</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>2</span>
-                                        <div class="calendar-event bg-info">Lenguaje 3°B</div>
-                                        <div class="calendar-event bg-warning">Reunión Depto.</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>3</span>
-                                        <div class="calendar-event bg-success">Historia 2°A</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>4</span>
-                                        <div class="calendar-event bg-danger">Evaluación</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>5</span>
-                                        <div class="calendar-event bg-info">Lenguaje 2°A</div>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>6</span>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>7</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="calendar-day">
-                                        <span>8</span>
-                                        <div class="calendar-event bg-primary">Matemáticas 2°A</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>9</span>
-                                        <div class="calendar-event bg-info">Lenguaje 3°B</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>10</span>
-                                        <div class="calendar-event bg-success">Historia 2°A</div>
-                                        <div class="calendar-event bg-warning">Consejo</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>11</span>
-                                        <div class="calendar-event bg-danger">Prueba</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>12</span>
-                                        <div class="calendar-event bg-info">Lenguaje 2°A</div>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>13</span>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>14</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="calendar-day">
-                                        <span>15</span>
-                                        <div class="calendar-event bg-primary">Matemáticas 2°A</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>16</span>
-                                        <div class="calendar-event bg-info">Lenguaje 3°B</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>17</span>
-                                        <div class="calendar-event bg-success">Historia 2°A</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>18</span>
-                                        <div class="calendar-event bg-danger">Control</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>19</span>
-                                        <div class="calendar-event bg-info">Lenguaje 2°A</div>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>20</span>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>21</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="calendar-day">
-                                        <span>22</span>
-                                        <div class="calendar-event bg-primary">Matemáticas 2°A</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>23</span>
-                                        <div class="calendar-event bg-info">Lenguaje 3°B</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>24</span>
-                                        <div class="calendar-event bg-success">Historia 2°A</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>25</span>
-                                        <div class="calendar-event bg-danger">Evaluación</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>26</span>
-                                        <div class="calendar-event bg-info">Lenguaje 2°A</div>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>27</span>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>28</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="calendar-day">
-                                        <span>29</span>
-                                        <div class="calendar-event bg-primary">Matemáticas 2°A</div>
-                                    </td>
-                                    <td class="calendar-day">
-                                        <span>30</span>
-                                        <div class="calendar-event bg-info">Lenguaje 3°B</div>
-                                        <div class="calendar-event bg-warning">Reunión</div>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>1</span>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>2</span>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>3</span>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>4</span>
-                                    </td>
-                                    <td class="calendar-day text-muted">
-                                        <span>5</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Próximos Eventos -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-gradient-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-list me-2"></i>Próximos Eventos
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item">
-                            <div class="d-flex w-100 justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">
-                                        <i class="fas fa-graduation-cap text-primary me-2"></i>
-                                        Reunión de Apoderados 2°A
-                                    </h6>
-                                    <p class="mb-1 text-muted">Reunión general con apoderados del curso</p>
-                                    <small class="text-muted">
-                                        <i class="fas fa-clock me-1"></i>Mañana - 19:00 PM
-                                        <i class="fas fa-map-marker-alt ms-3 me-1"></i>Sala de Reuniones
-                                    </small>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge bg-primary">Colegio</span>
-                                    <div class="mt-2">
-                                        <button class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i> Ver Detalles
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="list-group-item">
-                            <div class="d-flex w-100 justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">
-                                        <i class="fas fa-clipboard-check text-success me-2"></i>
-                                        Evaluación Matemáticas 2°A
-                                    </h6>
-                                    <p class="mb-1 text-muted">Prueba de Álgebra y Geometría</p>
-                                    <small class="text-muted">
-                                        <i class="fas fa-clock me-1"></i>En 2 días - 10:00 AM
-                                        <i class="fas fa-map-marker-alt ms-3 me-1"></i>Sala 2°A
-                                    </small>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge bg-success">Asignatura</span>
-                                    <div class="mt-2">
-                                        <button class="btn btn-sm btn-outline-success">
-                                            <i class="fas fa-edit"></i> Preparar
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="list-group-item">
-                            <div class="d-flex w-100 justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">
-                                        <i class="fas fa-users text-info me-2"></i>
-                                        Consejo de Profesores
-                                    </h6>
-                                    <p class="mb-1 text-muted">Reunión mensual del consejo</p>
-                                    <small class="text-muted">
-                                        <i class="fas fa-clock me-1"></i>En 3 días - 15:00 PM
-                                        <i class="fas fa-map-marker-alt ms-3 me-1"></i>Sala de Profesores
-                                    </small>
-                                </div>
-                                <div class="text-end">
-                                    <span class="badge bg-info">Colegio</span>
-                                    <div class="mt-2">
-                                        <button class="btn btn-sm btn-outline-info">
-                                            <i class="fas fa-eye"></i> Ver Agenda
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Panel Lateral -->
-        <div class="col-lg-4">
-            <!-- Filtros del Calendario -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-info text-white">
-                    <h6 class="card-title mb-0">
-                        <i class="fas fa-filter me-2"></i>Filtros del Calendario
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <h6 class="text-primary">Tipos de Eventos</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="eventosColegio" checked>
-                            <label class="form-check-label" for="eventosColegio">
-                                <i class="fas fa-school text-primary me-1"></i>Eventos del Colegio
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="eventosAsignatura" checked>
-                            <label class="form-check-label" for="eventosAsignatura">
-                                <i class="fas fa-book text-success me-1"></i>Mis Asignaturas
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="eventosEvaluacion" checked>
-                            <label class="form-check-label" for="eventosEvaluacion">
-                                <i class="fas fa-clipboard-check text-danger me-1"></i>Evaluaciones
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="eventosReunion" checked>
-                            <label class="form-check-label" for="eventosReunion">
-                                <i class="fas fa-users text-warning me-1"></i>Reuniones
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <h6 class="text-success">Asignaturas</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="matematicas" checked>
-                            <label class="form-check-label" for="matematicas">Matemáticas</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="lenguaje" checked>
-                            <label class="form-check-label" for="lenguaje">Lenguaje</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="historia" checked>
-                            <label class="form-check-label" for="historia">Historia</label>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <h6 class="text-warning">Cursos</h6>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="curso2A" checked>
-                            <label class="form-check-label" for="curso2A">2°A</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="curso3B" checked>
-                            <label class="form-check-label" for="curso3B">3°B</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Leyenda -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-secondary text-white">
-                    <h6 class="card-title mb-0">
-                        <i class="fas fa-info-circle me-2"></i>Leyenda
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="legend-dot bg-primary"></div>
-                        <small>Eventos del Colegio</small>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="legend-dot bg-success"></div>
-                        <small>Mis Asignaturas</small>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="legend-dot bg-danger"></div>
-                        <small>Evaluaciones</small>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="legend-dot bg-warning"></div>
-                        <small>Reuniones</small>
-                    </div>
-                    <div class="d-flex align-items-center mb-2">
-                        <div class="legend-dot bg-info"></div>
-                        <small>Actividades</small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Acciones Rápidas -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-primary text-white">
-                    <h6 class="card-title mb-0">
-                        <i class="fas fa-plus me-2"></i>Agregar Evento
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Tipo de Evento</label>
-                        <select class="form-select">
-                            <option>Evaluación</option>
-                            <option>Reunión</option>
-                            <option>Actividad</option>
-                            <option>Evento Colegio</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Fecha</label>
-                        <input type="date" class="form-control">
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Hora</label>
-                        <input type="time" class="form-control">
-                    </div>
-                    
-                    <div class="d-grid">
-                        <button class="btn btn-primary">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalCrearEvento">
                             <i class="fas fa-plus me-2"></i>Crear Evento
                         </button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Estadísticas del Mes -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-gradient-success text-white">
-                    <h6 class="card-title mb-0">
-                        <i class="fas fa-chart-pie me-2"></i>Estadísticas del Mes
-                    </h6>
-                </div>
                 <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-6 mb-3">
-                            <h4 class="text-primary">12</h4>
-                            <small class="text-muted">Clases</small>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <h4 class="text-success">3</h4>
-                            <small class="text-muted">Evaluaciones</small>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <h4 class="text-warning">2</h4>
-                            <small class="text-muted">Reuniones</small>
-                        </div>
-                        <div class="col-6 mb-3">
-                            <h4 class="text-info">5</h4>
-                            <small class="text-muted">Eventos</small>
-                        </div>
-                    </div>
+                    <div id='calendario-general-docente'></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Lateral - Próximos Eventos -->
+        <div class="col-lg-4">
+            <!-- Próximos Eventos -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-gradient-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>Próximos Eventos
+                    </h5>
+                    <button class="btn btn-sm btn-light" onclick="refreshEventList()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="card-body p-0" id="proximos-eventos-container" style="max-height: 600px; overflow-y: auto;">
+                    <div class="p-4 text-center text-muted">Cargando eventos...</div>
                 </div>
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+<!-- Modal para Crear Evento -->
+<div class="modal fade" id="modalCrearEvento" tabindex="-1" aria-labelledby="modalCrearEventoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalCrearEventoLabel">
+                    <i class="fas fa-plus me-2"></i>Crear Nuevo Evento
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-crear-evento">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tipo-evento" class="form-label">Tipo de Evento</label>
+                            <select class="form-select" id="tipo-evento" required onchange="updateEventTypeFields()">
+                                <option value="">Selecciona el tipo</option>
+                                <option value="REUNION">📅 Reunión</option>
+                                <option value="EVALUACION">📝 Evaluación</option>
+                                <option value="TAREA">📚 Tarea/Actividad</option>
+                                <option value="MATERIAL">📋 Material de Clase</option>
+                                <option value="ENTREGA">📤 Entrega/Proyecto</option>
+                                <option value="EVENTO_COLEGIO">🏫 Evento del Colegio</option>
+                                <option value="CAPACITACION">🎓 Capacitación</option>
+                                <option value="CANCELAR_CLASE">❌ Cancelar Clase</option>
+                                <option value="OTRO">📌 Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="asignatura-evento" class="form-label">Asignatura <span class="text-danger" id="asignatura-required" style="display: none;">*</span></label>
+                            <select class="form-select" id="asignatura-evento">
+                                <option value="">Sin asignatura específica</option>
+                                {% for asignatura in asignaturas %}
+                                <option value="{{ asignatura.id }}" data-asignatura-info='{{ asignatura|safe }}'>{{ asignatura.asignatura.nombre }} ({{ asignatura.codigo }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="titulo-evento" class="form-label">Título del Evento</label>
+                            <input type="text" class="form-control" id="titulo-evento" required placeholder="Ej: Reunión de Departamento, Prueba de Matemáticas...">
+                        </div>
+                        <div class="col-md-4 mb-3" id="campo-curso-info">
+                            <label for="curso-info-evento" class="form-label">Curso</label>
+                            <input type="text" class="form-control" id="curso-info-evento" readonly placeholder="Selecciona una asignatura">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha-evento" class="form-label">Fecha</label>
+                            <select class="form-select" id="fecha-evento" required disabled>
+                                <option value="">Selecciona una asignatura primero</option>
+                            </select>
+                            <small class="form-text text-muted">Solo se muestran días donde se imparte la asignatura</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="bloque-evento" class="form-label">Bloque/Horario</label>
+                            <select class="form-select" id="bloque-evento" required disabled>
+                                <option value="">Selecciona una fecha primero</option>
+                            </select>
+                            <small class="form-text text-muted">Se muestran los bloques de la asignatura en esa fecha</small>
+                        </div>
+                    </div>
+                    <div class="mb-3" id="campo-ubicacion">
+                        <label for="ubicacion-evento" class="form-label">Ubicación</label>
+                        <input type="text" class="form-control" id="ubicacion-evento" placeholder="Ej: Sala de Profesores, Aula 2-A, Biblioteca...">
+                        <small class="form-text text-muted">Para asignaturas, se usa automáticamente la sala correspondiente</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion-evento" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion-evento" rows="3" placeholder="Descripción detallada del evento..."></textarea>
+                    </div>
+                    <div class="mb-3" id="campo-materiales" style="display: none;">
+                        <label for="materiales-evento" class="form-label">Materiales Necesarios</label>
+                        <textarea class="form-control" id="materiales-evento" rows="2" placeholder="Lista de materiales que los estudiantes deben traer..."></textarea>
+                    </div>
+
+                    <div class="row" id="campos-evaluacion" style="display: none;">
+                        <div class="col-md-6 mb-3">
+                            <label for="ponderacion-evento" class="form-label">Ponderación (%)</label>
+                            <input type="number" class="form-control" id="ponderacion-evento" min="1" max="100" placeholder="Ej: 20">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tipo-evaluacion" class="form-label">Tipo de Evaluación</label>
+                            <select class="form-select" id="tipo-evaluacion">
+                                <option value="">Seleccionar...</option>
+                                <option value="PRUEBA">Prueba Escrita</option>
+                                <option value="ORAL">Evaluación Oral</option>
+                                <option value="PRACTICA">Evaluación Práctica</option>
+                                <option value="PROYECTO">Proyecto</option>
+                                <option value="TALLER">Taller</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="clearEventForm()">
+                    <i class="fas fa-broom me-2"></i>Limpiar
+                </button>
+                <button type="submit" form="form-crear-evento" class="btn btn-success">
+                    <i class="fas fa-plus me-2"></i>Crear Evento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Evento -->
+<div class="modal fade" id="modalEditarEvento" tabindex="-1" aria-labelledby="modalEditarEventoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalEditarEventoLabel">
+                    <i class="fas fa-edit me-2"></i>Editar Evento
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-editar-evento">
+                    <input type="hidden" id="evento-id-edit" value="">
+                    <input type="hidden" id="evento-type-edit" value="">
+                    
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="titulo-evento-edit" class="form-label">Título del Evento</label>
+                            <input type="text" class="form-control" id="titulo-evento-edit" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha-evento-edit" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha-evento-edit" required>
+                        </div>
+                        <div class="col-md-6 mb-3" id="campo-ubicacion-edit">
+                            <label for="ubicacion-evento-edit" class="form-label">Ubicación</label>
+                            <input type="text" class="form-control" id="ubicacion-evento-edit">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion-evento-edit" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion-evento-edit" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3" id="campo-materiales-edit" style="display: none;">
+                        <label for="materiales-evento-edit" class="form-label">Materiales</label>
+                        <textarea class="form-control" id="materiales-evento-edit" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="submit" form="form-editar-evento" class="btn btn-info">
+                    <i class="fas fa-save me-2"></i>Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos para el calendario general de docentes */
+.event-list-item-general {
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.event-list-item-general:hover {
+    background-color: #f8f9fa;
+    transform: translateX(2px);
+}
+
+.event-list-item-general:last-child {
+    border-bottom: none;
+}
+
+.event-list-item-general .event-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.event-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.event-time {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.modal-header.bg-warning {
+    border-bottom: 1px solid #ffc107;
+}
+
+.modal-header.bg-success {
+    border-bottom: 1px solid #198754;
+}
+
+.priority-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+}
+
+/* Colores para diferentes tipos de eventos */
+.bg-reunion { background-color: #6f42c1; }
+.bg-evaluacion { background-color: #dc3545; }
+.bg-tarea { background-color: #fd7e14; }
+.bg-material { background-color: #20c997; }
+.bg-entrega { background-color: #0d6efd; }
+.bg-evento-colegio { background-color: #6610f2; }
+.bg-capacitacion { background-color: #d63384; }
+.bg-otro { background-color: #6c757d; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendario-general-docente');
+    var calendarTab = document.getElementById('calendario-general-tab');
+    var calendarInstance = null;
+    var allEvents = [];
+
+    function initializeCalendarGeneral() {
+        if (calendarInstance) return;
+
+        // Obtener eventos del backend
+        try {
+            allEvents = JSON.parse('{{ eventos_calendario|safe }}');
+            console.log('Eventos cargados:', allEvents);
+        } catch (e) {
+            console.error('Error parseando eventos:', e);
+            allEvents = [];
+        }
+
+        calendarInstance = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            height: 'auto',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,listWeek'
+            },
+            events: allEvents,
+            eventDisplay: 'block',
+            eventClick: function(info) {
+                showEventDetails(info.event);
+            },
+            dateClick: function(info) {
+                // Autocompletar fecha en el formulario y abrir modal de crear evento
+                document.getElementById('fecha-evento').value = info.dateStr;
+                var modal = new bootstrap.Modal(document.getElementById('modalCrearEvento'));
+                modal.show();
+            }
+        });
+
+        calendarInstance.render();
+        updateProximosEventos();
+    }
+
+    function updateProximosEventos() {
+        var container = document.getElementById('proximos-eventos-container');
+        var hoy = new Date();
+        var proximosEventos = allEvents.filter(event => {
+            var eventDate = new Date(event.start);
+            return eventDate >= hoy;
+        }).sort((a, b) => new Date(a.start) - new Date(b.start)).slice(0, 12);
+
+        if (proximosEventos.length === 0) {
+            container.innerHTML = '<div class="p-4 text-center text-muted"><i class="fas fa-calendar-times fa-2x mb-3 text-muted"></i><br>No hay eventos próximos.</div>';
+            return;
+        }
+
+        container.innerHTML = '';
+        proximosEventos.forEach(event => {
+            var eventDate = new Date(event.start);
+            var eventEl = document.createElement('div');
+            eventEl.className = 'event-list-item-general';
+            
+            var icon = getEventIcon(event.extendedProps.type);
+            var timeText = eventDate.toLocaleDateString('es-ES', { 
+                weekday: 'short', 
+                day: 'numeric', 
+                month: 'short'
+            });
+            var hourText = eventDate.toLocaleTimeString('es-ES', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // Calcular días restantes
+            var diasRestantes = Math.ceil((eventDate - hoy) / (1000 * 60 * 60 * 24));
+            var tiempoTexto = diasRestantes === 0 ? 'Hoy' : 
+                            diasRestantes === 1 ? 'Mañana' :
+                            `En ${diasRestantes} días`;
+
+            // Prioridad si existe
+            var prioridadBadge = '';
+            if (event.extendedProps.prioridad) {
+                var prioridadColor = event.extendedProps.prioridad === 'URGENTE' ? 'bg-danger' :
+                                   event.extendedProps.prioridad === 'ALTA' ? 'bg-warning' : 'bg-info';
+                prioridadBadge = `<span class="badge priority-badge ${prioridadColor}">${event.extendedProps.prioridad}</span>`;
+            }
+
+            eventEl.innerHTML = `
+                <div class="d-flex align-items-start">
+                    <div class="event-icon ${getEventBg(event.extendedProps.type)}">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${event.title}</h6>
+                        <div class="event-time mb-1">
+                            <i class="fas fa-clock me-1"></i>${timeText} - ${hourText}
+                        </div>
+                        <div class="mb-2">
+                            <span class="badge event-badge ${getEventBadge(event.extendedProps.type)}">${getEventTypeLabel(event.extendedProps.type)}</span>
+                            <span class="badge bg-secondary event-badge">${tiempoTexto}</span>
+                            ${prioridadBadge}
+                        </div>
+                        ${event.description ? `<small class="text-muted">${event.description}</small>` : ''}
+                        <div class="mt-2">
+                            ${event.extendedProps.puede_editar ? `
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="editarEvento('${event.id}', event)" title="Editar evento">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            ` : ''}
+                            ${event.extendedProps.puede_eliminar ? `
+                                <button class="btn btn-sm btn-outline-danger" onclick="eliminarEvento('${event.id}', '${event.title}', event)" title="Eliminar evento">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            eventEl.addEventListener('click', function() {
+                showEventDetails(event);
+            });
+            
+            container.appendChild(eventEl);
+        });
+    }
+
+    function getEventIcon(type) {
+        switch(type) {
+            case 'REUNION': return 'fas fa-users text-white';
+            case 'EVALUACION': return 'fas fa-clipboard-check text-white';
+            case 'TAREA': return 'fas fa-tasks text-white';
+            case 'MATERIAL': return 'fas fa-book-open text-white';
+            case 'ENTREGA': return 'fas fa-upload text-white';
+            case 'EVENTO_COLEGIO': return 'fas fa-school text-white';
+            case 'CAPACITACION': return 'fas fa-graduation-cap text-white';
+            case 'Colegio': return 'fas fa-school text-white';
+            case 'Asignatura': return 'fas fa-book text-white';
+            case 'Cancelacion': return 'fas fa-times-circle text-white';
+            default: return 'fas fa-calendar text-white';
+        }
+    }
+
+    function getEventBg(type) {
+        switch(type) {
+            case 'REUNION': return 'bg-reunion';
+            case 'EVALUACION': return 'bg-evaluacion';
+            case 'TAREA': return 'bg-tarea';
+            case 'MATERIAL': return 'bg-material';
+            case 'ENTREGA': return 'bg-entrega';
+            case 'EVENTO_COLEGIO': return 'bg-evento-colegio';
+            case 'CAPACITACION': return 'bg-capacitacion';
+            case 'Colegio': return 'bg-primary';
+            case 'Asignatura': return 'bg-success';
+            case 'Cancelacion': return 'bg-danger';
+            default: return 'bg-otro';
+        }
+    }
+
+    function getEventBadge(type) {
+        return getEventBg(type);
+    }
+
+    function getEventTypeLabel(type) {
+        switch(type) {
+            case 'REUNION': return 'Reunión';
+            case 'EVALUACION': return 'Evaluación';
+            case 'TAREA': return 'Tarea';
+            case 'MATERIAL': return 'Material';
+            case 'ENTREGA': return 'Entrega';
+            case 'EVENTO_COLEGIO': return 'Evento Colegio';
+            case 'CAPACITACION': return 'Capacitación';
+            case 'Colegio': return 'Colegio';
+            case 'Asignatura': return 'Asignatura';
+            case 'Cancelacion': return 'Cancelación';
+            default: return type;
+        }
+    }
+
+    function showEventDetails(event) {
+        var eventDate = new Date(event.start);
+        var formattedDate = eventDate.toLocaleDateString('es-ES', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        var details = `
+            <div class="alert alert-info">
+                <h5><i class="${getEventIcon(event.extendedProps.type).replace('text-white', 'text-info')} me-2"></i>${event.title}</h5>
+                <hr>
+                <p><strong>Fecha y Hora:</strong> ${formattedDate}</p>
+                <p><strong>Tipo:</strong> <span class="badge ${getEventBadge(event.extendedProps.type)}">${getEventTypeLabel(event.extendedProps.type)}</span></p>
+                ${event.extendedProps.description ? `<p><strong>Descripción:</strong> ${event.extendedProps.description}</p>` : ''}
+                ${event.extendedProps.ubicacion ? `<p><strong>Ubicación:</strong> ${event.extendedProps.ubicacion}</p>` : ''}
+                ${event.extendedProps.materiales ? `<p><strong>Materiales:</strong> ${event.extendedProps.materiales}</p>` : ''}
+                ${event.extendedProps.instrucciones ? `<p><strong>Instrucciones:</strong> ${event.extendedProps.instrucciones}</p>` : ''}
+                ${event.extendedProps.ponderacion ? `<p><strong>Ponderación:</strong> ${event.extendedProps.ponderacion}%</p>` : ''}
+                ${event.extendedProps.prioridad ? `<p><strong>Prioridad:</strong> <span class="badge ${event.extendedProps.prioridad === 'URGENTE' ? 'bg-danger' : event.extendedProps.prioridad === 'ALTA' ? 'bg-warning' : 'bg-info'}">${event.extendedProps.prioridad}</span></p>` : ''}
+                ${event.extendedProps.encargado ? `<p><strong>Encargado:</strong> ${event.extendedProps.encargado}</p>` : ''}
+                ${event.extendedProps.motivo ? `<p><strong>Motivo:</strong> ${event.extendedProps.motivo}</p>` : ''}
+            </div>
+        `;
+        
+        // Crear un modal dinámico para mostrar detalles
+        var modalHtml = `
+            <div class="modal fade" id="modalEventDetails" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header ${getEventBg(event.extendedProps.type)} text-white">
+                            <h5 class="modal-title">Detalles del Evento</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            ${details}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remover modal anterior si existe
+        var existingModal = document.getElementById('modalEventDetails');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // Agregar nuevo modal
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        var modal = new bootstrap.Modal(document.getElementById('modalEventDetails'));
+        modal.show();
+        
+        // Limpiar modal después de cerrarlo
+        document.getElementById('modalEventDetails').addEventListener('hidden.bs.modal', function() {
+            this.remove();
+        });
+    }
+
+    // Mapeo de horarios por bloques
+    var horariosBloques = {
+        '1': { inicio: '08:00', fin: '08:45' },
+        '2': { inicio: '08:45', fin: '09:30' },
+        '3': { inicio: '09:45', fin: '10:30' },
+        '4': { inicio: '10:30', fin: '11:15' },
+        '5': { inicio: '11:30', fin: '12:15' },
+        '6': { inicio: '12:15', fin: '13:00' },
+        '7': { inicio: '13:45', fin: '14:30' },
+        '8': { inicio: '14:30', fin: '15:15' },
+        '9': { inicio: '15:15', fin: '16:00' }
+    };
+
+    // Función para obtener el token CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Función para actualizar campos según tipo de evento
+    window.updateEventTypeFields = function() {
+        var tipo = document.getElementById('tipo-evento').value;
+        var campoMateriales = document.getElementById('campo-materiales');
+        var camposEvaluacion = document.getElementById('campos-evaluacion');
+        var asignaturaRequired = document.getElementById('asignatura-required');
+        var selectAsignatura = document.getElementById('asignatura-evento');
+        var ubicacionField = document.getElementById('ubicacion-evento');
+        
+        // Resetear visibilidad
+        campoMateriales.style.display = 'none';
+        camposEvaluacion.style.display = 'none';
+        asignaturaRequired.style.display = 'none';
+        selectAsignatura.required = false;
+        
+        // Resetear ubicación
+        ubicacionField.readOnly = false;
+        ubicacionField.value = '';
+        
+        // Mostrar campos específicos según tipo
+        switch(tipo) {
+            case 'MATERIAL':
+            case 'TAREA':
+                campoMateriales.style.display = 'block';
+                break;
+            case 'EVALUACION':
+                camposEvaluacion.style.display = 'block';
+                asignaturaRequired.style.display = 'inline';
+                selectAsignatura.required = true;
+                break;
+            case 'CANCELAR_CLASE':
+                asignaturaRequired.style.display = 'inline';
+                selectAsignatura.required = true;
+                break;
+        }
+        
+        // Actualizar fechas disponibles si hay asignatura seleccionada
+        updateFechasDisponibles();
+    };
+
+    // Función para actualizar fechas disponibles según la asignatura seleccionada
+    function updateFechasDisponibles() {
+        var selectAsignatura = document.getElementById('asignatura-evento');
+        var selectFecha = document.getElementById('fecha-evento');
+        var cursoInfo = document.getElementById('curso-info-evento');
+        var ubicacionField = document.getElementById('ubicacion-evento');
+        
+        // Limpiar fechas
+        selectFecha.innerHTML = '<option value="">Selecciona una fecha</option>';
+        selectFecha.disabled = true;
+        
+        // Limpiar curso info y ubicación
+        cursoInfo.value = '';
+        ubicacionField.value = '';
+        
+        var asignaturaId = selectAsignatura.value;
+        if (!asignaturaId) {
+            selectFecha.innerHTML = '<option value="">Selecciona una asignatura primero</option>';
+            return;
+        }
+        
+        // Limpiar curso temporalmente
+        document.getElementById('curso-info-evento').value = 'Cargando...';
+        
+        // Hacer petición AJAX para obtener horarios específicos de la asignatura
+        fetch(`/obtener-horarios-asignatura/${asignaturaId}/`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                var horarios = data.horarios;
+                var diasUnicos = [...new Set(horarios.map(h => h.dia))];
+                
+                // Auto-completar curso desde el backend
+                if (horarios.length > 0) {
+                    document.getElementById('curso-info-evento').value = horarios[0].curso;
+                } else {
+                    document.getElementById('curso-info-evento').value = 'Sin curso asignado';
+                }
+                
+                // Obtener la sala principal de la asignatura
+                if (horarios.length > 0) {
+                    ubicacionField.value = horarios[0].sala;
+                    ubicacionField.readOnly = true;
+                }
+                
+                // Generar fechas para las próximas 4 semanas solo para días válidos
+                var hoy = new Date();
+                
+                for (var i = 0; i < 28; i++) { // 4 semanas
+                    var fecha = new Date(hoy);
+                    fecha.setDate(hoy.getDate() + i);
+                    
+                    var diaSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'][fecha.getDay()];
+                    
+                    // Solo mostrar días donde se imparte la asignatura
+                    if (diasUnicos.includes(diaSemana)) {
+                        var fechaStr = fecha.toISOString().split('T')[0];
+                        var fechaDisplay = fecha.toLocaleDateString('es-ES', { 
+                            weekday: 'long', 
+                            day: 'numeric', 
+                            month: 'long' 
+                        });
+                        
+                        var option = document.createElement('option');
+                        option.value = fechaStr;
+                        option.textContent = fechaDisplay;
+                        option.setAttribute('data-dia', diaSemana);
+                        selectFecha.appendChild(option);
+                    }
+                }
+                
+                selectFecha.disabled = false;
+                
+                // Guardar horarios para uso posterior
+                selectFecha.setAttribute('data-horarios', JSON.stringify(horarios));
+                         } else {
+                alert('Error al obtener horarios de la asignatura');
+                document.getElementById('curso-info-evento').value = 'Error al cargar';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('curso-info-evento').value = 'Error de conexión';
+            
+            // Fallback: mostrar días laborales genéricos
+            var diasSemana = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES'];
+            var hoy = new Date();
+            
+            for (var i = 0; i < 28; i++) {
+                var fecha = new Date(hoy);
+                fecha.setDate(hoy.getDate() + i);
+                
+                var diaSemana = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'][fecha.getDay()];
+                
+                if (diasSemana.includes(diaSemana)) {
+                    var fechaStr = fecha.toISOString().split('T')[0];
+                    var fechaDisplay = fecha.toLocaleDateString('es-ES', { 
+                        weekday: 'long', 
+                        day: 'numeric', 
+                        month: 'long' 
+                    });
+                    
+                    var option = document.createElement('option');
+                    option.value = fechaStr;
+                    option.textContent = fechaDisplay;
+                    option.setAttribute('data-dia', diaSemana);
+                    selectFecha.appendChild(option);
+                }
+            }
+            
+            selectFecha.disabled = false;
+        });
+    }
+    
+    // Función para actualizar bloques disponibles según la fecha seleccionada
+    function updateBloquesDisponibles() {
+        var selectAsignatura = document.getElementById('asignatura-evento');
+        var selectFecha = document.getElementById('fecha-evento');
+        var selectBloque = document.getElementById('bloque-evento');
+        
+        // Limpiar bloques
+        selectBloque.innerHTML = '<option value="">Selecciona un bloque</option>';
+        selectBloque.disabled = true;
+        
+        var asignaturaId = selectAsignatura.value;
+        var fechaSeleccionada = selectFecha.value;
+        
+        if (!asignaturaId || !fechaSeleccionada) {
+            selectBloque.innerHTML = '<option value="">Selecciona una fecha primero</option>';
+            return;
+        }
+        
+        // Obtener día de la semana de la fecha seleccionada
+        var option = selectFecha.querySelector('option:checked');
+        var diaSemana = option.getAttribute('data-dia');
+        
+        // Obtener horarios guardados de la asignatura
+        var horariosData = selectFecha.getAttribute('data-horarios');
+        if (!horariosData) {
+            selectBloque.innerHTML = '<option value="">Error: No se pudieron cargar los horarios</option>';
+            return;
+        }
+        
+        try {
+            var horarios = JSON.parse(horariosData);
+            
+            // Filtrar horarios para el día seleccionado
+            var horariosDelDia = horarios.filter(h => h.dia === diaSemana);
+            
+            if (horariosDelDia.length === 0) {
+                selectBloque.innerHTML = '<option value="">No hay clases este día</option>';
+                return;
+            }
+            
+            // Agrupar bloques consecutivos
+            var bloquesUsados = horariosDelDia.map(h => parseInt(h.bloque)).sort((a, b) => a - b);
+            var bloquesAgrupados = [];
+            var bloquesEnGrupo = new Set();
+            
+            // Detectar bloques consecutivos (pares)
+            for (var i = 0; i < bloquesUsados.length - 1; i++) {
+                var bloqueActual = bloquesUsados[i];
+                var bloqueSiguiente = bloquesUsados[i + 1];
+                
+                // Si son consecutivos
+                if (bloqueSiguiente === bloqueActual + 1 && !bloquesEnGrupo.has(bloqueActual)) {
+                    var inicioHora = horariosBloques[bloqueActual].inicio;
+                    var finHora = horariosBloques[bloqueSiguiente].fin;
+                    
+                    bloquesAgrupados.push({
+                        value: inicioHora + '-' + finHora,
+                        text: `Bloques ${bloqueActual}-${bloqueSiguiente} (${inicioHora} - ${finHora})`,
+                        bloques: [bloqueActual, bloqueSiguiente]
+                    });
+                    
+                    bloquesEnGrupo.add(bloqueActual);
+                    bloquesEnGrupo.add(bloqueSiguiente);
+                }
+            }
+            
+            // Agregar bloques individuales que no son parte de pares
+            bloquesUsados.forEach(bloque => {
+                if (!bloquesEnGrupo.has(bloque)) {
+                    var inicioHora = horariosBloques[bloque].inicio;
+                    var finHora = horariosBloques[bloque].fin;
+                    
+                    bloquesAgrupados.push({
+                        value: inicioHora + '-' + finHora,
+                        text: `Bloque ${bloque} (${inicioHora} - ${finHora})`,
+                        bloques: [bloque]
+                    });
+                }
+            });
+            
+            // Ordenar por primer bloque
+            bloquesAgrupados.sort((a, b) => Math.min(...a.bloques) - Math.min(...b.bloques));
+            
+            // Agregar opciones al select
+            bloquesAgrupados.forEach(bloque => {
+                var option = document.createElement('option');
+                option.value = bloque.value;
+                option.textContent = bloque.text;
+                selectBloque.appendChild(option);
+            });
+            
+            selectBloque.disabled = false;
+            
+        } catch (error) {
+            console.error('Error al procesar horarios:', error);
+            selectBloque.innerHTML = '<option value="">Error al cargar bloques</option>';
+        }
+    }
+    
+
+
+    // Evitar duplicación de event listeners
+    function setupEventListeners() {
+        var asignaturaSelect = document.getElementById('asignatura-evento');
+        var fechaSelect = document.getElementById('fecha-evento');
+        
+        // Remover listeners existentes
+        asignaturaSelect.removeEventListener('change', updateFechasDisponibles);
+        fechaSelect.removeEventListener('change', updateBloquesDisponibles);
+        
+        // Agregar listeners
+        asignaturaSelect.addEventListener('change', updateFechasDisponibles);
+        fechaSelect.addEventListener('change', updateBloquesDisponibles);
+    }
+
+    // Inicializar calendario cuando se hace clic en la pestaña
+    if (calendarTab) {
+        calendarTab.addEventListener('click', function() {
+            setTimeout(() => {
+                initializeCalendarGeneral();
+                setupEventListeners();
+            }, 100);
+        });
+    }
+
+    // Si la pestaña ya está activa, inicializar inmediatamente
+    if (calendarTab && calendarTab.classList.contains('active')) {
+        initializeCalendarGeneral();
+        setupEventListeners();
+    }
+
+    // Manejar formulario de crear evento
+    document.getElementById('form-crear-evento').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = {
+            tipo: document.getElementById('tipo-evento').value,
+            asignatura_id: document.getElementById('asignatura-evento').value || null,
+            titulo: document.getElementById('titulo-evento').value,
+            descripcion: document.getElementById('descripcion-evento').value,
+            fecha: document.getElementById('fecha-evento').value,
+            bloque_horario: document.getElementById('bloque-evento').value,
+            ubicacion: document.getElementById('ubicacion-evento').value || null,
+            materiales: document.getElementById('materiales-evento').value || null,
+            ponderacion: document.getElementById('ponderacion-evento').value || null,
+            tipo_evaluacion: document.getElementById('tipo-evaluacion').value || null
+        };
+
+        // Validación básica
+        if (!formData.tipo || !formData.titulo || !formData.fecha) {
+            alert('Por favor completa los campos obligatorios');
+            return;
+        }
+        
+        // Validación específica para evaluaciones y cancelaciones
+        if (formData.tipo === 'EVALUACION' || formData.tipo === 'CANCELAR_CLASE') {
+            if (!formData.asignatura_id) {
+                alert('Para ' + (formData.tipo === 'EVALUACION' ? 'evaluaciones' : 'cancelar clases') + ', debes seleccionar una asignatura');
+                return;
+            }
+            if (!formData.bloque_horario) {
+                alert('Para ' + (formData.tipo === 'EVALUACION' ? 'evaluaciones' : 'cancelar clases') + ', debes seleccionar el bloque/horario');
+                return;
+            }
+        }
+
+        // Mostrar loading
+        var submitBtn = document.querySelector('#modalCrearEvento .btn-success');
+        var originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creando...';
+        submitBtn.disabled = true;
+
+        // Debug: mostrar datos que se van a enviar
+        console.log('=== DATOS A ENVIAR ===');
+        console.log('formData:', formData);
+        console.log('URLSearchParams:', new URLSearchParams(formData).toString());
+        
+        // Enviar datos al backend
+        fetch('/crear-evento-calendario/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: new URLSearchParams(formData)
+        })
+        .then(response => {
+            console.log('=== RESPUESTA RECIBIDA ===');
+            console.log('Status:', response.status);
+            console.log('Headers:', response.headers);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data:', data);
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            if (data.success) {
+                alert('✅ ' + data.message);
+                bootstrap.Modal.getInstance(document.getElementById('modalCrearEvento')).hide();
+                
+                // Recargar la página para mostrar el nuevo evento
+                location.reload();
+            } else {
+                alert('❌ Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            alert('❌ Error de conexión: ' + error.message);
+        });
+    });
+
+
+
+    // Función para obtener el CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Funciones globales
+    window.refreshEventList = function() {
+        updateProximosEventos();
+    };
+
+    window.clearEventForm = function() {
+        document.getElementById('form-crear-evento').reset();
+        
+        // Resetear campos dependientes
+        document.getElementById('fecha-evento').innerHTML = '<option value="">Selecciona una asignatura primero</option>';
+        document.getElementById('fecha-evento').disabled = true;
+        document.getElementById('bloque-evento').innerHTML = '<option value="">Selecciona una fecha primero</option>';
+        document.getElementById('bloque-evento').disabled = true;
+        document.getElementById('curso-info-evento').value = '';
+        document.getElementById('ubicacion-evento').value = '';
+        document.getElementById('ubicacion-evento').readOnly = false;
+        
+        updateEventTypeFields(); // Resetear campos dinámicos
+    };
+
+    // Función para editar eventos
+    window.editarEvento = function(eventoId, eventData) {
+        // Extraer ID real del evento (sin prefijo)
+        var realId = eventoId.replace(/^(colegio_|clase_|cancelada_)/, '');
+        var eventType = eventoId.includes('colegio_') ? 'colegio' : 'clase';
+        
+        // Obtener datos del evento desde el backend
+        fetch(`/editar-evento-calendario/${realId}/`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                var evento = data.evento;
+                
+                // Llenar el formulario de edición
+                document.getElementById('evento-id-edit').value = realId;
+                document.getElementById('evento-type-edit').value = evento.event_type;
+                document.getElementById('titulo-evento-edit').value = evento.titulo;
+                document.getElementById('fecha-evento-edit').value = evento.fecha;
+                document.getElementById('descripcion-evento-edit').value = evento.descripcion;
+                document.getElementById('ubicacion-evento-edit').value = evento.ubicacion || '';
+                
+                // Mostrar campos específicos
+                if (evento.event_type === 'clase') {
+                    document.getElementById('campo-materiales-edit').style.display = 'block';
+                    document.getElementById('materiales-evento-edit').value = evento.materiales || '';
+                    document.getElementById('campo-ubicacion-edit').style.display = 'none';
+                } else {
+                    document.getElementById('campo-materiales-edit').style.display = 'none';
+                    document.getElementById('campo-ubicacion-edit').style.display = 'block';
+                }
+                
+                // Mostrar modal
+                var modal = new bootstrap.Modal(document.getElementById('modalEditarEvento'));
+                modal.show();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al cargar los datos del evento');
+        });
+    };
+
+    // Función para eliminar eventos
+    window.eliminarEvento = function(eventoId, titulo, eventData) {
+        if (!confirm(`¿Estás seguro de que quieres eliminar el evento "${titulo}"?`)) {
+            return;
+        }
+        
+        // Extraer ID real del evento (sin prefijo)
+        var realId = eventoId.replace(/^(colegio_|clase_|cancelada_)/, '');
+        var eventType = eventoId.includes('colegio_') ? 'colegio' : 'clase';
+        
+        fetch(`/eliminar-evento-calendario/${realId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: new URLSearchParams({
+                'event_type': eventType
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ ' + data.message);
+                location.reload(); // Recargar para actualizar la lista
+            } else {
+                alert('❌ Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error al eliminar el evento');
+        });
+    };
+
+    // Manejar formulario de editar evento
+    document.getElementById('form-editar-evento').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        var eventoId = document.getElementById('evento-id-edit').value;
+        var eventType = document.getElementById('evento-type-edit').value;
+        
+        var formData = {
+            titulo: document.getElementById('titulo-evento-edit').value,
+            fecha: document.getElementById('fecha-evento-edit').value,
+            descripcion: document.getElementById('descripcion-evento-edit').value,
+            event_type: eventType
+        };
+        
+        if (eventType === 'clase') {
+            formData.materiales = document.getElementById('materiales-evento-edit').value;
+        } else {
+            formData.ubicacion = document.getElementById('ubicacion-evento-edit').value;
+        }
+        
+        var submitBtn = document.querySelector('#modalEditarEvento .btn-info');
+        var originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
+        submitBtn.disabled = true;
+        
+        fetch(`/editar-evento-calendario/${eventoId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: new URLSearchParams(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            if (data.success) {
+                alert('✅ ' + data.message);
+                bootstrap.Modal.getInstance(document.getElementById('modalEditarEvento')).hide();
+                location.reload(); // Recargar para mostrar cambios
+            } else {
+                alert('❌ Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            console.error('Error:', error);
+            alert('❌ Error al guardar los cambios');
+        });
+    });
+});
+</script> 

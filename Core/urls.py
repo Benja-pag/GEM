@@ -8,6 +8,8 @@ from Core.views import (
     CursoDetalleView, AsignaturaDetalleView, AsignaturaDetalleEstudianteView, CleanupAuthUsersView
 )
 from Core.views.alumnos import InscribirElectivoView, InscribirElectivosLoteView, BorrarInscripcionElectivosView
+from Core.views.docentes import CancelarClaseView, MarcarClaseRecuperadaView, ObtenerHorariosAsignaturaView, CrearEventoCalendarioView, EditarEventoCalendarioView, EliminarEventoCalendarioView
+from Core.views.admin import AdminEventosCalendarioView, AdminCrearEventoCalendarioView, AdminEditarEventoCalendarioView, AdminEliminarEventoCalendarioView
 from Core.views import foro as foro_views
 from Core.views import pdf_views as pdf_views
 
@@ -68,5 +70,23 @@ urlpatterns += [
     path('inscribir-electivo/', InscribirElectivoView.as_view(), name='inscribir_electivo'),
     path('inscribir-electivos-lote/', InscribirElectivosLoteView.as_view(), name='inscribir_electivos_lote'),
     path('borrar-inscripcion-electivos/', BorrarInscripcionElectivosView.as_view(), name='borrar_inscripcion_electivos'),
+    
+    # URLs para cancelación de clases
+    path('cancelar-clase/', CancelarClaseView.as_view(), name='cancelar_clase'),
+    path('marcar-clase-recuperada/', MarcarClaseRecuperadaView.as_view(), name='marcar_clase_recuperada'),
+    
+    # URLs para horarios de asignaturas
+    path('obtener-horarios-asignatura/<int:asignatura_id>/', ObtenerHorariosAsignaturaView.as_view(), name='obtener_horarios_asignatura'),
+    
+    # URLs para eventos del calendario (docentes)
+    path('crear-evento-calendario/', CrearEventoCalendarioView.as_view(), name='crear_evento_calendario'),
+    path('editar-evento-calendario/<int:evento_id>/', EditarEventoCalendarioView.as_view(), name='editar_evento_calendario'),
+    path('eliminar-evento-calendario/<int:evento_id>/', EliminarEventoCalendarioView.as_view(), name='eliminar_evento_calendario'),
+    
+    # URLs para eventos del calendario (administrador)
+    path('admin-eventos-calendario/', AdminEventosCalendarioView.as_view(), name='admin_eventos_calendario'),
+    path('admin-crear-evento-calendario/', AdminCrearEventoCalendarioView.as_view(), name='admin_crear_evento_calendario'),
+    path('admin-editar-evento-calendario/<str:evento_id>/', AdminEditarEventoCalendarioView.as_view(), name='admin_editar_evento_calendario'),
+    path('admin-eliminar-evento-calendario/<str:evento_id>/', AdminEliminarEventoCalendarioView.as_view(), name='admin_eliminar_evento_calendario'),
 ]
 

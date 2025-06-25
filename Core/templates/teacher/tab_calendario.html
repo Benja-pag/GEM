@@ -1,93 +1,399 @@
-<!-- Calendario -->
+<!-- Calendario para Docentes -->
 <div class="tab-pane fade" id="calendario">
-    <div class="row">
+    <div class="row g-4">
         <!-- Columna del Calendario -->
-        <div class="col-lg-9">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-light">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-calendar-alt text-primary me-2"></i>
-                            <strong>Junio 2024</strong>
-                        </h5>
-                        <div class="btn-group">
-                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-left"></i></button>
-                            <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                    </div>
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Calendario de Actividades
+                    </h5>
                 </div>
-                <div class="card-body p-2">
-                    <table class="table table-bordered calendar-table">
-                        <thead class="text-center">
-                            <tr>
-                                <th>Lun</th><th>Mar</th><th>Mié</th><th>Jue</th><th>Vie</th><th>Sáb</th><th>Dom</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="text-muted">27</td><td class="text-muted">28</td><td class="text-muted">29</td><td class="text-muted">30</td><td class="text-muted">31</td><td>1</td><td>2</td>
-                            </tr>
-                            <tr>
-                                <td>3</td><td>4</td><td>5<div class="calendar-event bg-warning text-dark">Evaluación 2°A</div></td><td>6</td><td>7</td><td>8</td><td>9</td>
-                            </tr>
-                            <tr>
-                                <td>10</td><td>11</td><td>12</td><td>13</td><td>14<div class="calendar-event bg-info text-dark">Reunión Apoderados</div></td><td>15</td><td>16</td>
-                            </tr>
-                            <tr>
-                                <td>17</td><td>18</td><td>19</td><td class="today">20</td><td>21</td><td>22</td><td>23</td>
-                            </tr>
-                            <tr>
-                                <td>24</td><td>25</td><td>26<div class="calendar-event bg-success">Entrega Ensayos</div></td><td>27</td><td>28</td><td>29</td><td>30</td>
-                            </tr>
-                            <tr>
-                                <td class="text-muted">1</td><td class="text-muted">2</td><td class="text-muted">3</td><td class="text-muted">4</td><td class="text-muted">5</td><td class="text-muted">6</td><td class="text-muted">7</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="card-body">
+                    <div id='calendario-docente'></div>
                 </div>
             </div>
         </div>
-        <!-- Columna de Información Adicional -->
-        <div class="col-lg-3">
-            <div class="card border-0 shadow-sm mb-4">
+        
+        <!-- Columna de Acciones y Eventos -->
+        <div class="col-lg-4">
+            <!-- Card para Cancelar Clases -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-times-circle me-2"></i>
+                        Cancelar Clase
+                    </h6>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title mb-3"><i class="fas fa-star me-2 text-warning"></i>Próximos Eventos</h5>
-                    <div class="list-group list-group-flush">
-                        <a href="#" class="list-group-item list-group-item-action px-0">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Evaluación 2°A</h6>
-                                <small class="text-muted">05/06</small>
-                            </div>
-                            <small class="badge bg-warning-soft text-warning">Evaluación</small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action px-0">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Reunión Apoderados</h6>
-                                <small class="text-muted">14/06</small>
-                            </div>
-                            <small class="badge bg-info-soft text-info">Reunión</small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action px-0">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Entrega Ensayos</h6>
-                                <small class="text-muted">26/06</small>
-                            </div>
-                            <small class="badge bg-success-soft text-success">Entrega</small>
-                        </a>
-                    </div>
+                    <form id="form-cancelar-clase">
+                        <div class="mb-3">
+                            <label for="asignatura-cancelar" class="form-label">Asignatura</label>
+                            <select class="form-select" id="asignatura-cancelar" required>
+                                <option value="">Selecciona una asignatura</option>
+                                {% for asignatura in asignaturas %}
+                                <option value="{{ asignatura.id }}">{{ asignatura.asignatura.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fecha-cancelar" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha-cancelar" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="hora-cancelar" class="form-label">Hora</label>
+                            <select class="form-select" id="hora-cancelar" required>
+                                <option value="">Selecciona la hora</option>
+                                <option value="08:00">08:00 - Bloque 1</option>
+                                <option value="08:45">08:45 - Bloque 2</option>
+                                <option value="09:45">09:45 - Bloque 3</option>
+                                <option value="10:30">10:30 - Bloque 4</option>
+                                <option value="11:30">11:30 - Bloque 5</option>
+                                <option value="12:15">12:15 - Bloque 6</option>
+                                <option value="13:45">13:45 - Bloque 7</option>
+                                <option value="14:30">14:30 - Bloque 8</option>
+                                <option value="15:15">15:15 - Bloque 9</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="motivo-cancelar" class="form-label">Motivo</label>
+                            <select class="form-select" id="motivo-cancelar" required>
+                                <option value="">Selecciona el motivo</option>
+                                <option value="ENFERMEDAD">Enfermedad del docente</option>
+                                <option value="PERSONAL">Motivos personales</option>
+                                <option value="CAPACITACION">Capacitación</option>
+                                <option value="REUNION">Reunión institucional</option>
+                                <option value="ACTIVIDAD_COLEGIO">Actividad del colegio</option>
+                                <option value="EMERGENCIA">Emergencia</option>
+                                <option value="OTRO">Otro motivo</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion-cancelar" class="form-label">Descripción (opcional)</label>
+                            <textarea class="form-control" id="descripcion-cancelar" rows="2" placeholder="Descripción adicional del motivo..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="fas fa-times-circle me-2"></i>
+                            Cancelar Clase
+                        </button>
+                    </form>
                 </div>
             </div>
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title mb-3"><i class="fas fa-tags me-2 text-primary"></i>Leyenda</h5>
-                    <div class="d-flex flex-column gap-2">
-                        <div class="d-flex align-items-center"><div class="legend-dot bg-warning"></div>Evaluaciones</div>
-                        <div class="d-flex align-items-center"><div class="legend-dot bg-info"></div>Reuniones</div>
-                        <div class="d-flex align-items-center"><div class="legend-dot bg-success"></div>Entregas</div>
-                        <div class="d-flex align-items-center"><div class="legend-dot bg-danger"></div>Avisos Importantes</div>
-                    </div>
+
+            <!-- Card para Eventos del Día Seleccionado -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="card-title mb-0" id="eventos-dia-title">
+                        <i class="fas fa-calendar-day me-2"></i>
+                        Eventos de Hoy
+                    </h6>
+                </div>
+                <div class="card-body p-0" id="eventos-dia-body" style="max-height: 280px; overflow-y: auto;">
+                    <div class="p-4 text-center text-muted">Selecciona un día para ver sus eventos.</div>
+                </div>
+            </div>
+
+            <!-- Card para Clases Canceladas -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Clases Canceladas
+                    </h6>
+                </div>
+                <div class="card-body p-0" id="clases-canceladas-body" style="max-height: 280px; overflow-y: auto;">
+                    {% if clases_canceladas %}
+                        {% for cancelacion in clases_canceladas %}
+                        <div class="cancelacion-item p-3 border-bottom" data-cancelacion-id="{{ cancelacion.id }}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ cancelacion.asignatura_impartida.asignatura.nombre }}</h6>
+                                    <small class="text-muted">
+                                        {{ cancelacion.fecha_cancelacion|date:"d/m/Y" }} - {{ cancelacion.hora_cancelacion|time:"H:i" }}
+                                    </small>
+                                    <div class="mt-1">
+                                        <span class="badge bg-secondary">{{ cancelacion.get_motivo_display }}</span>
+                                        {% if cancelacion.clase_recuperada %}
+                                            <span class="badge bg-success">Recuperada</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Pendiente</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if not cancelacion.clase_recuperada %}
+                                <button class="btn btn-sm btn-success marcar-recuperada" data-cancelacion-id="{{ cancelacion.id }}">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% if cancelacion.descripcion %}
+                            <div class="mt-2">
+                                <small class="text-muted">{{ cancelacion.descripcion }}</small>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-4 text-center text-muted">No hay clases canceladas.</div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+<style>
+/* Estilos para el calendario de docentes */
+.cancelacion-item:hover {
+    background-color: #f8f9fa;
+}
+
+.event-list-item {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.event-list-item:last-child {
+    border-bottom: none;
+}
+.event-list-item:hover {
+    background-color: #f8f9fa;
+}
+.event-list-item .event-title {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+}
+.event-list-item .event-details {
+    display: none;
+    padding-top: 0.5rem;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+.event-list-item.active .event-details {
+    display: block;
+}
+.event-list-item.active {
+    background-color: #e9f5ff;
+}
+.event-icon {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendario-docente');
+    var calendarTab = document.getElementById('calendario-tab');
+    var calendarInstance = null;
+    var allEvents = [];
+
+    var eventosDiaTitle = document.getElementById('eventos-dia-title');
+    var eventosDiaBody = document.getElementById('eventos-dia-body');
+
+    function initializeCalendar() {
+        if (calendarInstance) return;
+
+        // Obtener eventos del backend
+        allEvents = JSON.parse('{{ eventos_calendario|safe }}');
+
+        calendarInstance = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth'
+            },
+            events: allEvents,
+            eventDisplay: 'block',
+            dateClick: function(info) {
+                updateSelectedDayList(info.date);
+            },
+            eventClick: function(info) {
+                updateSelectedDayList(info.event.start);
+                highlightEvent(info.event.id, true);
+            }
+        });
+
+        calendarInstance.render();
+        updateSelectedDayList(new Date());
+    }
+
+    function updateSelectedDayList(date) {
+        var selectedDate = new Date(date);
+        var title = selectedDate.toDateString() === new Date().toDateString() 
+            ? 'Eventos para Hoy' 
+            : `Eventos del ${selectedDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`;
+        
+        var eventsOnDay = allEvents.filter(e => new Date(e.start).toDateString() === selectedDate.toDateString());
+        populateEventList(eventosDiaBody, eventosDiaTitle, title, eventsOnDay, false);
+    }
+
+    function populateEventList(container, titleElement, titleText, events, showDate) {
+        if (titleElement) titleElement.innerHTML = `<i class="fas fa-calendar-day me-2"></i> ${titleText}`;
+        container.innerHTML = '';
+
+        if (events.length === 0) {
+            container.innerHTML = '<div class="p-4 text-center text-muted">No hay eventos programados.</div>';
+            return;
+        }
+
+        events.sort((a, b) => new Date(a.start) - new Date(b.start));
+        
+        events.forEach(event => {
+            var eventEl = document.createElement('div');
+            var eventId = event.id;
+            eventEl.className = 'event-list-item';
+            eventEl.id = `event-${eventId}`;
+            
+            var eventDate = new Date(event.start);
+            var eventTime = eventDate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            var dateString = showDate ? `<strong>${eventDate.getDate()}/${eventDate.getMonth()+1}</strong>` : `<strong>${eventTime}</strong>`;
+            var icon = getEventIcon(event.extendedProps.type);
+            var props = event.extendedProps;
+
+            eventEl.innerHTML = `
+                <div class="event-title">
+                    <i class="${icon} event-icon"></i>
+                    <span>${dateString} - ${event.title}</span>
+                </div>
+                <div class="event-details">
+                    <hr class="my-2">
+                    ${event.description ? `<div>${event.description}</div>` : ''}
+                    ${props.encargado ? `<div><strong>Encargado:</strong> ${props.encargado}</div>` : ''}
+                    ${props.ubicacion ? `<div><strong>Ubicación:</strong> ${props.ubicacion}</div>` : ''}
+                    ${props.motivo ? `<div><strong>Motivo:</strong> ${props.motivo}</div>` : ''}
+                    ${props.recuperada !== undefined ? `<div><strong>Estado:</strong> ${props.recuperada ? 'Recuperada' : 'Pendiente'}</div>` : ''}
+                </div>
+            `;
+            
+            eventEl.onclick = () => highlightEvent(eventId);
+            container.appendChild(eventEl);
+        });
+    }
+
+    function getEventIcon(type) {
+        switch(type) {
+            case 'Colegio': return 'fas fa-school text-info';
+            case 'Asignatura': return 'fas fa-book text-success';
+            case 'Cancelacion': return 'fas fa-times-circle text-danger';
+            default: return 'fas fa-calendar text-secondary';
+        }
+    }
+
+    function highlightEvent(eventId, scrollTo = false) {
+        // Remover destacado anterior
+        document.querySelectorAll('.event-list-item.active').forEach(el => {
+            el.classList.remove('active');
+        });
+        
+        // Destacar el evento seleccionado
+        var eventEl = document.getElementById(`event-${eventId}`);
+        if (eventEl) {
+            eventEl.classList.add('active');
+            if (scrollTo) {
+                eventEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }
+
+    // Inicializar calendario cuando se hace clic en la pestaña
+    if (calendarTab) {
+        calendarTab.addEventListener('click', function() {
+            setTimeout(initializeCalendar, 100);
+        });
+    }
+
+    // Si la pestaña ya está activa, inicializar inmediatamente
+    if (calendarTab && calendarTab.classList.contains('active')) {
+        initializeCalendar();
+    }
+
+    // Manejar formulario de cancelar clase
+    document.getElementById('form-cancelar-clase').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = {
+            asignatura_impartida_id: document.getElementById('asignatura-cancelar').value,
+            fecha_cancelacion: document.getElementById('fecha-cancelar').value,
+            hora_cancelacion: document.getElementById('hora-cancelar').value,
+            motivo: document.getElementById('motivo-cancelar').value,
+            descripcion: document.getElementById('descripcion-cancelar').value
+        };
+
+        fetch('/cancelar-clase/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Clase cancelada exitosamente');
+                location.reload(); // Recargar para actualizar la lista
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al cancelar la clase');
+        });
+    });
+
+    // Manejar botones de marcar como recuperada
+    document.querySelectorAll('.marcar-recuperada').forEach(button => {
+        button.addEventListener('click', function() {
+            var cancelacionId = this.getAttribute('data-cancelacion-id');
+            
+            fetch('/marcar-clase-recuperada/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    cancelacion_id: cancelacionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Clase marcada como recuperada');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al marcar la clase como recuperada');
+            });
+        });
+    });
+
+    // Función para obtener el CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script> 

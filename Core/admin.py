@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     AuthUser, Usuario, Administrativo, Docente, Estudiante,
-    Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, Asignatura
+    Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, Asignatura, ClaseCancelada
 )
 
 class AuthUserAdmin(UserAdmin):
@@ -19,6 +19,28 @@ class AuthUserAdmin(UserAdmin):
             'classes': ('wide',),
             'fields': ('rut', 'div', 'password1', 'password2', 'is_active', 'is_admin')}
         ),
+    )
+
+class ClaseCanceladaAdmin(admin.ModelAdmin):
+    list_display = ('docente', 'asignatura_impartida', 'fecha_cancelacion', 'hora_cancelacion', 'motivo', 'clase_recuperada', 'fecha_registro')
+    list_filter = ('motivo', 'clase_recuperada', 'fecha_cancelacion', 'fecha_registro')
+    search_fields = ('docente__usuario__nombre', 'docente__usuario__apellido_paterno', 'asignatura_impartida__asignatura__nombre')
+    ordering = ('-fecha_cancelacion', '-hora_cancelacion')
+    readonly_fields = ('fecha_registro',)
+    fieldsets = (
+        ('Información Básica', {
+            'fields': ('docente', 'asignatura_impartida', 'fecha_cancelacion', 'hora_cancelacion')
+        }),
+        ('Motivo y Descripción', {
+            'fields': ('motivo', 'descripcion')
+        }),
+        ('Estado', {
+            'fields': ('notificado_estudiantes', 'clase_recuperada', 'fecha_recuperacion')
+        }),
+        ('Metadatos', {
+            'fields': ('fecha_registro',),
+            'classes': ('collapse',)
+        }),
     )
 
 # class ClaseAdmin(admin.ModelAdmin):
@@ -44,3 +66,4 @@ admin.site.register(CalendarioColegio)
 admin.site.register(Clase)
 admin.site.register(Foro)
 admin.site.register(Asignatura)
+admin.site.register(ClaseCancelada, ClaseCanceladaAdmin)

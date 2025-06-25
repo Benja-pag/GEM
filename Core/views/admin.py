@@ -12,6 +12,90 @@ from Core.servicios.helpers import validadores, serializadores
 from Core.servicios.repos.usuarios import crear_usuario, actualizar_usuario
 from Core.servicios.repos.cursos import get_curso, get_estudiantes_por_curso
 from django.http import JsonResponse
+import json
+from datetime import datetime, date
+
+def get_eventos_calendario_admin():
+    """
+    Obtiene todos los eventos del colegio para el administrador
+    """
+    try:
+        eventos = []
+        
+        # Mapeo de colores para diferentes tipos de eventos
+        COLOR_MAPPING = {
+            'REUNION': '#6f42c1',
+            'EVALUACION': '#dc3545', 
+            'TAREA': '#fd7e14',
+            'MATERIAL': '#20c997',
+            'ENTREGA': '#0d6efd',
+            'EVENTO_COLEGIO': '#6610f2',
+            'CAPACITACION': '#d63384',
+            'CANCELAR_CLASE': '#dc3545',
+            'OTRO': '#6c757d'
+        }
+        
+        # Eventos del colegio (institucionales)
+        eventos_colegio = CalendarioColegio.objects.all()
+        for evento in eventos_colegio:
+            eventos.append({
+                'id': f'colegio_{evento.pk}',
+                'title': evento.nombre_actividad,
+                'start': f'{evento.fecha}T{evento.hora}',
+                'description': evento.descripcion,
+                'color': '#0dcaf0',  # Azul claro para eventos del colegio
+                'extendedProps': {
+                    'type': 'Colegio',
+                    'encargado': evento.encargado,
+                    'ubicacion': evento.ubicacion,
+                    'puede_editar': True,  # Admin puede editar todos
+                    'puede_eliminar': True
+                }
+            })
+        
+        # Eventos de todas las clases con información de curso
+        eventos_clases = CalendarioClase.objects.all().select_related('asignatura')
+        for evento in eventos_clases:
+            # Intentar obtener información del curso a través de AsignaturaImpartida
+            curso_info = 'Sin curso'
+            try:
+                # Buscar AsignaturaImpartida relacionada para obtener el curso
+                from Core.models import AsignaturaImpartida, Clase
+                asignatura_impartida = AsignaturaImpartida.objects.filter(
+                    asignatura=evento.asignatura
+                ).first()
+                
+                if asignatura_impartida:
+                    # Buscar clases relacionadas para obtener el curso
+                    clase = Clase.objects.filter(
+                        asignatura_impartida=asignatura_impartida
+                    ).first()
+                    
+                    if clase and clase.curso:
+                        curso_info = f"{clase.curso.nivel}°{clase.curso.letra}"
+            except:
+                pass
+            
+            eventos.append({
+                'id': f'clase_{evento.pk}',
+                'title': f"{evento.nombre_actividad} - {evento.asignatura.nombre}",
+                'start': f'{evento.fecha}T{evento.hora if evento.hora else "00:00:00"}',
+                'description': evento.descripcion,
+                'color': '#198754',  # Verde para eventos de clases
+                'extendedProps': {
+                    'type': 'Asignatura',
+                    'materia': evento.asignatura.nombre,
+                    'curso': curso_info,
+                    'puede_editar': True,  # Admin puede editar todos
+                    'puede_eliminar': True
+                }
+            })
+        
+        return eventos
+
+    except Exception as e:
+        print(f"Error en get_eventos_calendario_admin: {e}")
+        return []
 
 @method_decorator(login_required, name='dispatch')
 class AdminPanelView(View):
@@ -460,6 +544,10 @@ class AdminPanelModularView(View):
             # Obtener todas las especialidades
             especialidades = Especialidad.objects.all()
             
+            # Obtener eventos del calendario para el administrador
+            eventos_calendario_lista = get_eventos_calendario_admin()
+            eventos_calendario = json.dumps(eventos_calendario_lista)  # Para el JavaScript
+            
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
@@ -478,6 +566,7 @@ class AdminPanelModularView(View):
                 'asignaturas': asignaturas,
                 'cursos': cursos,
                 'especialidades': especialidades,
+                'eventos_calendario': eventos_calendario,
             }
             return render(request, 'admin_panel_modular.html', context)
         except Exception as e:
@@ -745,3 +834,188 @@ class AdminPanelModularView(View):
         except Exception as e:
             messages.error(request, f'Error en el panel de administrador: {str(e)}')
             return redirect('admin_panel')
+
+@method_decorator(login_required, name='dispatch')
+class AdminEventosCalendarioView(View):
+    """
+    Vista AJAX para obtener eventos del calendario para el administrador
+    """
+    def get(self, request):
+        if not request.user.is_authenticated or not request.user.is_admin:
+            return JsonResponse({'error': 'No autorizado'}, status=403)
+        
+        try:
+            eventos = get_eventos_calendario_admin()
+            return JsonResponse(eventos, safe=False)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+@method_decorator(login_required, name='dispatch')  
+class AdminCrearEventoCalendarioView(View):
+    """
+    Vista para crear eventos desde el panel de administrador
+    """
+    def post(self, request):
+        if not request.user.is_authenticated or not request.user.is_admin:
+            return JsonResponse({'success': False, 'error': 'No autorizado'})
+        
+        try:
+            titulo = request.POST.get('titulo')
+            descripcion = request.POST.get('descripcion')
+            fecha = request.POST.get('fecha')
+            hora = request.POST.get('hora')
+            tipo_evento = request.POST.get('tipo_evento')
+            ubicacion = request.POST.get('ubicacion', '')
+            encargado = request.POST.get('encargado', '')
+            
+            # Validaciones básicas
+            if not titulo or not fecha or not tipo_evento:
+                return JsonResponse({'success': False, 'error': 'Faltan campos obligatorios'})
+            
+            # Crear evento del colegio (institucional)
+            evento = CalendarioColegio.objects.create(
+                nombre_actividad=titulo,
+                descripcion=descripcion or '',
+                fecha=fecha,
+                hora=hora or '00:00:00',
+                ubicacion=ubicacion,
+                encargado=encargado or f"{request.user.nombre} {request.user.apellido_paterno}"
+            )
+            
+            return JsonResponse({
+                'success': True, 
+                'message': 'Evento creado exitosamente',
+                'evento_id': evento.id
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator(login_required, name='dispatch')
+class AdminEditarEventoCalendarioView(View):
+    """
+    Vista para editar eventos desde el panel de administrador
+    """
+    def get(self, request, evento_id):
+        if not request.user.is_authenticated or not request.user.is_admin:
+            return JsonResponse({'success': False, 'error': 'No autorizado'})
+        
+        try:
+            event_type, id_numerico = evento_id.split('_', 1)
+            
+            if event_type == 'colegio':
+                evento = CalendarioColegio.objects.filter(id=id_numerico).first()
+                if not evento:
+                    return JsonResponse({'success': False, 'error': 'Evento no encontrado'})
+                
+                return JsonResponse({
+                    'success': True,
+                    'evento': {
+                        'titulo': evento.nombre_actividad,
+                        'descripcion': evento.descripcion,
+                        'fecha': evento.fecha.strftime('%Y-%m-%d'),
+                        'hora': str(evento.hora),
+                        'ubicacion': evento.ubicacion,
+                        'encargado': evento.encargado,
+                        'tipo': 'colegio'
+                    }
+                })
+            elif event_type == 'clase':
+                evento = CalendarioClase.objects.filter(id=id_numerico).first()
+                if not evento:
+                    return JsonResponse({'success': False, 'error': 'Evento no encontrado'})
+                
+                return JsonResponse({
+                    'success': True,
+                    'evento': {
+                        'titulo': evento.nombre_actividad,
+                        'descripcion': evento.descripcion,
+                        'fecha': evento.fecha.strftime('%Y-%m-%d'),
+                        'hora': str(evento.hora) if evento.hora else '00:00:00',
+                        'asignatura': evento.asignatura.nombre,
+                        'tipo': 'clase'
+                    }
+                })
+            else:
+                return JsonResponse({'success': False, 'error': 'Tipo de evento no válido'})
+                
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    def post(self, request, evento_id):
+        if not request.user.is_authenticated or not request.user.is_admin:
+            return JsonResponse({'success': False, 'error': 'No autorizado'})
+        
+        try:
+            event_type, id_numerico = evento_id.split('_', 1)
+            
+            titulo = request.POST.get('titulo')
+            descripcion = request.POST.get('descripcion')
+            fecha = request.POST.get('fecha')
+            hora = request.POST.get('hora')
+            ubicacion = request.POST.get('ubicacion', '')
+            encargado = request.POST.get('encargado', '')
+            
+            if event_type == 'colegio':
+                evento = CalendarioColegio.objects.filter(id=id_numerico).first()
+                if not evento:
+                    return JsonResponse({'success': False, 'error': 'Evento no encontrado'})
+                
+                # Actualizar evento
+                evento.nombre_actividad = titulo
+                evento.descripcion = descripcion
+                evento.fecha = fecha
+                evento.hora = hora
+                evento.ubicacion = ubicacion
+                evento.encargado = encargado
+                evento.save()
+                
+            elif event_type == 'clase':
+                evento = CalendarioClase.objects.filter(id=id_numerico).first()
+                if not evento:
+                    return JsonResponse({'success': False, 'error': 'Evento no encontrado'})
+                
+                # Actualizar evento
+                evento.nombre_actividad = titulo
+                evento.descripcion = descripcion
+                evento.fecha = fecha
+                evento.hora = hora
+                evento.save()
+            
+            return JsonResponse({'success': True, 'message': 'Evento actualizado exitosamente'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator(login_required, name='dispatch')
+class AdminEliminarEventoCalendarioView(View):
+    """
+    Vista para eliminar eventos desde el panel de administrador
+    """
+    def post(self, request, evento_id):
+        if not request.user.is_authenticated or not request.user.is_admin:
+            return JsonResponse({'success': False, 'error': 'No autorizado'})
+        
+        try:
+            event_type, id_numerico = evento_id.split('_', 1)
+            
+            if event_type == 'colegio':
+                evento = CalendarioColegio.objects.filter(id=id_numerico).first()
+                if not evento:
+                    return JsonResponse({'success': False, 'error': 'Evento no encontrado'})
+                
+                titulo = evento.nombre_actividad
+                evento.delete()
+                
+            elif event_type == 'clase':
+                evento = CalendarioClase.objects.filter(id=id_numerico).first()
+                if not evento:
+                    return JsonResponse({'success': False, 'error': 'Evento no encontrado'})
+                
+                titulo = evento.nombre_actividad
+                evento.delete()
+            
+            return JsonResponse({'success': True, 'message': f'Evento "{titulo}" eliminado exitosamente'})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})

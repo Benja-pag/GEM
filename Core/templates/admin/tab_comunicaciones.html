@@ -1,240 +1,331 @@
 <!-- Pestaña de Comunicaciones -->
 <div class="tab-pane fade" id="comunicaciones" role="tabpanel" aria-labelledby="comunicaciones-tab">
+    <!-- Dashboard de Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-bullhorn me-2"></i>Total</h5>
+                    <h2 class="display-6" id="total-comunicaciones">{{ comunicaciones_stats.total|default:0 }}</h2>
+                    <small>Comunicaciones</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-eye me-2"></i>Leídas</h5>
+                    <h2 class="display-6" id="comunicaciones-leidas">{{ comunicaciones_stats.leidas|default:0 }}</h2>
+                    <small>{{ comunicaciones_stats.porcentaje_leidas|default:0 }}% de lectura</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-envelope me-2"></i>No Leídas</h5>
+                    <h2 class="display-6" id="comunicaciones-no-leidas">{{ comunicaciones_stats.no_leidas|default:0 }}</h2>
+                    <small>Pendientes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-paperclip me-2"></i>Adjuntos</h5>
+                    <h2 class="display-6" id="comunicaciones-adjuntos">{{ comunicaciones_stats.con_adjuntos|default:0 }}</h2>
+                    <small>Con archivos</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header con Acciones -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded shadow-sm">
+                <h4 class="mb-0"><i class="fas fa-comments me-2 text-primary"></i>Gestión de Comunicaciones</h4>
+                <a href="{% url 'crear_comunicacion' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Nueva Comunicación
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buscador y Filtros -->
     <div class="row mb-4">
         <div class="col-md-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="card-title mb-0"><i class="fas fa-bullhorn me-2"></i>Nueva Comunicación</h5>
-                </div>
-                <div class="card-body">
-                    <form class="mt-3">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Tipo de Comunicación</label>
-                                <select class="form-select">
-                                    <option>General</option>
-                                    <option>Urgente</option>
-                                    <option>Informativa</option>
-                                    <option>Recordatorio</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Prioridad</label>
-                                <select class="form-select">
-                                    <option>Baja</option>
-                                    <option>Media</option>
-                                    <option>Alta</option>
-                                    <option>Crítica</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Destinatarios</label>
-                            <select class="form-select" multiple>
-                                <option value="todos">Todos los Usuarios</option>
-                                <option value="estudiantes">Estudiantes</option>
-                                <option value="docentes">Docentes</option>
-                                <option value="administrativos">Administrativos</option>
-                                <option value="apoderados">Apoderados</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Asunto</label>
-                            <input type="text" class="form-control" placeholder="Ingrese el asunto de la comunicación">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Mensaje</label>
-                            <textarea class="form-control" rows="5" placeholder="Escriba su mensaje aquí..."></textarea>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Programar Envío</label>
-                                <input type="datetime-local" class="form-control">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Adjuntos</label>
-                                <input type="file" class="form-control" multiple>
-                            </div>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane me-2"></i>Enviar Comunicación
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary">
-                                <i class="fas fa-save me-2"></i>Guardar Borrador
-                            </button>
-                            <button type="button" class="btn btn-outline-info">
-                                <i class="fas fa-eye me-2"></i>Vista Previa
-                            </button>
-                        </div>
-                    </form>
-                </div>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" id="buscar-comunicaciones" 
+                       placeholder="Buscar por asunto, autor o contenido...">
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card shadow-sm mb-3">
-                <div class="card-header bg-success text-white">
-                    <h6 class="card-title mb-0"><i class="fas fa-history me-2"></i>Comunicaciones Recientes</h6>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Reunión de Apoderados</h6>
-                                <small class="text-danger">Urgente</small>
-                            </div>
-                            <p class="mb-1">Información sobre la próxima reunión...</p>
-                            <small class="text-muted">Enviado a: Todos los Apoderados</small>
-                            <br>
-                            <small class="text-muted">Hace 2 días</small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Cambio de Horario</h6>
-                                <small class="text-warning">Media</small>
-                            </div>
-                            <p class="mb-1">Ajustes en el horario de clases...</p>
-                            <small class="text-muted">Enviado a: Docentes</small>
-                            <br>
-                            <small class="text-muted">Hace 5 días</small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">Mantenimiento Sistema</h6>
-                                <small class="text-info">Baja</small>
-                            </div>
-                            <p class="mb-1">Programado para el fin de semana...</p>
-                            <small class="text-muted">Enviado a: Todos los Usuarios</small>
-                            <br>
-                            <small class="text-muted">Hace 1 semana</small>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Plantillas de Comunicación -->
-            <div class="card shadow-sm">
-                <div class="card-header bg-info text-white">
-                    <h6 class="card-title mb-0"><i class="fas fa-copy me-2"></i>Plantillas</h6>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-calendar me-1"></i>Reunión de Apoderados
-                        </button>
-                        <button class="btn btn-outline-success btn-sm">
-                            <i class="fas fa-clock me-1"></i>Cambio de Horario
-                        </button>
-                        <button class="btn btn-outline-warning btn-sm">
-                            <i class="fas fa-exclamation-triangle me-1"></i>Emergencia
-                        </button>
-                        <button class="btn btn-outline-info btn-sm">
-                            <i class="fas fa-info-circle me-1"></i>Información General
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <select class="form-select" id="filtro-tipo">
+                <option value="">Todos los tipos</option>
+                <option value="general">General</option>
+                <option value="urgente">Urgente</option>
+                <option value="informativa">Informativa</option>
+                <option value="recordatorio">Recordatorio</option>
+            </select>
         </div>
     </div>
-    
-    <!-- Estadísticas de Comunicaciones -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Total Enviadas</h5>
-                    <h2 class="display-6">156</h2>
-                    <small>Este mes</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Leídas</h5>
-                    <h2 class="display-6">142</h2>
-                    <small>91% de lectura</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Pendientes</h5>
-                    <h2 class="display-6">14</h2>
-                    <small>Por leer</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Respuestas</h5>
-                    <h2 class="display-6">23</h2>
-                    <small>Recibidas</small>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Configuración de Notificaciones -->
+
+    <!-- Lista de Comunicaciones -->
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h6 class="card-title mb-0"><i class="fas fa-bell me-2"></i>Configuración de Notificaciones</h6>
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>Todas las Comunicaciones</h5>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Método de Envío</label>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" checked>
-                            <label class="form-check-label">Notificación en sistema</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" checked>
-                            <label class="form-check-label">Email</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox">
-                            <label class="form-check-label">SMS</label>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Horario de Envío</label>
-                        <select class="form-select">
-                            <option>Inmediato</option>
-                            <option>Horario laboral (8:00 - 18:00)</option>
-                            <option>Mañana (8:00 - 12:00)</option>
-                            <option>Tarde (12:00 - 18:00)</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h6 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Análisis de Comunicaciones</h6>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Tasa de Lectura por Tipo</label>
-                        <div class="progress mb-2" style="height: 20px;">
-                            <div class="progress-bar bg-primary" style="width: 95%">Generales 95%</div>
-                        </div>
-                        <div class="progress mb-2" style="height: 20px;">
-                            <div class="progress-bar bg-warning" style="width: 88%">Urgentes 88%</div>
-                        </div>
-                        <div class="progress mb-2" style="height: 20px;">
-                            <div class="progress-bar bg-info" style="width: 92%">Informativas 92%</div>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <small class="text-muted">Promedio general: 91.7%</small>
+                <div class="card-body p-0">
+                    <div id="lista-comunicaciones">
+                        {% if comunicaciones %}
+                            {% for comunicacion in comunicaciones %}
+                            <div class="comunicacion-item border-bottom" data-id="{{ comunicacion.id }}" 
+                                 data-asunto="{{ comunicacion.asunto|lower }}" 
+                                 data-autor="{{ comunicacion.autor.rut|lower }}"
+                                 data-contenido="{{ comunicacion.contenido|lower }}">
+                                <div class="p-4 hover-bg-light">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <div class="d-flex align-items-start">
+                                                <div class="me-3">
+                                                    <span class="badge bg-primary fs-6">
+                                                        <i class="fas fa-bullhorn me-1"></i>Oficial
+                                                    </span>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-bold">{{ comunicacion.asunto }}</h6>
+                                                    <p class="mb-2 text-muted">
+                                                        {{ comunicacion.contenido|truncatewords:20 }}
+                                                    </p>
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-user me-1"></i>{{ comunicacion.autor.rut }}-{{ comunicacion.autor.div }}
+                                                        </small>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-calendar me-1"></i>{{ comunicacion.fecha_envio|date:"d/m/Y H:i" }}
+                                                        </small>
+                                                        {% if comunicacion.adjuntos.count > 0 %}
+                                                        <small class="text-info">
+                                                            <i class="fas fa-paperclip me-1"></i>{{ comunicacion.adjuntos.count }} adjunto{{ comunicacion.adjuntos.count|pluralize }}
+                                                        </small>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="mt-2">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-users me-1"></i>Destinatarios: 
+                                                            {% for curso in comunicacion.destinatarios_cursos.all %}
+                                                                <span class="badge bg-light text-dark me-1">{{ curso.nivel }}°{{ curso.letra }}</span>
+                                                            {% empty %}
+                                                                <span class="text-muted">Sin cursos específicos</span>
+                                                            {% endfor %}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <div class="dropdown">
+                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i> Acciones
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a class="dropdown-item" href="{% url 'detalle_comunicacion' comunicacion.id %}">
+                                                            <i class="fas fa-eye me-2"></i>Ver Detalle
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="{% url 'editar_comunicacion' comunicacion.id %}">
+                                                            <i class="fas fa-edit me-2"></i>Editar
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger" href="#" 
+                                                           onclick="confirmarEliminarComunicacion({{ comunicacion.id }}, '{{ comunicacion.asunto|escapejs }}')">
+                                                            <i class="fas fa-trash me-2"></i>Eliminar
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center p-5">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No hay comunicaciones</h5>
+                                <p class="text-muted">Crea tu primera comunicación para empezar</p>
+                                <a href="{% url 'crear_comunicacion' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Crear Comunicación
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div> 
+</div>
+
+
+
+<!-- Modal de Confirmación para Eliminar -->
+<div class="modal fade" id="modalEliminarComunicacion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">¿Estás seguro de que deseas eliminar la comunicación?</p>
+                <div class="alert alert-warning">
+                    <strong id="comunicacion-eliminar-titulo"></strong>
+                </div>
+                <p class="text-muted mb-0">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" onclick="eliminarComunicacion()">
+                    <i class="fas fa-trash me-2"></i>
+                    <span class="btn-text">Eliminar</span>
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.comunicacion-item {
+    transition: all 0.3s ease;
+}
+
+.hover-bg-light:hover {
+    background-color: #f8f9fa !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+#buscar-comunicaciones:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.comunicacion-item .dropdown-toggle::after {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .comunicacion-item .row {
+        flex-direction: column;
+    }
+    
+    .comunicacion-item .col-md-4 {
+        margin-top: 1rem;
+        text-align: left !important;
+    }
+}
+</style>
+
+<script>
+let comunicacionEliminarId = null;
+
+function confirmarEliminarComunicacion(id, titulo) {
+    comunicacionEliminarId = id;
+    document.getElementById('comunicacion-eliminar-titulo').textContent = titulo;
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminarComunicacion'));
+    modal.show();
+}
+
+function eliminarComunicacion() {
+    if (!comunicacionEliminarId) return;
+    
+    fetch(`{% url 'eliminar_comunicacion' 0 %}`.replace('0', comunicacionEliminarId), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Comunicación eliminada exitosamente', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification(data.message || 'Error al eliminar la comunicación', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error al eliminar la comunicación', 'error');
+    });
+}
+
+// Búsqueda en tiempo real
+document.getElementById('buscar-comunicaciones').addEventListener('input', function() {
+    const termino = this.value.toLowerCase();
+    const comunicaciones = document.querySelectorAll('.comunicacion-item');
+    
+    comunicaciones.forEach(item => {
+        const asunto = item.dataset.asunto || '';
+        const autor = item.dataset.autor || '';
+        const contenido = item.dataset.contenido || '';
+        
+        if (asunto.includes(termino) || autor.includes(termino) || contenido.includes(termino)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        max-width: 500px;
+    `;
+    
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+</script> 

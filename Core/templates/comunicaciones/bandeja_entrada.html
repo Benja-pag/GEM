@@ -2,37 +2,309 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0"><i class="fas fa-inbox me-2"></i>Bandeja de Entrada de Comunicaciones</h4>
-        </div>
-        <div class="card-body">
-            <div class="list-group list-group-flush">
-                {% for comunicacion in comunicaciones %}
-                    <a href="{% url 'detalle_comunicacion' comunicacion.id %}" 
-                       class="list-group-item list-group-item-action {% if request.user not in comunicacion.leido_por.all %}list-group-item-primary fw-bold{% endif %}">
-                        <div class="d-flex w-100 justify-content-between">
-                            <p class="mb-1">
-                                <i class="fas fa-user-tie me-2"></i>
-                                De: {{ comunicacion.autor.usuario.nombre }} {{ comunicacion.autor.usuario.apellido_paterno }}
-                            </p>
-                            <small class="text-muted">{{ comunicacion.fecha_envio|date:"d M, Y H:i" }}</small>
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header con acciones -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="text-primary mb-0">
+                        <i class="fas fa-envelope me-2"></i>Sistema de Comunicaciones
+                    </h2>
+                    <small class="text-muted">Gestiona las comunicaciones oficiales del colegio</small>
+                </div>
+                <div>
+                    {% if user.is_superuser or user.usuario.administrativo %}
+                        <a href="{% url 'crear_comunicacion' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Nueva Comunicación
+                        </a>
+                    {% endif %}
+                    <button class="btn btn-outline-secondary" onclick="location.reload()">
+                        <i class="fas fa-sync-alt me-2"></i>Actualizar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estadísticas rápidas -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-envelope fa-2x me-3"></i>
+                                <div>
+                                    <h5 class="mb-0">{{ comunicaciones.count }}</h5>
+                                    <small>Total Comunicaciones</small>
+                                </div>
+                            </div>
                         </div>
-                        <h5 class="mb-1">{{ comunicacion.asunto }}</h5>
-                        <small>
-                            <i class="fas fa-paperclip me-1"></i>
-                            {{ comunicacion.adjuntos.count }} Archivos Adjuntos
-                        </small>
-                    </a>
-                {% empty %}
-                    <div class="alert alert-info text-center">
-                        <i class="fas fa-info-circle me-2"></i>
-                        No tienes comunicaciones en tu bandeja de entrada.
                     </div>
-                {% endfor %}
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-check-circle fa-2x me-3"></i>
+                                <div>
+                                    <h5 class="mb-0">{{ comunicaciones_leidas }}</h5>
+                                    <small>Leídas</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-exclamation-circle fa-2x me-3"></i>
+                                <div>
+                                    <h5 class="mb-0">{{ comunicaciones_no_leidas }}</h5>
+                                    <small>No Leídas</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-paperclip fa-2x me-3"></i>
+                                <div>
+                                    <h5 class="mb-0">{{ total_adjuntos }}</h5>
+                                    <small>Archivos Adjuntos</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de comunicaciones mejorada -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 class="mb-0">
+                                <i class="fas fa-inbox me-2"></i>Bandeja de Entrada
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="buscarComunicacion" 
+                                       placeholder="Buscar comunicaciones...">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% for comunicacion in comunicaciones %}
+                        <div class="comunicacion-item border-bottom p-3 
+                                    {% if request.user not in comunicacion.leido_por.all %}comunicacion-no-leida{% endif %}"
+                             data-comunicacion-id="{{ comunicacion.id }}">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    {% if request.user not in comunicacion.leido_por.all %}
+                                        <i class="fas fa-circle text-primary" title="No leída"></i>
+                                    {% else %}
+                                        <i class="far fa-circle text-muted" title="Leída"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="comunicacion-content">
+                                        <h6 class="mb-1 fw-bold">
+                                            <a href="{% url 'detalle_comunicacion' comunicacion.id %}" 
+                                               class="text-decoration-none comunicacion-link">
+                                                {{ comunicacion.asunto }}
+                                            </a>
+                                        </h6>
+                                        <div class="comunicacion-meta text-muted small">
+                                            <span>
+                                                <i class="fas fa-user me-1"></i>
+                                                {% if comunicacion.autor.usuario %}
+                                                    {{ comunicacion.autor.usuario.nombre }} {{ comunicacion.autor.usuario.apellido_paterno }}
+                                                {% else %}
+                                                    {{ comunicacion.autor.rut }}-{{ comunicacion.autor.div }}
+                                                {% endif %}
+                                            </span>
+                                            <span class="ms-3">
+                                                <i class="fas fa-calendar me-1"></i>
+                                                {{ comunicacion.fecha_envio|date:"d M, Y" }}
+                                            </span>
+                                            <span class="ms-3">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ comunicacion.fecha_envio|date:"H:i" }}
+                                            </span>
+                                        </div>
+                                        <div class="comunicacion-preview text-muted small mt-1">
+                                            {{ comunicacion.contenido|truncatewords:15|linebreaksbr }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center">
+                                    {% if comunicacion.adjuntos.count > 0 %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-paperclip me-1"></i>
+                                            {{ comunicacion.adjuntos.count }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-1 text-center">
+                                    {% if user.is_superuser or comunicacion.autor == user %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                    type="button" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'editar_comunicacion' comunicacion.id %}">
+                                                        <i class="fas fa-edit me-2"></i>Editar
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item text-danger" 
+                                                       href="#" onclick="eliminarComunicacion({{ comunicacion.id }}, '{{ comunicacion.asunto }}')">
+                                                        <i class="fas fa-trash me-2"></i>Eliminar
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center p-5">
+                            <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                            <h5 class="text-muted">No hay comunicaciones</h5>
+                            <p class="text-muted">No tienes comunicaciones en tu bandeja de entrada.</p>
+                            {% if user.is_superuser or user.usuario.administrativo %}
+                                <a href="{% url 'crear_comunicacion' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Crear Primera Comunicación
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- CSS personalizado -->
+<style>
+.comunicacion-item {
+    transition: all 0.3s ease;
+}
+
+.comunicacion-item:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.comunicacion-no-leida {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.comunicacion-link {
+    color: #495057;
+}
+
+.comunicacion-link:hover {
+    color: #2196f3;
+}
+
+.comunicacion-meta {
+    font-size: 0.85rem;
+}
+
+.comunicacion-preview {
+    font-size: 0.8rem;
+    max-height: 40px;
+    overflow: hidden;
+}
+
+.card {
+    border-radius: 10px;
+}
+
+.btn {
+    border-radius: 6px;
+}
+</style>
+
+<!-- JavaScript para funcionalidades -->
+<script>
+// Búsqueda en tiempo real
+document.getElementById('buscarComunicacion').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const comunicaciones = document.querySelectorAll('.comunicacion-item');
+    
+    comunicaciones.forEach(function(item) {
+        const content = item.textContent.toLowerCase();
+        if (content.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+// Función para eliminar comunicación
+function eliminarComunicacion(comunicacionId, asunto) {
+    if (confirm(`¿Estás seguro de que deseas eliminar la comunicación "${asunto}"?`)) {
+        fetch(`/comunicaciones/${comunicacionId}/eliminar/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Comunicación eliminada exitosamente', 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showNotification('Error: ' + data.message, 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Error de conexión', 'error');
+        });
+    }
+}
+
+// Función para mostrar notificaciones
+function showNotification(message, type) {
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+    
+    const notification = document.createElement('div');
+    notification.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        <i class="fas ${iconClass} me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+</script>
+
+<!-- CSRF Token -->
+{% csrf_token %}
 {% endblock %} 

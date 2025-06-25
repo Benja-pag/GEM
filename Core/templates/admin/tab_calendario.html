@@ -1,76 +1,112 @@
-<!-- Pestaña de Calendario General - Administrador -->
+{% load static %}
+
+<!-- Pestaña de Calendario del Administrador -->
 <div class="tab-pane fade" id="calendario" role="tabpanel" aria-labelledby="calendario-tab">
     <div class="container-fluid">
         <div class="row">
-            <!-- Panel del Calendario -->
+            <!-- Calendario Principal -->
             <div class="col-md-8">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-calendar-alt me-2"></i>Calendario General de Actividades - Vista Administrador
-                            </h5>
-                            <div class="btn-group">
-                                <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalCrearEventoAdmin">
-                                    <i class="fas fa-plus me-2"></i>Crear Evento
-                                </button>
-                            </div>
-                        </div>
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>Calendario General del Sistema
+                        </h5>
+                        <button type="button" class="btn btn-light btn-sm" onclick="crearEventoAdmin()">
+                            <i class="fas fa-plus me-1"></i>Crear Evento
+                        </button>
                     </div>
-                    <div class="card-body p-0">
-                        <div id="calendarAdmin" style="height: 600px;"></div>
+                    <div class="card-body p-3">
+                        <div id="calendarAdmin"></div>
                     </div>
                 </div>
             </div>
-
+            
             <!-- Panel Lateral -->
             <div class="col-md-4">
-                <!-- Próximos Eventos -->
-                <div class="card shadow-sm mb-3">
-                    <div class="card-header bg-warning text-white">
-                        <h6 class="card-title mb-0">
-                            <i class="fas fa-school me-2"></i>Eventos Generales
-                        </h6>
+                <!-- Controles de Panel -->
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="mb-0 text-muted">
+                        <i class="fas fa-list me-1"></i>Paneles de Eventos
+                    </h6>
+                    <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="expandirTodosPaneles()" title="Expandir todos">
+                            <i class="fas fa-expand-arrows-alt"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="colapsarTodosPaneles()" title="Colapsar todos">
+                            <i class="fas fa-compress-arrows-alt"></i>
+                        </button>
                     </div>
-                    <div class="card-body" style="max-height: 300px; overflow-y: auto;">
-                        <div id="proximosEventosAdmin">
-                            <div class="text-center text-muted py-3">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p class="mb-0">Cargando eventos...</p>
+                </div>
+                
+
+                
+                <!-- BLOQUE UNIFICADO DE PANELES -->
+                <div class="panel-group-unified shadow-sm">
+                    <!-- Eventos Generales -->
+                    <div class="panel-item panel-first">
+                        <div class="panel-header bg-info text-white d-flex justify-content-between align-items-center" 
+                             style="cursor: pointer;" 
+                             data-bs-toggle="collapse" 
+                             data-bs-target="#collapseEventosGenerales">
+                            <h6 class="mb-0 small">
+                                <i class="fas fa-star me-2"></i>Eventos Generales
+                            </h6>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                        <div class="collapse show" id="collapseEventosGenerales">
+                            <div class="panel-body">
+                                <div id="proximosEventosAdmin">
+                                    <div class="text-center text-muted py-2">
+                                        <i class="fas fa-spinner fa-spin mb-1"></i>
+                                        <p class="mb-0 small">Cargando eventos...</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Eventos por Cursos -->
-                <div class="card shadow-sm mb-3">
-                    <div class="card-header bg-success text-white">
-                        <h6 class="card-title mb-0">
-                            <i class="fas fa-users me-2"></i>Eventos por Cursos
-                        </h6>
-                    </div>
-                    <div class="card-body" style="max-height: 300px; overflow-y: auto;">
-                        <div id="eventosPorCursos">
-                            <div class="text-center text-muted py-3">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p class="mb-0">Cargando eventos por cursos...</p>
+                    
+                    <!-- Eventos por Cursos -->
+                    <div class="panel-item panel-middle">
+                        <div class="panel-header bg-success text-white d-flex justify-content-between align-items-center" 
+                             style="cursor: pointer;" 
+                             data-bs-toggle="collapse" 
+                             data-bs-target="#collapseEventosCursos">
+                            <h6 class="mb-0 small">
+                                <i class="fas fa-book me-2"></i>Eventos por Cursos
+                            </h6>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                        <div class="collapse show" id="collapseEventosCursos">
+                            <div class="panel-body">
+                                <div id="eventosPorCursos">
+                                    <div class="text-center text-muted py-2">
+                                        <i class="fas fa-spinner fa-spin mb-1"></i>
+                                        <p class="mb-0 small">Cargando eventos...</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Eventos por Electivos -->
-                <div class="card shadow-sm">
-                    <div class="card-header bg-info text-white">
-                        <h6 class="card-title mb-0">
-                            <i class="fas fa-graduation-cap me-2"></i>Eventos por Electivos
-                        </h6>
-                    </div>
-                    <div class="card-body" style="max-height: 300px; overflow-y: auto;">
-                        <div id="eventosPorElectivos">
-                            <div class="text-center text-muted py-3">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                <p class="mb-0">Cargando eventos por electivos...</p>
+                    
+                    <!-- Eventos por Electivos -->
+                    <div class="panel-item panel-last">
+                        <div class="panel-header bg-warning text-dark d-flex justify-content-between align-items-center" 
+                             style="cursor: pointer;" 
+                             data-bs-toggle="collapse" 
+                             data-bs-target="#collapseEventosElectivos">
+                            <h6 class="mb-0 small">
+                                <i class="fas fa-graduation-cap me-2"></i>Eventos de Electivos
+                            </h6>
+                            <i class="fas fa-chevron-down collapse-icon"></i>
+                        </div>
+                        <div class="collapse show" id="collapseEventosElectivos">
+                            <div class="panel-body">
+                                <div id="eventosPorElectivos">
+                                    <div class="text-center text-muted py-2">
+                                        <i class="fas fa-spinner fa-spin mb-1"></i>
+                                        <p class="mb-0 small">Cargando eventos...</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -80,43 +116,31 @@
     </div>
 </div>
 
-<!-- Modal Crear Evento (Administrador) -->
-<div class="modal fade" id="modalCrearEventoAdmin" tabindex="-1" aria-labelledby="modalCrearEventoAdminLabel" aria-hidden="true">
+<!-- Modal para Crear Evento -->
+<div class="modal fade" id="modalCrearEventoAdmin" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalCrearEventoAdminLabel">
-                    <i class="fas fa-plus-circle me-2"></i>Crear Nuevo Evento
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header">
+                <h5 class="modal-title">Crear Nuevo Evento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="formCrearEventoAdmin">
-                <div class="modal-body">
+            <div class="modal-body">
+                <form id="formCrearEventoAdmin">
+                    {% csrf_token %}
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="tituloEventoAdmin" class="form-label">
-                                    <i class="fas fa-heading me-1"></i>Título del Evento *
-                                </label>
+                                <label for="tituloEventoAdmin" class="form-label">Título del Evento</label>
                                 <input type="text" class="form-control" id="tituloEventoAdmin" name="titulo" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="tipoEventoAdmin" class="form-label">
-                                    <i class="fas fa-tag me-1"></i>Tipo de Evento *
-                                </label>
-                                <select class="form-select" id="tipoEventoAdmin" name="tipo_evento" required>
-                                    <option value="">Seleccionar tipo...</option>
-                                    <option value="REUNION">Reunión</option>
-                                    <option value="EVALUACION">Evaluación</option>
-                                    <option value="TAREA">Tarea</option>
-                                    <option value="MATERIAL">Material</option>
-                                    <option value="ENTREGA">Entrega</option>
-                                    <option value="EVENTO_COLEGIO">Evento del Colegio</option>
-                                    <option value="CAPACITACION">Capacitación</option>
-                                    <option value="MANTENIMIENTO">Mantenimiento</option>
-                                    <option value="OTRO">Otro</option>
+                                <label for="tipoEventoAdmin" class="form-label">Tipo de Evento</label>
+                                <select class="form-select" id="tipoEventoAdmin" name="tipo" required>
+                                    <option value="">Seleccionar tipo</option>
+                                    <option value="Colegio">Evento Institucional</option>
+                                    <option value="Asignatura">Evento de Clase/Asignatura</option>
                                 </select>
                             </div>
                         </div>
@@ -125,654 +149,430 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="fechaEventoAdmin" class="form-label">
-                                    <i class="fas fa-calendar me-1"></i>Fecha *
-                                </label>
+                                <label for="fechaEventoAdmin" class="form-label">Fecha</label>
                                 <input type="date" class="form-control" id="fechaEventoAdmin" name="fecha" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="horaEventoAdmin" class="form-label">
-                                    <i class="fas fa-clock me-1"></i>Hora
-                                </label>
-                                <input type="time" class="form-control" id="horaEventoAdmin" name="hora">
+                                <label for="horaEventoAdmin" class="form-label">Hora</label>
+                                <input type="time" class="form-control" id="horaEventoAdmin" name="hora" required>
                             </div>
                         </div>
                     </div>
-
+                    
+                    <div class="mb-3">
+                        <label for="descripcionEventoAdmin" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcionEventoAdmin" name="descripcion" rows="3"></textarea>
+                    </div>
+                    
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="ubicacionEventoAdmin" class="form-label">
-                                    <i class="fas fa-map-marker-alt me-1"></i>Ubicación
-                                </label>
-                                <input type="text" class="form-control" id="ubicacionEventoAdmin" name="ubicacion" placeholder="Ej: Sala 101, Gimnasio, Auditorio">
+                                <label for="ubicacionEventoAdmin" class="form-label">Ubicación</label>
+                                <input type="text" class="form-control" id="ubicacionEventoAdmin" name="ubicacion">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="encargadoEventoAdmin" class="form-label">
-                                    <i class="fas fa-user me-1"></i>Encargado
-                                </label>
-                                <input type="text" class="form-control" id="encargadoEventoAdmin" name="encargado" placeholder="Nombre del encargado">
+                                <label for="encargadoEventoAdmin" class="form-label">Encargado</label>
+                                <input type="text" class="form-control" id="encargadoEventoAdmin" name="encargado" value="Dirección">
                             </div>
                         </div>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="descripcionEventoAdmin" class="form-label">
-                            <i class="fas fa-align-left me-1"></i>Descripción
-                        </label>
-                        <textarea class="form-control" id="descripcionEventoAdmin" name="descripcion" rows="3" placeholder="Descripción detallada del evento"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i>Cancelar
-                    </button>
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-save me-1"></i>Crear Evento
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Editar Evento (Administrador) -->
-<div class="modal fade" id="modalEditarEventoAdmin" tabindex="-1" aria-labelledby="modalEditarEventoAdminLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title" id="modalEditarEventoAdminLabel">
-                    <i class="fas fa-edit me-2"></i>Editar Evento
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </form>
             </div>
-            <form id="formEditarEventoAdmin">
-                <div class="modal-body">
-                    <input type="hidden" id="eventoIdAdmin" name="evento_id">
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="tituloEventoEditAdmin" class="form-label">
-                                    <i class="fas fa-heading me-1"></i>Título del Evento *
-                                </label>
-                                <input type="text" class="form-control" id="tituloEventoEditAdmin" name="titulo" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="fechaEventoEditAdmin" class="form-label">
-                                    <i class="fas fa-calendar me-1"></i>Fecha *
-                                </label>
-                                <input type="date" class="form-control" id="fechaEventoEditAdmin" name="fecha" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="horaEventoEditAdmin" class="form-label">
-                                    <i class="fas fa-clock me-1"></i>Hora
-                                </label>
-                                <input type="time" class="form-control" id="horaEventoEditAdmin" name="hora">
-                            </div>
-                        </div>
-                        <div class="col-md-6" id="ubicacionFieldAdmin" style="display: none;">
-                            <div class="mb-3">
-                                <label for="ubicacionEventoEditAdmin" class="form-label">
-                                    <i class="fas fa-map-marker-alt me-1"></i>Ubicación
-                                </label>
-                                <input type="text" class="form-control" id="ubicacionEventoEditAdmin" name="ubicacion">
-                            </div>
-                        </div>
-                        <div class="col-md-6" id="encargadoFieldAdmin" style="display: none;">
-                            <div class="mb-3">
-                                <label for="encargadoEventoEditAdmin" class="form-label">
-                                    <i class="fas fa-user me-1"></i>Encargado
-                                </label>
-                                <input type="text" class="form-control" id="encargadoEventoEditAdmin" name="encargado">
-                            </div>
-                        </div>
-                        <div class="col-md-6" id="asignaturaFieldAdmin" style="display: none;">
-                            <div class="mb-3">
-                                <label for="asignaturaEventoEditAdmin" class="form-label">
-                                    <i class="fas fa-book me-1"></i>Asignatura
-                                </label>
-                                <input type="text" class="form-control" id="asignaturaEventoEditAdmin" readonly>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="descripcionEventoEditAdmin" class="form-label">
-                            <i class="fas fa-align-left me-1"></i>Descripción
-                        </label>
-                        <textarea class="form-control" id="descripcionEventoEditAdmin" name="descripcion" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i>Cancelar
-                    </button>
-                    <button type="submit" class="btn btn-warning">
-                        <i class="fas fa-save me-1"></i>Guardar Cambios
-                    </button>
-                </div>
-            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarEventoAdmin()">
+                    <i class="fas fa-save me-1"></i>Guardar Evento
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
+<style>
+/* Estilos específicos para el calendario del administrador */
+#calendarAdmin .fc-event {
+    font-size: 11px;
+    padding: 1px 3px;
+    margin-bottom: 1px;
+    border-radius: 3px;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#calendarAdmin .fc-event-title {
+    font-weight: 500;
+}
+
+#calendarAdmin .fc-daygrid-event {
+    border-radius: 3px;
+    margin: 1px;
+}
+
+#calendarAdmin .fc-more-link {
+    font-size: 11px;
+    color: #6c757d;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+#calendarAdmin .fc-more-link:hover {
+    color: #495057;
+    text-decoration: underline;
+}
+
+#calendarAdmin .fc-daygrid-day-number {
+    font-weight: 600;
+    color: #495057;
+}
+
+#calendarAdmin .fc-col-header-cell {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+#calendarAdmin .fc-today {
+    background-color: #fff3cd !important;
+}
+
+/* Colores específicos para tipos de eventos */
+.fc-event.evento-colegio {
+    background-color: #0dcaf0 !important;
+    border-color: #0dcaf0 !important;
+}
+
+.fc-event.evento-asignatura {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+}
+
+.fc-event.evento-evaluacion {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+/* Estilos para paneles colapsables */
+.card-header[data-bs-toggle="collapse"] {
+    transition: all 0.3s ease;
+}
+
+.card-header[data-bs-toggle="collapse"]:hover {
+    filter: brightness(1.1);
+}
+
+.collapse-icon {
+    transition: transform 0.3s ease;
+}
+
+.collapse-icon.collapsed {
+    transform: rotate(-90deg);
+}
+
+.card-header[aria-expanded="false"] .collapse-icon {
+    transform: rotate(-90deg);
+}
+
+/* Asegurar que todos los paneles sean visibles */
+#calendario .col-md-4 .card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#calendario .col-md-4 {
+    overflow: visible !important;
+}
+
+/* Diseño mejorado y profesional para paneles unidos */
+.panel-group-unified {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #dee2e6;
+    margin-bottom: 25px;
+}
+
+.panel-item {
+    border: none;
+    margin: 0;
+}
+
+.panel-item:not(:last-child) {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.panel-header {
+    padding: 14px 18px;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.panel-header:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.panel-header h6 {
+    font-weight: 700;
+    margin: 0;
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.panel-body {
+    padding: 16px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    min-height: 120px;
+}
+
+/* Eventos con botones de acción */
+.evento-item {
+    position: relative;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.evento-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.evento-item.evento-colegio {
+    border-left-color: #0dcaf0;
+}
+
+.evento-item.evento-asignatura {
+    border-left-color: #198754;
+}
+
+.evento-item.evento-evaluacion {
+    border-left-color: #dc3545;
+}
+
+.evento-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.evento-info h6 {
+    margin: 0 0 4px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.evento-info .text-muted {
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.evento-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.evento-item:hover .evento-actions {
+    opacity: 1;
+}
+
+.btn-evento {
+    padding: 4px 8px;
+    font-size: 10px;
+    border-radius: 4px;
+    border: none;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-evento:hover {
+    transform: scale(1.05);
+}
+
+.btn-editar {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.btn-editar:hover {
+    background-color: #ffb300;
+    color: #212529;
+}
+
+.btn-eliminar {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-eliminar:hover {
+    background-color: #c82333;
+}
+
+/* Curso badge mejorado */
+.curso-badge {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    color: white;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Estados vacíos mejorados */
+.estado-vacio {
+    text-align: center;
+    padding: 30px 20px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+.estado-vacio i {
+    font-size: 28px;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .panel-header {
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+    
+    .panel-body {
+        padding: 12px;
+    }
+    
+    .evento-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .evento-actions {
+        opacity: 1;
+        align-self: flex-end;
+    }
+}
+</style>
+
+<!-- CSRF Token para las funciones AJAX -->
+{% csrf_token %}
+
+<script src="{% static 'js/admin_calendario.js' %}"></script>
 <script>
-// Variables globales para el calendario del administrador
-let calendarAdmin;
-let eventosDataAdmin = [];
-
-// Inicializar calendario del administrador cuando se muestra la pestaña
+// Pasar datos del contexto de Django al JavaScript
 document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar el calendario cuando se haga clic en la pestaña
-    const tabCalendario = document.querySelector('a[href="#calendario"]');
-    if (tabCalendario) {
-        tabCalendario.addEventListener('shown.bs.tab', function() {
-            if (!calendarAdmin) {
-                initCalendarAdmin();
-            }
-        });
-    }
-
-    // Si la pestaña ya está activa al cargar la página
-    if (document.querySelector('#calendario.active')) {
-        initCalendarAdmin();
-    }
+    // Hacer los datos disponibles globalmente
+    window.eventosCalendarioAdmin = {{ eventos_calendario|safe }};
+    console.log('Datos de eventos disponibles:', window.eventosCalendarioAdmin);
 });
 
-function initCalendarAdmin() {
-    const calendarEl = document.getElementById('calendarAdmin');
-    if (!calendarEl) return;
-
-    try {
-        // Obtener eventos desde el contexto de Django
-        eventosDataAdmin = {{ eventos_calendario|safe }};
-        
-        calendarAdmin = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'es',
-            height: 'auto',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            buttonText: {
-                today: 'Hoy',
-                month: 'Mes',
-                week: 'Semana',
-                day: 'Día'
-            },
-            events: eventosDataAdmin,
-            eventDidMount: function(info) {
-                // Agregar tooltip con información adicional
-                const event = info.event;
-                const tooltip = `
-                    <strong>${event.title}</strong><br/>
-                    Fecha: ${event.start.toLocaleDateString('es-ES')}<br/>
-                    ${event.extendedProps.description ? `Descripción: ${event.extendedProps.description}<br/>` : ''}
-                    ${event.extendedProps.ubicacion ? `Ubicación: ${event.extendedProps.ubicacion}<br/>` : ''}
-                    ${event.extendedProps.encargado ? `Encargado: ${event.extendedProps.encargado}` : ''}
-                `;
-                
-                info.el.setAttribute('title', tooltip);
-                info.el.setAttribute('data-bs-toggle', 'tooltip');
-                info.el.setAttribute('data-bs-html', 'true');
-            },
-            eventClick: function(info) {
-                // Mostrar opciones para editar/eliminar si el admin tiene permisos
-                const event = info.event;
-                if (event.extendedProps.puede_editar) {
-                    mostrarOpcionesEventoAdmin(event);
-                }
-            },
-            dateClick: function(info) {
-                // Pre-llenar la fecha en el modal de crear evento
-                document.getElementById('fechaEventoAdmin').value = info.dateStr;
-                const modal = new bootstrap.Modal(document.getElementById('modalCrearEventoAdmin'));
-                modal.show();
-            }
-        });
-
-                 calendarAdmin.render();
-         updateProximosEventosAdmin();
-         updateEventosPorCursos();
-         updateEventosPorElectivos();
-        
-    } catch (error) {
-        console.error('Error al inicializar el calendario del administrador:', error);
-        calendarEl.innerHTML = `
-            <div class="alert alert-danger text-center" role="alert">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                Error al cargar el calendario. Por favor, recarga la página.
-            </div>
-        `;
-    }
-}
-
-function mostrarOpcionesEventoAdmin(event) {
-    const actionButtons = `
-        <div class="btn-group w-100" role="group">
-            <button type="button" class="btn btn-outline-primary" onclick="editarEventoAdmin('${event.id}', event)">
-                <i class="fas fa-edit me-1"></i>Editar
-            </button>
-            <button type="button" class="btn btn-outline-danger" onclick="eliminarEventoAdmin('${event.id}', '${event.title}', event)">
-                <i class="fas fa-trash me-1"></i>Eliminar
-            </button>
-        </div>
-    `;
-
-    // Crear un modal temporal para mostrar las opciones
-    const modalHtml = `
-        <div class="modal fade" id="modalOpcionesEventoAdmin" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">${event.title}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong>Fecha:</strong> ${event.start.toLocaleDateString('es-ES')}</p>
-                        ${event.extendedProps.description ? `<p><strong>Descripción:</strong> ${event.extendedProps.description}</p>` : ''}
-                        ${event.extendedProps.ubicacion ? `<p><strong>Ubicación:</strong> ${event.extendedProps.ubicacion}</p>` : ''}
-                        ${event.extendedProps.encargado ? `<p><strong>Encargado:</strong> ${event.extendedProps.encargado}</p>` : ''}
-                        <hr>
-                        ${actionButtons}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Eliminar modal anterior si existe
-    const existingModal = document.getElementById('modalOpcionesEventoAdmin');
-    if (existingModal) {
-        existingModal.remove();
-    }
-
-    // Agregar el nuevo modal
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    const modal = new bootstrap.Modal(document.getElementById('modalOpcionesEventoAdmin'));
+// Funciones auxiliares para el modal
+function crearEventoAdmin() {
+    const modal = new bootstrap.Modal(document.getElementById('modalCrearEventoAdmin'));
+    // Limpiar el formulario
+    document.getElementById('formCrearEventoAdmin').reset();
+    // Establecer fecha de hoy por defecto
+    document.getElementById('fechaEventoAdmin').value = new Date().toISOString().split('T')[0];
     modal.show();
-
-    // Limpiar el modal cuando se cierre
-    document.getElementById('modalOpcionesEventoAdmin').addEventListener('hidden.bs.modal', function() {
-        this.remove();
-    });
 }
 
- function updateProximosEventosAdmin() {
-     const container = document.getElementById('proximosEventosAdmin');
-     if (!container || !eventosDataAdmin) return;
-
-     const hoy = new Date();
-     // Solo eventos generales del colegio (creados por administradores)
-     const proximosEventos = eventosDataAdmin
-         .filter(evento => new Date(evento.start) >= hoy && evento.extendedProps.type === 'Colegio')
-         .sort((a, b) => new Date(a.start) - new Date(b.start))
-         .slice(0, 5);
-
-    if (proximosEventos.length === 0) {
-        container.innerHTML = `
-            <div class="text-center text-muted py-3">
-                <i class="fas fa-calendar-times fa-2x mb-2"></i>
-                <p class="mb-0">No hay eventos próximos</p>
-            </div>
-        `;
+function guardarEventoAdmin() {
+    const form = document.getElementById('formCrearEventoAdmin');
+    const formData = new FormData(form);
+    
+    if (!form.checkValidity()) {
+        form.reportValidity();
         return;
     }
-
-    const eventosHtml = proximosEventos.map(evento => {
-        const fecha = new Date(evento.start);
-        const esHoy = fecha.toDateString() === hoy.toDateString();
-        const esMañana = fecha.toDateString() === new Date(hoy.getTime() + 24 * 60 * 60 * 1000).toDateString();
-        
-        let badge = '';
-        if (esHoy) badge = '<span class="badge bg-danger">Hoy</span>';
-        else if (esMañana) badge = '<span class="badge bg-warning">Mañana</span>';
-        else badge = `<span class="badge bg-secondary">${fecha.toLocaleDateString('es-ES')}</span>`;
-
-        const actionButtons = evento.extendedProps.puede_editar ? `
-            <div class="mt-2">
-                <button class="btn btn-sm btn-outline-primary me-1" onclick="editarEventoAdmin('${evento.id}', '${JSON.stringify(evento).replace(/'/g, "\\'")}')">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" onclick="eliminarEventoAdmin('${evento.id}', '${evento.title}', '${JSON.stringify(evento).replace(/'/g, "\\'")}')">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        ` : '';
-
-        return `
-            <div class="list-group-item">
-                <div class="d-flex w-100 justify-content-between align-items-start">
-                    <h6 class="mb-1">${evento.title}</h6>
-                    ${badge}
-                </div>
-                ${evento.description ? `<p class="mb-1 text-muted small">${evento.description}</p>` : ''}
-                <small class="text-muted">
-                    <i class="fas fa-clock me-1"></i>${fecha.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}
-                    ${evento.extendedProps.ubicacion ? ` • <i class="fas fa-map-marker-alt me-1"></i>${evento.extendedProps.ubicacion}` : ''}
-                </small>
-                ${actionButtons}
-            </div>
-        `;
-    }).join('');
-
-    container.innerHTML = `<div class="list-group list-group-flush">${eventosHtml}</div>`;
-}
-
- function updateEventosPorCursos() {
-     const container = document.getElementById('eventosPorCursos');
-     if (!container || !eventosDataAdmin) return;
-
-     const hoy = new Date();
-     // Eventos de clases/asignaturas organizados por curso
-     const eventosClase = eventosDataAdmin
-         .filter(evento => new Date(evento.start) >= hoy && evento.extendedProps.type === 'Asignatura')
-         .sort((a, b) => new Date(a.start) - new Date(b.start));
-
-     if (eventosClase.length === 0) {
-         container.innerHTML = `
-             <div class="text-center text-muted py-3">
-                 <i class="fas fa-calendar-times fa-2x mb-2"></i>
-                 <p class="mb-0">No hay eventos por cursos próximos</p>
-             </div>
-         `;
-         return;
-     }
-
-           // Agrupar eventos por curso
-      const eventosPorCurso = {};
-      eventosClase.forEach(evento => {
-          // Usar la información de curso que viene del backend
-          let curso = evento.extendedProps.curso || 'Sin curso asignado';
-          
-          if (!eventosPorCurso[curso]) {
-              eventosPorCurso[curso] = [];
-          }
-          eventosPorCurso[curso].push(evento);
-      });
-
-     let cursosHtml = '';
-     Object.keys(eventosPorCurso).forEach(curso => {
-         const eventos = eventosPorCurso[curso].slice(0, 3); // Máximo 3 eventos por curso
-         const eventosHtml = eventos.map(evento => {
-             const fecha = new Date(evento.start);
-             const actionButtons = evento.extendedProps.puede_editar ? `
-                 <div class="mt-1">
-                     <button class="btn btn-sm btn-outline-primary me-1" onclick="editarEventoAdmin('${evento.id}')">
-                         <i class="fas fa-edit"></i>
-                     </button>
-                     <button class="btn btn-sm btn-outline-danger" onclick="eliminarEventoAdmin('${evento.id}', '${evento.title}')">
-                         <i class="fas fa-trash"></i>
-                     </button>
-                 </div>
-             ` : '';
-
-             return `
-                 <div class="border-start border-primary border-3 ps-2 mb-2">
-                     <h6 class="mb-1 small">${evento.title}</h6>
-                     <small class="text-muted">
-                         <i class="fas fa-calendar me-1"></i>${fecha.toLocaleDateString('es-ES')} 
-                         <i class="fas fa-clock me-1"></i>${fecha.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}
-                     </small>
-                     ${actionButtons}
-                 </div>
-             `;
-         }).join('');
-
-         cursosHtml += `
-             <div class="mb-3">
-                 <h6 class="text-primary mb-2">
-                     <i class="fas fa-book me-1"></i>${curso}
-                 </h6>
-                 ${eventosHtml}
-             </div>
-         `;
-     });
-
-     container.innerHTML = cursosHtml;
- }
-
- function updateEventosPorElectivos() {
-     const container = document.getElementById('eventosPorElectivos');
-     if (!container || !eventosDataAdmin) return;
-
-     const hoy = new Date();
-     // Por ahora, mostrar eventos que contengan "Electivo" en el título o sean categorizados como electivos
-     const eventosElectivos = eventosDataAdmin
-         .filter(evento => {
-             const esElectivo = evento.title.toLowerCase().includes('electivo') || 
-                              evento.extendedProps.materia?.toLowerCase().includes('electivo') ||
-                              evento.description?.toLowerCase().includes('electivo');
-             return new Date(evento.start) >= hoy && esElectivo;
-         })
-         .sort((a, b) => new Date(a.start) - new Date(b.start))
-         .slice(0, 5);
-
-     if (eventosElectivos.length === 0) {
-         container.innerHTML = `
-             <div class="text-center text-muted py-3">
-                 <i class="fas fa-graduation-cap fa-2x mb-2"></i>
-                 <p class="mb-0">No hay eventos de electivos próximos</p>
-             </div>
-         `;
-         return;
-     }
-
-     const eventosHtml = eventosElectivos.map(evento => {
-         const fecha = new Date(evento.start);
-         const actionButtons = evento.extendedProps.puede_editar ? `
-             <div class="mt-2">
-                 <button class="btn btn-sm btn-outline-primary me-1" onclick="editarEventoAdmin('${evento.id}')">
-                     <i class="fas fa-edit"></i>
-                 </button>
-                 <button class="btn btn-sm btn-outline-danger" onclick="eliminarEventoAdmin('${evento.id}', '${evento.title}')">
-                     <i class="fas fa-trash"></i>
-                 </button>
-             </div>
-         ` : '';
-
-         return `
-             <div class="list-group-item">
-                 <div class="d-flex w-100 justify-content-between align-items-start">
-                     <h6 class="mb-1">${evento.title}</h6>
-                     <span class="badge bg-info">Electivo</span>
-                 </div>
-                 ${evento.description ? `<p class="mb-1 text-muted small">${evento.description}</p>` : ''}
-                 <small class="text-muted">
-                     <i class="fas fa-clock me-1"></i>${fecha.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'})}
-                     ${evento.extendedProps.ubicacion ? ` • <i class="fas fa-map-marker-alt me-1"></i>${evento.extendedProps.ubicacion}` : ''}
-                 </small>
-                 ${actionButtons}
-             </div>
-         `;
-     }).join('');
-
-     container.innerHTML = `<div class="list-group list-group-flush">${eventosHtml}</div>`;
- }
-
-// Funciones para gestión de eventos
-
-// Crear evento
-document.getElementById('formCrearEventoAdmin').addEventListener('submit', function(e) {
-    e.preventDefault();
     
-    const formData = new FormData(this);
+    // Mostrar indicador de carga
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creando...';
+    button.disabled = true;
     
-    fetch('{% url "admin_crear_evento_calendario" %}', {
+    // Enviar datos al backend
+    fetch('/admin-crear-evento-calendario/', {
         method: 'POST',
         body: formData,
         headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-Requested-With': 'XMLHttpRequest'
         }
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             // Cerrar modal
-            bootstrap.Modal.getInstance(document.getElementById('modalCrearEventoAdmin')).hide();
-            // Limpiar formulario
-            this.reset();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalCrearEventoAdmin'));
+            modal.hide();
+            
             // Mostrar mensaje de éxito
-            mostrarMensaje('Evento creado exitosamente', 'success');
-            // Recargar eventos
-            location.reload();
-        } else {
-            mostrarMensaje(data.error || 'Error al crear el evento', 'danger');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        mostrarMensaje('Error al crear el evento', 'danger');
-    });
-});
-
-// Editar evento
-function editarEventoAdmin(eventoId) {
-    fetch(`{% url "admin_editar_evento_calendario" "EVENTO_ID" %}`.replace('EVENTO_ID', eventoId))
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const evento = data.evento;
+            showNotification('Evento creado exitosamente', 'success');
             
-            // Llenar el formulario de edición
-            document.getElementById('eventoIdAdmin').value = eventoId;
-            document.getElementById('tituloEventoEditAdmin').value = evento.titulo;
-            document.getElementById('fechaEventoEditAdmin').value = evento.fecha;
-            document.getElementById('horaEventoEditAdmin').value = evento.hora;
-            document.getElementById('descripcionEventoEditAdmin').value = evento.descripcion || '';
-            
-            // Mostrar campos específicos según el tipo
-            if (evento.tipo === 'colegio') {
-                document.getElementById('ubicacionFieldAdmin').style.display = 'block';
-                document.getElementById('encargadoFieldAdmin').style.display = 'block';
-                document.getElementById('asignaturaFieldAdmin').style.display = 'none';
-                document.getElementById('ubicacionEventoEditAdmin').value = evento.ubicacion || '';
-                document.getElementById('encargadoEventoEditAdmin').value = evento.encargado || '';
-            } else {
-                document.getElementById('ubicacionFieldAdmin').style.display = 'none';
-                document.getElementById('encargadoFieldAdmin').style.display = 'none';
-                document.getElementById('asignaturaFieldAdmin').style.display = 'block';
-                document.getElementById('asignaturaEventoEditAdmin').value = evento.asignatura || '';
-            }
-            
-            // Cerrar modal de opciones si existe
-            const modalOpciones = document.getElementById('modalOpcionesEventoAdmin');
-            if (modalOpciones) {
-                bootstrap.Modal.getInstance(modalOpciones).hide();
-            }
-            
-            // Mostrar modal de edición
-            const modalEditar = new bootstrap.Modal(document.getElementById('modalEditarEventoAdmin'));
-            modalEditar.show();
-        } else {
-            mostrarMensaje(data.error || 'Error al cargar el evento', 'danger');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        mostrarMensaje('Error al cargar el evento', 'danger');
-    });
-}
-
-// Guardar cambios de evento
-document.getElementById('formEditarEventoAdmin').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const eventoId = document.getElementById('eventoIdAdmin').value;
-    const formData = new FormData(this);
-    
-    fetch(`{% url "admin_editar_evento_calendario" "EVENTO_ID" %}`.replace('EVENTO_ID', eventoId), {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Cerrar modal
-            bootstrap.Modal.getInstance(document.getElementById('modalEditarEventoAdmin')).hide();
-            // Mostrar mensaje de éxito
-            mostrarMensaje('Evento actualizado exitosamente', 'success');
-            // Recargar eventos
-            location.reload();
-        } else {
-            mostrarMensaje(data.error || 'Error al actualizar el evento', 'danger');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        mostrarMensaje('Error al actualizar el evento', 'danger');
-    });
-});
-
-// Eliminar evento
-function eliminarEventoAdmin(eventoId, titulo) {
-    if (confirm(`¿Estás seguro de que deseas eliminar el evento "${titulo}"?`)) {
-        fetch(`{% url "admin_eliminar_evento_calendario" "EVENTO_ID" %}`.replace('EVENTO_ID', eventoId), {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Cerrar modal de opciones si existe
-                const modalOpciones = document.getElementById('modalOpcionesEventoAdmin');
-                if (modalOpciones) {
-                    bootstrap.Modal.getInstance(modalOpciones).hide();
-                }
-                // Mostrar mensaje de éxito
-                mostrarMensaje(data.message, 'success');
-                // Recargar eventos
+            // Recargar calendario
+            setTimeout(() => {
                 location.reload();
-            } else {
-                mostrarMensaje(data.error || 'Error al eliminar el evento', 'danger');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            mostrarMensaje('Error al eliminar el evento', 'danger');
-        });
-    }
+            }, 1000);
+        } else {
+            showNotification('Error al crear el evento: ' + (data.message || 'Error desconocido'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error de conexión al crear el evento', 'error');
+    })
+    .finally(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
 }
 
-// Función auxiliar para mostrar mensajes
-function mostrarMensaje(mensaje, tipo) {
-    // Crear el elemento de alerta
-    const alerta = document.createElement('div');
-    alerta.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
-    alerta.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    alerta.innerHTML = `
-        ${mensaje}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+// Función para expandir todos los paneles
+function expandirTodosPaneles() {
+    const collapseElements = ['#collapseEventosGenerales', '#collapseEventosCursos', '#collapseEventosElectivos'];
     
-    // Agregar al body
-    document.body.appendChild(alerta);
-    
-    // Auto-remover después de 5 segundos
-    setTimeout(() => {
-        if (alerta.parentNode) {
-            alerta.remove();
+    collapseElements.forEach(elementId => {
+        const collapseElement = document.querySelector(elementId);
+        if (collapseElement && !collapseElement.classList.contains('show')) {
+            const collapse = new bootstrap.Collapse(collapseElement, {
+                show: true
+            });
         }
-    }, 5000);
+    });
+}
+
+// Función para colapsar todos los paneles
+function colapsarTodosPaneles() {
+    const collapseElements = ['#collapseEventosGenerales', '#collapseEventosCursos', '#collapseEventosElectivos'];
+    
+    collapseElements.forEach(elementId => {
+        const collapseElement = document.querySelector(elementId);
+        if (collapseElement && collapseElement.classList.contains('show')) {
+            const collapse = new bootstrap.Collapse(collapseElement, {
+                hide: true
+            });
+        }
+    });
 }
 </script> 

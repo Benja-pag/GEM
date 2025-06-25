@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, ProfesorJefe, Especialidad
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, ProfesorJefe, Especialidad, Comunicacion
 from django.db.models import Count, Avg
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -548,6 +548,23 @@ class AdminPanelModularView(View):
             eventos_calendario_lista = get_eventos_calendario_admin()
             eventos_calendario = json.dumps(eventos_calendario_lista)  # Para el JavaScript
             
+            # Obtener datos de comunicaciones
+            comunicaciones = Comunicacion.objects.select_related('autor').prefetch_related('destinatarios_cursos', 'adjuntos').order_by('-fecha_envio')
+            
+            # Estadísticas de comunicaciones
+            total_comunicaciones = comunicaciones.count()
+            comunicaciones_con_adjuntos = comunicaciones.filter(adjuntos__isnull=False).distinct().count()
+            comunicaciones_con_cursos = comunicaciones.filter(destinatarios_cursos__isnull=False).distinct().count()
+            
+            comunicaciones_stats = {
+                'total': total_comunicaciones,
+                'leidas': 0,  # Por ahora no tenemos sistema de lectura
+                'no_leidas': total_comunicaciones,
+                'con_adjuntos': comunicaciones_con_adjuntos,
+                'con_cursos': comunicaciones_con_cursos,
+                'porcentaje_leidas': 0
+            }
+            
             context = {
                 'total_estudiantes': total_estudiantes,
                 'total_profesores': total_profesores,
@@ -567,6 +584,8 @@ class AdminPanelModularView(View):
                 'cursos': cursos,
                 'especialidades': especialidades,
                 'eventos_calendario': eventos_calendario,
+                'comunicaciones': comunicaciones,
+                'comunicaciones_stats': comunicaciones_stats,
             }
             return render(request, 'admin_panel_modular.html', context)
         except Exception as e:

@@ -10,6 +10,7 @@
 <script src="{% static 'js/user_edit.js' %}"></script>
 <script src="{% static 'js/user_details.js' %}"></script>
 <script src="{% static 'js/curso_form.js' %}"></script>
+<script src="{% static 'js/admin_calendario.js' %}"></script>
 <script>
     // Agregar el atributo data-is-admin al body
     document.addEventListener('DOMContentLoaded', function() {
@@ -144,76 +145,7 @@
                 <!-- Incluir Pestaña de Calendario -->
                 {% include 'admin/tab_calendario.html' %}
 
-                <!-- Pestaña de Configuración -->
-                <div class="tab-pane fade" id="configuracion" role="tabpanel" aria-labelledby="configuracion-tab">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card shadow-sm">
-                                <div class="card-header bg-secondary text-white">
-                                    <h6 class="card-title mb-0"><i class="fas fa-cogs me-2"></i>Configuración del Sistema</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Nombre del Colegio</label>
-                                        <input type="text" class="form-control" value="Colegio GEM" readonly>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Año Académico</label>
-                                        <select class="form-select">
-                                            <option>2024</option>
-                                            <option>2025</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Período Actual</label>
-                                        <select class="form-select">
-                                            <option>Primer Semestre</option>
-                                            <option>Segundo Semestre</option>
-                                        </select>
-                                    </div>
-                                    <button class="btn btn-primary">
-                                        <i class="fas fa-save me-2"></i>Guardar Cambios
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card shadow-sm">
-                                <div class="card-header bg-dark text-white">
-                                    <h6 class="card-title mb-0"><i class="fas fa-shield-alt me-2"></i>Configuración de Seguridad</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label class="form-label">Política de Contraseñas</label>
-                                        <select class="form-select">
-                                            <option>Mínimo 8 caracteres</option>
-                                            <option>Mínimo 10 caracteres</option>
-                                            <option>Mínimo 12 caracteres</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Sesión de Usuario</label>
-                                        <select class="form-select">
-                                            <option>30 minutos</option>
-                                            <option>1 hora</option>
-                                            <option>2 horas</option>
-                                            <option>Sin límite</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" checked>
-                                            <label class="form-check-label">Requerir cambio de contraseña</label>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-warning">
-                                        <i class="fas fa-lock me-2"></i>Aplicar Configuración
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
 
             <!-- Modales para crear registros -->

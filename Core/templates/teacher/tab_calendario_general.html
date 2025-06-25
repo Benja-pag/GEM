@@ -14,12 +14,12 @@
                             <i class="fas fa-plus me-2"></i>Crear Evento
                         </button>
                     </div>
-                </div>
+                                        </div>
                 <div class="card-body">
                     <div id='calendario-general-docente'></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
         <!-- Panel Lateral - Próximos Eventos -->
         <div class="col-lg-4">
@@ -35,12 +35,12 @@
                 </div>
                 <div class="card-body p-0" id="proximos-eventos-container" style="max-height: 600px; overflow-y: auto;">
                     <div class="p-4 text-center text-muted">Cargando eventos...</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+                                </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
 <!-- Modal para Crear Evento -->
 <div class="modal fade" id="modalCrearEvento" tabindex="-1" aria-labelledby="modalCrearEventoLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -50,7 +50,7 @@
                     <i class="fas fa-plus me-2"></i>Crear Nuevo Evento
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+                                </div>
             <div class="modal-body">
                 <form id="form-crear-evento">
                     <div class="row">
@@ -113,12 +113,12 @@
                     <div class="mb-3">
                         <label for="descripcion-evento" class="form-label">Descripción</label>
                         <textarea class="form-control" id="descripcion-evento" rows="3" placeholder="Descripción detallada del evento..."></textarea>
-                    </div>
+                        </div>
                     <div class="mb-3" id="campo-materiales" style="display: none;">
                         <label for="materiales-evento" class="form-label">Materiales Necesarios</label>
                         <textarea class="form-control" id="materiales-evento" rows="2" placeholder="Lista de materiales que los estudiantes deben traer..."></textarea>
                     </div>
-
+                    
                     <div class="row" id="campos-evaluacion" style="display: none;">
                         <div class="col-md-6 mb-3">
                             <label for="ponderacion-evento" class="form-label">Ponderación (%)</label>
@@ -148,10 +148,10 @@
                 <button type="submit" form="form-crear-evento" class="btn btn-success">
                     <i class="fas fa-plus me-2"></i>Crear Evento
                 </button>
-            </div>
-        </div>
-    </div>
-</div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
 
 <!-- Modal para Editar Evento -->
 <div class="modal fade" id="modalEditarEvento" tabindex="-1" aria-labelledby="modalEditarEventoLabel" aria-hidden="true">
@@ -172,7 +172,7 @@
                         <div class="col-md-12 mb-3">
                             <label for="titulo-evento-edit" class="form-label">Título del Evento</label>
                             <input type="text" class="form-control" id="titulo-evento-edit" required>
-                        </div>
+                </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -202,9 +202,9 @@
                     <i class="fas fa-save me-2"></i>Guardar Cambios
                 </button>
             </div>
-        </div>
-    </div>
-</div>
+                    </div>
+                </div>
+            </div>
 
 <style>
 /* Estilos para el calendario general de docentes */
@@ -367,12 +367,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h6 class="mb-1">${event.title}</h6>
                         <div class="event-time mb-1">
                             <i class="fas fa-clock me-1"></i>${timeText} - ${hourText}
-                        </div>
+                    </div>
                         <div class="mb-2">
                             <span class="badge event-badge ${getEventBadge(event.extendedProps.type)}">${getEventTypeLabel(event.extendedProps.type)}</span>
                             <span class="badge bg-secondary event-badge">${tiempoTexto}</span>
                             ${prioridadBadge}
-                        </div>
+                    </div>
                         ${event.description ? `<small class="text-muted">${event.description}</small>` : ''}
                         <div class="mt-2">
                             ${event.extendedProps.puede_editar ? `
@@ -383,7 +383,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             ${event.extendedProps.puede_eliminar ? `
                                 <button class="btn btn-sm btn-outline-danger" onclick="eliminarEvento('${event.id}', '${event.title}', event)" title="Eliminar evento">
                                     <i class="fas fa-trash"></i>
-                                </button>
+                        </button>
                             ` : ''}
                         </div>
                     </div>

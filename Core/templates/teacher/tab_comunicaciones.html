@@ -1,0 +1,408 @@
+<!-- Pestaña de Comunicaciones -->
+<div class="tab-pane fade" id="comunicaciones" role="tabpanel" aria-labelledby="comunicaciones-tab">
+    <!-- Dashboard de Estadísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-bullhorn me-2"></i>Total</h5>
+                    <h2 class="display-6" id="total-comunicaciones">{{ comunicaciones_stats.total|default:0 }}</h2>
+                    <small>Comunicaciones</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-paper-plane me-2"></i>Enviadas</h5>
+                    <h2 class="display-6" id="comunicaciones-enviadas">{{ comunicaciones_stats.enviadas|default:0 }}</h2>
+                    <small>Por mí</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-inbox me-2"></i>Recibidas</h5>
+                    <h2 class="display-6" id="comunicaciones-recibidas">{{ comunicaciones_stats.recibidas|default:0 }}</h2>
+                    <small>Para mí</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title"><i class="fas fa-paperclip me-2"></i>Adjuntos</h5>
+                    <h2 class="display-6" id="comunicaciones-adjuntos">{{ comunicaciones_stats.con_adjuntos|default:0 }}</h2>
+                    <small>Con archivos</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header con Acciones -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded shadow-sm">
+                <h4 class="mb-0"><i class="fas fa-comments me-2 text-primary"></i>Comunicaciones</h4>
+                <a href="{% url 'crear_comunicacion' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Nueva Comunicación
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buscador y Filtros -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" id="buscar-comunicaciones" 
+                       placeholder="Buscar por asunto, autor o contenido...">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="filtro-tipo">
+                <option value="">Todas</option>
+                <option value="enviadas">Enviadas por mí</option>
+                <option value="recibidas">Recibidas</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" id="filtro-curso">
+                <option value="">Todos los cursos</option>
+                {% for curso in cursos %}
+                <option value="{{ curso.id }}">{{ curso.nivel }}°{{ curso.letra }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Lista de Comunicaciones -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>Todas las Comunicaciones</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="lista-comunicaciones">
+                        {% if comunicaciones %}
+                            {% for comunicacion in comunicaciones %}
+                            <div class="comunicacion-item border-bottom" data-id="{{ comunicacion.id }}" 
+                                 data-asunto="{{ comunicacion.asunto|lower }}" 
+                                 data-autor="{{ comunicacion.autor.rut|lower }}"
+                                 data-contenido="{{ comunicacion.contenido|lower }}"
+                                 data-tipo="{% if comunicacion.autor == user.usuario.auth_user %}enviada{% else %}recibida{% endif %}">
+                                <div class="p-4 hover-bg-light">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-8">
+                                            <div class="d-flex align-items-start">
+                                                <div class="me-3">
+                                                    {% if comunicacion.autor == user.usuario.auth_user %}
+                                                        <span class="badge bg-success fs-6">
+                                                            <i class="fas fa-paper-plane me-1"></i>Enviada
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="badge bg-info fs-6">
+                                                            <i class="fas fa-inbox me-1"></i>Recibida
+                                                        </span>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-bold">{{ comunicacion.asunto }}</h6>
+                                                    <p class="mb-2 text-muted">
+                                                        {{ comunicacion.contenido|truncatewords:20 }}
+                                                    </p>
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-user me-1"></i>
+                                                            {% if comunicacion.autor == user.usuario.auth_user %}
+                                                                Yo
+                                                            {% else %}
+                                                                {{ comunicacion.autor.rut }}-{{ comunicacion.autor.div }}
+                                                            {% endif %}
+                                                        </small>
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-calendar me-1"></i>{{ comunicacion.fecha_envio|date:"d/m/Y H:i" }}
+                                                        </small>
+                                                        {% if comunicacion.adjuntos.count > 0 %}
+                                                        <small class="text-warning">
+                                                            <i class="fas fa-paperclip me-1"></i>{{ comunicacion.adjuntos.count }} adjunto{{ comunicacion.adjuntos.count|pluralize }}
+                                                        </small>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="mt-2">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-users me-1"></i>Destinatarios: 
+                                                            {% for curso in comunicacion.destinatarios_cursos.all %}
+                                                                <span class="badge bg-light text-dark me-1">{{ curso.nivel }}°{{ curso.letra }}</span>
+                                                            {% empty %}
+                                                                <span class="text-muted">Sin cursos específicos</span>
+                                                            {% endfor %}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 text-end">
+                                            <div class="dropdown">
+                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i> Acciones
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a class="dropdown-item" href="{% url 'detalle_comunicacion' comunicacion.id %}">
+                                                            <i class="fas fa-eye me-2"></i>Ver Detalle
+                                                        </a>
+                                                    </li>
+                                                    {% if comunicacion.autor == user.usuario.auth_user %}
+                                                    <li>
+                                                        <a class="dropdown-item" href="{% url 'editar_comunicacion' comunicacion.id %}">
+                                                            <i class="fas fa-edit me-2"></i>Editar
+                                                        </a>
+                                                    </li>
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger" href="#" 
+                                                           onclick="confirmarEliminarComunicacion({{ comunicacion.id }}, '{{ comunicacion.asunto|escapejs }}')">
+                                                            <i class="fas fa-trash me-2"></i>Eliminar
+                                                        </a>
+                                                    </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center p-5">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No hay comunicaciones</h5>
+                                <p class="text-muted">Crea tu primera comunicación para empezar</p>
+                                <a href="{% url 'crear_comunicacion' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Crear Comunicación
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación para Eliminar -->
+<div class="modal fade" id="modalEliminarComunicacion" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">¿Estás seguro de que deseas eliminar la comunicación?</p>
+                <div class="alert alert-warning">
+                    <strong id="comunicacion-eliminar-titulo"></strong>
+                </div>
+                <p class="text-muted mb-0">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" onclick="eliminarComunicacion()">
+                    <i class="fas fa-trash me-2"></i>
+                    <span class="btn-text">Eliminar</span>
+                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.comunicacion-item {
+    transition: all 0.3s ease;
+}
+
+.hover-bg-light:hover {
+    background-color: #f8f9fa !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+#buscar-comunicaciones:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.comunicacion-item .dropdown-toggle::after {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .comunicacion-item .row {
+        flex-direction: column;
+    }
+    
+    .comunicacion-item .col-md-4 {
+        margin-top: 1rem;
+        text-align: left !important;
+    }
+}
+</style>
+
+<script>
+let comunicacionEliminarId = null;
+
+function confirmarEliminarComunicacion(id, titulo) {
+    comunicacionEliminarId = id;
+    document.getElementById('comunicacion-eliminar-titulo').textContent = titulo;
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminarComunicacion'));
+    modal.show();
+}
+
+function eliminarComunicacion() {
+    if (!comunicacionEliminarId) return;
+    
+    const button = document.querySelector('#modalEliminarComunicacion .btn-danger');
+    const btnText = button.querySelector('.btn-text');
+    const spinner = button.querySelector('.spinner-border');
+    
+    // Mostrar loading
+    btnText.textContent = 'Eliminando...';
+    spinner.classList.remove('d-none');
+    button.disabled = true;
+    
+    fetch(`{% url 'eliminar_comunicacion' 0 %}`.replace('0', comunicacionEliminarId), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Comunicación eliminada exitosamente', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification(data.message || 'Error al eliminar la comunicación', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error al eliminar la comunicación', 'error');
+    })
+    .finally(() => {
+        // Ocultar loading
+        btnText.textContent = 'Eliminar';
+        spinner.classList.add('d-none');
+        button.disabled = false;
+    });
+}
+
+// Búsqueda en tiempo real
+document.getElementById('buscar-comunicaciones').addEventListener('input', function() {
+    const termino = this.value.toLowerCase();
+    const comunicaciones = document.querySelectorAll('.comunicacion-item');
+    
+    comunicaciones.forEach(item => {
+        const asunto = item.dataset.asunto || '';
+        const autor = item.dataset.autor || '';
+        const contenido = item.dataset.contenido || '';
+        
+        if (asunto.includes(termino) || autor.includes(termino) || contenido.includes(termino)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+// Filtro por tipo (enviadas/recibidas)
+document.getElementById('filtro-tipo').addEventListener('change', function() {
+    const tipo = this.value;
+    const comunicaciones = document.querySelectorAll('.comunicacion-item');
+    
+    comunicaciones.forEach(item => {
+        const tipoItem = item.dataset.tipo;
+        
+        if (!tipo || tipoItem === tipo) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+// Filtro por curso
+document.getElementById('filtro-curso').addEventListener('change', function() {
+    const cursoId = this.value;
+    const comunicaciones = document.querySelectorAll('.comunicacion-item');
+    
+    if (!cursoId) {
+        comunicaciones.forEach(item => {
+            item.style.display = 'block';
+        });
+        return;
+    }
+    
+    comunicaciones.forEach(item => {
+        const cursoBadges = item.querySelectorAll('.badge.bg-light');
+        let tieneCurso = false;
+        
+        cursoBadges.forEach(badge => {
+            // Aquí podrías hacer una lógica más sofisticada
+            // Por ahora, mostramos todas si hay algún curso
+            tieneCurso = true;
+        });
+        
+        if (tieneCurso) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        max-width: 500px;
+    `;
+    
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+</script>

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.http import JsonResponse
-from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, ProfesorJefe, Evaluacion, AlumnoEvaluacion, EvaluacionBase, ClaseCancelada
+from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, ProfesorJefe, Evaluacion, AlumnoEvaluacion, EvaluacionBase, ClaseCancelada, Comunicacion
 from django.db.models import Count, Avg
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
@@ -255,6 +255,57 @@ def get_clases_canceladas_docente(docente_id):
     
     return clases_canceladas
 
+def get_comunicaciones_docente(docente):
+    """
+    Obtiene todas las comunicaciones relacionadas con un docente
+    """
+    from django.db import models
+    
+    # Obtener cursos donde el docente imparte asignaturas o es profesor jefe
+    cursos_docente = set()
+    
+    # Cursos donde imparte asignaturas
+    asignaturas_impartidas = AsignaturaImpartida.objects.filter(docente=docente)
+    for asignatura in asignaturas_impartidas:
+        clases = Clase.objects.filter(asignatura_impartida=asignatura)
+        for clase in clases:
+            if clase.curso:
+                cursos_docente.add(clase.curso.id)
+    
+    # Cursos donde es profesor jefe
+    try:
+        profesor_jefe = ProfesorJefe.objects.filter(docente=docente)
+        for pj in profesor_jefe:
+            cursos_docente.add(pj.curso.id)
+    except:
+        pass
+    
+    # Obtener comunicaciones
+    # Obtener el AuthUser asociado al docente a través de la relación Usuario -> AuthUser
+    auth_user = docente.usuario.auth_user
+    
+    comunicaciones = Comunicacion.objects.filter(
+        models.Q(autor=auth_user) |  # Comunicaciones que envió
+        models.Q(destinatarios_cursos__id__in=cursos_docente) |  # Para sus cursos
+        models.Q(destinatarios_usuarios=auth_user)  # Dirigidas a él específicamente
+    ).distinct().select_related('autor').prefetch_related(
+        'destinatarios_cursos', 'adjuntos'
+    ).order_by('-fecha_envio')
+    
+    # Estadísticas
+    total = comunicaciones.count()
+    enviadas = comunicaciones.filter(autor=auth_user).count()
+    recibidas = total - enviadas
+    con_adjuntos = comunicaciones.filter(adjuntos__isnull=False).distinct().count()
+    
+    return {
+        'comunicaciones': comunicaciones,
+        'total': total,
+        'enviadas': enviadas,
+        'recibidas': recibidas,
+        'con_adjuntos': con_adjuntos
+    }
+
 @method_decorator(login_required, name='dispatch')
 class ProfesorPanelView(View):
     def get(self, request):
@@ -327,6 +378,12 @@ class ProfesorPanelModularView(View):
         eventos_calendario = json.dumps(eventos_calendario_lista)  # Para el JavaScript
         clases_canceladas = get_clases_canceladas_docente(docente.pk)
         
+        # Obtener comunicaciones del docente
+        datos_comunicaciones = get_comunicaciones_docente(docente)
+        
+        # Obtener todos los cursos para filtros
+        cursos = Curso.objects.all().order_by('nivel', 'letra')
+        
         context = {
             'cursos_profesor_jefe': cursos_profesor_jefe,
             'asignaturas': asignaturas,
@@ -334,7 +391,15 @@ class ProfesorPanelModularView(View):
             'estadisticas_docente': estadisticas_docente,
             'estadisticas_asistencia': estadisticas_asistencia,
             'eventos_calendario': eventos_calendario,
-            'clases_canceladas': clases_canceladas
+            'clases_canceladas': clases_canceladas,
+            'comunicaciones': datos_comunicaciones['comunicaciones'],
+            'comunicaciones_stats': {
+                'total': datos_comunicaciones['total'],
+                'enviadas': datos_comunicaciones['enviadas'],
+                'recibidas': datos_comunicaciones['recibidas'],
+                'con_adjuntos': datos_comunicaciones['con_adjuntos']
+            },
+            'cursos': cursos
         }
         return render(request, 'teacher_panel_modular.html', context)
 

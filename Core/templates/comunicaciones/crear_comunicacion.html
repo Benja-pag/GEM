@@ -11,9 +11,19 @@
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">
                         <i class="fas fa-plus me-2"></i>Nueva Comunicación
+                        {% if not es_administrador %}
+                        <small class="ms-2 opacity-75">(Para tus asignaturas y curso jefe)</small>
+                        {% endif %}
                     </h4>
                 </div>
                 <div class="card-body">
+                    {% if not es_administrador %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Información:</strong> Como docente, puedes enviar comunicaciones únicamente a los cursos donde impartes asignaturas o eres profesor jefe.
+                    </div>
+                    {% endif %}
+                    
                     <form id="form-crear-comunicacion" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         
@@ -40,30 +50,42 @@
                         <!-- Destinatarios (Cursos) -->
                         <div class="mb-3">
                             <label for="cursos_destinatarios" class="form-label fw-bold">
-                                <i class="fas fa-users me-1"></i>Cursos Destinatarios
+                                <i class="fas fa-users me-1"></i>Cursos Destinatarios *
+                                {% if not es_administrador %}
+                                <small class="text-muted">(Solo tus cursos disponibles)</small>
+                                {% endif %}
                             </label>
+                            {% if cursos %}
                             <div class="row">
                                 {% for curso in cursos %}
                                 <div class="col-md-4 col-sm-6 mb-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" 
-                                                   name="cursos_destinatarios" value="{{ curso.id }}" 
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="cursos_destinatarios" value="{{ curso.id }}" 
                                                id="curso-{{ curso.id }}">
                                         <label class="form-check-label" for="curso-{{ curso.id }}">
-                                                {{ curso.nivel }}°{{ curso.letra }}
-                                            </label>
-                                        </div>
+                                            {{ curso.nivel }}°{{ curso.letra }}
+                                        </label>
                                     </div>
-                                {% empty %}
-                                <div class="col-12">
-                                    <p class="text-muted">No hay cursos disponibles</p>
                                 </div>
                                 {% endfor %}
                             </div>
                             <small class="form-text text-muted">
-                                Selecciona los cursos que recibirán esta comunicación. Si no seleccionas ninguno, 
-                                será una comunicación general.
+                                {% if es_administrador %}
+                                Selecciona los cursos que recibirán esta comunicación.
+                                {% else %}
+                                Selecciona los cursos de tus asignaturas o curso jefe que recibirán esta comunicación.
+                                {% endif %}
                             </small>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                No tienes cursos disponibles para enviar comunicaciones. 
+                                {% if not es_administrador %}
+                                Verifica que tengas asignaturas asignadas o seas profesor jefe de algún curso.
+                                {% endif %}
+                            </div>
+                            {% endif %}
                         </div>
 
                         <!-- Archivos Adjuntos -->
@@ -80,9 +102,15 @@
 
                         <!-- Botones de Acción -->
                         <div class="d-flex justify-content-between">
+                            {% if es_administrador %}
                             <a href="{% url 'admin_panel' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>Volver al Panel
+                                <i class="fas fa-arrow-left me-2"></i>Volver al Panel Administrativo
                             </a>
+                            {% else %}
+                            <a href="{% url 'profesor_panel' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver al Panel Docente
+                            </a>
+                            {% endif %}
                             <div>
                                 <button type="button" class="btn btn-outline-primary me-2" onclick="previsualizarComunicacion()">
                                     <i class="fas fa-eye me-2"></i>Previsualizar
@@ -200,7 +228,11 @@ document.getElementById('form-crear-comunicacion').addEventListener('submit', fu
         if (data.success) {
             showNotification('Comunicación creada exitosamente', 'success');
             setTimeout(() => {
+                {% if es_administrador %}
                 window.location.href = '{% url "admin_panel" %}';
+                {% else %}
+                window.location.href = '{% url "profesor_panel" %}';
+                {% endif %}
             }, 1500);
         } else {
             showNotification(data.message || 'Error al crear la comunicación', 'error');

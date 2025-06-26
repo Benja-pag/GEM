@@ -11,9 +11,19 @@
                 <div class="card-header bg-warning text-dark">
                     <h4 class="mb-0">
                         <i class="fas fa-edit me-2"></i>Editar Comunicación
+                        {% if not es_administrador %}
+                        <small class="ms-2 opacity-75">(Solo tus cursos disponibles)</small>
+                        {% endif %}
                     </h4>
                 </div>
                 <div class="card-body">
+                    {% if not es_administrador %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Información:</strong> Como docente, solo puedes editar tus propias comunicaciones y enviarlas a los cursos donde impartes asignaturas o eres profesor jefe.
+                    </div>
+                    {% endif %}
+                    
                     <form id="form-editar-comunicacion" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         
@@ -41,8 +51,12 @@
                         <!-- Destinatarios (Cursos) -->
                         <div class="mb-3">
                             <label for="cursos_destinatarios" class="form-label fw-bold">
-                                <i class="fas fa-users me-1"></i>Cursos Destinatarios
+                                <i class="fas fa-users me-1"></i>Cursos Destinatarios *
+                                {% if not es_administrador %}
+                                <small class="text-muted">(Solo tus cursos disponibles)</small>
+                                {% endif %}
                             </label>
+                            {% if cursos %}
                             <div class="row">
                                 {% for curso in cursos %}
                                 <div class="col-md-4 col-sm-6 mb-2">
@@ -56,16 +70,24 @@
                                         </label>
                                     </div>
                                 </div>
-                                {% empty %}
-                                <div class="col-12">
-                                    <p class="text-muted">No hay cursos disponibles</p>
-                                </div>
                                 {% endfor %}
                             </div>
                             <small class="form-text text-muted">
-                                Selecciona los cursos que recibirán esta comunicación. Si no seleccionas ninguno, 
-                                será una comunicación general.
+                                {% if es_administrador %}
+                                Selecciona los cursos que recibirán esta comunicación.
+                                {% else %}
+                                Selecciona los cursos de tus asignaturas o curso jefe que recibirán esta comunicación.
+                                {% endif %}
                             </small>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                No tienes cursos disponibles para enviar comunicaciones.
+                                {% if not es_administrador %}
+                                Verifica que tengas asignaturas asignadas o seas profesor jefe de algún curso.
+                                {% endif %}
+                            </div>
+                            {% endif %}
                         </div>
 
                         <!-- Adjuntos Existentes -->
@@ -149,9 +171,15 @@
                                 <a href="{% url 'detalle_comunicacion' comunicacion.id %}" class="btn btn-outline-secondary me-2">
                                     <i class="fas fa-arrow-left me-2"></i>Volver al Detalle
                                 </a>
+                                {% if es_administrador %}
                                 <a href="{% url 'admin_panel' %}" class="btn btn-outline-info">
                                     <i class="fas fa-home me-2"></i>Panel Admin
                                 </a>
+                                {% else %}
+                                <a href="{% url 'profesor_panel' %}" class="btn btn-outline-info">
+                                    <i class="fas fa-home me-2"></i>Panel Docente
+                                </a>
+                                {% endif %}
                             </div>
                             <div>
                                 <button type="button" class="btn btn-outline-primary me-2" onclick="previsualizarComunicacion()">

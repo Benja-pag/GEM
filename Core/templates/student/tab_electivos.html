@@ -22,12 +22,11 @@
                         <div class="row">
                             {% if electivos_disponibles %}
                                 {% for electivo in electivos_disponibles %}
-                                {% with primera_clase=electivo.imparticiones.first.clases.first %}
                                 <div class="col-md-6 mb-3">
                                     <div class="card h-100 border-0 shadow-sm hover-card card-electivo" 
                                          data-id-electivo="{{ electivo.id }}" 
-                                         data-dia-clase="{{ primera_clase.fecha }}"
-                                         data-bloque-clase="{{ primera_clase.horario }}">
+                                         data-dia-clase="{{ electivo.primera_clase.fecha }}"
+                                         data-bloque-clase="{{ electivo.primera_clase.horario }}">
                                         <div class="card-body d-flex flex-column">
                                             <div class="form-check">
                                                 <input class="form-check-input check-electivo" type="checkbox" value="{{ electivo.id }}" id="electivo-{{ electivo.id }}">
@@ -44,44 +43,40 @@
                                                     <small class="text-muted">
                                                         <i class="fas fa-chalkboard-teacher me-1"></i>
                                                         <strong>Profesor:</strong> 
-                                                        {% for impartida in electivo.imparticiones.all %}
-                                                            {{ impartida.docente.usuario.nombre }} {{ impartida.docente.usuario.apellido_paterno }}
-                                                            {% if impartida.docente.especialidad %}
-                                                                ({{ impartida.docente.especialidad.nombre }})
+                                                        {{ electivo.docente.usuario.nombre }} {{ electivo.docente.usuario.apellido_paterno }}
+                                                        {% if electivo.docente.especialidad %}
+                                                            ({{ electivo.docente.especialidad.nombre }})
                                                             {% endif %}
-                                                        {% empty %}
-                                                            No asignado
-                                                        {% endfor %}
                                                     </small>
                                                 </div>
                                                 
-                                                {% if primera_clase %}
+                                                {% if electivo.primera_clase %}
                                                 <!-- Información del horario -->
                                                 <div class="mb-2">
                                                     <small class="text-muted">
                                                         <i class="fas fa-calendar-day me-1"></i>
-                                                        <strong>Día:</strong> {{ primera_clase.get_fecha_display }}
+                                                        <strong>Día:</strong> {{ electivo.primera_clase.get_fecha_display }}
                                                     </small>
                                                 </div>
                                                 <div class="mb-2">
                                                     <small class="text-muted">
                                                         <i class="fas fa-clock me-1"></i>
                                                         <strong>Horario:</strong> 
-                                                        {% if primera_clase.horario == '7' %}
+                                                        {% if electivo.primera_clase.horario == '7' %}
                                                             13:45 - 14:30
-                                                        {% elif primera_clase.horario == '8' %}
+                                                        {% elif electivo.primera_clase.horario == '8' %}
                                                             14:30 - 15:15
-                                                        {% elif primera_clase.horario == '9' %}
+                                                        {% elif electivo.primera_clase.horario == '9' %}
                                                             15:15 - 16:00
                                                         {% else %}
-                                                            Bloque {{ primera_clase.horario }}
+                                                            Bloque {{ electivo.primera_clase.horario }}
                                                         {% endif %}
                                                     </small>
                                                 </div>
                                                 <div class="mb-2">
                                                     <small class="text-muted">
                                                         <i class="fas fa-map-marker-alt me-1"></i>
-                                                        <strong>Sala:</strong> {{ primera_clase.get_sala_display }}
+                                                        <strong>Sala:</strong> {{ electivo.primera_clase.get_sala_display }}
                                                     </small>
                                                 </div>
                                                 {% else %}
@@ -96,7 +91,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                {% endwith %}
                                 {% endfor %}
                             {% else %}
                                 <div class="col-12">

@@ -68,7 +68,7 @@ class Usuario(models.Model):
 
     def __str__(self):
         return f'{self.nombre} {self.apellido_paterno}'  # Representación legible del objeto
-    
+
     def get_full_name(self):
         """Retorna el nombre completo del usuario"""
         return f'{self.nombre} {self.apellido_paterno} {self.apellido_materno}'.strip()

@@ -8,7 +8,7 @@ from Core.views import (
     CursoDetalleView, AsignaturaDetalleView, AsignaturaDetalleEstudianteView, CleanupAuthUsersView
 )
 from Core.views.alumnos import InscribirElectivoView, InscribirElectivosLoteView, BorrarInscripcionElectivosView
-from Core.views.docentes import CancelarClaseView, MarcarClaseRecuperadaView, ObtenerHorariosAsignaturaView, CrearEventoCalendarioView, EditarEventoCalendarioView, EliminarEventoCalendarioView
+from Core.views.docentes import CancelarClaseView, MarcarClaseRecuperadaView, ObtenerHorariosAsignaturaView, CrearEventoCalendarioView, EditarEventoCalendarioView, EliminarEventoCalendarioView, ReporteEvaluacionesAsignaturasDocenteView, ReporteEvaluacionesCursoJefeView, ReporteAsistenciaAsignaturasDocenteView, ReporteAsistenciaCursoJefeView, ResumenGeneralDocenteView
 from Core.views.admin import AdminEventosCalendarioView, AdminCrearEventoCalendarioView, AdminEditarEventoCalendarioView, AdminEliminarEventoCalendarioView, AdminDetalleEventoCalendarioView, ApiCursosView, ApiAsignaturasView, CursoDataView, CursoUpdateView, CursoDeleteView, AsignaturaDataView, AsignaturaUpdateView
 from Core.views.reportes import DashboardMetricasView, ReporteAsistenciaGeneralView, ReporteEvaluacionesView
 from Core.views.reportes_simple import ReporteRendimientoCursosViewSimple, ReporteDocentesViewSimple, ReporteEstudiantesRiesgoViewSimple, ReporteAsistenciaGeneralViewSimple, ReporteAsistenciaEstudianteViewSimple, ReporteAsistenciaCursoViewSimple, ListaEstudiantesViewSimple, ReporteAsistenciaAsignaturasCursoViewSimple, ReporteEvaluacionesAsignaturasCursoViewSimple, ReporteEvaluacionesGeneralViewSimple, ReporteEvaluacionesEstudianteViewSimple
@@ -77,6 +77,10 @@ urlpatterns = [
     path('pdf/evaluaciones-asignaturas-curso/', pdf_views.DescargarEvaluacionesAsignaturasCursoPDFView.as_view(), name='descargar_evaluaciones_asignaturas_curso_pdf'),
     path('pdf/evaluaciones-estudiante-admin/', pdf_views.DescargarEvaluacionesEstudianteAdminPDFView.as_view(), name='descargar_evaluaciones_estudiante_admin_pdf'),
     path('pdf/reporte-evaluaciones-general/', pdf_views.DescargarReporteEvaluacionesGeneralPDFView.as_view(), name='descargar_reporte_evaluaciones_general_pdf'),
+    path('pdf/reporte-evaluaciones-asignaturas-docente/', pdf_views.DescargarReporteEvaluacionesAsignaturasDocentePDFView.as_view(), name='descargar_reporte_evaluaciones_asignaturas_docente_pdf'),
+    path('pdf/reporte-evaluaciones-curso-jefe/', pdf_views.DescargarReporteEvaluacionesCursoJefePDFView.as_view(), name='descargar_reporte_evaluaciones_curso_jefe_pdf'),
+    path('pdf/reporte-asistencia-asignaturas-docente/', pdf_views.DescargarReporteAsistenciaAsignaturasDocentePDFView.as_view(), name='descargar_reporte_asistencia_asignaturas_docente_pdf'),
+    path('pdf/reporte-asistencia-curso-jefe/', pdf_views.DescargarReporteAsistenciaCursoJefePDFView.as_view(), name='descargar_reporte_asistencia_curso_jefe_pdf'),
 ]
 
 urlpatterns += [
@@ -131,5 +135,12 @@ urlpatterns += [
     path('api/reporte-docentes/', ReporteDocentesViewSimple.as_view(), name='reporte_docentes'),
     path('api/reporte-estudiantes-riesgo/', ReporteEstudiantesRiesgoViewSimple.as_view(), name='reporte_estudiantes_riesgo'),
     path('api/reporte-evaluaciones/', ReporteEvaluacionesView.as_view(), name='reporte_evaluaciones'),
+    
+    # URLs para reportes de docentes
+    path('api/reporte-evaluaciones-asignaturas-docente/', ReporteEvaluacionesAsignaturasDocenteView.as_view(), name='reporte_evaluaciones_asignaturas_docente'),
+    path('api/reporte-evaluaciones-curso-jefe/', ReporteEvaluacionesCursoJefeView.as_view(), name='reporte_evaluaciones_curso_jefe'),
+    path('api/reporte-asistencia-asignaturas-docente/', ReporteAsistenciaAsignaturasDocenteView.as_view(), name='reporte_asistencia_asignaturas_docente'),
+    path('api/reporte-asistencia-curso-jefe/', ReporteAsistenciaCursoJefeView.as_view(), name='reporte_asistencia_curso_jefe'),
+    path('api/resumen-general-docente/', ResumenGeneralDocenteView.as_view(), name='resumen_general_docente'),
 ]
 

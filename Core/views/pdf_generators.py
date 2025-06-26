@@ -9,6 +9,7 @@ from io import BytesIO
 from datetime import datetime
 import os
 from django.conf import settings
+import io
 
 def generar_pdf_horario(estudiante, horario_data):
     """
@@ -3229,4 +3230,704 @@ def generar_pdf_reporte_evaluaciones_general(data):
     doc.build(elements, onFirstPage=footer, onLaterPages=footer)
     buffer.seek(0)
     
+    return buffer
+
+def generar_pdf_evaluaciones_asignaturas_docente(data):
+    """
+    Genera un PDF con el reporte de evaluaciones de las asignaturas del docente
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=1*inch, bottomMargin=1*inch)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Colores
+    color_primary = colors.HexColor('#2c3e50')
+    color_secondary = colors.HexColor('#3498db')
+    color_success = colors.HexColor('#27ae60')
+    color_warning = colors.HexColor('#f39c12')
+    color_danger = colors.HexColor('#e74c3c')
+    
+    # --- Encabezado ---
+    logo_style = ParagraphStyle(
+        'LogoStyle',
+        parent=styles['Normal'],
+        fontSize=18,
+        textColor=color_primary,
+        spaceAfter=12,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    
+    elements.append(Paragraph("🎓 SISTEMA EDUCATIVO GEM", logo_style))
+    
+    title_style = ParagraphStyle(
+        'TitleStyle', 
+        parent=styles['Heading1'],
+        fontSize=16,
+        textColor=color_primary,
+        spaceAfter=30,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    
+    elements.append(Paragraph("REPORTE DE EVALUACIONES - MIS ASIGNATURAS", title_style))
+    
+    # --- Información del Docente ---
+    info_style = ParagraphStyle(
+        'InfoStyle',
+        parent=styles['Normal'],
+        fontSize=11,
+        spaceAfter=6,
+        fontName='Helvetica'
+    )
+    
+    # Información básica
+    fecha_actual = datetime.now().strftime("%d de %B de %Y")
+    hora_actual = datetime.now().strftime("%H:%M")
+    
+    info_data = [
+        [Paragraph('<b>Docente:</b>', info_style), Paragraph(data['docente'], info_style)],
+        [Paragraph('<b>Fecha del reporte:</b>', info_style), Paragraph(f"{fecha_actual} - {hora_actual}", info_style)],
+        [Paragraph('<b>Tipo de reporte:</b>', info_style), Paragraph("Evaluaciones de mis asignaturas", info_style)]
+    ]
+    
+    info_table = Table(info_data, colWidths=[2*inch, 4*inch])
+    info_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+    ]))
+    
+    elements.append(info_table)
+    elements.append(Spacer(1, 20))
+    
+    # --- Estadísticas Generales ---
+    stats = data['estadisticas_generales']
+    
+    stats_style = ParagraphStyle(
+        'StatsStyle',
+        parent=styles['Normal'],
+        fontSize=10,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    
+    stats_data = [
+        [
+            Paragraph(f"{stats['total_asignaturas']}<br/><font size=8>Asignaturas</font>", stats_style),
+            Paragraph(f"{stats['total_evaluaciones']}<br/><font size=8>Evaluaciones</font>", stats_style),
+            Paragraph(f"{stats['total_notas']}<br/><font size=8>Notas Registradas</font>", stats_style),
+            Paragraph(f"{stats['promedio_general']}<br/><font size=8>Promedio General</font>", stats_style),
+            Paragraph(f"{stats['porcentaje_aprobacion_general']}%<br/><font size=8>% Aprobación</font>", stats_style)
+        ]
+    ]
+    
+    stats_table = Table(stats_data, colWidths=[1.2*inch]*5)
+    stats_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('BOX', (0, 0), (-1, -1), 2, color_primary),
+    ]))
+    
+    elements.append(stats_table)
+    elements.append(Spacer(1, 20))
+    
+    # --- Tabla Principal ---
+    if data['asignaturas']:
+        # Encabezados
+        table_data = [[
+            Paragraph('<b>Asignatura</b>', styles['Normal']),
+            Paragraph('<b>Código</b>', styles['Normal']),
+            Paragraph('<b>Cursos</b>', styles['Normal']),
+            Paragraph('<b>Evaluaciones</b>', styles['Normal']),
+            Paragraph('<b>Est. Evaluados</b>', styles['Normal']),
+            Paragraph('<b>Promedio</b>', styles['Normal']),
+            Paragraph('<b>% Aprobación</b>', styles['Normal']),
+            Paragraph('<b>Estado</b>', styles['Normal'])
+        ]]
+        
+        # Datos de asignaturas
+        for asignatura in data['asignaturas']:
+            # Color según estado
+            if asignatura['estado'] == 'Excelente':
+                estado_color = color_success
+            elif asignatura['estado'] == 'Bueno':
+                estado_color = color_secondary
+            elif asignatura['estado'] == 'Regular':
+                estado_color = color_warning
+            else:
+                estado_color = color_danger
+            
+            table_data.append([
+                Paragraph(asignatura['asignatura'], styles['Normal']),
+                Paragraph(asignatura['codigo'], styles['Normal']),
+                Paragraph(asignatura['cursos'], styles['Normal']),
+                Paragraph(str(asignatura['total_evaluaciones']), styles['Normal']),
+                Paragraph(str(asignatura['estudiantes_evaluados']), styles['Normal']),
+                Paragraph(str(asignatura['promedio_asignatura']), styles['Normal']),
+                Paragraph(f"{asignatura['porcentaje_aprobacion']}%", styles['Normal']),
+                Paragraph(f'<font color="{estado_color}">{asignatura["estado"]}</font>', styles['Normal'])
+            ])
+        
+        # Crear tabla
+        table = Table(table_data, colWidths=[1.5*inch, 0.8*inch, 1*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch])
+        table.setStyle(TableStyle([
+            # Encabezados
+            ('BACKGROUND', (0, 0), (-1, 0), color_primary),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            
+            # Datos
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.beige, colors.white]),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ]))
+        
+        elements.append(table)
+    else:
+        # Mensaje cuando no hay datos
+        no_data_style = ParagraphStyle(
+            'NoDataStyle',
+            parent=styles['Normal'],
+            fontSize=12,
+            alignment=TA_CENTER,
+            fontName='Helvetica-Oblique',
+            textColor=colors.grey
+        )
+        elements.append(Paragraph("No hay asignaturas asignadas para este docente.", no_data_style))
+    
+    # --- Pie de página ---
+    elements.append(Spacer(1, 30))
+    
+    footer_style = ParagraphStyle(
+        'FooterStyle',
+        parent=styles['Normal'],
+        fontSize=8,
+        alignment=TA_CENTER,
+        textColor=colors.grey
+    )
+    
+    elements.append(Paragraph(f"Reporte generado por Sistema Educativo GEM - {fecha_actual}", footer_style))
+    
+    # Construir PDF
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
+
+def generar_pdf_evaluaciones_curso_jefe(data):
+    """
+    Genera un PDF con el reporte de evaluaciones del curso donde es profesor jefe
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=1*inch, bottomMargin=1*inch)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Colores
+    color_primary = colors.HexColor('#2c3e50')
+    color_secondary = colors.HexColor('#3498db')
+    color_success = colors.HexColor('#27ae60')
+    color_warning = colors.HexColor('#f39c12')
+    color_danger = colors.HexColor('#e74c3c')
+    
+    # --- Encabezado ---
+    logo_style = ParagraphStyle(
+        'LogoStyle',
+        parent=styles['Normal'],
+        fontSize=18,
+        textColor=color_primary,
+        spaceAfter=12,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    
+    elements.append(Paragraph("🎓 SISTEMA EDUCATIVO GEM", logo_style))
+    
+    title_style = ParagraphStyle(
+        'TitleStyle', 
+        parent=styles['Heading1'],
+        fontSize=16,
+        textColor=color_primary,
+        spaceAfter=30,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    
+    elements.append(Paragraph(f"REPORTE DE EVALUACIONES - CURSO {data['curso']}", title_style))
+    
+    # --- Información del Reporte ---
+    info_style = ParagraphStyle(
+        'InfoStyle',
+        parent=styles['Normal'],
+        fontSize=11,
+        spaceAfter=6,
+        fontName='Helvetica'
+    )
+    
+    # Información básica
+    fecha_actual = datetime.now().strftime("%d de %B de %Y")
+    hora_actual = datetime.now().strftime("%H:%M")
+    
+    info_data = [
+        [Paragraph('<b>Profesor Jefe:</b>', info_style), Paragraph(data['docente'], info_style)],
+        [Paragraph('<b>Curso:</b>', info_style), Paragraph(data['curso'], info_style)],
+        [Paragraph('<b>Fecha del reporte:</b>', info_style), Paragraph(f"{fecha_actual} - {hora_actual}", info_style)],
+        [Paragraph('<b>Tipo de reporte:</b>', info_style), Paragraph("Evaluaciones del curso como profesor jefe", info_style)]
+    ]
+    
+    info_table = Table(info_data, colWidths=[2*inch, 4*inch])
+    info_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+    ]))
+    
+    elements.append(info_table)
+    elements.append(Spacer(1, 20))
+    
+    # --- Estadísticas Generales del Curso ---
+    stats = data['estadisticas_generales']
+    
+    stats_style = ParagraphStyle(
+        'StatsStyle',
+        parent=styles['Normal'],
+        fontSize=10,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    
+    stats_data = [
+        [
+            Paragraph(f"{stats['total_estudiantes']}<br/><font size=8>Estudiantes</font>", stats_style),
+            Paragraph(f"{stats['total_asignaturas']}<br/><font size=8>Asignaturas</font>", stats_style),
+            Paragraph(f"{stats['total_evaluaciones']}<br/><font size=8>Evaluaciones</font>", stats_style),
+            Paragraph(f"{stats['promedio_general_curso']}<br/><font size=8>Promedio Curso</font>", stats_style),
+            Paragraph(f"{stats['porcentaje_aprobacion_curso']}%<br/><font size=8>% Aprobación</font>", stats_style)
+        ]
+    ]
+    
+    stats_table = Table(stats_data, colWidths=[1.2*inch]*5)
+    stats_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.lightgrey),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('BOX', (0, 0), (-1, -1), 2, color_primary),
+    ]))
+    
+    elements.append(stats_table)
+    elements.append(Spacer(1, 20))
+    
+    # --- Tabla Principal ---
+    if data['asignaturas']:
+        # Encabezados
+        table_data = [[
+            Paragraph('<b>Asignatura</b>', styles['Normal']),
+            Paragraph('<b>Docente</b>', styles['Normal']),
+            Paragraph('<b>Evaluaciones</b>', styles['Normal']),
+            Paragraph('<b>Est. Evaluados</b>', styles['Normal']),
+            Paragraph('<b>Promedio</b>', styles['Normal']),
+            Paragraph('<b>% Aprobación</b>', styles['Normal']),
+            Paragraph('<b>Estado</b>', styles['Normal'])
+        ]]
+        
+        # Datos de asignaturas
+        for asignatura in data['asignaturas']:
+            # Color según estado
+            if asignatura['estado'] == 'Excelente':
+                estado_color = color_success
+            elif asignatura['estado'] == 'Bueno':
+                estado_color = color_secondary
+            elif asignatura['estado'] == 'Regular':
+                estado_color = color_warning
+            else:
+                estado_color = color_danger
+            
+            table_data.append([
+                Paragraph(asignatura['asignatura'], styles['Normal']),
+                Paragraph(asignatura['docente'], styles['Normal']),
+                Paragraph(str(asignatura['total_evaluaciones']), styles['Normal']),
+                Paragraph(str(asignatura['estudiantes_evaluados']), styles['Normal']),
+                Paragraph(str(asignatura['promedio_asignatura']), styles['Normal']),
+                Paragraph(f"{asignatura['porcentaje_aprobacion']}%", styles['Normal']),
+                Paragraph(f'<font color="{estado_color}">{asignatura["estado"]}</font>', styles['Normal'])
+            ])
+        
+        # Crear tabla
+        table = Table(table_data, colWidths=[1.5*inch, 1.3*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch, 0.8*inch])
+        table.setStyle(TableStyle([
+            # Encabezados
+            ('BACKGROUND', (0, 0), (-1, 0), color_primary),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            
+            # Datos
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.beige, colors.white]),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ]))
+        
+        elements.append(table)
+    else:
+        # Mensaje cuando no hay datos
+        no_data_style = ParagraphStyle(
+            'NoDataStyle',
+            parent=styles['Normal'],
+            fontSize=12,
+            alignment=TA_CENTER,
+            fontName='Helvetica-Oblique',
+            textColor=colors.grey
+        )
+        elements.append(Paragraph(f"No hay asignaturas con evaluaciones para el curso {data['curso']}.", no_data_style))
+    
+    # --- Pie de página ---
+    elements.append(Spacer(1, 30))
+    
+    footer_style = ParagraphStyle(
+        'FooterStyle',
+        parent=styles['Normal'],
+        fontSize=8,
+        alignment=TA_CENTER,
+        textColor=colors.grey
+    )
+    
+    elements.append(Paragraph(f"Reporte generado por Sistema Educativo GEM - {fecha_actual}", footer_style))
+    
+    # Construir PDF
+    doc.build(elements)
+    pdf = buffer.getvalue()
+    buffer.close()
+    return pdf
+
+def generar_pdf_asistencia_asignaturas_docente(data):
+    """Genera PDF del reporte de asistencia de asignaturas del docente"""
+    buffer = io.BytesIO()
+    
+    # Crear el documento PDF
+    doc = SimpleDocTemplate(buffer, pagesize=letter, 
+                           rightMargin=72, leftMargin=72, 
+                           topMargin=72, bottomMargin=18)
+    
+    # Contenedor para los elementos del PDF
+    elements = []
+    
+    # Estilos
+    styles = getSampleStyleSheet()
+    
+    # Estilo personalizado para el título
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        spaceAfter=30,
+        alignment=1,  # Centrado
+        textColor=colors.darkblue
+    )
+    
+    # Estilo para subtítulos
+    subtitle_style = ParagraphStyle(
+        'CustomSubtitle',
+        parent=styles['Heading2'],
+        fontSize=14,
+        spaceAfter=12,
+        textColor=colors.darkblue
+    )
+    
+    # Título del reporte
+    titulo = Paragraph("Reporte de Asistencia - Mis Asignaturas", title_style)
+    elements.append(titulo)
+    
+    # Información del docente
+    fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M")
+    info_docente = f"""
+    <b>Docente:</b> {data.get('docente', 'No especificado')}<br/>
+    <b>Fecha de generación:</b> {fecha_actual}<br/>
+    """
+    elements.append(Paragraph(info_docente, styles['Normal']))
+    elements.append(Spacer(1, 20))
+    
+    # Estadísticas generales
+    stats = data.get('estadisticas_generales', {})
+    elements.append(Paragraph("Resumen General", subtitle_style))
+    
+    # Crear tabla de estadísticas generales
+    stats_data = [
+        ['Métrica', 'Valor'],
+        ['Total de Asignaturas', str(stats.get('total_asignaturas', 0))],
+        ['Clases Programadas', str(stats.get('total_clases_programadas', 0))],
+        ['Registros de Asistencia', str(stats.get('total_registros_asistencia', 0))],
+        ['Porcentaje de Asistencia Promedio', f"{stats.get('porcentaje_asistencia_general', 0)}%"],
+        ['Estudiantes en Riesgo', str(stats.get('total_estudiantes_riesgo', 0))]
+    ]
+    
+    stats_table = Table(stats_data, colWidths=[3*inch, 2*inch])
+    stats_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+    ]))
+    
+    elements.append(stats_table)
+    elements.append(Spacer(1, 30))
+    
+    # Detalle por asignaturas
+    elements.append(Paragraph("Detalle por Asignaturas", subtitle_style))
+    
+    asignaturas = data.get('asignaturas', [])
+    if asignaturas:
+        # Crear tabla de asignaturas
+        table_data = [
+            ['Asignatura', 'Código', 'Cursos', 'Clases', 'Registros', 
+             '% Asistencia', 'En Riesgo', 'Estado']
+        ]
+        
+        for asignatura in asignaturas:
+            table_data.append([
+                asignatura.get('asignatura', ''),
+                asignatura.get('codigo', ''),
+                asignatura.get('cursos', ''),
+                str(asignatura.get('total_clases_programadas', 0)),
+                str(asignatura.get('total_registros_asistencia', 0)),
+                f"{asignatura.get('porcentaje_asistencia', 0)}%",
+                str(asignatura.get('estudiantes_en_riesgo', 0)),
+                asignatura.get('estado', '')
+            ])
+        
+        # Crear tabla con ancho ajustado
+        col_widths = [1.5*inch, 0.8*inch, 1*inch, 0.6*inch, 0.7*inch, 0.8*inch, 0.6*inch, 0.8*inch]
+        asignaturas_table = Table(table_data, colWidths=col_widths)
+        
+        # Aplicar estilos a la tabla
+        table_style = [
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]
+        
+        # Agregar colores según el estado de asistencia
+        for i, asignatura in enumerate(asignaturas, 1):
+            porcentaje = asignatura.get('porcentaje_asistencia', 0)
+            if porcentaje >= 90:
+                color = colors.lightgreen
+            elif porcentaje >= 80:
+                color = colors.lightblue
+            elif porcentaje >= 70:
+                color = colors.lightyellow
+            else:
+                color = colors.lightcoral
+            
+            table_style.append(('BACKGROUND', (5, i), (5, i), color))
+        
+        asignaturas_table.setStyle(TableStyle(table_style))
+        elements.append(asignaturas_table)
+    else:
+        elements.append(Paragraph("No hay datos de asignaturas disponibles.", styles['Normal']))
+    
+    # Pie de página
+    elements.append(Spacer(1, 30))
+    pie_pagina = f"Generado el {fecha_actual} - Sistema Educativo GEM"
+    elements.append(Paragraph(pie_pagina, styles['Normal']))
+    
+    # Construir PDF
+    doc.build(elements)
+    buffer.seek(0)
+    return buffer
+
+def generar_pdf_asistencia_curso_jefe(data):
+    """Genera PDF del reporte de asistencia del curso jefe"""
+    buffer = io.BytesIO()
+    
+    # Crear el documento PDF
+    doc = SimpleDocTemplate(buffer, pagesize=letter, 
+                           rightMargin=72, leftMargin=72, 
+                           topMargin=72, bottomMargin=18)
+    
+    # Contenedor para los elementos del PDF
+    elements = []
+    
+    # Estilos
+    styles = getSampleStyleSheet()
+    
+    # Estilo personalizado para el título
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        spaceAfter=30,
+        alignment=1,  # Centrado
+        textColor=colors.darkgreen
+    )
+    
+    # Estilo para subtítulos
+    subtitle_style = ParagraphStyle(
+        'CustomSubtitle',
+        parent=styles['Heading2'],
+        fontSize=14,
+        spaceAfter=12,
+        textColor=colors.darkgreen
+    )
+    
+    # Título del reporte
+    titulo = Paragraph("Reporte de Asistencia - Curso Jefe", title_style)
+    elements.append(titulo)
+    
+    # Información del curso y docente
+    fecha_actual = datetime.now().strftime("%d/%m/%Y %H:%M")
+    curso = data.get('curso', 'No especificado')
+    docente = data.get('docente', 'No especificado')
+    
+    info_curso = f"""
+    <b>Curso:</b> {curso}<br/>
+    <b>Profesor Jefe:</b> {docente}<br/>
+    <b>Fecha de generación:</b> {fecha_actual}<br/>
+    """
+    elements.append(Paragraph(info_curso, styles['Normal']))
+    elements.append(Spacer(1, 20))
+    
+    # Estadísticas generales del curso
+    stats = data.get('estadisticas_generales', {})
+    elements.append(Paragraph("Resumen del Curso", subtitle_style))
+    
+    # Crear tabla de estadísticas del curso
+    stats_data = [
+        ['Métrica', 'Valor'],
+        ['Total de Estudiantes', str(stats.get('total_estudiantes', 0))],
+        ['Total de Asignaturas', str(stats.get('total_asignaturas', 0))],
+        ['Clases Programadas', str(stats.get('total_clases_programadas', 0))],
+        ['Registros de Asistencia', str(stats.get('total_registros_asistencia', 0))],
+        ['Porcentaje de Asistencia del Curso', f"{stats.get('porcentaje_asistencia_curso', 0)}%"],
+        ['Estudiantes en Riesgo', str(stats.get('total_estudiantes_riesgo', 0))]
+    ]
+    
+    stats_table = Table(stats_data, colWidths=[3*inch, 2*inch])
+    stats_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+    ]))
+    
+    elements.append(stats_table)
+    elements.append(Spacer(1, 30))
+    
+    # Detalle por asignaturas del curso
+    elements.append(Paragraph("Asignaturas del Curso", subtitle_style))
+    
+    asignaturas = data.get('asignaturas', [])
+    if asignaturas:
+        # Crear tabla de asignaturas del curso
+        table_data = [
+            ['Asignatura', 'Código', 'Docente', 'Clases', 'Registros', 
+             '% Asistencia', 'En Riesgo', 'Estado']
+        ]
+        
+        for asignatura in asignaturas:
+            table_data.append([
+                asignatura.get('asignatura', ''),
+                asignatura.get('codigo', ''),
+                asignatura.get('docente', ''),
+                str(asignatura.get('total_clases_programadas', 0)),
+                str(asignatura.get('total_registros_asistencia', 0)),
+                f"{asignatura.get('porcentaje_asistencia', 0)}%",
+                str(asignatura.get('estudiantes_en_riesgo', 0)),
+                asignatura.get('estado', '')
+            ])
+        
+        # Crear tabla con ancho ajustado
+        col_widths = [1.3*inch, 0.7*inch, 1.2*inch, 0.6*inch, 0.7*inch, 0.8*inch, 0.6*inch, 0.8*inch]
+        asignaturas_table = Table(table_data, colWidths=col_widths)
+        
+        # Aplicar estilos a la tabla
+        table_style = [
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkgreen),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 8),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]
+        
+        # Agregar colores según el estado de asistencia
+        for i, asignatura in enumerate(asignaturas, 1):
+            porcentaje = asignatura.get('porcentaje_asistencia', 0)
+            if porcentaje >= 90:
+                color = colors.lightgreen
+            elif porcentaje >= 80:
+                color = colors.lightblue
+            elif porcentaje >= 70:
+                color = colors.lightyellow
+            else:
+                color = colors.lightcoral
+            
+            table_style.append(('BACKGROUND', (5, i), (5, i), color))
+        
+        asignaturas_table.setStyle(TableStyle(table_style))
+        elements.append(asignaturas_table)
+    else:
+        elements.append(Paragraph("No hay datos de asignaturas disponibles para este curso.", styles['Normal']))
+    
+    # Pie de página
+    elements.append(Spacer(1, 30))
+    pie_pagina = f"Generado el {fecha_actual} - Sistema Educativo GEM"
+    elements.append(Paragraph(pie_pagina, styles['Normal']))
+    
+    # Construir PDF
+    doc.build(elements)
+    buffer.seek(0)
     return buffer

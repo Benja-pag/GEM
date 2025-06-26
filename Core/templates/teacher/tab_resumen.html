@@ -7,164 +7,35 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-gradient-primary text-white">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-user-tie me-2"></i>Resumen General - Prof. Juan Pérez
+                        <i class="fas fa-user-tie me-2"></i>Resumen General - <span id="nombre-docente">Cargando...</span>
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-3 text-center">
                             <div class="stats-card">
-                                <div class="stats-number text-primary">3</div>
+                                <div class="stats-number text-primary" id="total-cursos">-</div>
                                 <small class="text-muted">Cursos</small>
                             </div>
                         </div>
                         <div class="col-md-3 text-center">
                             <div class="stats-card">
-                                <div class="stats-number text-success">8</div>
+                                <div class="stats-number text-success" id="total-asignaturas">-</div>
                                 <small class="text-muted">Asignaturas</small>
                             </div>
                         </div>
                         <div class="col-md-3 text-center">
                             <div class="stats-card">
-                                <div class="stats-number text-warning">75</div>
+                                <div class="stats-number text-warning" id="total-estudiantes">-</div>
                                 <small class="text-muted">Estudiantes</small>
                             </div>
                         </div>
                         <div class="col-md-3 text-center">
                             <div class="stats-card">
-                                <div class="stats-number text-info">12</div>
-                                <small class="text-muted">Evaluaciones Pendientes</small>
+                                <div class="stats-number text-info" id="total-evaluaciones">-</div>
+                                <small class="text-muted">Evaluaciones</small>
                             </div>
                         </div>
-                    </div>
-                    
-                    <!-- Acceso Rápido -->
-                    <div class="text-center mb-4">
-                        <div class="row">
-                            <div class="col-md-4 mb-2">
-                                <button class="btn btn-outline-primary w-100" onclick="window.location.href='/curso/3/'">
-                                    <i class="fas fa-users me-2"></i>Gestionar Curso 2°A
-                                </button>
-                            </div>
-                            <div class="col-md-4 mb-2">
-                                <button class="btn btn-outline-success w-100" onclick="mostrarPestanaAsignaturas()">
-                                    <i class="fas fa-book me-2"></i>Mis Asignaturas
-                                </button>
-                            </div>
-                            <div class="col-md-4 mb-2">
-                                <button class="btn btn-outline-warning w-100" onclick="mostrarPestanaReportes()">
-                                    <i class="fas fa-chart-bar me-2"></i>Generar Reportes
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actividad Reciente -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-clock me-2"></i>Actividad Reciente
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item px-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Evaluación de Matemáticas calificada</h6>
-                                    <small class="text-muted">Curso 2°A - Hace 2 horas</small>
-                                </div>
-                                <span class="badge bg-success">Completado</span>
-                            </div>
-                        </div>
-                        <div class="list-group-item px-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Mensaje enviado a apoderados</h6>
-                                    <small class="text-muted">Curso 3°B - Hace 4 horas</small>
-                                </div>
-                                <span class="badge bg-info">Enviado</span>
-                            </div>
-                        </div>
-                        <div class="list-group-item px-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Asistencia registrada</h6>
-                                    <small class="text-muted">Curso 1°A - Hace 6 horas</small>
-                                </div>
-                                <span class="badge bg-warning">Pendiente</span>
-                            </div>
-                        </div>
-                        <div class="list-group-item px-0">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="mb-1">Material subido a plataforma</h6>
-                                    <small class="text-muted">Historia - Hace 1 día</small>
-                                </div>
-                                <span class="badge bg-success">Subido</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Próximas Actividades -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-gradient-info text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-calendar me-2"></i>Próximas Actividades
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Actividad</th>
-                                    <th>Curso</th>
-                                    <th>Fecha</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Evaluación de Lenguaje</td>
-                                    <td>2°A</td>
-                                    <td>Mañana - 10:00 AM</td>
-                                    <td><span class="badge bg-warning">Pendiente</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i> Ver
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Reunión de Apoderados</td>
-                                    <td>2°A</td>
-                                    <td>Mañana - 19:00 PM</td>
-                                    <td><span class="badge bg-info">Programada</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-success">
-                                            <i class="fas fa-calendar"></i> Detalles
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Entrega de Tareas</td>
-                                    <td>3°B</td>
-                                    <td>En 2 días - 14:00 PM</td>
-                                    <td><span class="badge bg-warning">Pendiente</span></td>
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-warning">
-                                            <i class="fas fa-clock"></i> Recordar
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -172,36 +43,20 @@
 
         <!-- Panel Lateral -->
         <div class="col-lg-4">
-            <!-- Notificaciones -->
+            <!-- Estudiantes en Riesgo -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-warning text-white">
+                <div class="card-header bg-gradient-warning text-dark">
                     <h6 class="card-title mb-0">
-                        <i class="fas fa-bell me-2"></i>Notificaciones
+                        <i class="fas fa-exclamation-triangle me-2"></i>Estudiantes en Riesgo
                     </h6>
                 </div>
                 <div class="card-body">
-                    <div class="alert alert-danger">
-                        <h6 class="alert-heading">
-                            <i class="fas fa-exclamation-triangle me-1"></i>Evaluación Pendiente
-                        </h6>
-                        <p class="mb-1">Lenguaje 2°A debe calificarse hoy</p>
-                        <small>Prioridad: Alta</small>
-                    </div>
-                    
-                    <div class="alert alert-warning">
-                        <h6 class="alert-heading">
-                            <i class="fas fa-user-clock me-1"></i>Estudiantes en Riesgo
-                        </h6>
-                        <p class="mb-1">3 estudiantes requieren atención</p>
-                        <small>Curso 2°A</small>
-                    </div>
-                    
-                    <div class="alert alert-info">
-                        <h6 class="alert-heading">
-                            <i class="fas fa-envelope me-1"></i>Mensajes Nuevos
-                        </h6>
-                        <p class="mb-1">5 mensajes sin leer</p>
-                        <small>De apoderados y colegas</small>
+                    <div id="estudiantes-riesgo">
+                        <div class="text-center">
+                            <div class="spinner-border spinner-border-sm" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -210,52 +65,27 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-gradient-success text-white">
                     <h6 class="card-title mb-0">
-                        <i class="fas fa-chart-pie me-2"></i>Estadísticas Rápidas
+                        <i class="fas fa-chart-pie me-2"></i>Estadísticas Generales
                     </h6>
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
                         <div class="col-6 mb-3">
-                            <h4 class="text-success">85%</h4>
+                            <h4 class="text-success" id="porcentaje-asistencia">-</h4>
                             <small class="text-muted">Asistencia Promedio</small>
                         </div>
                         <div class="col-6 mb-3">
-                            <h4 class="text-warning">6.7</h4>
+                            <h4 class="text-warning" id="promedio-general">-</h4>
                             <small class="text-muted">Promedio General</small>
                         </div>
                         <div class="col-6 mb-3">
-                            <h4 class="text-info">92%</h4>
+                            <h4 class="text-info" id="porcentaje-aprobacion">-</h4>
                             <small class="text-muted">Aprobación</small>
                         </div>
                         <div class="col-6 mb-3">
-                            <h4 class="text-danger">8%</h4>
+                            <h4 class="text-danger" id="porcentaje-riesgo">-</h4>
                             <small class="text-muted">En Riesgo</small>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Acciones Rápidas -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-gradient-primary text-white">
-                    <h6 class="card-title mb-0">
-                        <i class="fas fa-bolt me-2"></i>Acciones Rápidas
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-plus me-1"></i>Crear Evaluación
-                        </button>
-                        <button class="btn btn-outline-success btn-sm">
-                            <i class="fas fa-upload me-1"></i>Subir Material
-                        </button>
-                        <button class="btn btn-outline-warning btn-sm">
-                            <i class="fas fa-envelope me-1"></i>Enviar Mensaje
-                        </button>
-                        <button class="btn btn-outline-info btn-sm">
-                            <i class="fas fa-calendar me-1"></i>Programar Actividad
-                        </button>
                     </div>
                 </div>
             </div>
@@ -423,4 +253,88 @@
     .shadow-sm {
         box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
     }
-</style> 
+</style>
+
+<script>
+// Cargar datos del resumen general al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    cargarResumenGeneral();
+});
+
+async function cargarResumenGeneral() {
+    try {
+        const response = await fetch('/api/resumen-general-docente/');
+        const data = await response.json();
+        
+        if (data.success) {
+            // Actualizar información del docente
+            document.getElementById('nombre-docente').textContent = data.docente.nombre;
+            
+            // Actualizar estadísticas principales
+            const stats = data.estadisticas;
+            document.getElementById('total-cursos').textContent = stats.total_cursos;
+            document.getElementById('total-asignaturas').textContent = stats.total_asignaturas;
+            document.getElementById('total-estudiantes').textContent = stats.total_estudiantes;
+            document.getElementById('total-evaluaciones').textContent = stats.total_evaluaciones;
+            
+            // Actualizar estadísticas del panel lateral
+            document.getElementById('porcentaje-asistencia').textContent = stats.porcentaje_asistencia_general + '%';
+            document.getElementById('promedio-general').textContent = stats.promedio_general;
+            document.getElementById('porcentaje-aprobacion').textContent = stats.porcentaje_aprobacion + '%';
+            document.getElementById('porcentaje-riesgo').textContent = stats.porcentaje_riesgo + '%';
+            
+            // Mostrar estudiantes en riesgo
+            mostrarEstudiantesRiesgo(data.estudiantes_riesgo);
+            
+        } else {
+            console.error('Error al cargar resumen:', data.error);
+            mostrarErrorCarga();
+        }
+    } catch (error) {
+        console.error('Error de conexión:', error);
+        mostrarErrorCarga();
+    }
+}
+
+function mostrarEstudiantesRiesgo(estudiantes) {
+    const contenedor = document.getElementById('estudiantes-riesgo');
+    
+    if (estudiantes.length === 0) {
+        contenedor.innerHTML = `
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                No hay estudiantes en situación de riesgo académico.
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    estudiantes.forEach(estudiante => {
+        html += `
+            <div class="alert alert-warning">
+                <h6 class="alert-heading">
+                    <i class="fas fa-user-times me-1"></i>${estudiante.nombre}
+                </h6>
+                <p class="mb-1">Curso: ${estudiante.curso}</p>
+                <p class="mb-1">Asistencia: ${estudiante.asistencia}%</p>
+                <small>Motivo: ${estudiante.motivo}</small>
+            </div>
+        `;
+    });
+    
+    contenedor.innerHTML = html;
+}
+
+function mostrarErrorCarga() {
+    // Mostrar mensaje de error en elementos principales
+    document.getElementById('nombre-docente').textContent = 'Error al cargar';
+    document.getElementById('estudiantes-riesgo').innerHTML = `
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Error al cargar los datos. Intenta recargar la página.
+        </div>
+    `;
+}
+</script> 

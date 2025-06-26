@@ -93,16 +93,29 @@ class EstudiantePanelModularView(View):
         mostrar_electivos = False
         if curso and curso.nivel in [3, 4]:
             mostrar_electivos = True
-            electivos_disponibles = Asignatura.objects.filter(
-                es_electivo=True,
-                nivel=curso.nivel,
-                imparticiones__isnull=False,
-                imparticiones__docente__isnull=False,
-                imparticiones__clases__isnull=False
-            ).distinct().prefetch_related(
-                'imparticiones__docente__usuario', 
-                'imparticiones__clases'
-            )
+            # Obtener asignaturas electivas con sus imparticiones
+            asignaturas_impartidas = AsignaturaImpartida.objects.filter(
+                asignatura__es_electivo=True,
+                asignatura__nivel=curso.nivel,
+                docente__isnull=False,
+                clases__isnull=False
+            ).select_related(
+                'asignatura',
+                'docente__usuario'
+            ).prefetch_related('clases').distinct()
+            
+            # Convertir a lista de asignaturas con información de impartición
+            for asignatura_impartida in asignaturas_impartidas:
+                electivos_disponibles.append({
+                    'id': asignatura_impartida.asignatura.id,
+                    'nombre': asignatura_impartida.asignatura.nombre,
+                    'nivel': asignatura_impartida.asignatura.nivel,
+                    'docente': asignatura_impartida.docente,
+                    'codigo': asignatura_impartida.codigo,
+                    'clases': asignatura_impartida.clases.all(),
+                    'primera_clase': asignatura_impartida.clases.first(),
+                    'asignatura_impartida': asignatura_impartida
+                })
 
         # Obtener los electivos en los que el estudiante ya está inscrito
         electivos_inscritos = AsignaturaInscrita.objects.filter(
@@ -392,7 +405,14 @@ class InscribirElectivosLoteView(View):
                 return JsonResponse({'success': False, 'error': 'Alguno de los electivos seleccionados no es válido para tu nivel.'})
 
             for asignatura in asignaturas:
-                clase_info = Clase.objects.filter(asignatura_impartida__asignatura=asignatura).first()
+                # Buscar la AsignaturaImpartida para esta asignatura
+                try:
+                    impartida = AsignaturaImpartida.objects.get(asignatura=asignatura)
+                except AsignaturaImpartida.DoesNotExist:
+                    return JsonResponse({'success': False, 'error': f'El electivo "{asignatura.nombre}" no está disponible.'})
+                
+                # Buscar las clases para esta AsignaturaImpartida
+                clase_info = Clase.objects.filter(asignatura_impartida=impartida).first()
                 if not clase_info:
                     return JsonResponse({'success': False, 'error': f'El electivo "{asignatura.nombre}" no tiene un horario definido.'})
 
@@ -402,11 +422,10 @@ class InscribirElectivosLoteView(View):
                     return JsonResponse({'success': False, 'error': f'Hay un choque de horario. Tienes más de un electivo seleccionado el {clase_info.get_fecha_display()} en el bloque {clase_info.horario}.'})
                 
                 horarios_seleccionados.add(horario_clave)
-                impartida = AsignaturaImpartida.objects.get(asignatura=asignatura)
                 electivos_a_inscribir.append(impartida)
 
-        except (ValueError, AsignaturaImpartida.DoesNotExist):
-            return JsonResponse({'success': False, 'error': 'Ocurrió un error con los datos enviados.'})
+        except (ValueError, Exception) as e:
+            return JsonResponse({'success': False, 'error': f'Ocurrió un error con los datos enviados: {str(e)}'})
 
         # 3. Proceso de inscripción (atómico gracias al decorador)
         # Borrar inscripciones de electivos anteriores

@@ -5,9 +5,9 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from Core.models import Estudiante, Curso, Asistencia, AlumnoEvaluacion
 from Core.views.alumnos import get_horario_estudiante, get_asistencia_estudiante, get_evaluaciones_estudiante, get_promedio_estudiante
-from .pdf_generators import generar_pdf_horario, generar_pdf_asistencia, generar_pdf_calificaciones
+from .pdf_generators import generar_pdf_horario, generar_pdf_asistencia, generar_pdf_calificaciones, generar_pdf_asistencia_asignaturas_docente, generar_pdf_asistencia_curso_jefe
 from django.db.models import Avg
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from Core.views.reportes_simple import get_periodo_fechas
 from .pdf_generators import generar_pdf_reporte_estudiantes_riesgo
 
@@ -82,7 +82,7 @@ class DescargarCalificacionesPDFView(View):
         response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="calificaciones_{estudiante.usuario.nombre}_{estudiante.usuario.apellido_paterno}.pdf"'
         
-        return response
+        return response 
 
 @method_decorator(login_required, name='dispatch')
 class DescargarReporteCursosPDFView(View):
@@ -1269,7 +1269,7 @@ class DescargarEvaluacionesEstudianteAdminPDFView(View):
                         'nota_maxima': float(nota_maxima),
                         'nota_minima': float(nota_minima),
                         'aprobadas': aprobadas,
-                        'reprobadas': reprobadas,
+                        'reprobados': reprobadas,
                         'estado': estado,
                         'evaluaciones_detalle': evaluaciones_detalle
                     })
@@ -1390,4 +1390,384 @@ class DescargarReporteEvaluacionesGeneralPDFView(View):
             
         except Exception as e:
             print(f"Error generando PDF del reporte general: {str(e)}")
-            return HttpResponse(f"Error al generar el PDF: {str(e)}", status=500) 
+            return HttpResponse(f"Error al generar el PDF: {str(e)}", status=500)
+
+@method_decorator(login_required, name='dispatch')
+class DescargarReporteEvaluacionesAsignaturasDocentePDFView(View):
+    """Vista para que los docentes descarguen PDF de evaluaciones de sus asignaturas"""
+    
+    def get(self, request):
+        # Verificar que sea docente
+        if not (hasattr(request.user, 'usuario') and hasattr(request.user.usuario, 'docente')):
+            return HttpResponseForbidden("No tienes permisos de docente")
+        
+        try:
+            docente = request.user.usuario.docente
+            
+            # Obtener asignaturas que imparte el docente
+            asignaturas_impartidas = AsignaturaImpartida.objects.filter(docente=docente)
+            
+            asignaturas_data = []
+            
+            for asignatura_impartida in asignaturas_impartidas:
+                # Obtener clases de esta asignatura
+                clases = Clase.objects.filter(asignatura_impartida=asignatura_impartida)
+                
+                # Obtener evaluaciones de todas las clases de esta asignatura
+                evaluaciones = Evaluacion.objects.filter(clase__in=clases)
+                total_evaluaciones = evaluaciones.count()
+                
+                if total_evaluaciones > 0:
+                    # Obtener notas de estas evaluaciones
+                    notas = AlumnoEvaluacion.objects.filter(evaluacion__in=evaluaciones)
+                    total_notas = notas.count()
+                    
+                    if total_notas > 0:
+                        promedio_asignatura = notas.aggregate(promedio=Avg('nota'))['promedio']
+                        nota_maxima = notas.aggregate(max_nota=Max('nota'))['max_nota']
+                        nota_minima = notas.aggregate(min_nota=Min('nota'))['min_nota']
+                        aprobados = notas.filter(nota__gte=4.0).count()
+                        reprobados = notas.filter(nota__lt=4.0).count()
+                        porcentaje_aprobacion = (aprobados / total_notas * 100)
+                        
+                        # Estudiantes únicos evaluados
+                        estudiantes_evaluados = notas.values('estudiante').distinct().count()
+                        
+                        # Estado según promedio
+                        if promedio_asignatura >= 5.5:
+                            estado = "Excelente"
+                        elif promedio_asignatura >= 4.5:
+                            estado = "Bueno"
+                        elif promedio_asignatura >= 4.0:
+                            estado = "Regular"
+                        else:
+                            estado = "Deficiente"
+                    else:
+                        promedio_asignatura = 0
+                        nota_maxima = 0
+                        nota_minima = 0
+                        aprobados = 0
+                        reprobados = 0
+                        porcentaje_aprobacion = 0
+                        estudiantes_evaluados = 0
+                        estado = "Sin notas"
+                else:
+                    total_notas = 0
+                    promedio_asignatura = 0
+                    nota_maxima = 0
+                    nota_minima = 0
+                    aprobados = 0
+                    reprobados = 0
+                    porcentaje_aprobacion = 0
+                    estudiantes_evaluados = 0
+                    estado = "Sin evaluaciones"
+                
+                # Obtener cursos donde se imparte (para asignaturas regulares)
+                cursos_str = []
+                for clase in clases:
+                    if clase.curso:
+                        curso_nombre = f"{clase.curso.nivel}°{clase.curso.letra}"
+                        if curso_nombre not in cursos_str:
+                            cursos_str.append(curso_nombre)
+                
+                asignaturas_data.append({
+                    'asignatura': asignatura_impartida.asignatura.nombre,
+                    'codigo': asignatura_impartida.codigo,
+                    'cursos': ', '.join(cursos_str) if cursos_str else 'Electivo',
+                    'total_evaluaciones': total_evaluaciones,
+                    'estudiantes_evaluados': estudiantes_evaluados,
+                    'total_notas': total_notas,
+                    'promedio_asignatura': round(promedio_asignatura, 2) if promedio_asignatura else 0,
+                    'nota_maxima': nota_maxima if nota_maxima else 0,
+                    'nota_minima': nota_minima if nota_minima else 0,
+                    'aprobados': aprobados,
+                    'reprobados': reprobados,
+                    'porcentaje_aprobacion': round(porcentaje_aprobacion, 1) if porcentaje_aprobacion else 0,
+                    'estado': estado
+                })
+            
+            # Ordenar por promedio descendente
+            asignaturas_data.sort(key=lambda x: x['promedio_asignatura'], reverse=True)
+            
+            # Calcular estadísticas generales
+            if asignaturas_data:
+                total_evaluaciones_general = sum(a['total_evaluaciones'] for a in asignaturas_data)
+                total_notas_general = sum(a['total_notas'] for a in asignaturas_data)
+                
+                if total_notas_general > 0:
+                    # Calcular promedio ponderado
+                    suma_promedios = sum(a['promedio_asignatura'] * a['total_notas'] for a in asignaturas_data if a['total_notas'] > 0)
+                    promedio_general = suma_promedios / total_notas_general
+                    
+                    total_aprobados_general = sum(a['aprobados'] for a in asignaturas_data)
+                    porcentaje_aprobacion_general = (total_aprobados_general / total_notas_general * 100)
+                else:
+                    promedio_general = 0
+                    porcentaje_aprobacion_general = 0
+            else:
+                total_evaluaciones_general = 0
+                total_notas_general = 0
+                promedio_general = 0
+                porcentaje_aprobacion_general = 0
+            
+            # Preparar datos para el PDF
+            data = {
+                'docente': docente.usuario.get_full_name(),
+                'asignaturas': asignaturas_data,
+                'estadisticas_generales': {
+                    'total_asignaturas': len(asignaturas_data),
+                    'total_evaluaciones': total_evaluaciones_general,
+                    'total_notas': total_notas_general,
+                    'promedio_general': round(promedio_general, 2),
+                    'porcentaje_aprobacion_general': round(porcentaje_aprobacion_general, 1)
+                }
+            }
+            
+            # Generar el PDF
+            pdf_content = generar_pdf_evaluaciones_asignaturas_docente(data)
+            
+            # Crear respuesta HTTP
+            response = HttpResponse(pdf_content, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="reporte_evaluaciones_asignaturas_docente_{docente.usuario.rut}.pdf"'
+            
+            return response
+            
+        except Exception as e:
+            return HttpResponse(f"Error al generar el reporte: {str(e)}", status=500)
+
+@method_decorator(login_required, name='dispatch')
+class DescargarReporteEvaluacionesCursoJefePDFView(View):
+    """Vista para que los profesores jefe descarguen PDF de evaluaciones de su curso"""
+    
+    def get(self, request):
+        # Verificar que sea docente
+        if not (hasattr(request.user, 'usuario') and hasattr(request.user.usuario, 'docente')):
+            return HttpResponseForbidden("No tienes permisos de docente")
+        
+        try:
+            docente = request.user.usuario.docente
+            
+            # Verificar si es profesor jefe
+            profesor_jefe = ProfesorJefe.objects.filter(docente=docente).first()
+            
+            if not profesor_jefe or not profesor_jefe.curso:
+                return HttpResponse("No eres profesor jefe de ningún curso", status=403)
+            
+            curso = profesor_jefe.curso
+            
+            # Obtener todas las asignaturas impartidas en el curso
+            asignaturas_impartidas = AsignaturaImpartida.objects.filter(
+                clases__curso=curso
+            ).distinct()
+            
+            asignaturas_data = []
+            
+            for asignatura_impartida in asignaturas_impartidas:
+                # Obtener evaluaciones de esta asignatura en el curso específico
+                evaluaciones = Evaluacion.objects.filter(
+                    clase__asignatura_impartida=asignatura_impartida,
+                    clase__curso=curso
+                )
+                total_evaluaciones = evaluaciones.count()
+                
+                if total_evaluaciones > 0:
+                    # Obtener notas de estudiantes del curso en estas evaluaciones
+                    notas_curso = AlumnoEvaluacion.objects.filter(
+                        evaluacion__in=evaluaciones,
+                        estudiante__curso=curso
+                    )
+                    total_notas = notas_curso.count()
+                    
+                    if total_notas > 0:
+                        promedio_asignatura = notas_curso.aggregate(promedio=Avg('nota'))['promedio']
+                        nota_maxima = notas_curso.aggregate(max_nota=Max('nota'))['max_nota']
+                        nota_minima = notas_curso.aggregate(min_nota=Min('nota'))['min_nota']
+                        aprobados = notas_curso.filter(nota__gte=4.0).count()
+                        reprobados = notas_curso.filter(nota__lt=4.0).count()
+                        porcentaje_aprobacion = (aprobados / total_notas * 100)
+                        
+                        # Estudiantes evaluados
+                        estudiantes_evaluados = notas_curso.values('estudiante').distinct().count()
+                        
+                        # Estado según promedio
+                        if promedio_asignatura >= 5.5:
+                            estado = "Excelente"
+                        elif promedio_asignatura >= 4.5:
+                            estado = "Bueno"
+                        elif promedio_asignatura >= 4.0:
+                            estado = "Regular"
+                        else:
+                            estado = "Deficiente"
+                    else:
+                        promedio_asignatura = 0
+                        nota_maxima = 0
+                        nota_minima = 0
+                        aprobados = 0
+                        reprobados = 0
+                        porcentaje_aprobacion = 0
+                        estudiantes_evaluados = 0
+                        estado = "Sin notas"
+                else:
+                    total_notas = 0
+                    promedio_asignatura = 0
+                    nota_maxima = 0
+                    nota_minima = 0
+                    aprobados = 0
+                    reprobados = 0
+                    porcentaje_aprobacion = 0
+                    estudiantes_evaluados = 0
+                    estado = "Sin evaluaciones"
+                
+                # Información del docente
+                docente_nombre = "Sin asignar"
+                if asignatura_impartida.docente:
+                    docente_nombre = asignatura_impartida.docente.usuario.get_full_name()
+                
+                asignaturas_data.append({
+                    'asignatura': asignatura_impartida.asignatura.nombre,
+                    'codigo': asignatura_impartida.codigo,
+                    'docente': docente_nombre,
+                    'total_evaluaciones': total_evaluaciones,
+                    'estudiantes_evaluados': estudiantes_evaluados,
+                    'total_notas': total_notas,
+                    'promedio_asignatura': round(promedio_asignatura, 2) if promedio_asignatura else 0,
+                    'nota_maxima': nota_maxima if nota_maxima else 0,
+                    'nota_minima': nota_minima if nota_minima else 0,
+                    'aprobados': aprobados,
+                    'reprobados': reprobados,
+                    'porcentaje_aprobacion': round(porcentaje_aprobacion, 1) if porcentaje_aprobacion else 0,
+                    'estado': estado
+                })
+            
+            # Ordenar por promedio descendente
+            asignaturas_data.sort(key=lambda x: x['promedio_asignatura'], reverse=True)
+            
+            # Calcular estadísticas generales del curso
+            if asignaturas_data:
+                total_evaluaciones_curso = sum(a['total_evaluaciones'] for a in asignaturas_data)
+                total_notas_curso = sum(a['total_notas'] for a in asignaturas_data)
+                
+                if total_notas_curso > 0:
+                    # Calcular promedio ponderado del curso
+                    suma_promedios = sum(a['promedio_asignatura'] * a['total_notas'] for a in asignaturas_data if a['total_notas'] > 0)
+                    promedio_general_curso = suma_promedios / total_notas_curso
+                    
+                    total_aprobados_curso = sum(a['aprobados'] for a in asignaturas_data)
+                    porcentaje_aprobacion_curso = (total_aprobados_curso / total_notas_curso * 100)
+                else:
+                    promedio_general_curso = 0
+                    porcentaje_aprobacion_curso = 0
+            else:
+                total_evaluaciones_curso = 0
+                total_notas_curso = 0
+                promedio_general_curso = 0
+                porcentaje_aprobacion_curso = 0
+            
+            # Obtener total de estudiantes del curso
+            total_estudiantes_curso = curso.estudiantes.count()
+            
+            # Preparar datos para el PDF
+            data = {
+                'curso': f"{curso.nivel}°{curso.letra}",
+                'curso_id': curso.id,
+                'docente': docente.usuario.get_full_name(),
+                'asignaturas': asignaturas_data,
+                'estadisticas_generales': {
+                    'total_estudiantes': total_estudiantes_curso,
+                    'total_asignaturas': len(asignaturas_data),
+                    'total_evaluaciones': total_evaluaciones_curso,
+                    'total_notas': total_notas_curso,
+                    'promedio_general_curso': round(promedio_general_curso, 2),
+                    'porcentaje_aprobacion_curso': round(porcentaje_aprobacion_curso, 1)
+                }
+            }
+            
+            # Generar el PDF
+            pdf_content = generar_pdf_evaluaciones_curso_jefe(data)
+            
+            # Crear respuesta HTTP
+            response = HttpResponse(pdf_content, content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="reporte_evaluaciones_curso_{curso.nivel}{curso.letra}_jefe_{docente.usuario.rut}.pdf"'
+            
+            return response
+            
+        except Exception as e:
+            return HttpResponse(f"Error al generar el reporte: {str(e)}", status=500) 
+
+@method_decorator(login_required, name='dispatch')
+class DescargarReporteAsistenciaAsignaturasDocentePDFView(View):
+    """Vista para descargar PDF del reporte de asistencia de asignaturas del docente"""
+    
+    def get(self, request):
+        # Verificar que sea docente
+        if not (hasattr(request.user, 'usuario') and hasattr(request.user.usuario, 'docente')):
+            return HttpResponse('No tienes permisos de docente', status=403)
+        
+        try:
+            # Obtener datos del reporte
+            from Core.views.docentes import ReporteAsistenciaAsignaturasDocenteView
+            vista_reporte = ReporteAsistenciaAsignaturasDocenteView()
+            vista_reporte.request = request
+            
+            response_data = vista_reporte.get(request)
+            if hasattr(response_data, 'content'):
+                import json
+                data = json.loads(response_data.content.decode('utf-8'))
+            else:
+                data = response_data
+            
+            if not data.get('success'):
+                return HttpResponse('Error al obtener datos del reporte', status=400)
+            
+            # Generar PDF
+            pdf_buffer = generar_pdf_asistencia_asignaturas_docente(data)
+            
+            # Configurar respuesta
+            response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+            fecha_actual = timezone.now().strftime('%Y%m%d_%H%M')
+            filename = f'reporte_asistencia_asignaturas_docente_{fecha_actual}.pdf'
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            return response
+            
+        except Exception as e:
+            return HttpResponse(f'Error al generar PDF: {str(e)}', status=500)
+
+@method_decorator(login_required, name='dispatch')
+class DescargarReporteAsistenciaCursoJefePDFView(View):
+    """Vista para descargar PDF del reporte de asistencia del curso jefe"""
+    
+    def get(self, request):
+        # Verificar que sea docente
+        if not (hasattr(request.user, 'usuario') and hasattr(request.user.usuario, 'docente')):
+            return HttpResponse('No tienes permisos de docente', status=403)
+        
+        try:
+            # Obtener datos del reporte
+            from Core.views.docentes import ReporteAsistenciaCursoJefeView
+            vista_reporte = ReporteAsistenciaCursoJefeView()
+            vista_reporte.request = request
+            
+            response_data = vista_reporte.get(request)
+            if hasattr(response_data, 'content'):
+                import json
+                data = json.loads(response_data.content.decode('utf-8'))
+            else:
+                data = response_data
+            
+            if not data.get('success'):
+                return HttpResponse('Error al obtener datos del reporte', status=400)
+            
+            # Generar PDF
+            pdf_buffer = generar_pdf_asistencia_curso_jefe(data)
+            
+            # Configurar respuesta
+            response = HttpResponse(pdf_buffer.getvalue(), content_type='application/pdf')
+            fecha_actual = timezone.now().strftime('%Y%m%d_%H%M')
+            filename = f'reporte_asistencia_curso_jefe_{fecha_actual}.pdf'
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            return response
+            
+        except Exception as e:
+            return HttpResponse(f'Error al generar PDF: {str(e)}', status=500)

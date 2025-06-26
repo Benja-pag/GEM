@@ -26,8 +26,8 @@ $(document).ready(function() {
         }
     });
 
-    // Manejar el cambio de estado de usuario
-    $('.toggle-user-status').click(function(e) {
+    // Manejar el cambio de estado de usuario (usando delegación)
+    $(document).on('click', '.toggle-user-status', function(e) {
         e.preventDefault();
         e.stopPropagation();
         
@@ -114,8 +114,10 @@ $(document).ready(function() {
         });
     });
 
-    // Manejar la eliminación de usuarios
-    $('.delete-user').click(function() {
+    // Manejar la eliminación de usuarios (usando delegación)
+    $(document).on('click', '.delete-user', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         const userId = $(this).data('user-id');
         const row = $(this).closest('tr');
         

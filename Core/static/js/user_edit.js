@@ -42,7 +42,7 @@ $(document).ready(function() {
         toggleSpecificFields($(this).val());
     });
 
-    // Manejar el clic en el botón de editar
+    // Manejar el clic en el botón de editar (usando delegación)
     $(document).on('click', '.edit-user', function(e) {
         e.preventDefault();
         const userId = $(this).data('user-id');
@@ -125,7 +125,7 @@ $(document).ready(function() {
         formData.append('user_id', userId);
 
         $.ajax({
-            url: `/users/${userId}/data/`,
+            url: `/users/${userId}/update/`,
             type: 'POST',
             data: formData,
             processData: false,

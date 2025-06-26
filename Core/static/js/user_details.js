@@ -66,8 +66,8 @@ $(document).ready(function() {
         });
     }
 
-    // Manejar el clic en el botón de ver detalles
-    $('.view-user').click(function(e) {
+    // Manejar el clic en el botón de ver detalles (usando delegación)
+    $(document).on('click', '.view-user', function(e) {
         e.preventDefault();
         const userId = $(this).data('user-id');
         loadUserDetails(userId);

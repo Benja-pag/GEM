@@ -85,17 +85,11 @@
                         </td>
                         <td>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-info btn-sm" title="Ver detalles">
+                                <button type="button" class="btn btn-info btn-sm view-asignatura" data-asignatura-id="{{ clase.asignatura_impartida.id }}" title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button type="button" class="btn btn-warning btn-sm" title="Editar">
+                                <button type="button" class="btn btn-warning btn-sm edit-asignatura" data-asignatura-id="{{ clase.asignatura_impartida.id }}" title="Editar">
                                     <i class="fas fa-edit"></i>
-                                </button>
-                                <button type="button" class="btn btn-success btn-sm" title="Asignar Profesor">
-                                    <i class="fas fa-user-plus"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger btn-sm" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </td>

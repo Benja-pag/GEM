@@ -9,7 +9,7 @@ from Core.views import (
 )
 from Core.views.alumnos import InscribirElectivoView, InscribirElectivosLoteView, BorrarInscripcionElectivosView
 from Core.views.docentes import CancelarClaseView, MarcarClaseRecuperadaView, ObtenerHorariosAsignaturaView, CrearEventoCalendarioView, EditarEventoCalendarioView, EliminarEventoCalendarioView
-from Core.views.admin import AdminEventosCalendarioView, AdminCrearEventoCalendarioView, AdminEditarEventoCalendarioView, AdminEliminarEventoCalendarioView, AdminDetalleEventoCalendarioView, ApiCursosView, ApiAsignaturasView
+from Core.views.admin import AdminEventosCalendarioView, AdminCrearEventoCalendarioView, AdminEditarEventoCalendarioView, AdminEliminarEventoCalendarioView, AdminDetalleEventoCalendarioView, ApiCursosView, ApiAsignaturasView, CursoDataView, CursoUpdateView, CursoDeleteView, AsignaturaDataView, AsignaturaUpdateView
 from Core.views.reportes import DashboardMetricasView, ReporteAsistenciaGeneralView, ReporteEvaluacionesView
 from Core.views.reportes_simple import ReporteRendimientoCursosViewSimple, ReporteDocentesViewSimple, ReporteEstudiantesRiesgoViewSimple, ReporteAsistenciaGeneralViewSimple, ReporteAsistenciaEstudianteViewSimple, ReporteAsistenciaCursoViewSimple, ListaEstudiantesViewSimple, ReporteAsistenciaAsignaturasCursoViewSimple, ReporteEvaluacionesAsignaturasCursoViewSimple, ReporteEvaluacionesGeneralViewSimple, ReporteEvaluacionesEstudianteViewSimple
 from Core.views import foro as foro_views
@@ -106,6 +106,15 @@ urlpatterns += [
     # APIs para formularios
     path('api/cursos/', ApiCursosView.as_view(), name='api_cursos'),
     path('api/asignaturas/', ApiAsignaturasView.as_view(), name='api_asignaturas'),
+    
+    # URLs para gestión de cursos
+    path('cursos/<int:curso_id>/data/', CursoDataView.as_view(), name='curso_data'),
+    path('cursos/<int:curso_id>/update/', CursoUpdateView.as_view(), name='curso_update'),
+    path('cursos/<int:curso_id>/delete/', CursoDeleteView.as_view(), name='curso_delete'),
+    
+    # URLs para gestión de asignaturas
+    path('asignaturas/<int:asignatura_id>/data/', AsignaturaDataView.as_view(), name='asignatura_data'),
+    path('asignaturas/<int:asignatura_id>/update/', AsignaturaUpdateView.as_view(), name='asignatura_update'),
     
     # URLs para reportes del admin
     path('api/dashboard-metricas/', DashboardMetricasView.as_view(), name='dashboard_metricas'),

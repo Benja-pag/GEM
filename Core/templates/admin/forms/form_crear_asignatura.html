@@ -13,27 +13,36 @@
                     
                     <div class="mb-3">
                         <label for="codigo" class="form-label">Código de la Asignatura</label>
-                        <input type="text" class="form-control" id="codigo" name="codigo" required>
+                        <input type="text" class="form-control" id="codigo" name="codigo" required 
+                               placeholder="Ej: MAT_1A, BIO-2B, HIS01">
+                        <div class="form-text">Código único para identificar esta asignatura impartida</div>
                     </div>
 
                     <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre de la Asignatura</label>
-                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required
+                               placeholder="Ej: Matemáticas, Historia, Biología">
                     </div>
 
                     <div class="mb-3">
-                        <label for="descripcion" class="form-label">Descripción</label>
-                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="curso" class="form-label">Curso</label>
-                        <select class="form-select" id="curso" name="curso" required>
-                            <option value="">Seleccione un curso</option>
-                            {% for curso in cursos %}
-                                <option value="{{ curso.id }}">{{ curso.nivel }}°{{ curso.letra }}</option>
-                            {% endfor %}
+                        <label for="nivel" class="form-label">Nivel</label>
+                        <select class="form-select" id="nivel" name="nivel" required>
+                            <option value="">Seleccione un nivel</option>
+                            <option value="1">1° Básico</option>
+                            <option value="2">2° Básico</option>
+                            <option value="3">3° Básico</option>
+                            <option value="4">4° Básico</option>
                         </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="es_electivo" name="es_electivo">
+                            <label class="form-check-label" for="es_electivo">
+                                ¿Es asignatura electiva?
+                            </label>
+                            <div class="form-text">Las asignaturas electivas permiten estudiantes de diferentes cursos</div>
+                        </div>
                     </div>
 
                     <div class="mb-3">

@@ -862,17 +862,21 @@ class AdminPanelModularView(View):
                 try:
                     codigo = request.POST.get('codigo')
                     nombre = request.POST.get('nombre')
-                    curso_id = request.POST.get('curso')
+                    nivel = request.POST.get('nivel')
                     profesor_id = request.POST.get('profesor')
-                    descripcion = request.POST.get('descripcion')
+                    es_electivo = request.POST.get('es_electivo') == 'on'
                     
                     errores = []
                     if not codigo:
                         errores.append('El código es obligatorio')
                     if not nombre:
                         errores.append('El nombre es obligatorio')
-                    if not curso_id:
-                        errores.append('Debe seleccionar un curso')
+                    if not nivel:
+                        errores.append('Debe seleccionar un nivel')
+                    
+                    # Verificar si ya existe una asignatura impartida con el mismo código
+                    if AsignaturaImpartida.objects.filter(codigo=codigo).exists():
+                        errores.append(f'Ya existe una asignatura con el código {codigo}')
                     
                     if errores:
                         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -884,23 +888,36 @@ class AdminPanelModularView(View):
                             messages.error(request, error)
                         return redirect('admin_panel')
                     
-                    # Crear la asignatura
-                    asignatura = Asignatura.objects.create(
-                        codigo=codigo,
+                    # Verificar si ya existe una asignatura con el mismo nombre y nivel
+                    asignatura, created = Asignatura.objects.get_or_create(
                         nombre=nombre,
-                        descripcion=descripcion
+                        nivel=nivel,
+                        defaults={'es_electivo': es_electivo}
                     )
                     
                     # Crear la asignatura impartida
-                    curso = get_object_or_404(Curso, id=curso_id)
                     docente = None
                     if profesor_id:
                         docente = get_object_or_404(Docente, usuario__auth_user_id=profesor_id)
                     
                     asignatura_impartida = AsignaturaImpartida.objects.create(
                         asignatura=asignatura,
-                        docente=docente
+                        docente=docente,
+                        codigo=codigo
                     )
+                    
+                    # Si no es electiva, crear clases para todos los cursos del nivel
+                    if not es_electivo:
+                        cursos_nivel = Curso.objects.filter(nivel=nivel)
+                        for curso in cursos_nivel:
+                            # Crear al menos una clase de ejemplo (se puede personalizar después)
+                            Clase.objects.create(
+                                asignatura_impartida=asignatura_impartida,
+                                curso=curso,
+                                fecha='LUNES',  # Día por defecto
+                                horario='1',    # Bloque por defecto
+                                sala='SALA_1'   # Sala por defecto
+                            )
                     
                     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                         return JsonResponse({
@@ -1233,3 +1250,312 @@ class ApiAsignaturasView(View):
             return JsonResponse(data, safe=False)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
+
+@method_decorator([login_required, csrf_exempt], name='dispatch')
+class CursoDataView(View):
+    """Vista para obtener datos de un curso específico"""
+    def get(self, request, curso_id):
+        try:
+            if not request.user.is_admin:
+                return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
+            
+            curso = get_object_or_404(Curso, id=curso_id)
+            
+            # Obtener estadísticas del curso
+            total_estudiantes = Estudiante.objects.filter(curso=curso).count()
+            total_asignaturas = AsignaturaImpartida.objects.filter(clases__curso=curso).distinct().count()
+            
+            # Obtener profesor jefe
+            profesor_jefe = None
+            if hasattr(curso, 'jefatura_actual') and curso.jefatura_actual:
+                profesor_jefe = {
+                    'id': curso.jefatura_actual.docente.usuario.auth_user_id,
+                    'nombre': curso.jefatura_actual.docente.usuario.get_full_name()
+                }
+            
+            # Obtener lista de estudiantes
+            estudiantes = []
+            for estudiante in Estudiante.objects.filter(curso=curso).select_related('usuario'):
+                estudiantes.append({
+                    'id': estudiante.pk,
+                    'nombre': estudiante.usuario.get_full_name(),
+                    'rut': f"{estudiante.usuario.rut}-{estudiante.usuario.div}",
+                    'correo': estudiante.usuario.correo
+                })
+            
+            # Obtener lista de asignaturas
+            asignaturas = []
+            for asignatura in AsignaturaImpartida.objects.filter(clases__curso=curso).distinct().select_related('asignatura', 'docente__usuario'):
+                asignaturas.append({
+                    'id': asignatura.id,
+                    'nombre': asignatura.asignatura.nombre,
+                    'codigo': asignatura.codigo,
+                    'docente': asignatura.docente.usuario.get_full_name() if asignatura.docente else 'Sin docente'
+                })
+            
+            data = {
+                'id': curso.id,
+                'nivel': curso.nivel,
+                'letra': curso.letra,
+                'nombre': f"{curso.nivel}°{curso.letra}",
+                'total_estudiantes': total_estudiantes,
+                'total_asignaturas': total_asignaturas,
+                'profesor_jefe': profesor_jefe,
+                'estudiantes': estudiantes,
+                'asignaturas': asignaturas
+            }
+            
+            return JsonResponse({'success': True, 'data': data})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator([login_required, csrf_exempt], name='dispatch')
+class CursoUpdateView(View):
+    """Vista para actualizar un curso"""
+    def post(self, request, curso_id):
+        try:
+            if not request.user.is_admin:
+                return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
+            
+            curso = get_object_or_404(Curso, id=curso_id)
+            
+            nivel = request.POST.get('nivel')
+            letra = request.POST.get('letra', '').upper()
+            profesor_jefe_id = request.POST.get('profesor_jefe_id')
+            
+            errores = []
+            
+            # Validar datos
+            if not nivel or not nivel.isdigit() or int(nivel) < 1 or int(nivel) > 4:
+                errores.append('El nivel debe estar entre 1 y 4')
+            
+            if not letra or letra not in ['A', 'B', 'C']:
+                errores.append('La letra debe ser A, B o C')
+            
+            # Verificar si ya existe otro curso con el mismo nivel y letra
+            curso_existente = Curso.objects.filter(nivel=nivel, letra=letra).exclude(id=curso_id).first()
+            if curso_existente:
+                errores.append(f'Ya existe otro curso {nivel}°{letra}')
+            
+            if errores:
+                return JsonResponse({'success': False, 'errors': errores})
+            
+            with transaction.atomic():
+                # Actualizar datos del curso
+                curso.nivel = int(nivel)
+                curso.letra = letra
+                curso.save()
+                
+                # Actualizar profesor jefe si se especifica
+                if profesor_jefe_id:
+                    # Quitar profesor jefe anterior si existe
+                    if hasattr(curso, 'jefatura_actual') and curso.jefatura_actual:
+                        profesor_anterior = curso.jefatura_actual.docente
+                        curso.jefatura_actual.delete()
+                        # Si el profesor anterior no tiene otras jefaturas, desmarcar es_profesor_jefe
+                        if not profesor_anterior.jefaturas.exists():
+                            profesor_anterior.es_profesor_jefe = False
+                            profesor_anterior.save()
+                    
+                    # Asignar nuevo profesor jefe
+                    docente = get_object_or_404(Docente, usuario__auth_user_id=profesor_jefe_id)
+                    
+                    # Verificar si el docente ya es jefe de otro curso
+                    if docente.jefaturas.filter(curso__isnull=False).exclude(curso=curso).exists():
+                        return JsonResponse({
+                            'success': False, 
+                            'errors': ['El profesor seleccionado ya es jefe de otro curso']
+                        })
+                    
+                    docente.es_profesor_jefe = True
+                    docente.save()
+                    
+                    ProfesorJefe.objects.create(
+                        docente=docente,
+                        curso=curso
+                    )
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Curso {curso.nivel}°{curso.letra} actualizado exitosamente'
+                })
+                
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator([login_required, csrf_exempt], name='dispatch')
+class CursoDeleteView(View):
+    """Vista para eliminar un curso"""
+    def post(self, request, curso_id):
+        try:
+            if not request.user.is_admin:
+                return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
+            
+            curso = get_object_or_404(Curso, id=curso_id)
+            
+            # Verificar si el curso tiene estudiantes asignados
+            total_estudiantes = Estudiante.objects.filter(curso=curso).count()
+            if total_estudiantes > 0:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'No se puede eliminar el curso {curso.nivel}°{curso.letra} porque tiene {total_estudiantes} estudiantes asignados'
+                })
+            
+            # Verificar si el curso tiene asignaturas asignadas
+            total_asignaturas = AsignaturaImpartida.objects.filter(clases__curso=curso).count()
+            if total_asignaturas > 0:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'No se puede eliminar el curso {curso.nivel}°{curso.letra} porque tiene {total_asignaturas} asignaturas asignadas'
+                })
+            
+            with transaction.atomic():
+                curso_nombre = f"{curso.nivel}°{curso.letra}"
+                
+                # Eliminar jefatura si existe
+                if hasattr(curso, 'jefatura_actual') and curso.jefatura_actual:
+                    profesor_jefe = curso.jefatura_actual.docente
+                    curso.jefatura_actual.delete()
+                    # Si el profesor no tiene otras jefaturas, desmarcar es_profesor_jefe
+                    if not profesor_jefe.jefaturas.exists():
+                        profesor_jefe.es_profesor_jefe = False
+                        profesor_jefe.save()
+                
+                # Eliminar el curso
+                curso.delete()
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Curso {curso_nombre} eliminado exitosamente'
+                })
+                
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator([login_required, csrf_exempt], name='dispatch')
+class AsignaturaDataView(View):
+    """Vista para obtener datos de una asignatura específica"""
+    def get(self, request, asignatura_id):
+        try:
+            if not request.user.is_admin:
+                return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
+            
+            asignatura_impartida = get_object_or_404(AsignaturaImpartida, id=asignatura_id)
+            
+            # Obtener clases asociadas
+            clases = Clase.objects.filter(asignatura_impartida=asignatura_impartida).select_related('curso')
+            
+            # Obtener estudiantes inscritos
+            estudiantes_inscritos = []
+            for clase in clases:
+                estudiantes = Estudiante.objects.filter(curso=clase.curso).select_related('usuario')
+                for estudiante in estudiantes:
+                    if not any(e['id'] == estudiante.pk for e in estudiantes_inscritos):
+                        estudiantes_inscritos.append({
+                            'id': estudiante.pk,
+                            'nombre': estudiante.usuario.get_full_name(),
+                            'rut': f"{estudiante.usuario.rut}-{estudiante.usuario.div}",
+                            'curso': f"{estudiante.curso.nivel}°{estudiante.curso.letra}" if estudiante.curso else 'Sin curso'
+                        })
+            
+            # Obtener horarios
+            horarios = []
+            for clase in clases:
+                horarios.append({
+                    'dia': clase.get_fecha_display(),
+                    'horario': clase.horario,  # horario es CharField, no tiene choices
+                    'sala': clase.get_sala_display(),
+                    'curso': f"{clase.curso.nivel}°{clase.curso.letra}"
+                })
+            
+            # Obtener evaluaciones
+            evaluaciones = Evaluacion.objects.filter(clase__asignatura_impartida=asignatura_impartida).select_related('evaluacion_base')
+            evaluaciones_data = []
+            for evaluacion in evaluaciones:
+                evaluaciones_data.append({
+                    'id': evaluacion.id,
+                    'nombre': evaluacion.evaluacion_base.nombre,
+                    'descripcion': evaluacion.evaluacion_base.descripcion,
+                    'fecha': evaluacion.fecha.strftime('%d/%m/%Y') if evaluacion.fecha else 'Sin fecha',
+                    'curso': f"{evaluacion.clase.curso.nivel}°{evaluacion.clase.curso.letra}"
+                })
+            
+            data = {
+                'id': asignatura_impartida.id,
+                'codigo': asignatura_impartida.codigo,  # El código está en AsignaturaImpartida
+                'nombre': asignatura_impartida.asignatura.nombre,
+                'nivel': asignatura_impartida.asignatura.get_nivel_display(),
+                'es_electivo': asignatura_impartida.asignatura.es_electivo,
+                'docente': {
+                    'id': asignatura_impartida.docente.usuario.auth_user_id if asignatura_impartida.docente else None,
+                    'nombre': asignatura_impartida.docente.usuario.get_full_name() if asignatura_impartida.docente else 'Sin docente',
+                    'especialidad': asignatura_impartida.docente.especialidad.nombre if asignatura_impartida.docente and asignatura_impartida.docente.especialidad else 'Sin especialidad'
+                },
+                'total_estudiantes': len(estudiantes_inscritos),
+                'total_horarios': len(horarios),
+                'total_evaluaciones': len(evaluaciones_data),
+                'estudiantes': estudiantes_inscritos,
+                'horarios': horarios,
+                'evaluaciones': evaluaciones_data
+            }
+            
+            return JsonResponse({'success': True, 'data': data})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator([login_required, csrf_exempt], name='dispatch')
+class AsignaturaUpdateView(View):
+    """Vista para actualizar una asignatura"""
+    def post(self, request, asignatura_id):
+        try:
+            if not request.user.is_admin:
+                return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
+            
+            asignatura_impartida = get_object_or_404(AsignaturaImpartida, id=asignatura_id)
+            
+            codigo = request.POST.get('codigo')
+            nombre = request.POST.get('nombre')
+            descripcion = request.POST.get('descripcion', '')
+            docente_id = request.POST.get('docente_id')
+            
+            errores = []
+            
+            # Validar datos
+            if not codigo:
+                errores.append('El código es obligatorio')
+            if not nombre:
+                errores.append('El nombre es obligatorio')
+            
+            # Verificar si ya existe otra asignatura impartida con el mismo código
+            if AsignaturaImpartida.objects.filter(codigo=codigo).exclude(id=asignatura_impartida.id).exists():
+                errores.append(f'Ya existe otra asignatura impartida con el código {codigo}')
+            
+            if errores:
+                return JsonResponse({'success': False, 'errors': errores})
+            
+            with transaction.atomic():
+                # Actualizar la asignatura base
+                asignatura_base = asignatura_impartida.asignatura
+                asignatura_base.nombre = nombre
+                asignatura_base.save()
+                
+                # Actualizar el código en AsignaturaImpartida
+                asignatura_impartida.codigo = codigo
+                
+                # Actualizar el docente si se especifica
+                if docente_id:
+                    docente = get_object_or_404(Docente, usuario__auth_user_id=docente_id)
+                    asignatura_impartida.docente = docente
+                
+                # Guardar los cambios en AsignaturaImpartida
+                asignatura_impartida.save()
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Asignatura {nombre} actualizada exitosamente'
+                })
+                
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})

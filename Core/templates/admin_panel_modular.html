@@ -10,6 +10,8 @@
 <script src="{% static 'js/user_edit.js' %}"></script>
 <script src="{% static 'js/user_details.js' %}"></script>
 <script src="{% static 'js/curso_form.js' %}"></script>
+<script src="{% static 'js/curso_actions.js' %}"></script>
+<script src="{% static 'js/asignatura_actions.js' %}"></script>
 <script src="{% static 'js/admin_calendario.js' %}"></script>
 <script>
     // Agregar el atributo data-is-admin al body
@@ -154,6 +156,409 @@
             {% include 'admin/forms/form_crear_admin.html' %}
             {% include 'admin/forms/form_crear_curso.html' %}
             {% include 'admin/forms/form_crear_asignatura.html' %}
+
+            <!-- Modal de Detalles de Curso -->
+            <div class="modal fade" id="cursoDetailsModal" tabindex="-1" aria-labelledby="cursoDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="cursoDetailsModalLabel">Detalles del Curso</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Curso:</strong> <span id="cursoDetailNombre"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Profesor Jefe:</strong> <span id="cursoDetailProfesor"></span>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Total Estudiantes:</strong> <span id="cursoDetailEstudiantes"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Total Asignaturas:</strong> <span id="cursoDetailAsignaturas"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Tabs para estudiantes y asignaturas -->
+                            <ul class="nav nav-tabs mb-3" id="cursoDetailsTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantesTab" type="button" role="tab">
+                                        <i class="fas fa-users me-1"></i>Estudiantes
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="asignaturas-tab" data-bs-toggle="tab" data-bs-target="#asignaturasTab" type="button" role="tab">
+                                        <i class="fas fa-book me-1"></i>Asignaturas
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content" id="cursoDetailsTabContent">
+                                <div class="tab-pane fade show active" id="estudiantesTab" role="tabpanel">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nombre</th>
+                                                    <th>RUT</th>
+                                                    <th>Correo</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cursoEstudiantesList">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="asignaturasTab" role="tabpanel">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Asignatura</th>
+                                                    <th>Código</th>
+                                                    <th>Docente</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cursoAsignaturasList">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Edición de Curso -->
+            <div class="modal fade" id="editCursoModal" tabindex="-1" aria-labelledby="editCursoModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editCursoModalLabel">Editar Curso</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editCursoForm">
+                                <div class="alert alert-danger" id="editCursoErrors" style="display: none;"></div>
+                                
+                                <div class="mb-3">
+                                    <label for="editCursoNivel" class="form-label">Nivel</label>
+                                    <select class="form-select" id="editCursoNivel" name="nivel" required>
+                                        <option value="1">1°</option>
+                                        <option value="2">2°</option>
+                                        <option value="3">3°</option>
+                                        <option value="4">4°</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="editCursoLetra" class="form-label">Letra</label>
+                                    <select class="form-select" id="editCursoLetra" name="letra" required>
+                                        <option value="A">A</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="editCursoProfesorJefe" class="form-label">Profesor Jefe (Opcional)</label>
+                                    <select class="form-select" id="editCursoProfesorJefe" name="profesor_jefe_id">
+                                        <option value="">Sin profesor jefe</option>
+                                        {% for docente in docentes %}
+                                            <option value="{{ docente.usuario.auth_user_id }}">{{ docente.usuario.get_full_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" id="saveEditCursoBtn">Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Detalles de Asignatura -->
+            <div class="modal fade" id="asignaturaDetailsModal" tabindex="-1" aria-labelledby="asignaturaDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="asignaturaDetailsModalLabel">Detalles de la Asignatura</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Código:</strong> <span id="asignaturaDetailCodigo"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Nombre:</strong> <span id="asignaturaDetailNombre"></span>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Docente:</strong> <span id="asignaturaDetailDocente"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Total Estudiantes:</strong> <span id="asignaturaDetailEstudiantes"></span>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <strong>Descripción:</strong> <span id="asignaturaDetailDescripcion"></span>
+                                </div>
+                            </div>
+                            
+                            <!-- Tabs para estudiantes, horarios y evaluaciones -->
+                            <ul class="nav nav-tabs mb-3" id="asignaturaDetailsTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="estudiantes-asig-tab" data-bs-toggle="tab" data-bs-target="#estudiantesAsigTab" type="button" role="tab">
+                                        <i class="fas fa-users me-1"></i>Estudiantes
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="horarios-tab" data-bs-toggle="tab" data-bs-target="#horariosTab" type="button" role="tab">
+                                        <i class="fas fa-clock me-1"></i>Horarios
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="evaluaciones-asig-tab" data-bs-toggle="tab" data-bs-target="#evaluacionesAsigTab" type="button" role="tab">
+                                        <i class="fas fa-clipboard-list me-1"></i>Evaluaciones
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content" id="asignaturaDetailsTabContent">
+                                <div class="tab-pane fade show active" id="estudiantesAsigTab" role="tabpanel">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nombre</th>
+                                                    <th>RUT</th>
+                                                    <th>Curso</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="asignaturaEstudiantesList">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="horariosTab" role="tabpanel">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Día</th>
+                                                    <th>Horario</th>
+                                                    <th>Sala</th>
+                                                    <th>Curso</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="asignaturaHorariosList">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="evaluacionesAsigTab" role="tabpanel">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Evaluación</th>
+                                                    <th>Descripción</th>
+                                                    <th>Fecha</th>
+                                                    <th>Curso</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="asignaturaEvaluacionesList">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Edición de Asignatura -->
+            <div class="modal fade" id="editAsignaturaModal" tabindex="-1" aria-labelledby="editAsignaturaModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editAsignaturaModalLabel">Editar Asignatura</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editAsignaturaForm">
+                                <div class="alert alert-danger" id="editAsignaturaErrors" style="display: none;"></div>
+                                
+                                <div class="mb-3">
+                                    <label for="editAsignaturaCodigo" class="form-label">Código</label>
+                                    <input type="text" class="form-control" id="editAsignaturaCodigo" name="codigo" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="editAsignaturaNombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="editAsignaturaNombre" name="nombre" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="editAsignaturaDescripcion" class="form-label">Descripción</label>
+                                    <textarea class="form-control" id="editAsignaturaDescripcion" name="descripcion" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="editAsignaturaDocente" class="form-label">Docente (Opcional)</label>
+                                    <select class="form-select" id="editAsignaturaDocente" name="docente_id">
+                                        <option value="">Sin docente asignado</option>
+                                        {% for docente in docentes %}
+                                            <option value="{{ docente.usuario.auth_user_id }}">{{ docente.usuario.get_full_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" id="saveEditAsignaturaBtn">Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Edición de Usuario -->
+            <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editUserModalLabel">Editar Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="editUserForm">
+                                <input type="hidden" id="edit-user-id" name="user_id">
+                                <div class="mb-3">
+                                    <label for="edit-nombre" class="form-label">Nombre</label>
+                                    <input type="text" class="form-control" id="edit-nombre" name="nombre" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-apellido-paterno" class="form-label">Apellido Paterno</label>
+                                    <input type="text" class="form-control" id="edit-apellido-paterno" name="apellido_paterno" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-apellido-materno" class="form-label">Apellido Materno</label>
+                                    <input type="text" class="form-control" id="edit-apellido-materno" name="apellido_materno" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-rut" class="form-label">RUT</label>
+                                    <input type="text" class="form-control" id="edit-rut" name="rut" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-div" class="form-label">Dígito Verificador</label>
+                                    <input type="text" class="form-control" id="edit-div" name="div" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-correo" class="form-label">Correo</label>
+                                    <input type="email" class="form-control" id="edit-correo" name="correo" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-telefono" class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control" id="edit-telefono" name="telefono" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-direccion" class="form-label">Dirección</label>
+                                    <textarea class="form-control" id="edit-direccion" name="direccion" rows="2" required></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-fecha-nacimiento" class="form-label">Fecha de Nacimiento</label>
+                                    <input type="date" class="form-control" id="edit-fecha-nacimiento" name="fecha_nacimiento" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-tipo-usuario" class="form-label">Tipo de Usuario</label>
+                                    <select class="form-select" id="edit-tipo-usuario" name="tipo_usuario" required>
+                                        <option value="">Seleccione un tipo</option>
+                                        <option value="estudiante">Estudiante</option>
+                                        <option value="docente">Docente</option>
+                                        <option value="administrativo">Administrativo</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" form="editUserForm" class="btn btn-primary">Guardar Cambios</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Detalles de Usuario -->
+            <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="userDetailsModalLabel">Detalles del Usuario</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Información Personal</h6>
+                                    <p><strong>Nombre Completo:</strong> <span id="detail-nombre-completo"></span></p>
+                                    <p><strong>RUT:</strong> <span id="detail-rut"></span></p>
+                                    <p><strong>Correo:</strong> <span id="detail-correo"></span></p>
+                                    <p><strong>Teléfono:</strong> <span id="detail-telefono"></span></p>
+                                    <p><strong>Dirección:</strong> <span id="detail-direccion"></span></p>
+                                    <p><strong>Fecha de Nacimiento:</strong> <span id="detail-fecha-nacimiento"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="mb-3">Información del Sistema</h6>
+                                    <p><strong>Tipo de Usuario:</strong> <span id="detail-tipo-usuario"></span></p>
+                                    <p><strong>Estado:</strong> <span id="detail-estado" class="badge"></span></p>
+                                    <p><strong>Fecha de Creación:</strong> <span id="detail-fecha-creacion"></span></p>
+                                    
+                                    <!-- Información específica de estudiante -->
+                                    <div id="detail-estudiante-info" style="display: none;">
+                                        <h6 class="mb-2">Información de Estudiante</h6>
+                                        <p><strong>Contacto de Emergencia:</strong> <span id="detail-contacto-emergencia"></span></p>
+                                        <p><strong>Curso:</strong> <span id="detail-curso"></span></p>
+                                    </div>
+                                    
+                                    <!-- Información específica de docente -->
+                                    <div id="detail-docente-info" style="display: none;">
+                                        <h6 class="mb-2">Información de Docente</h6>
+                                        <p><strong>Especialidad:</strong> <span id="detail-especialidad"></span></p>
+                                        <p><strong>Es Profesor Jefe:</strong> <span id="detail-es-profesor-jefe"></span></p>
+                                    </div>
+                                    
+                                    <!-- Información específica de administrativo -->
+                                    <div id="detail-administrativo-info" style="display: none;">
+                                        <h6 class="mb-2">Información Administrativa</h6>
+                                        <p><strong>Rol:</strong> <span id="detail-rol-administrativo"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {% else %}
             <div class="alert alert-warning" role="alert">

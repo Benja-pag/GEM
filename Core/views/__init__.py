@@ -2,9 +2,7 @@ from .usuarios import *
 from .admin import *
 from .alumnos import *
 from .auth import *
-from .asignaturas import *
 from .docentes import *
-from .evaluaciones import *
 from .template_vistas import *
 from .template_vistas import HomeView, SurveysView, TasksView, TestsView
 from .admin import AdminPanelView, AdminPanelModularView, ToggleUserStatusView, CreateAdminView

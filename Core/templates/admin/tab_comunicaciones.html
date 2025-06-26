@@ -130,8 +130,8 @@
                                         </div>
                                         <div class="col-md-4 text-end">
                                             <a href="{% url 'detalle_comunicacion' comunicacion.id %}" class="btn btn-outline-primary">
-                                                <i class="fas fa-eye me-2"></i>Ver Detalle
-                                            </a>
+                                                            <i class="fas fa-eye me-2"></i>Ver Detalle
+                                                        </a>
                                         </div>
                                     </div>
                                 </div>
@@ -201,7 +201,7 @@
 <script>
 $(document).ready(function() {
 
-    // Búsqueda en tiempo real
+// Búsqueda en tiempo real
     $('#buscar-comunicaciones').on('input', function() {
         const termino = $(this).val().toLowerCase();
         $('.comunicacion-item').each(function() {
@@ -209,14 +209,14 @@ $(document).ready(function() {
             const asunto = $item.data('asunto') || '';
             const autor = $item.data('autor') || '';
             const contenido = $item.data('contenido') || '';
-            
-            if (asunto.includes(termino) || autor.includes(termino) || contenido.includes(termino)) {
+        
+        if (asunto.includes(termino) || autor.includes(termino) || contenido.includes(termino)) {
                 $item.show();
-            } else {
+        } else {
                 $item.hide();
-            }
-        });
+        }
     });
+});
 
     // Filtro por tipo
     $('#filtro-tipo').on('change', function() {

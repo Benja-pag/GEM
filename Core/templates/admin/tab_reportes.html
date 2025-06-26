@@ -14,7 +14,7 @@
                     <small>Registrados</small>
                 </div>
             </div>
-        </div>
+                    </div>
         <div class="col-md-3">
             <div class="card bg-success text-white shadow-sm">
                 <div class="card-body text-center">
@@ -38,7 +38,7 @@
                     <small>Colegio</small>
                 </div>
             </div>
-        </div>
+                    </div>
         <div class="col-md-3">
             <div class="card bg-warning text-white shadow-sm">
                 <div class="card-body text-center">
@@ -51,9 +51,7 @@
                 </div>
             </div>
         </div>
-    </div>
-
-
+                </div>
 
     <!-- Sistema de Pestañas para Reportes -->
     <div class="container-fluid">
@@ -61,23 +59,22 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="rendimiento-tab" data-bs-toggle="tab" data-bs-target="#rendimiento-academico" type="button" role="tab" aria-controls="rendimiento-academico" aria-selected="true">
                     <i class="fas fa-graduation-cap me-2"></i>Rendimiento Académico
-                </button>
+                        </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="asistencia-tab" data-bs-toggle="tab" data-bs-target="#asistencia-reporte" type="button" role="tab" aria-controls="asistencia-reporte" aria-selected="false">
                     <i class="fas fa-calendar-check me-2"></i>Asistencia
-                </button>
+                        </button>
             </li>
-
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="riesgo-tab" data-bs-toggle="tab" data-bs-target="#estudiantes-riesgo" type="button" role="tab" aria-controls="estudiantes-riesgo" aria-selected="false">
                     <i class="fas fa-exclamation-triangle me-2"></i>Estudiantes en Riesgo
-                </button>
+                        </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="evaluaciones-tab" data-bs-toggle="tab" data-bs-target="#evaluaciones-reporte" type="button" role="tab" aria-controls="evaluaciones-reporte" aria-selected="false">
                     <i class="fas fa-clipboard-list me-2"></i>Evaluaciones
-                </button>
+                        </button>
             </li>
         </ul>
     </div>
@@ -90,9 +87,14 @@
             <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title mb-0"><i class="fas fa-graduation-cap me-2"></i>Rendimiento Académico por Cursos</h6>
-                    <button class="btn btn-sm btn-outline-primary" onclick="generarReporteRendimiento()">
-                        <i class="fas fa-sync-alt"></i> Actualizar
-                    </button>
+                    <div>
+                        <a href="{% url 'descargar_reporte_cursos_pdf' %}" class="btn btn-sm btn-outline-success me-2" title="Descargar reporte en PDF">
+                            <i class="fas fa-file-pdf me-1"></i>PDF
+                        </a>
+                        <button class="btn btn-sm btn-outline-primary" onclick="generarReporteRendimiento()">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -112,51 +114,170 @@
                                 <!-- Las filas se cargarán dinámicamente -->
                             </tbody>
                         </table>
-                    </div>
                 </div>
             </div>
         </div>
-
+    </div>
+    
         <!-- Pestaña de Asistencia -->
         <div class="tab-pane fade" id="asistencia-reporte" role="tabpanel" aria-labelledby="asistencia-tab">
-            <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="card-title mb-0"><i class="fas fa-calendar-check me-2"></i>Reporte de Asistencia por Curso</h6>
-                    <button class="btn btn-sm btn-outline-warning" onclick="generarReporteAsistencia()">
-                        <i class="fas fa-sync-alt"></i> Actualizar
+            
+            <!-- Sub-pestañas para Asistencia -->
+            <ul class="nav nav-pills mb-3" id="asistencia-sub-tabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="asistencia-general-tab" data-bs-toggle="pill" data-bs-target="#asistencia-general" type="button" role="tab">
+                        <i class="fas fa-chart-bar me-2"></i>Reporte General
                     </button>
-                </div>
-                <div class="card-body" id="reporte-asistencia">
-                    <div class="text-center">
-                        <div class="spinner-border text-warning" role="status">
-                            <span class="visually-hidden">Cargando...</span>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="asistencia-estudiante-tab" data-bs-toggle="pill" data-bs-target="#asistencia-estudiante" type="button" role="tab">
+                        <i class="fas fa-user me-2"></i>Por Estudiante
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="asistencia-curso-tab" data-bs-toggle="pill" data-bs-target="#asistencia-curso" type="button" role="tab">
+                        <i class="fas fa-users me-2"></i>Por Curso
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content" id="asistencia-sub-content">
+                
+                <!-- Reporte General de Asistencia -->
+                <div class="tab-pane fade show active" id="asistencia-general" role="tabpanel">
+                    <div class="card shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="card-title mb-0"><i class="fas fa-calendar-check me-2"></i>Reporte General de Asistencia</h6>
+                            <div>
+                                <a href="{% url 'descargar_reporte_asistencia_pdf' %}" class="btn btn-sm btn-outline-success me-2" title="Descargar reporte de asistencia en PDF">
+                                    <i class="fas fa-file-pdf me-1"></i>PDF
+                                </a>
+                                <button class="btn btn-sm btn-outline-warning" onclick="generarReporteAsistencia()">
+                                    <i class="fas fa-sync-alt"></i> Actualizar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body" id="reporte-asistencia">
+                            <div class="text-center">
+                                <div class="spinner-border text-warning" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Reporte de Asistencia por Estudiante -->
+                <div class="tab-pane fade" id="asistencia-estudiante" role="tabpanel">
+                    <div class="card shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="card-title mb-0"><i class="fas fa-user me-2"></i>Reporte de Asistencia por Estudiante</h6>
+                            <div>
+                                <label for="periodo-estudiante-tabla" class="form-label me-2">Período:</label>
+                                <select class="form-select d-inline-block w-auto" id="periodo-estudiante-tabla">
+                                    <option value="ano_actual">Año Actual</option>
+                                    <option value="mes_actual">Mes Actual</option>
+                                    <option value="semestre_actual">Semestre Actual</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-primary ms-2" onclick="cargarTablaEstudiantes()">
+                                    <i class="fas fa-sync-alt"></i> Actualizar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="tabla-estudiantes-container">
+                                <div class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando estudiantes...</span>
+                                    </div>
+                                    <p class="mt-2">Cargando lista de estudiantes...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reporte de Asistencia por Curso -->
+                <div class="tab-pane fade" id="asistencia-curso" role="tabpanel">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0"><i class="fas fa-users me-2"></i>Reporte de Asistencia por Curso</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="select-curso" class="form-label">Seleccionar Curso:</label>
+                                    <select class="form-select" id="select-curso">
+                                        <option value="">Cargando cursos...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="periodo-curso" class="form-label">Período:</label>
+                                    <select class="form-select" id="periodo-curso">
+                                        <option value="ano_actual">Año Actual</option>
+                                        <option value="mes_actual">Mes Actual</option>
+                                        <option value="semestre_actual">Semestre Actual</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 mb-3">
+                                <button class="btn btn-primary" onclick="generarReporteAsistenciaCurso()">
+                                    <i class="fas fa-chart-bar me-2"></i>Generar Reporte
+                                </button>
+                                <button class="btn btn-success" onclick="descargarPDFAsistenciaCurso()" disabled id="btn-pdf-curso">
+                                    <i class="fas fa-file-pdf me-2"></i>Descargar PDF
+                                </button>
+                            </div>
+                            <div id="reporte-asistencia-curso">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Selecciona un curso y presiona "Generar Reporte" para ver el detalle de asistencia del curso.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
-
-
 
         <!-- Pestaña de Estudiantes en Riesgo -->
         <div class="tab-pane fade" id="estudiantes-riesgo" role="tabpanel" aria-labelledby="riesgo-tab">
             <div class="card shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="card-title mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Estudiantes en Situación de Riesgo</h6>
-                    <button class="btn btn-sm btn-outline-danger" onclick="generarReporteEstudiantesRiesgo()">
-                        <i class="fas fa-sync-alt"></i> Actualizar
-                    </button>
-                </div>
+                    <div class="btn-group" role="group">
+                        <div class="dropdown me-2">
+                            <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-file-pdf me-1"></i>Descargar PDF
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'descargar_reporte_estudiantes_riesgo_pdf' %}?tipo=completo">
+                                    <i class="fas fa-file-pdf text-danger me-2"></i>Reporte Completo
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'descargar_reporte_estudiantes_riesgo_pdf' %}?tipo=academico">
+                                    <i class="fas fa-chart-line text-warning me-2"></i>Solo Riesgo Académico
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'descargar_reporte_estudiantes_riesgo_pdf' %}?tipo=asistencia">
+                                    <i class="fas fa-calendar-times text-info me-2"></i>Solo Riesgo Asistencia
+                                </a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="generarReporteEstudiantesRiesgo()">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                                </div>
+                            </div>
                 <div class="card-body" id="reporte-estudiantes-riesgo">
                     <div class="text-center">
                         <div class="spinner-border text-danger" role="status">
                             <span class="visually-hidden">Cargando...</span>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
+    </div>
+    
         <!-- Pestaña de Evaluaciones -->
         <div class="tab-pane fade" id="evaluaciones-reporte" role="tabpanel" aria-labelledby="evaluaciones-tab">
             <div class="card shadow-sm">
@@ -217,7 +338,12 @@ function inicializarReportes() {
 // Cargar métricas del dashboard
 function cargarDashboardMetricas() {
     fetch('/api/dashboard-metricas/')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 mostrarDashboardMetricas(data.data);
@@ -227,7 +353,7 @@ function cargarDashboardMetricas() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error al cargar métricas del dashboard:', error);
             mostrarErrorMetricas();
         });
 }
@@ -240,10 +366,10 @@ function mostrarDashboardMetricas(data) {
 }
 
 function mostrarErrorMetricas() {
-    document.getElementById('total-estudiantes').innerHTML = '<small class="text-muted">Error</small>';
-    document.getElementById('total-docentes').innerHTML = '<small class="text-muted">Error</small>';
-    document.getElementById('promedio-general').innerHTML = '<small class="text-muted">Error</small>';
-    document.getElementById('asistencia-promedio').innerHTML = '<small class="text-muted">Error</small>';
+    document.getElementById('total-estudiantes').innerHTML = '<small class="text-danger">Error</small>';
+    document.getElementById('total-docentes').innerHTML = '<small class="text-danger">Error</small>';
+    document.getElementById('promedio-general').innerHTML = '<small class="text-danger">Error</small>';
+    document.getElementById('asistencia-promedio').innerHTML = '<small class="text-danger">Error</small>';
 }
 
 // Generar reporte de rendimiento por cursos
@@ -262,7 +388,12 @@ function generarReporteRendimiento() {
     }
 
     fetch('/api/reporte-rendimiento-cursos/')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 mostrarTablaRendimiento(data.data);
@@ -273,7 +404,7 @@ function generarReporteRendimiento() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error al cargar reporte de rendimiento:', error);
             mostrarErrorTabla('tbody-rendimiento', 7);
         });
 }
@@ -287,71 +418,46 @@ function mostrarTablaRendimiento(cursos) {
     }
 
     tbody.innerHTML = cursos.map(curso => {
-        const estadoClass = curso.promedio >= 6.0 ? 'success' : curso.promedio >= 5.0 ? 'warning' : 'danger';
-        const estadoTexto = curso.promedio >= 6.0 ? 'Excelente' : curso.promedio >= 5.0 ? 'Regular' : 'Crítico';
+        const promedio = curso.promedio_curso || curso.promedio || 0;
+        const aprobacion = curso.porcentaje_aprobacion || 0;
+        const asistencia = curso.porcentaje_asistencia || 0;
+        const estado = curso.estado || 'N/A';
+        const estadoClase = curso.estado_clase || 'secondary';
+        
+        // Determinar color de la barra de asistencia basado en el estado
+        let asistenciaBarClass = 'success';
+        if (asistencia < 83) {
+            asistenciaBarClass = 'danger';
+        } else if (asistencia < 85) {
+            asistenciaBarClass = 'warning';
+        }
         
         return `
             <tr>
                 <td><span class="badge bg-primary">${curso.curso}</span></td>
                 <td><span class="badge bg-info">${curso.total_estudiantes}</span></td>
                 <td><span class="badge bg-secondary">${curso.total_evaluaciones}</span></td>
-                <td><strong>${curso.promedio.toFixed(1)}</strong></td>
+                <td><strong>${promedio.toFixed(2)}</strong></td>
                 <td>
                     <div class="progress" style="height: 20px;">
-                        <div class="progress-bar bg-${estadoClass}" role="progressbar" 
-                             style="width: ${curso.porcentaje_aprobacion}%">
-                            ${curso.porcentaje_aprobacion.toFixed(1)}%
+                        <div class="progress-bar bg-success" role="progressbar" 
+                             style="width: ${aprobacion}%">
+                            ${aprobacion.toFixed(1)}%
                         </div>
                     </div>
                 </td>
                 <td>
                     <div class="progress" style="height: 20px;">
-                        <div class="progress-bar bg-warning" role="progressbar" 
-                             style="width: ${curso.asistencia_promedio}%">
-                            ${curso.asistencia_promedio.toFixed(1)}%
+                        <div class="progress-bar bg-${asistenciaBarClass}" role="progressbar" 
+                             style="width: ${asistencia}%">
+                            ${asistencia.toFixed(1)}%
                         </div>
                     </div>
                 </td>
-                <td><span class="badge bg-${estadoClass}">${estadoTexto}</span></td>
+                <td><span class="badge bg-${estadoClase}">${estado}</span></td>
             </tr>
         `;
     }).join('');
-
-    // Inicializar DataTable después de cargar los datos
-    setTimeout(() => {
-        try {
-            if ($.fn.DataTable && cursos.length > 0) {
-                // Verificar que la tabla tenga filas de datos válidas antes de inicializar DataTables
-                const tableRows = document.querySelectorAll('#tabla-rendimiento-reportes tbody tr');
-                const hasValidData = tableRows.length > 0 && 
-                                   !tableRows[0].innerHTML.includes('spinner-border') && 
-                                   !tableRows[0].innerHTML.includes('text-muted');
-                
-                if (hasValidData) {
-                    reportesDataTable = $('#tabla-rendimiento-reportes').DataTable({
-                        language: {
-                            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
-                        },
-                        responsive: true,
-                        pageLength: 10,
-                        order: [[3, 'desc']], // Ordenar por promedio descendente
-                        dom: 'Bfrtip',
-                        buttons: [
-                            'copy', 'csv', 'excel', 'pdf', 'print'
-                        ],
-                        columnDefs: [
-                            { 
-                                targets: [4, 5], // Columnas de progreso (Aprobación y Asistencia)
-                                orderable: false 
-                            }
-                        ]
-                    });
-                }
-            }
-        } catch (error) {
-            console.log('DataTables no disponible o error al inicializar:', error);
-        }
-    }, 200);
 }
 
 // Generar reporte de asistencia
@@ -365,8 +471,13 @@ function generarReporteAsistencia() {
         </div>
     `;
 
-    fetch('/api/reporte-asistencia-general/')
-        .then(response => response.json())
+    fetch('/api/reporte-asistencia-cursos/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 mostrarReporteAsistencia(data.data);
@@ -376,7 +487,7 @@ function generarReporteAsistencia() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error al cargar reporte de asistencia:', error);
             mostrarErrorReporte('reporte-asistencia');
         });
 }
@@ -396,29 +507,52 @@ function mostrarReporteAsistencia(data) {
                     <tr>
                         <th><i class="fas fa-chalkboard"></i> Curso</th>
                         <th><i class="fas fa-users"></i> Estudiantes</th>
-                        <th><i class="fas fa-calendar-check"></i> Asistencia Promedio</th>
+                        <th><i class="fas fa-clipboard-list"></i> Registros</th>
+                        <th><i class="fas fa-check-circle"></i> Presentes</th>
+                        <th><i class="fas fa-times-circle"></i> Ausentes</th>
+                        <th><i class="fas fa-calendar-check"></i> % Asistencia</th>
+                        <th><i class="fas fa-exclamation-triangle"></i> En Riesgo</th>
                         <th><i class="fas fa-traffic-light"></i> Estado</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${data.map(item => {
-                        const estadoClass = item.asistencia_promedio >= 85 ? 'success' : 
-                                          item.asistencia_promedio >= 70 ? 'warning' : 'danger';
-                        const estadoTexto = item.asistencia_promedio >= 85 ? 'Excelente' : 
-                                          item.asistencia_promedio >= 70 ? 'Regular' : 'Crítica';
+                    ${data.map(curso => {
+                        const asistencia = curso.porcentaje_asistencia || 0;
+                        const estadoClass = curso.estado_clase || 'secondary';
+                        const estado = curso.estado || 'N/A';
+                        
+                        // Determinar clase de color para la barra de progreso
+                        let progressClass = 'secondary';
+                        if (asistencia >= 85) {
+                            progressClass = 'success';
+                        } else if (asistencia >= 83) {
+                            progressClass = 'warning';
+                        } else if (asistencia > 0) {
+                            progressClass = 'danger';
+                        }
+                        
                         return `
                             <tr>
-                                <td><span class="badge bg-primary">${item.curso}</span></td>
-                                <td><span class="badge bg-info">${item.total_estudiantes || 'N/A'}</span></td>
+                                <td><span class="badge bg-primary">${curso.curso}</span></td>
+                                <td><span class="badge bg-info">${curso.total_estudiantes}</span></td>
+                                <td><span class="badge bg-secondary">${curso.total_registros.toLocaleString()}</span></td>
+                                <td><span class="badge bg-success">${curso.presentes.toLocaleString()}</span></td>
+                                <td><span class="badge bg-danger">${curso.ausentes.toLocaleString()}</span></td>
                                 <td>
                                     <div class="progress" style="height: 20px;">
-                                        <div class="progress-bar bg-${estadoClass}" 
-                                             style="width: ${item.asistencia_promedio}%">
-                                            ${item.asistencia_promedio.toFixed(1)}%
+                                        <div class="progress-bar bg-${progressClass}" role="progressbar" 
+                                             style="width: ${Math.max(asistencia, 5)}%">
+                                            ${asistencia.toFixed(1)}%
                                         </div>
                                     </div>
                                 </td>
-                                <td><span class="badge bg-${estadoClass}">${estadoTexto}</span></td>
+                                <td>
+                                    ${curso.estudiantes_riesgo > 0 ? 
+                                        `<span class="badge bg-warning">${curso.estudiantes_riesgo}</span>` : 
+                                        `<span class="badge bg-success">0</span>`
+                                    }
+                                </td>
+                                <td><span class="badge bg-${estadoClass}">${estado}</span></td>
                             </tr>
                         `;
                     }).join('')}
@@ -427,8 +561,6 @@ function mostrarReporteAsistencia(data) {
         </div>
     `;
 }
-
-
 
 // Generar reporte de estudiantes en riesgo
 function generarReporteEstudiantesRiesgo() {
@@ -442,7 +574,12 @@ function generarReporteEstudiantesRiesgo() {
     `;
 
     fetch('/api/reporte-estudiantes-riesgo/')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 mostrarReporteEstudiantesRiesgo(data.data);
@@ -452,7 +589,7 @@ function generarReporteEstudiantesRiesgo() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error al cargar reporte de estudiantes en riesgo:', error);
             mostrarErrorReporte('reporte-estudiantes-riesgo');
         });
 }
@@ -460,80 +597,392 @@ function generarReporteEstudiantesRiesgo() {
 function mostrarReporteEstudiantesRiesgo(data) {
     const container = document.getElementById('reporte-estudiantes-riesgo');
     
-    if (!data || (!data.riesgo_academico?.length && !data.riesgo_asistencia?.length)) {
+    if (!data || (!data.riesgo_notas && !data.riesgo_asistencia) || 
+        (data.riesgo_notas && data.riesgo_notas.length === 0 && data.riesgo_asistencia && data.riesgo_asistencia.length === 0)) {
         container.innerHTML = `
-            <div class="alert alert-success text-center">
-                <i class="fas fa-check-circle fa-2x mb-2"></i>
-                <h5>¡Excelente!</h5>
-                <p class="mb-0">No hay estudiantes en situación de riesgo en este período</p>
+            <div class="text-center py-5">
+                <div class="alert alert-success border-0 shadow-sm">
+                    <div class="mb-3">
+                        <i class="fas fa-shield-check fa-4x text-success mb-3"></i>
+                    </div>
+                    <h4 class="text-success mb-3">¡Situación Óptima!</h4>
+                    <p class="mb-2 fs-5">No hay estudiantes en situación de riesgo</p>
+                    <small class="text-muted">Todos los estudiantes cumplen con los estándares académicos y de asistencia</small>
+                    <div class="mt-3">
+                        <span class="badge bg-success fs-6 me-2">
+                            <i class="fas fa-graduation-cap me-1"></i>Rendimiento: Excelente
+                        </span>
+                        <span class="badge bg-success fs-6">
+                            <i class="fas fa-calendar-check me-1"></i>Asistencia: Óptima
+                        </span>
+                    </div>
+                </div>
             </div>
         `;
         return;
     }
 
-    let html = '<div class="row">';
-    
-    if (data.riesgo_academico && data.riesgo_academico.length > 0) {
-        html += `
-            <div class="col-md-6">
-                <div class="card border-danger">
-                    <div class="card-header bg-danger text-white">
-                        <h6 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Riesgo Académico (${data.riesgo_academico.length})</h6>
+    // Estadísticas generales
+    const totalRiesgoNotas = data.riesgo_notas ? data.riesgo_notas.length : 0;
+    const totalRiesgoAsistencia = data.riesgo_asistencia ? data.riesgo_asistencia.length : 0;
+    const totalEstudiantesRiesgo = new Set([
+        ...(data.riesgo_notas || []).map(e => e.rut),
+        ...(data.riesgo_asistencia || []).map(e => e.rut)
+    ]).size;
+
+    // Calcular estadísticas adicionales
+    const promedioMasBajo = data.riesgo_notas && data.riesgo_notas.length > 0 ? 
+        Math.min(...data.riesgo_notas.map(e => e.promedio)) : null;
+    const asistenciaMasBaja = data.riesgo_asistencia && data.riesgo_asistencia.length > 0 ? 
+        Math.min(...data.riesgo_asistencia.map(e => e.asistencia)) : null;
+
+    // Agrupar por curso para análisis
+    const cursosAfectados = new Set([
+        ...(data.riesgo_notas || []).map(e => e.curso),
+        ...(data.riesgo_asistencia || []).map(e => e.curso)
+    ]);
+
+    let html = `
+        <!-- Alerta de situación -->
+        <div class="alert alert-warning border-0 shadow-sm mb-4">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                </div>
+                <div class="col">
+                    <h6 class="alert-heading mb-1">Atención Requerida</h6>
+                    <p class="mb-0">Se han identificado <strong>${totalEstudiantesRiesgo} estudiantes únicos</strong> en situación de riesgo en <strong>${cursosAfectados.size} cursos</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen estadístico mejorado -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-danger shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <i class="fas fa-chart-line fa-2x text-danger"></i>
+                            <span class="badge bg-danger">${totalRiesgoNotas > 0 ? 'CRÍTICO' : 'OK'}</span>
+                        </div>
+                        <h3 class="text-danger mb-1">${totalRiesgoNotas}</h3>
+                        <p class="text-muted mb-1">Riesgo Académico</p>
+                        ${promedioMasBajo !== null ? 
+                            `<small class="text-danger"><i class="fas fa-arrow-down me-1"></i>Mín: ${promedioMasBajo.toFixed(2)}</small>` : 
+                            '<small class="text-success"><i class="fas fa-check me-1"></i>Sin riesgo</small>'
+                        }
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Estudiante</th>
-                                        <th>Curso</th>
-                                        <th>Promedio</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${data.riesgo_academico.map(est => `
-                                        <tr>
-                                            <td><small>${est.nombre}</small></td>
-                                            <td><span class="badge bg-primary">${est.curso}</span></td>
-                                            <td><span class="badge bg-danger">${est.promedio.toFixed(1)}</span></td>
-                                        </tr>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-warning shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <i class="fas fa-calendar-times fa-2x text-warning"></i>
+                            <span class="badge bg-warning text-dark">${totalRiesgoAsistencia > 0 ? 'ALERTA' : 'OK'}</span>
+                        </div>
+                        <h3 class="text-warning mb-1">${totalRiesgoAsistencia}</h3>
+                        <p class="text-muted mb-1">Riesgo Asistencia</p>
+                        ${asistenciaMasBaja !== null ? 
+                            `<small class="text-warning"><i class="fas fa-arrow-down me-1"></i>Mín: ${asistenciaMasBaja.toFixed(1)}%</small>` : 
+                            '<small class="text-success"><i class="fas fa-check me-1"></i>Sin riesgo</small>'
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-info shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <i class="fas fa-users fa-2x text-info"></i>
+                            <span class="badge bg-info">TOTAL</span>
+                        </div>
+                        <h3 class="text-info mb-1">${totalEstudiantesRiesgo}</h3>
+                        <p class="text-muted mb-1">Estudiantes Únicos</p>
+                        <small class="text-info"><i class="fas fa-users me-1"></i>Requieren seguimiento</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card border-secondary shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <i class="fas fa-school fa-2x text-secondary"></i>
+                            <span class="badge bg-secondary">CURSOS</span>
+                        </div>
+                        <h3 class="text-secondary mb-1">${cursosAfectados.size}</h3>
+                        <p class="text-muted mb-1">Cursos Afectados</p>
+                        <small class="text-secondary"><i class="fas fa-exclamation-circle me-1"></i>Con estudiantes en riesgo</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+    `;
+    
+    // Estudiantes en riesgo por notas - Diseño mejorado
+    if (data.riesgo_notas && data.riesgo_notas.length > 0) {
+        // Agrupar por nivel de riesgo
+        const riesgoCritico = data.riesgo_notas.filter(e => e.promedio < 3.0);
+        const riesgoModerado = data.riesgo_notas.filter(e => e.promedio >= 3.0);
+        
+        html += `
+            <div class="col-lg-6 mb-4">
+                <div class="card border-danger shadow">
+                    <div class="card-header bg-danger text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    Riesgo Académico
+                                </h6>
+                                <small>Promedio < 4.0 (Nota mínima de aprobación)</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-light text-dark fs-6">${data.riesgo_notas.length}</span>
+                                <br><small>estudiantes</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        ${riesgoCritico.length > 0 ? `
+                            <div class="bg-danger bg-opacity-10 p-3 border-bottom">
+                                <h6 class="text-danger mb-2">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Riesgo Crítico (< 3.0) - ${riesgoCritico.length} estudiantes
+                                </h6>
+                                <div class="row">
+                                    ${riesgoCritico.map(est => `
+                                        <div class="col-md-6 mb-2">
+                                            <div class="card border-danger">
+                                                <div class="card-body p-2">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <strong class="text-danger">${est.nombre}</strong>
+                                                            <br><small class="text-muted">${est.rut} - ${est.curso}</small>
+                                                        </div>
+                                                        <div class="text-end">
+                                                            <span class="badge bg-danger fs-6">${est.promedio.toFixed(2)}</span>
+                                                            <br><small class="text-muted">${est.total_evaluaciones} eval.</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     `).join('')}
-                                </tbody>
-                            </table>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        ${riesgoModerado.length > 0 ? `
+                            <div class="p-3">
+                                <h6 class="text-warning mb-2">
+                                    <i class="fas fa-exclamation-circle me-1"></i>
+                                    Riesgo Moderado (3.0 - 3.9) - ${riesgoModerado.length} estudiantes
+                                </h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Estudiante</th>
+                                                <th>Curso</th>
+                                                <th>Promedio</th>
+                                                <th>Evaluaciones</th>
+                                                <th>Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${riesgoModerado.map(est => `
+                                                <tr>
+                                                    <td>
+                                                        <div>
+                                                            <strong>${est.nombre}</strong>
+                                                            <br><small class="text-muted">${est.rut}</small>
+                                                        </div>
+                                                    </td>
+                                                    <td><span class="badge bg-primary">${est.curso}</span></td>
+                                                    <td>
+                                                        <span class="badge bg-warning fs-6">
+                                                            ${est.promedio.toFixed(2)}
+                                                        </span>
+                                                    </td>
+                                                    <td><span class="text-muted">${est.total_evaluaciones}</span></td>
+                                                    <td>
+                                                        <small class="text-warning">
+                                                            <i class="fas fa-clock me-1"></i>Requiere apoyo
+                                                        </small>
+                                                    </td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        // Mostrar mensaje positivo si no hay riesgo académico
+        html += `
+            <div class="col-lg-6 mb-4">
+                <div class="card border-success shadow">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            Rendimiento Académico
+                        </h6>
+                    </div>
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-trophy fa-3x text-success mb-3"></i>
+                        <h5 class="text-success">¡Excelente Rendimiento!</h5>
+                        <p class="text-muted mb-0">Todos los estudiantes mantienen promedios superiores a 4.0</p>
+                        <div class="mt-3">
+                            <span class="badge bg-success fs-6">
+                                <i class="fas fa-check me-1"></i>Sin estudiantes en riesgo académico
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
         `;
     }
-    
+
+    // Estudiantes en riesgo por asistencia - Diseño mejorado
     if (data.riesgo_asistencia && data.riesgo_asistencia.length > 0) {
+        // Agrupar por nivel de riesgo de asistencia
+        const asistenciaCritica = data.riesgo_asistencia.filter(e => e.asistencia < 70);
+        const asistenciaModerada = data.riesgo_asistencia.filter(e => e.asistencia >= 70);
+        
         html += `
-            <div class="col-md-6">
-                <div class="card border-warning">
+            <div class="col-lg-6 mb-4">
+                <div class="card border-warning shadow">
                     <div class="card-header bg-warning text-dark">
-                        <h6 class="mb-0"><i class="fas fa-calendar-times me-2"></i>Riesgo de Asistencia (${data.riesgo_asistencia.length})</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">
+                                    <i class="fas fa-calendar-times me-2"></i>
+                                    Riesgo de Asistencia
+                                </h6>
+                                <small>Asistencia < 85% (Mínimo requerido)</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-dark fs-6">${data.riesgo_asistencia.length}</span>
+                                <br><small>estudiantes</small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Estudiante</th>
-                                        <th>Curso</th>
-                                        <th>Asistencia</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${data.riesgo_asistencia.map(est => `
-                                        <tr>
-                                            <td><small>${est.nombre}</small></td>
-                                            <td><span class="badge bg-primary">${est.curso}</span></td>
-                                            <td><span class="badge bg-warning">${est.asistencia.toFixed(1)}%</span></td>
-                                        </tr>
+                    <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
+                        ${asistenciaCritica.length > 0 ? `
+                            <div class="bg-danger bg-opacity-10 p-3 border-bottom">
+                                <h6 class="text-danger mb-2">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>
+                                    Asistencia Crítica (< 70%) - ${asistenciaCritica.length} estudiantes
+                                </h6>
+                                <div class="row">
+                                    ${asistenciaCritica.slice(0, 6).map(est => `
+                                        <div class="col-md-6 mb-2">
+                                            <div class="card border-danger">
+                                                <div class="card-body p-2">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <strong class="text-danger">${est.nombre}</strong>
+                                                            <br><small class="text-muted">${est.rut} - ${est.curso}</small>
+                                                        </div>
+                                                        <div class="text-end">
+                                                            <span class="badge bg-danger fs-6">${est.asistencia.toFixed(1)}%</span>
+                                                            <br><small class="text-muted">${est.total_asistencias} reg.</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     `).join('')}
-                                </tbody>
-                            </table>
+                                </div>
+                                ${asistenciaCritica.length > 6 ? `
+                                    <small class="text-muted">Y ${asistenciaCritica.length - 6} estudiantes más con asistencia crítica...</small>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="p-3">
+                            <h6 class="text-warning mb-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                Asistencia en Riesgo (70% - 84%) - ${asistenciaModerada.length} estudiantes
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Estudiante</th>
+                                            <th>Curso</th>
+                                            <th>Asistencia</th>
+                                            <th>Registros</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${asistenciaModerada.slice(0, 20).map(est => `
+                                            <tr>
+                                                <td>
+                                                    <div>
+                                                        <strong>${est.nombre}</strong>
+                                                        <br><small class="text-muted">${est.rut}</small>
+                                                    </div>
+                                                </td>
+                                                <td><span class="badge bg-primary">${est.curso}</span></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="badge bg-warning fs-6 me-2">
+                                                            ${est.asistencia.toFixed(1)}%
+                                                        </span>
+                                                        <div class="progress" style="width: 50px; height: 6px;">
+                                                            <div class="progress-bar bg-warning" style="width: ${est.asistencia}%"></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td><span class="text-muted">${est.total_asistencias}</span></td>
+                                                <td>
+                                                    <small class="text-warning">
+                                                        <i class="fas fa-eye me-1"></i>Monitorear
+                                                    </small>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                            ${asistenciaModerada.length > 20 ? `
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">Mostrando 20 de ${asistenciaModerada.length} estudiantes. Ver PDF completo para todos los datos.</small>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        // Mostrar mensaje positivo si no hay riesgo de asistencia
+        html += `
+            <div class="col-lg-6 mb-4">
+                <div class="card border-success shadow">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Asistencia Escolar
+                        </h6>
+                    </div>
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-calendar-check fa-3x text-success mb-3"></i>
+                        <h5 class="text-success">¡Asistencia Óptima!</h5>
+                        <p class="text-muted mb-0">Todos los estudiantes mantienen asistencia superior al 85%</p>
+                        <div class="mt-3">
+                            <span class="badge bg-success fs-6">
+                                <i class="fas fa-check me-1"></i>Sin estudiantes en riesgo de asistencia
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -542,6 +991,9 @@ function mostrarReporteEstudiantesRiesgo(data) {
     }
 
     html += '</div>';
+    
+
+    
     container.innerHTML = html;
 }
 
@@ -557,7 +1009,12 @@ function generarReporteEvaluaciones() {
     `;
 
     fetch('/api/reporte-evaluaciones/')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 mostrarReporteEvaluaciones(data.data);
@@ -567,7 +1024,7 @@ function generarReporteEvaluaciones() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error al cargar reporte de evaluaciones:', error);
             mostrarErrorReporte('reporte-evaluaciones');
         });
 }
@@ -595,23 +1052,25 @@ function mostrarReporteEvaluaciones(data) {
                 </thead>
                 <tbody>
                     ${data.map(asignatura => {
-                        const estadoClass = asignatura.promedio >= 6.0 ? 'success' : 
-                                          asignatura.promedio >= 5.0 ? 'warning' : 'danger';
-                        const estadoTexto = asignatura.promedio >= 6.0 ? 'Excelente' : 
-                                          asignatura.promedio >= 5.0 ? 'Regular' : 'Crítico';
+                        const promedio = asignatura.promedio || 0;
+                        const aprobacion = asignatura.porcentaje_aprobacion || 0;
+                        const estadoClass = promedio >= 6.0 ? 'success' : 
+                                          promedio >= 5.0 ? 'warning' : 'danger';
+                        const estadoTexto = promedio >= 6.0 ? 'Excelente' : 
+                                          promedio >= 5.0 ? 'Regular' : 'Crítico';
                         return `
                             <tr>
                                 <td><strong>${asignatura.asignatura}</strong></td>
                                 <td><span class="badge bg-secondary">${asignatura.total_evaluaciones}</span></td>
                                 <td><span class="badge bg-info">${asignatura.total_estudiantes || 'N/A'}</span></td>
-                                <td><strong>${asignatura.promedio.toFixed(1)}</strong></td>
+                                <td><strong>${promedio.toFixed(1)}</strong></td>
                                 <td>
                                     <div class="progress" style="height: 20px;">
                                         <div class="progress-bar bg-${estadoClass}" role="progressbar" 
-                                             style="width: ${asignatura.porcentaje_aprobacion || 0}%">
-                                            ${(asignatura.porcentaje_aprobacion || 0).toFixed(1)}%
-                                        </div>
-                                    </div>
+                                             style="width: ${aprobacion}%">
+                                            ${aprobacion.toFixed(1)}%
+    </div>
+</div> 
                                 </td>
                                 <td><span class="badge bg-${estadoClass}">${estadoTexto}</span></td>
                             </tr>
@@ -670,8 +1129,6 @@ function actualizarReportes() {
         }
     }
 }
-
-
 
 // Inicializar reportes cuando se carga la pestaña
 document.addEventListener('DOMContentLoaded', function() {

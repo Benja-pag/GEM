@@ -15,7 +15,7 @@
                         <i class="fas fa-envelope-open me-2"></i>Comunicación Oficial
                     </h2>
                     <small class="text-muted">Detalle completo de la comunicación</small>
-                </div>
+        </div>
                 <div>
                     <a href="{% url 'admin_panel' %}" class="btn btn-outline-secondary me-2">
                         <i class="fas fa-arrow-left me-2"></i>Volver al Panel
@@ -91,13 +91,13 @@
                                                 ({{ adjunto.archivo.size|filesizeformat }})
                                             </small>
                                         </div>
-                                    {% endfor %}
+                    {% endfor %}
                                 </div>
                             {% else %}
                                 <span class="text-muted">
                                     <i class="fas fa-file-slash me-1"></i>Sin archivos adjuntos
                                 </span>
-                            {% endif %}
+            {% endif %}
                         </div>
                     </div>
                 </div>

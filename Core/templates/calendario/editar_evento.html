@@ -1,0 +1,376 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Editar Evento - {{ evento.titulo|default:evento.nombre_actividad }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.form-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.form-header {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    color: #212529;
+    padding: 2rem;
+    text-align: center;
+}
+
+.form-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.form-body {
+    padding: 2rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #ffc107;
+}
+
+.form-section-title {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #dee2e6;
+    display: flex;
+    align-items: center;
+}
+
+.form-section-title i {
+    margin-right: 0.5rem;
+    color: #ffc107;
+}
+
+.form-floating > label {
+    font-weight: 500;
+}
+
+.btn-group-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-top: 2rem;
+}
+
+.btn-accion {
+    padding: 0.75rem 2rem;
+    border-radius: 25px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-cancelar {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: white;
+}
+
+.btn-cancelar:hover {
+    background: linear-gradient(135deg, #5a6268, #3d4144);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn-guardar {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.btn-guardar:hover {
+    background: linear-gradient(135deg, #218838, #1c7d6e);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40,167,69,0.4);
+}
+
+.alert-info {
+    border-left: 4px solid #17a2b8;
+    background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+}
+
+@media (max-width: 768px) {
+    .form-container {
+        padding: 1rem;
+    }
+    
+    .btn-group-actions {
+        flex-direction: column;
+    }
+    
+    .btn-accion {
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="form-container">
+        
+        <!-- Tarjeta de Formulario -->
+        <div class="card form-card">
+            
+            <!-- Header -->
+            <div class="form-header">
+                <h1>
+                    <i class="fas fa-edit me-2"></i>
+                    Editar Evento
+                </h1>
+                <p class="mb-0 mt-2">Modifica la información del evento del calendario</p>
+            </div>
+            
+            <!-- Formulario -->
+            <div class="form-body">
+                
+                <!-- Información del evento actual -->
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle me-2"></i>Evento Actual</h6>
+                    <strong>{{ evento.titulo|default:evento.nombre_actividad }}</strong><br>
+                    <small>{{ evento.fecha|date:"d/m/Y" }} - {{ evento.hora|time:"H:i" }}</small>
+                </div>
+                
+                <form id="formEditarEvento" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="eventoId" value="{{ evento.id_completo }}">
+                    
+                    <!-- Información Básica -->
+                    <div class="form-section">
+                        <h6 class="form-section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Información Básica
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="titulo" name="titulo" 
+                                           value="{{ evento.nombre_actividad }}" placeholder="Título del evento" required>
+                                    <label for="titulo">
+                                        <i class="fas fa-heading me-2"></i>Título del Evento
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select class="form-select" id="tipo" name="tipo" disabled>
+                                        <option value="{{ evento.tipo|lower }}" selected>
+                                            {% if evento.tipo == 'Colegio' %}
+                                                🏫 Evento Institucional
+                                            {% elif evento.tipo == 'Asignatura' %}
+                                                📚 Evento de Clase
+                                            {% else %}
+                                                📅 {{ evento.tipo }}
+                                            {% endif %}
+                                        </option>
+                                    </select>
+                                    <label for="tipo">
+                                        <i class="fas fa-tag me-2"></i>Tipo de Evento
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mt-1">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" id="descripcion" name="descripcion" 
+                                              placeholder="Descripción del evento" style="height: 80px;">{{ evento.descripcion }}</textarea>
+                                    <label for="descripcion">
+                                        <i class="fas fa-align-left me-2"></i>Descripción
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fecha y Hora -->
+                    <div class="form-section">
+                        <h6 class="form-section-title">
+                            <i class="fas fa-clock"></i>
+                            Fecha y Hora
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="fecha" name="fecha" 
+                                           value="{{ evento.fecha|date:'Y-m-d' }}" required>
+                                    <label for="fecha">
+                                        <i class="fas fa-calendar me-2"></i>Fecha del Evento
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="time" class="form-control" id="hora" name="hora" 
+                                           value="{{ evento.hora|time:'H:i' }}" required>
+                                    <label for="hora">
+                                        <i class="fas fa-clock me-2"></i>Hora del Evento
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Información Adicional (solo para eventos de colegio) -->
+                    {% if evento.tipo == 'Colegio' %}
+                    <div class="form-section">
+                        <h6 class="form-section-title">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Información Adicional
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="ubicacion" name="ubicacion" 
+                                           value="{{ evento.ubicacion }}" placeholder="Ubicación del evento">
+                                    <label for="ubicacion">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Ubicación
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="encargado" name="encargado" 
+                                           value="{{ evento.encargado }}" placeholder="Encargado del evento">
+                                    <label for="encargado">
+                                        <i class="fas fa-user-tie me-2"></i>Encargado
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                </form>
+                
+                <!-- Botones de Acción -->
+                <div class="btn-group-actions">
+                    <a href="{% url 'admin_detalle_evento_calendario' evento.id_completo %}" class="btn-accion btn-cancelar">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </a>
+                    
+                    <button type="button" class="btn-accion btn-guardar" onclick="guardarCambios()">
+                        <i class="fas fa-save"></i>
+                        Guardar Cambios
+                    </button>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function guardarCambios() {
+    const form = document.getElementById('formEditarEvento');
+    const formData = new FormData(form);
+    const eventoId = document.getElementById('eventoId').value;
+    
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    // Mostrar indicador de carga
+    Swal.fire({
+        title: 'Guardando cambios...',
+        html: 'Por favor espera mientras se actualizan los datos del evento.',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+    
+    // Enviar datos al backend
+    fetch(`/admin-editar-evento-calendario/${eventoId}/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Evento actualizado!',
+                text: 'Los cambios se han guardado correctamente.',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                // Redirigir al detalle del evento
+                window.location.href = `/admin-detalle-evento-calendario/${eventoId}/`;
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.error || 'No se pudieron guardar los cambios.'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'No se pudo conectar con el servidor.'
+        });
+    });
+}
+
+// Validación en tiempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formEditarEvento');
+    const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+    
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (!this.value.trim()) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

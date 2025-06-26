@@ -82,6 +82,10 @@ function initCalendarAdmin() {
             eventosDataAdmin = [];
         }
         
+        // Hacer las variables disponibles globalmente para sincronización
+        window.eventosDataAdmin = eventosDataAdmin;
+        window.calendarAdmin = null; // Se asignará después
+        
         calendarAdmin = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'es',
@@ -133,21 +137,25 @@ function initCalendarAdmin() {
             },
             eventClick: function(info) {
                 const event = info.event;
-                mostrarDetalleEvento(event);
+                mostrarDetalleEventoPorId(event.id);
             },
             dateClick: function(info) {
-                // Pre-llenar la fecha en el modal de crear evento
-                const fechaInput = document.getElementById('fechaEventoAdmin');
-                if (fechaInput) {
-                    fechaInput.value = info.dateStr;
-                }
-                const modal = new bootstrap.Modal(document.getElementById('modalCrearEventoAdmin'));
-                modal.show();
+                // Redirigir a la página de crear evento con la fecha pre-seleccionada
+                const fechaSeleccionada = info.dateStr;
+                window.location.href = `/admin-crear-evento-calendario/?fecha=${fechaSeleccionada}`;
             }
         });
 
         calendarAdmin.render();
         console.log('Calendario renderizado exitosamente');
+        
+        // Hacer el calendario disponible globalmente
+        window.calendarAdmin = calendarAdmin;
+        
+        // Hacer las funciones de actualización disponibles globalmente
+        window.updateProximosEventosAdmin = updateProximosEventosAdmin;
+        window.updateEventosPorCursos = updateEventosPorCursos;
+        window.updateEventosPorElectivos = updateEventosPorElectivos;
         
         // Inicializar tooltips de Bootstrap
         setTimeout(() => {
@@ -234,11 +242,8 @@ function updateProximosEventosAdmin() {
                         </div>
                     </div>
                     <div class="evento-actions">
-                        <button class="btn btn-evento btn-editar" onclick="editarEvento('${evento.id}')" title="Editar evento">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-evento btn-eliminar" onclick="eliminarEvento('${evento.id}', '${evento.title}')" title="Eliminar evento">
-                            <i class="fas fa-trash"></i>
+                        <button class="btn btn-evento btn-detalle" onclick="mostrarDetalleEventoPorId('${evento.id}')" title="Ver detalle">
+                            <i class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
@@ -327,11 +332,8 @@ function updateEventosPorCursos() {
                             </div>
                         </div>
                         <div class="evento-actions">
-                            <button class="btn btn-evento btn-editar" onclick="editarEvento('${evento.id}')" title="Editar evento">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-evento btn-eliminar" onclick="eliminarEvento('${evento.id}', '${evento.title}')" title="Eliminar evento">
-                                <i class="fas fa-trash"></i>
+                            <button class="btn btn-evento btn-detalle" onclick="mostrarDetalleEventoPorId('${evento.id}')" title="Ver detalle">
+                                <i class="fas fa-eye"></i>
                             </button>
                         </div>
                     </div>
@@ -407,11 +409,8 @@ function updateEventosPorElectivos() {
                         </div>
                     </div>
                     <div class="evento-actions">
-                        <button class="btn btn-evento btn-editar" onclick="editarEvento('${evento.id}')" title="Editar evento">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-evento btn-eliminar" onclick="eliminarEvento('${evento.id}', '${evento.title}')" title="Eliminar evento">
-                            <i class="fas fa-trash"></i>
+                        <button class="btn btn-evento btn-detalle" onclick="mostrarDetalleEventoPorId('${evento.id}')" title="Ver detalle">
+                            <i class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
@@ -483,11 +482,13 @@ function mostrarDetalleEvento(event) {
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-warning" onclick="editarEvento('${event.id}')">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cerrar
+                    </button>
+                    <button type="button" class="btn btn-warning" onclick="editarEvento('${event.id}'); bootstrap.Modal.getInstance(this.closest('.modal')).hide();">
                         <i class="fas fa-edit me-1"></i>Editar
                     </button>
-                    <button type="button" class="btn btn-danger" onclick="eliminarEvento('${event.id}', '${event.title}')">
+                    <button type="button" class="btn btn-danger" onclick="confirmarEliminarEvento('${event.id}')">
                         <i class="fas fa-trash me-1"></i>Eliminar
                     </button>
                 </div>
@@ -503,6 +504,12 @@ function mostrarDetalleEvento(event) {
     modal.addEventListener('hidden.bs.modal', function() {
         document.body.removeChild(modal);
     });
+}
+
+// Función para mostrar detalle de evento por ID
+function mostrarDetalleEventoPorId(eventoId) {
+    // Redirigir a la página de detalle del evento
+    window.location.href = `/admin-detalle-evento-calendario/${eventoId}/`;
 }
 
 // Funciones de editar y eliminar eventos
@@ -529,6 +536,7 @@ function editarEvento(eventoId) {
                     </div>
                     <div class="modal-body">
                         <form id="formEditarEvento">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${document.querySelector('[name=csrfmiddlewaretoken]').value}">
                             <input type="hidden" id="eventoId" value="${eventoId}">
                             <div class="row">
                                 <div class="col-md-6">
@@ -603,7 +611,7 @@ function guardarCambiosEvento() {
     }
     
     // Mostrar indicador de carga
-    const button = event.target;
+    const button = document.querySelector('#modalEditarEvento .btn-warning');
     const originalText = button.innerHTML;
     button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Guardando...';
     button.disabled = true;
@@ -620,24 +628,36 @@ function guardarCambiosEvento() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Cerrar modal
+            // Cerrar modal de edición
             const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditarEvento'));
             modal.hide();
             
             // Mostrar mensaje de éxito
-            showNotification('Evento actualizado exitosamente', 'success');
+            showNotification('✅ Evento editado correctamente', 'success');
             
-            // Recargar calendario
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
+            // Actualizar datos locales con los nuevos valores
+            const eventoIndex = eventosDataAdmin.findIndex(evento => evento.id === eventoId);
+            
+            if (eventoIndex !== -1) {
+                // Actualizar el evento en los datos locales
+                const fechaHora = `${formData.get('fecha')}T${formData.get('hora')}:00`;
+                eventosDataAdmin[eventoIndex].title = formData.get('titulo');
+                eventosDataAdmin[eventoIndex].start = fechaHora;
+                eventosDataAdmin[eventoIndex].extendedProps.ubicacion = formData.get('ubicacion');
+                eventosDataAdmin[eventoIndex].extendedProps.description = formData.get('descripcion');
+                
+                console.log('📊 Evento actualizado en datos locales');
+                
+                // Actualizar todo el calendario y sincronizar variables
+                actualizarCalendarioCompleto();
+            }
         } else {
-            showNotification('Error al actualizar el evento: ' + (data.message || 'Error desconocido'), 'error');
+            showNotification('❌ Error al editar el evento: ' + (data.message || 'Error desconocido'), 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showNotification('Error de conexión al actualizar el evento', 'error');
+        showNotification('❌ Error de conexión al editar el evento', 'error');
     })
     .finally(() => {
         button.innerHTML = originalText;
@@ -699,7 +719,7 @@ function eliminarEvento(eventoId, titulo) {
 
 function confirmarEliminarEvento(eventoId) {
     // Mostrar indicador de carga
-    const button = event.target;
+    const button = document.querySelector('#modalEliminarEvento .btn-danger');
     const originalText = button.innerHTML;
     button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Eliminando...';
     button.disabled = true;
@@ -717,24 +737,35 @@ function confirmarEliminarEvento(eventoId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Cerrar modal
+            // Cerrar modal de eliminación
             const modal = bootstrap.Modal.getInstance(document.getElementById('modalEliminarEvento'));
             modal.hide();
             
             // Mostrar mensaje de éxito
-            showNotification('Evento eliminado exitosamente', 'success');
+            showNotification('✅ Evento eliminado correctamente', 'success');
             
-            // Recargar calendario
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
+            // Eliminar evento de los datos locales
+            eventosDataAdmin = eventosDataAdmin.filter(evento => evento.id !== eventoId);
+            console.log('📊 Evento eliminado de arrays locales');
+            
+            // Actualizar todo el calendario y sincronizar variables
+            actualizarCalendarioCompleto();
+            
+            // Cerrar cualquier modal de detalle que esté abierto
+            const modalDetalle = document.querySelector('.modal.show:not(#modalEliminarEvento)');
+            if (modalDetalle) {
+                const modalInstance = bootstrap.Modal.getInstance(modalDetalle);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            }
         } else {
-            showNotification('Error al eliminar el evento: ' + (data.message || 'Error desconocido'), 'error');
+            showNotification('❌ Error al eliminar el evento: ' + (data.message || 'Error desconocido'), 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        showNotification('Error de conexión al eliminar el evento', 'error');
+        showNotification('❌ Error de conexión al eliminar el evento', 'error');
     })
     .finally(() => {
         button.innerHTML = originalText;
@@ -763,4 +794,49 @@ function showNotification(message, type) {
             notification.remove();
         }
     }, 5000);
+}
+
+function sincronizarVariablesGlobales() {
+    // Mantener sincronizadas todas las variables globales
+    if (typeof window.eventosCalendarioAdmin !== 'undefined') {
+        window.eventosCalendarioAdmin = eventosDataAdmin;
+    }
+    if (typeof window.eventosDataAdmin !== 'undefined') {
+        window.eventosDataAdmin = eventosDataAdmin;
+    }
+    console.log('📊 Variables globales sincronizadas:', eventosDataAdmin.length, 'eventos');
+}
+
+function actualizarCalendarioCompleto() {
+    console.log('🔄 Actualizando calendario completo...');
+    
+    // Sincronizar variables globales
+    sincronizarVariablesGlobales();
+    
+    // Actualizar calendario
+    if (calendarAdmin) {
+        calendarAdmin.removeAllEvents();
+        calendarAdmin.addEventSource(eventosDataAdmin);
+        console.log('📅 Calendario actualizado con', eventosDataAdmin.length, 'eventos');
+    }
+    
+    // Actualizar paneles laterales
+    updateProximosEventosAdmin();
+    updateEventosPorCursos();
+    updateEventosPorElectivos();
+    
+    console.log('✅ Actualización completa finalizada');
+}
+
+function crearFilaVacia(numColumnas, contenido, claseAdicional = '') {
+    let fila = '<tr>';
+    for (let i = 0; i < numColumnas; i++) {
+        if (i === 0) {
+            fila += `<td class="text-center ${claseAdicional}">${contenido}</td>`;
+        } else {
+            fila += '<td></td>';
+        }
+    }
+    fila += '</tr>';
+    return fila;
 } 

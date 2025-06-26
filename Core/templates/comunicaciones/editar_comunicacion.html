@@ -1,0 +1,429 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Editar Comunicación - {{ comunicacion.asunto }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Editar Comunicación
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form id="form-editar-comunicacion" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Asunto -->
+                        <div class="mb-3">
+                            <label for="asunto" class="form-label fw-bold">
+                                <i class="fas fa-heading me-1"></i>Asunto *
+                            </label>
+                            <input type="text" class="form-control" id="asunto" name="asunto" 
+                                   value="{{ comunicacion.asunto }}" 
+                                   placeholder="Ingresa el asunto de la comunicación" required>
+                            <div class="invalid-feedback"></div>
+                        </div>
+
+                        <!-- Contenido -->
+                        <div class="mb-3">
+                            <label for="contenido" class="form-label fw-bold">
+                                <i class="fas fa-align-left me-1"></i>Contenido *
+                            </label>
+                            <textarea class="form-control" id="contenido" name="contenido" rows="8" 
+                                      placeholder="Escribe el contenido de la comunicación..." required>{{ comunicacion.contenido }}</textarea>
+                            <div class="invalid-feedback"></div>
+                        </div>
+
+                        <!-- Destinatarios (Cursos) -->
+                        <div class="mb-3">
+                            <label for="cursos_destinatarios" class="form-label fw-bold">
+                                <i class="fas fa-users me-1"></i>Cursos Destinatarios
+                            </label>
+                            <div class="row">
+                                {% for curso in cursos %}
+                                <div class="col-md-4 col-sm-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="cursos_destinatarios" value="{{ curso.id }}" 
+                                               id="curso-{{ curso.id }}"
+                                               {% if curso in comunicacion.destinatarios_cursos.all %}checked{% endif %}>
+                                        <label class="form-check-label" for="curso-{{ curso.id }}">
+                                            {{ curso.nivel }}°{{ curso.letra }}
+                                        </label>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12">
+                                    <p class="text-muted">No hay cursos disponibles</p>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <small class="form-text text-muted">
+                                Selecciona los cursos que recibirán esta comunicación. Si no seleccionas ninguno, 
+                                será una comunicación general.
+                            </small>
+                        </div>
+
+                        <!-- Adjuntos Existentes -->
+                        {% if comunicacion.adjuntos.exists %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-paperclip me-1"></i>Archivos Adjuntos Actuales
+                            </label>
+                            <div class="existing-attachments">
+                                {% for adjunto in comunicacion.adjuntos.all %}
+                                <div class="attachment-item d-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded" id="adjunto-{{ adjunto.id }}">
+                                    <div>
+                                        <i class="fas fa-file me-2 text-info"></i>
+                                        <strong>{{ adjunto.nombre_archivo }}</strong>
+                                        <small class="text-muted ms-2">({{ adjunto.archivo.size|filesizeformat }})</small>
+                                    </div>
+                                    <div>
+                                        <a href="{{ adjunto.archivo.url }}" target="_blank" class="btn btn-sm btn-outline-info me-2">
+                                            <i class="fas fa-eye me-1"></i>Ver
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarAdjunto({{ adjunto.id }})">
+                                            <i class="fas fa-trash me-1"></i>Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Nuevos Archivos Adjuntos -->
+                        <div class="mb-4">
+                            <label for="adjuntos" class="form-label fw-bold">
+                                <i class="fas fa-plus me-1"></i>Agregar Nuevos Archivos Adjuntos
+                            </label>
+                            <input type="file" class="form-control" id="adjuntos" name="adjuntos" multiple>
+                            <small class="form-text text-muted">
+                                Puedes agregar archivos adicionales. Formatos permitidos: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG
+                            </small>
+                            <div class="invalid-feedback"></div>
+                        </div>
+
+                        <!-- Información de la comunicación -->
+                        <div class="mb-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title text-muted">
+                                        <i class="fas fa-info-circle me-2"></i>Información de la Comunicación
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <small class="text-muted">
+                                                <strong>Creada por:</strong> {{ comunicacion.autor.get_full_name }}
+                                            </small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted">
+                                                <strong>Fecha de creación:</strong> {{ comunicacion.fecha_envio|date:"d/m/Y H:i" }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-6">
+                                            <small class="text-muted">
+                                                <strong>Leída por:</strong> {{ comunicacion.leido_por.count }} usuario{{ comunicacion.leido_por.count|pluralize }}
+                                            </small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted">
+                                                <strong>Adjuntos actuales:</strong> {{ comunicacion.adjuntos.count }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{% url 'detalle_comunicacion' comunicacion.id %}" class="btn btn-outline-secondary me-2">
+                                    <i class="fas fa-arrow-left me-2"></i>Volver al Detalle
+                                </a>
+                                <a href="{% url 'admin_panel' %}" class="btn btn-outline-info">
+                                    <i class="fas fa-home me-2"></i>Panel Admin
+                                </a>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-outline-primary me-2" onclick="previsualizarComunicacion()">
+                                    <i class="fas fa-eye me-2"></i>Previsualizar
+                                </button>
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-save me-2"></i>
+                                    <span class="btn-text">Guardar Cambios</span>
+                                    <span class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Previsualización -->
+<div class="modal fade" id="modalPrevisualizacion" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-eye me-2"></i>Previsualización de Cambios
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0" id="preview-asunto"></h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>De:</strong> {{ comunicacion.autor.get_full_name }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Para:</strong> <span id="preview-destinatarios"></span>
+                        </div>
+                        <div class="mb-3">
+                            <strong>Última modificación:</strong> Ahora
+                        </div>
+                        <hr>
+                        <div id="preview-contenido"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="guardarDesdePrevisualizacion()">
+                    <i class="fas fa-save me-2"></i>Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-check-input:checked {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.btn {
+    border-radius: 0.375rem;
+}
+
+#contenido {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.form-check {
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.form-check:hover {
+    background-color: #f8f9fa;
+}
+
+.form-check-input:checked + .form-check-label {
+    font-weight: 600;
+    color: #856404;
+}
+
+.attachment-item {
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.attachment-item:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.existing-attachments {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.card-header.bg-warning {
+    border-bottom: 1px solid rgba(0,0,0,0.125);
+}
+
+@media (max-width: 768px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .d-flex.justify-content-between > div {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+}
+</style>
+
+<script>
+document.getElementById('form-editar-comunicacion').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const btnSubmit = this.querySelector('button[type="submit"]');
+    const btnText = btnSubmit.querySelector('.btn-text');
+    const spinner = btnSubmit.querySelector('.spinner-border');
+    
+    // Mostrar loading
+    btnSubmit.disabled = true;
+    btnText.textContent = 'Guardando...';
+    spinner.classList.remove('d-none');
+    
+    fetch('{% url "editar_comunicacion" comunicacion.id %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Comunicación actualizada exitosamente', 'success');
+            setTimeout(() => {
+                window.location.href = '{% url "detalle_comunicacion" comunicacion.id %}';
+            }, 1500);
+        } else {
+            showNotification(data.message || 'Error al actualizar la comunicación', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error al actualizar la comunicación', 'error');
+    })
+    .finally(() => {
+        // Restaurar botón
+        btnSubmit.disabled = false;
+        btnText.textContent = 'Guardar Cambios';
+        spinner.classList.add('d-none');
+    });
+});
+
+function previsualizarComunicacion() {
+    const asunto = document.getElementById('asunto').value;
+    const contenido = document.getElementById('contenido').value;
+    
+    if (!asunto || !contenido) {
+        showNotification('Completa el asunto y contenido para previsualizar', 'warning');
+        return;
+    }
+    
+    // Obtener cursos seleccionados
+    const cursosSeleccionados = [];
+    document.querySelectorAll('input[name="cursos_destinatarios"]:checked').forEach(checkbox => {
+        const label = document.querySelector(`label[for="${checkbox.id}"]`);
+        cursosSeleccionados.push(label.textContent.trim());
+    });
+    
+    const destinatarios = cursosSeleccionados.length > 0 ? cursosSeleccionados.join(', ') : 'Comunicación general (todos los usuarios)';
+    
+    // Llenar el modal
+    document.getElementById('preview-asunto').textContent = asunto;
+    document.getElementById('preview-contenido').textContent = contenido;
+    document.getElementById('preview-destinatarios').textContent = destinatarios;
+    
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('modalPrevisualizacion'));
+    modal.show();
+}
+
+function guardarDesdePrevisualizacion() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modalPrevisualizacion'));
+    modal.hide();
+    document.getElementById('form-editar-comunicacion').dispatchEvent(new Event('submit'));
+}
+
+function eliminarAdjunto(adjuntoId) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este archivo adjunto?')) {
+        return;
+    }
+    
+    fetch(`{% url 'eliminar_adjunto' 0 %}`.replace('0', adjuntoId), {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`adjunto-${adjuntoId}`).remove();
+            showNotification('Archivo eliminado exitosamente', 'success');
+        } else {
+            showNotification(data.message || 'Error al eliminar el archivo', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error al eliminar el archivo', 'error');
+    });
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        max-width: 500px;
+    `;
+    
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// Previsualizar archivos nuevos seleccionados
+document.getElementById('adjuntos').addEventListener('change', function() {
+    const files = this.files;
+    if (files.length > 0) {
+        let filesInfo = `Archivos seleccionados: ${files.length}\n`;
+        Array.from(files).forEach(file => {
+            filesInfo += `- ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)\n`;
+        });
+        console.log(filesInfo);
+    }
+});
+</script>
+
+{% csrf_token %}
+{% endblock %} 

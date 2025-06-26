@@ -246,3 +246,688 @@ $(document).ready(function() {
         error: handleAjaxError
     });
 }); 
+
+// ===============================
+// FUNCIONES PARA REPORTES ESPECÍFICOS DE ASISTENCIA
+// ===============================
+
+// Variables globales para los reportes específicos
+let currentEstudianteId = null;
+let currentCursoId = null;
+
+// Función para cargar tabla de estudiantes
+function cargarTablaEstudiantes() {
+    $('#tabla-estudiantes-container').html(`
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando estudiantes...</span>
+            </div>
+            <p class="mt-2">Cargando lista de estudiantes...</p>
+        </div>
+    `);
+    
+    $.get('/api/lista-estudiantes/', function(response) {
+        if (response.success) {
+            mostrarTablaEstudiantes(response.data);
+        } else {
+            $('#tabla-estudiantes-container').html(`
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error al cargar estudiantes: ${response.error}
+                </div>
+            `);
+        }
+    }).fail(function() {
+        $('#tabla-estudiantes-container').html(`
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Error de conexión al cargar estudiantes
+            </div>
+        `);
+    });
+}
+
+// Función para mostrar la tabla de estudiantes
+function mostrarTablaEstudiantes(estudiantes) {
+    let html = `
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle" id="tabla-estudiantes">
+                <thead class="table-primary">
+                    <tr>
+                        <th><i class="fas fa-user me-1"></i>Nombre Completo</th>
+                        <th><i class="fas fa-envelope me-1"></i>Correo</th>
+                        <th><i class="fas fa-id-card me-1"></i>RUT</th>
+                        <th><i class="fas fa-graduation-cap me-1"></i>Curso</th>
+                        <th><i class="fas fa-cogs me-1"></i>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+    
+    estudiantes.forEach(function(estudiante) {
+        html += `
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px; font-size: 12px; font-weight: bold;">
+                            ${estudiante.nombre.charAt(0)}${estudiante.apellido_paterno.charAt(0)}
+                        </div>
+                        <div>
+                            <strong>${estudiante.nombre_completo}</strong>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <small class="text-muted">
+                        <i class="fas fa-envelope me-1"></i>${estudiante.correo}
+                    </small>
+                </td>
+                <td>
+                    <code>${estudiante.rut_completo}</code>
+                </td>
+                <td>
+                    <span class="badge bg-info">${estudiante.curso}</span>
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-success" 
+                                onclick="descargarPDFEstudianteDirecto(${estudiante.id}, '${estudiante.nombre_completo}')"
+                                title="Descargar PDF de Asistencia">
+                            <i class="fas fa-file-pdf me-1"></i>PDF Asistencia
+                        </button>
+                        <button class="btn btn-sm btn-outline-primary" 
+                                onclick="verDetalleEstudiante(${estudiante.id})"
+                                title="Ver detalle en pantalla">
+                            <i class="fas fa-eye me-1"></i>Ver Detalle
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Total de estudiantes: <strong>${estudiantes.length}</strong>
+                    </p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small class="text-muted">
+                        Haz clic en "PDF Asistencia" para descargar el reporte individual
+                    </small>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    $('#tabla-estudiantes-container').html(html);
+    
+    // Inicializar DataTable si está disponible
+    if ($.fn.DataTable) {
+        $('#tabla-estudiantes').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+            },
+            responsive: true,
+            pageLength: 25,
+            order: [[0, 'asc']],
+            columnDefs: [
+                { orderable: false, targets: [4] } // Deshabilitar ordenamiento en la columna de acciones
+            ]
+        });
+    }
+}
+
+// Función para cargar cursos en el select
+function cargarCursos() {
+    $.get('/api/cursos/', function(response) {
+        if (response.success) {
+            const select = $('#select-curso');
+            select.empty();
+            select.append('<option value="">Selecciona un curso...</option>');
+            
+            response.data.forEach(function(curso) {
+                select.append(`<option value="${curso.id}">${curso.nivel}°${curso.letra} (${curso.total_estudiantes} estudiantes)</option>`);
+            });
+        }
+    }).fail(function() {
+        $('#select-curso').html('<option value="">Error al cargar cursos</option>');
+    });
+}
+
+// Función para generar reporte de asistencia de estudiante específico
+function generarReporteAsistenciaEstudiante() {
+    const estudianteId = $('#select-estudiante').val();
+    const periodo = $('#periodo-estudiante').val();
+    
+    if (!estudianteId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: 'Por favor selecciona un estudiante'
+        });
+        return;
+    }
+    
+    currentEstudianteId = estudianteId;
+    
+    // Mostrar loading
+    $('#reporte-asistencia-estudiante').html(`
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Generando reporte...</span>
+            </div>
+            <p class="mt-2">Generando reporte de asistencia...</p>
+        </div>
+    `);
+    
+    // Realizar petición AJAX
+    $.get('/api/reporte-asistencia-estudiante/', {
+        estudiante_id: estudianteId,
+        periodo: periodo
+    }, function(response) {
+        if (response.success) {
+            mostrarReporteEstudiante(response.data, response.periodo_info);
+            $('#btn-pdf-estudiante').prop('disabled', false);
+        } else {
+            $('#reporte-asistencia-estudiante').html(`
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error al generar el reporte: ${response.error}
+                </div>
+            `);
+        }
+    }).fail(function() {
+        $('#reporte-asistencia-estudiante').html(`
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Error de conexión al generar el reporte
+            </div>
+        `);
+    });
+}
+
+// Función para mostrar el reporte del estudiante
+function mostrarReporteEstudiante(data, periodoInfo) {
+    const estudiante = data.estudiante;
+    const stats = data.estadisticas;
+    
+    // Determinar clase de estado
+    let estadoClass = 'success';
+    if (stats.estado === 'Crítico') estadoClass = 'danger';
+    else if (stats.estado === 'En Riesgo') estadoClass = 'warning';
+    
+    let html = `
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user me-2"></i>${estudiante.nombre}</h5>
+                        <small>RUT: ${estudiante.rut} | Curso: ${estudiante.curso}</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">📊 Estadísticas Generales</h6>
+                                        <ul class="list-unstyled">
+                                            <li><strong>Total de Clases:</strong> ${stats.total_registros}</li>
+                                            <li><strong>Clases Presentes:</strong> ${stats.presentes}</li>
+                                            <li><strong>Clases Ausentes:</strong> ${stats.ausentes}</li>
+                                            <li><strong>Faltas Justificadas:</strong> ${stats.justificados}</li>
+                                            <li><strong>Faltas Injustificadas:</strong> ${stats.injustificados}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-${estadoClass} text-white">
+                                    <div class="card-body text-center">
+                                        <h2 class="display-4">${stats.porcentaje_asistencia}%</h2>
+                                        <h6>Porcentaje de Asistencia</h6>
+                                        <span class="badge badge-light">${stats.estado}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Agregar tabla de asignaturas si hay datos
+    if (data.asignaturas && data.asignaturas.length > 0) {
+        html += `
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-book me-2"></i>Detalle por Asignatura</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Asignatura</th>
+                                    <th>Total Clases</th>
+                                    <th>Presentes</th>
+                                    <th>Ausentes</th>
+                                    <th>Justificadas</th>
+                                    <th>% Asistencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        `;
+        
+        data.asignaturas.forEach(function(asig) {
+            let porcentajeClass = 'success';
+            if (asig.porcentaje < 70) porcentajeClass = 'danger';
+            else if (asig.porcentaje < 85) porcentajeClass = 'warning';
+            
+            html += `
+                <tr>
+                    <td>${asig.asignatura}</td>
+                    <td>${asig.total_clases}</td>
+                    <td>${asig.presentes}</td>
+                    <td>${asig.ausentes}</td>
+                    <td>${asig.justificados}</td>
+                    <td><span class="badge bg-${porcentajeClass}">${asig.porcentaje}%</span></td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    $('#reporte-asistencia-estudiante').html(html);
+}
+
+// Función para generar reporte de asistencia de curso específico
+function generarReporteAsistenciaCurso() {
+    const cursoId = $('#select-curso').val();
+    const periodo = $('#periodo-curso').val();
+    
+    if (!cursoId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: 'Por favor selecciona un curso'
+        });
+        return;
+    }
+    
+    currentCursoId = cursoId;
+    
+    // Mostrar loading
+    $('#reporte-asistencia-curso').html(`
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Generando reporte...</span>
+            </div>
+            <p class="mt-2">Generando reporte de asistencia del curso...</p>
+        </div>
+    `);
+    
+    // Realizar petición AJAX
+    $.get('/api/reporte-asistencia-curso/', {
+        curso_id: cursoId,
+        periodo: periodo
+    }, function(response) {
+        if (response.success) {
+            mostrarReporteCurso(response.data, response.periodo_info);
+            $('#btn-pdf-curso').prop('disabled', false);
+        } else {
+            $('#reporte-asistencia-curso').html(`
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error al generar el reporte: ${response.error}
+                </div>
+            `);
+        }
+    }).fail(function() {
+        $('#reporte-asistencia-curso').html(`
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Error de conexión al generar el reporte
+            </div>
+        `);
+    });
+}
+
+// Función para mostrar el reporte del curso
+function mostrarReporteCurso(data, periodoInfo) {
+    const curso = data.curso;
+    const stats = data.estadisticas;
+    
+    let html = `
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-users me-2"></i>Curso ${curso.nombre}</h5>
+                        <small>Total de Estudiantes: ${curso.total_estudiantes}</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="card bg-success text-white text-center">
+                                            <div class="card-body">
+                                                <h3>${stats.estudiantes_buenos}</h3>
+                                                <small>Buen Estado</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card bg-warning text-white text-center">
+                                            <div class="card-body">
+                                                <h3>${stats.estudiantes_riesgo}</h3>
+                                                <small>En Riesgo</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card bg-danger text-white text-center">
+                                            <div class="card-body">
+                                                <h3>${stats.estudiantes_criticos}</h3>
+                                                <small>Estado Crítico</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <h2 class="display-4">${stats.promedio_asistencia}%</h2>
+                                        <h6>Promedio del Curso</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Agregar tabla de estudiantes si hay datos
+    if (data.estudiantes && data.estudiantes.length > 0) {
+        html += `
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-list me-2"></i>Detalle por Estudiante</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>RUT</th>
+                                    <th>Total</th>
+                                    <th>Presentes</th>
+                                    <th>Ausentes</th>
+                                    <th>Justificadas</th>
+                                    <th>% Asistencia</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        `;
+        
+        data.estudiantes.forEach(function(est) {
+            let estadoClass = 'success';
+            if (est.estado === 'Crítico') estadoClass = 'danger';
+            else if (est.estado === 'En Riesgo') estadoClass = 'warning';
+            
+            html += `
+                <tr>
+                    <td>${est.nombre}</td>
+                    <td>${est.rut}</td>
+                    <td>${est.total_clases}</td>
+                    <td>${est.presentes}</td>
+                    <td>${est.ausentes}</td>
+                    <td>${est.justificados}</td>
+                    <td><span class="badge bg-${estadoClass}">${est.porcentaje}%</span></td>
+                    <td><span class="badge bg-${estadoClass}">${est.estado}</span></td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    $('#reporte-asistencia-curso').html(html);
+}
+
+// Función para descargar PDF de asistencia de estudiante directamente desde la tabla
+function descargarPDFEstudianteDirecto(estudianteId, nombreEstudiante) {
+    const periodo = $('#periodo-estudiante-tabla').val() || 'ano_actual';
+    const url = `/pdf/reporte-asistencia-estudiante/?estudiante_id=${estudianteId}&periodo=${periodo}`;
+    
+    // Mostrar notificación de descarga
+    Swal.fire({
+        icon: 'info',
+        title: 'Descargando PDF',
+        text: `Generando reporte de asistencia para ${nombreEstudiante}`,
+        timer: 2000,
+        showConfirmButton: false
+    });
+    
+    // Abrir en nueva ventana para descargar
+    window.open(url, '_blank');
+}
+
+// Función para ver detalle de estudiante en pantalla
+function verDetalleEstudiante(estudianteId) {
+    const periodo = $('#periodo-estudiante-tabla').val() || 'ano_actual';
+    
+    // Mostrar modal con loading
+    Swal.fire({
+        title: 'Cargando detalle...',
+        html: `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-2">Obteniendo datos de asistencia...</p>
+            </div>
+        `,
+        showConfirmButton: false,
+        allowOutsideClick: false
+    });
+    
+    // Realizar petición AJAX
+    $.get('/api/reporte-asistencia-estudiante/', {
+        estudiante_id: estudianteId,
+        periodo: periodo
+    }, function(response) {
+        if (response.success) {
+            mostrarDetalleEstudianteModal(response.data);
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `Error al obtener el detalle: ${response.error}`
+            });
+        }
+    }).fail(function() {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de conexión',
+            text: 'No se pudo obtener el detalle del estudiante'
+        });
+    });
+}
+
+// Función para mostrar el detalle del estudiante en un modal
+function mostrarDetalleEstudianteModal(data) {
+    const estudiante = data.estudiante;
+    const stats = data.estadisticas;
+    
+    // Determinar clase de estado
+    let estadoClass = 'success';
+    let estadoIcon = 'check-circle';
+    if (stats.estado === 'Crítico') {
+        estadoClass = 'danger';
+        estadoIcon = 'exclamation-triangle';
+    } else if (stats.estado === 'En Riesgo') {
+        estadoClass = 'warning';
+        estadoIcon = 'exclamation-circle';
+    }
+    
+    let asignaturasHtml = '';
+    if (data.asignaturas && data.asignaturas.length > 0) {
+        asignaturasHtml = '<h6 class="mt-3"><i class="fas fa-book me-2"></i>Detalle por Asignatura:</h6><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Asignatura</th><th>Clases</th><th>% Asistencia</th></tr></thead><tbody>';
+        
+        data.asignaturas.forEach(function(asig) {
+            let porcentajeClass = 'success';
+            if (asig.porcentaje < 70) porcentajeClass = 'danger';
+            else if (asig.porcentaje < 85) porcentajeClass = 'warning';
+            
+            asignaturasHtml += `<tr><td>${asig.asignatura}</td><td>${asig.presentes}/${asig.total_clases}</td><td><span class="badge bg-${porcentajeClass}">${asig.porcentaje}%</span></td></tr>`;
+        });
+        
+        asignaturasHtml += '</tbody></table></div>';
+    }
+    
+    Swal.fire({
+        title: `<i class="fas fa-user me-2"></i>${estudiante.nombre}`,
+        html: `
+            <div class="text-start">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>RUT:</strong> ${estudiante.rut}</p>
+                        <p><strong>Curso:</strong> ${estudiante.curso}</p>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <div class="alert alert-${estadoClass} mb-0">
+                            <i class="fas fa-${estadoIcon} me-2"></i>
+                            <h4>${stats.porcentaje_asistencia}%</h4>
+                            <small>${stats.estado}</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="border rounded p-2">
+                            <h5 class="text-primary">${stats.total_registros}</h5>
+                            <small>Total Clases</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="border rounded p-2">
+                            <h5 class="text-success">${stats.presentes}</h5>
+                            <small>Presentes</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="border rounded p-2">
+                            <h5 class="text-warning">${stats.justificados}</h5>
+                            <small>Justificadas</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="border rounded p-2">
+                            <h5 class="text-danger">${stats.injustificados}</h5>
+                            <small>Injustificadas</small>
+                        </div>
+                    </div>
+                </div>
+                
+                ${asignaturasHtml}
+            </div>
+        `,
+        width: '800px',
+        showCancelButton: true,
+        confirmButtonText: '<i class="fas fa-file-pdf me-2"></i>Descargar PDF',
+        cancelButtonText: 'Cerrar',
+        confirmButtonColor: '#28a745'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            descargarPDFEstudianteDirecto(data.estudiante.id || currentEstudianteId, estudiante.nombre);
+        }
+    });
+}
+
+// Función para descargar PDF de asistencia de estudiante (mantener compatibilidad)
+function descargarPDFAsistenciaEstudiante() {
+    if (!currentEstudianteId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: 'Primero genera un reporte de estudiante'
+        });
+        return;
+    }
+    
+    const periodo = $('#periodo-estudiante').val();
+    const url = `/pdf/reporte-asistencia-estudiante/?estudiante_id=${currentEstudianteId}&periodo=${periodo}`;
+    
+    // Abrir en nueva ventana para descargar
+    window.open(url, '_blank');
+}
+
+// Función para descargar PDF de asistencia de curso
+function descargarPDFAsistenciaCurso() {
+    if (!currentCursoId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: 'Primero genera un reporte de curso'
+        });
+        return;
+    }
+    
+    const periodo = $('#periodo-curso').val();
+    const url = `/pdf/reporte-asistencia-curso/?curso_id=${currentCursoId}&periodo=${periodo}`;
+    
+    // Abrir en nueva ventana para descargar
+    window.open(url, '_blank');
+}
+
+// Inicializar los reportes específicos cuando se carga la pestaña
+$(document).ready(function() {
+    // Cargar datos cuando se activa la pestaña de asistencia
+    $('button[data-bs-target="#asistencia-reporte"]').on('shown.bs.tab', function() {
+        cargarCursos();
+    });
+    
+    // También cargar cuando se activan las sub-pestañas específicas
+    $('button[data-bs-target="#asistencia-estudiante"]').on('shown.bs.tab', function() {
+        // Cargar tabla de estudiantes si no está cargada
+        if ($('#tabla-estudiantes-container').find('table').length === 0) {
+            cargarTablaEstudiantes();
+        }
+    });
+    
+    $('button[data-bs-target="#asistencia-curso"]').on('shown.bs.tab', function() {
+        if ($('#select-curso option').length <= 1) {
+            cargarCursos();
+        }
+    });
+}); 

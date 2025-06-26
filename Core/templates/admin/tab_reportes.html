@@ -91,7 +91,7 @@
                         <a href="{% url 'descargar_reporte_cursos_pdf' %}" class="btn btn-sm btn-outline-success me-2" title="Descargar reporte en PDF">
                             <i class="fas fa-file-pdf me-1"></i>PDF
                         </a>
-                        <button class="btn btn-sm btn-outline-primary" onclick="generarReporteRendimiento()">
+                        <button class="btn btn-sm btn-outline-primary" onclick="location.reload()">
                             <i class="fas fa-sync-alt"></i> Actualizar
                         </button>
                     </div>
@@ -108,10 +108,59 @@
                                     <th><i class="fas fa-percentage"></i> Aprobación</th>
                                     <th><i class="fas fa-calendar-check"></i> Asistencia</th>
                                     <th><i class="fas fa-traffic-light"></i> Estado</th>
+                                    <th><i class="fas fa-cogs"></i> Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-rendimiento">
-                                <!-- Las filas se cargarán dinámicamente -->
+                                {% for curso in cursos %}
+                                <tr>
+                                    <td><span class="badge bg-primary">{{ curso.nivel }}°{{ curso.letra }}</span></td>
+                                    <td><span class="badge bg-info">{{ curso.total_estudiantes }}</span></td>
+                                    <td><span class="badge bg-secondary">{{ curso.total_evaluaciones|default:0 }}</span></td>
+                                    <td><strong>{{ curso.promedio_general|floatformat:2|default:"0.00" }}</strong></td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ curso.porcentaje_aprobacion|default:0 }}%">
+                                                {{ curso.porcentaje_aprobacion|default:0 }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-secondary" role="progressbar" style="width: 0%">
+                                                -%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if curso.promedio_general >= 5.5 %}
+                                            <span class="badge bg-success">Excelente</span>
+                                        {% elif curso.promedio_general >= 4.5 %}
+                                            <span class="badge bg-warning">Bueno</span>
+                                        {% elif curso.promedio_general >= 4.0 %}
+                                            <span class="badge bg-info">Regular</span>
+                                        {% elif curso.promedio_general > 0 %}
+                                            <span class="badge bg-danger">Deficiente</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Sin datos</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'descargar_promedio_asignaturas_curso_pdf' %}?curso_id={{ curso.id }}" 
+                                           class="btn btn-sm btn-outline-success" 
+                                           title="Descargar PDF de Promedios por Asignatura"
+                                           target="_blank">
+                                            <i class="fas fa-file-pdf"></i> PDF Asignaturas
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted">
+                                        <i class="fas fa-graduation-cap me-2"></i>No hay cursos registrados
+                                    </td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                 </div>
@@ -145,7 +194,7 @@
                 
                 <!-- Reporte General de Asistencia -->
                 <div class="tab-pane fade show active" id="asistencia-general" role="tabpanel">
-                    <div class="card shadow-sm">
+            <div class="card shadow-sm">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h6 class="card-title mb-0"><i class="fas fa-calendar-check me-2"></i>Reporte General de Asistencia</h6>
                             <div>
@@ -156,7 +205,7 @@
                                     <i class="fas fa-sync-alt"></i> Actualizar
                                 </button>
                             </div>
-                        </div>
+                </div>
                         <div class="card-body" id="reporte-asistencia">
                             <div class="text-center">
                                 <div class="spinner-border text-warning" role="status">
@@ -220,11 +269,12 @@
                                                     {% endif %}
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-sm btn-outline-danger" 
-                                                            onclick="descargarPDFEstudianteDirecto({{ usuario.estudiante.pk }}, '{{ usuario.nombre|escapejs }} {{ usuario.apellido_paterno|escapejs }} {{ usuario.apellido_materno|escapejs }}')"
-                                                            title="Descargar PDF de Asistencia">
+                                                    <a href="{% url 'descargar_asistencia_estudiante_admin_pdf' %}?estudiante_id={{ usuario.estudiante.pk }}" 
+                                                       class="btn btn-sm btn-outline-danger" 
+                                                       title="Descargar PDF de Asistencia"
+                                                       target="_blank">
                                                         <i class="fas fa-file-pdf"></i> PDF Asistencia
-                                                    </button>
+                                                    </a>
                                                 </td>
                                             </tr>
                                             {% endif %}
@@ -253,7 +303,7 @@
                                     </div>
                                     <div class="col-md-6 text-end">
                                         <small class="text-muted">
-                                            Haz clic en "PDF Asistencia" para descargar el reporte de asistencia
+                                            Haz clic en "PDF Asistencia" para descargar el reporte de asistencia del estudiante (mes actual)
                                         </small>
                                     </div>
                                 </div>
@@ -273,24 +323,23 @@
                                 <div class="col-md-6">
                                     <label for="select-curso" class="form-label">Seleccionar Curso:</label>
                                     <select class="form-select" id="select-curso">
-                                        <option value="">Cargando cursos...</option>
+                                        <option value="">Seleccionar curso...</option>
+                                        {% for curso in cursos %}
+                                        <option value="{{ curso.id }}">{{ curso.nivel }}°{{ curso.letra }}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="periodo-curso" class="form-label">Período:</label>
-                                    <select class="form-select" id="periodo-curso">
-                                        <option value="ano_actual">Año Actual</option>
-                                        <option value="mes_actual">Mes Actual</option>
-                                        <option value="semestre_actual">Semestre Actual</option>
+                                    <label for="tipo-reporte" class="form-label">Tipo de Reporte:</label>
+                                    <select class="form-select" id="tipo-reporte">
+                                        <option value="asistencia_general">Asistencia General del Curso</option>
+                                        <option value="asistencia_asignaturas">Promedio Asistencia por Asignatura</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="d-flex gap-2 mb-3">
+                                                        <div class="d-flex gap-2 mb-3">
                                 <button class="btn btn-primary" onclick="generarReporteAsistenciaCurso()">
                                     <i class="fas fa-chart-bar me-2"></i>Generar Reporte
-                                </button>
-                                <button class="btn btn-success" onclick="descargarPDFAsistenciaCurso()" disabled id="btn-pdf-curso">
-                                    <i class="fas fa-file-pdf me-2"></i>Descargar PDF
                                 </button>
                             </div>
                             <div id="reporte-asistencia-curso">
@@ -345,18 +394,196 @@
     
         <!-- Pestaña de Evaluaciones -->
         <div class="tab-pane fade" id="evaluaciones-reporte" role="tabpanel" aria-labelledby="evaluaciones-tab">
+            <!-- Sub-pestañas para Evaluaciones -->
             <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="card-title mb-0"><i class="fas fa-clipboard-list me-2"></i>Reporte de Evaluaciones por Asignatura</h6>
-                    <button class="btn btn-sm btn-outline-info" onclick="generarReporteEvaluaciones()">
-                        <i class="fas fa-sync-alt"></i> Actualizar
-                    </button>
+                <div class="card-header">
+                    <h6 class="card-title mb-0"><i class="fas fa-clipboard-list me-2"></i>Reportes de Evaluaciones</h6>
                 </div>
-                <div class="card-body" id="reporte-evaluaciones">
-                    <div class="text-center">
-                        <div class="spinner-border text-info" role="status">
-                            <span class="visually-hidden">Cargando...</span>
+                <div class="card-body p-0">
+                    <!-- Navegación de sub-pestañas -->
+                    <ul class="nav nav-tabs nav-tabs-bordered" id="evaluacionesTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="evaluaciones-general-tab" data-bs-toggle="tab" data-bs-target="#evaluaciones-general" type="button" role="tab" aria-controls="evaluaciones-general" aria-selected="true">
+                                <i class="fas fa-chart-line me-1"></i>General
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="evaluaciones-estudiante-tab" data-bs-toggle="tab" data-bs-target="#evaluaciones-estudiante" type="button" role="tab" aria-controls="evaluaciones-estudiante" aria-selected="false">
+                                <i class="fas fa-user me-1"></i>Por Estudiante
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="evaluaciones-curso-tab" data-bs-toggle="tab" data-bs-target="#evaluaciones-curso" type="button" role="tab" aria-controls="evaluaciones-curso" aria-selected="false">
+                                <i class="fas fa-users me-1"></i>Por Curso
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Contenido de las sub-pestañas -->
+                    <div class="tab-content" id="evaluacionesTabContent">
+                        
+                        <!-- Reporte General de Evaluaciones -->
+                        <div class="tab-pane fade show active" id="evaluaciones-general" role="tabpanel">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0"><i class="fas fa-chart-line me-2"></i>Reporte General de Evaluaciones</h6>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-warning" onclick="generarReporteEvaluacionesGeneral()">
+                                            <i class="fas fa-sync-alt"></i> Actualizar
+                                        </button>
+                                        <a href="{% url 'descargar_reporte_evaluaciones_general_pdf' %}" 
+                                           class="btn btn-sm btn-outline-success ms-2" 
+                                           title="Descargar PDF del Reporte General"
+                                           target="_blank">
+                                            <i class="fas fa-file-pdf"></i> Descargar PDF
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body" id="reporte-evaluaciones-general">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-warning" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Reporte de Evaluaciones por Estudiante -->
+                        <div class="tab-pane fade" id="evaluaciones-estudiante" role="tabpanel">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="card-title mb-0"><i class="fas fa-user me-2"></i>Lista de Estudiantes</h6>
+                                    <div>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="location.reload()">
+                                            <i class="fas fa-sync-alt"></i> Actualizar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-hover align-middle" id="tabla-estudiantes-evaluaciones">
+                                            <thead class="table-success">
+                                                <tr>
+                                                    <th><i class="fas fa-user me-1"></i>Nombre Completo</th>
+                                                    <th><i class="fas fa-id-card me-1"></i>RUT</th>
+                                                    <th><i class="fas fa-envelope me-1"></i>Correo Electrónico</th>
+                                                    <th><i class="fas fa-graduation-cap me-1"></i>Curso</th>
+                                                    <th><i class="fas fa-cogs me-1"></i>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for usuario in usuarios %}
+                                                    {% if usuario.estudiante %}
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="avatar-sm bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 35px; height: 35px; font-size: 12px; font-weight: bold;">
+                                                                    {{ usuario.nombre.0 }}{{ usuario.apellido_paterno.0 }}
+                                                                </div>
+                                                                <div>
+                                                                    <div class="fw-semibold">{{ usuario.nombre }} {{ usuario.apellido_paterno }} {{ usuario.apellido_materno }}</div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <code>{{ usuario.rut }}-{{ usuario.div }}</code>
+                                                        </td>
+                                                        <td>
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-envelope me-1"></i>{{ usuario.correo }}
+                                                            </small>
+                                                        </td>
+                                                        <td>
+                                                            {% if usuario.estudiante.curso %}
+                                                                <span class="badge bg-info">{{ usuario.estudiante.curso.nivel }}°{{ usuario.estudiante.curso.letra }}</span>
+                                                            {% else %}
+                                                                <span class="badge bg-secondary">Sin curso</span>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            <a href="{% url 'descargar_evaluaciones_estudiante_admin_pdf' %}?estudiante_id={{ usuario.estudiante.pk }}" 
+                                                               class="btn btn-sm btn-outline-success" 
+                                                               title="Descargar PDF de Evaluaciones"
+                                                               target="_blank">
+                                                                <i class="fas fa-file-pdf"></i> Descargar PDF
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                    {% endif %}
+                                                {% empty %}
+                                                <tr>
+                                                    <td class="text-center text-muted">
+                                                        <i class="fas fa-users me-2"></i>No hay usuarios registrados
+                                                    </td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p class="text-muted">
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    Lista de todos los estudiantes registrados
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6 text-end">
+                                                <small class="text-muted">
+                                                    Haz clic en "Descargar PDF" para obtener el reporte detallado de evaluaciones del estudiante
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reporte de Evaluaciones por Curso -->
+                        <div class="tab-pane fade" id="evaluaciones-curso" role="tabpanel">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0"><i class="fas fa-users me-2"></i>Reporte de Evaluaciones por Curso</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="select-curso-evaluaciones" class="form-label">Seleccionar Curso:</label>
+                                            <select class="form-select" id="select-curso-evaluaciones">
+                                                <option value="">Seleccionar curso...</option>
+                                                {% for curso in cursos %}
+                                                <option value="{{ curso.id }}">{{ curso.nivel }}°{{ curso.letra }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="tipo-reporte-evaluaciones" class="form-label">Tipo de Reporte:</label>
+                                            <select class="form-select" id="tipo-reporte-evaluaciones">
+                                                <option value="evaluaciones_asignaturas">Por Curso</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2 mb-3">
+                                        <button class="btn btn-primary" onclick="generarReporteEvaluacionesCurso()">
+                                            <i class="fas fa-chart-bar me-2"></i>Generar Reporte
+                                        </button>
+                                    </div>
+                                    <div id="reporte-evaluaciones-curso">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Selecciona un curso y presiona "Generar Reporte" para ver el detalle de evaluaciones del curso.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -440,7 +667,7 @@ function mostrarErrorMetricas() {
 // Generar reporte de rendimiento por cursos
 function generarReporteRendimiento() {
     const tbody = document.getElementById('tbody-rendimiento');
-    tbody.innerHTML = crearFilaVacia(7, `
+    tbody.innerHTML = crearFilaVacia(8, `
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Cargando datos...</span>
         </div>
@@ -478,7 +705,7 @@ function mostrarTablaRendimiento(cursos) {
     const tbody = document.getElementById('tbody-rendimiento');
     
     if (!cursos || cursos.length === 0) {
-        tbody.innerHTML = crearFilaVacia(7, 'No hay datos disponibles para el período seleccionado', 'text-muted');
+        tbody.innerHTML = crearFilaVacia(8, 'No hay datos disponibles para el período seleccionado', 'text-muted');
         return;
     }
 
@@ -520,9 +747,333 @@ function mostrarTablaRendimiento(cursos) {
                     </div>
                 </td>
                 <td><span class="badge bg-${estadoClase}">${estado}</span></td>
+                <td>
+                    <a href="/pdf/promedio-asignaturas-curso/?curso_id=${curso.curso_id || curso.id || ''}" 
+                       class="btn btn-sm btn-outline-success" 
+                       title="Descargar PDF de Promedios por Asignatura"
+                       target="_blank">
+                        <i class="fas fa-file-pdf"></i> PDF Asignaturas
+                    </a>
+                </td>
             </tr>
         `;
     }).join('');
+}
+
+// Generar reporte de asistencia por curso
+function generarReporteAsistenciaCurso() {
+    const cursoId = document.getElementById('select-curso').value;
+    const tipoReporte = document.getElementById('tipo-reporte').value;
+    const container = document.getElementById('reporte-asistencia-curso');
+    
+    if (!cursoId) {
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Por favor selecciona un curso para generar el reporte.
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Generando reporte...</span>
+            </div>
+        </div>
+    `;
+    
+    let apiUrl = '';
+    if (tipoReporte === 'asistencia_asignaturas') {
+        apiUrl = `/api/reporte-asistencia-asignaturas-curso/?curso_id=${cursoId}`;
+    } else {
+        apiUrl = `/api/reporte-asistencia-curso/?curso_id=${cursoId}`;
+    }
+    
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                if (tipoReporte === 'asistencia_asignaturas') {
+                    mostrarReporteAsistenciaAsignaturas(data.data);
+                } else {
+                    mostrarReporteAsistenciaCursoGeneral(data.data);
+                }
+            } else {
+                console.error('Error al cargar reporte:', data.error);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Error: ${data.error}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar reporte:', error);
+            container.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error al cargar el reporte: ${error.message}
+                </div>
+            `;
+        });
+}
+
+// Mostrar reporte de asistencia por asignaturas
+function mostrarReporteAsistenciaAsignaturas(data) {
+    const container = document.getElementById('reporte-asistencia-curso');
+    
+    if (!data.asignaturas || data.asignaturas.length === 0) {
+        container.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No hay datos de asistencia disponibles para el curso ${data.curso}.
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="card">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Promedio de Asistencia por Asignatura - Curso ${data.curso}
+                </h5>
+                <button type="button" class="btn btn-light btn-sm" onclick="descargarPDFAsistenciaAsignaturas('${data.curso_id}')">
+                    <i class="fas fa-file-pdf me-1"></i>
+                    Descargar PDF
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4 class="text-primary">${data.total_estudiantes}</h4>
+                                <small>Estudiantes</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4 class="text-info">${data.total_asignaturas}</h4>
+                                <small>Asignaturas</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h4 class="text-success">${data.promedio_asistencia_curso}%</h4>
+                                <small>Promedio General</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-primary">
+                            <tr>
+                                <th><i class="fas fa-book me-1"></i>Asignatura</th>
+                                <th><i class="fas fa-user-tie me-1"></i>Docente</th>
+                                <th><i class="fas fa-chalkboard me-1"></i>Clases</th>
+                                <th><i class="fas fa-users me-1"></i>Est. Evaluados</th>
+                                <th><i class="fas fa-check me-1"></i>Presentes</th>
+                                <th><i class="fas fa-times me-1"></i>Ausentes</th>
+                                <th><i class="fas fa-percentage me-1"></i>% Asistencia</th>
+                                <th><i class="fas fa-traffic-light me-1"></i>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.asignaturas.map(asignatura => `
+                                <tr>
+                                    <td><strong>${asignatura.asignatura}</strong></td>
+                                    <td><small>${asignatura.docente}</small></td>
+                                    <td><span class="badge bg-secondary">${asignatura.total_clases}</span></td>
+                                    <td><span class="badge bg-info">${asignatura.estudiantes_evaluados}</span></td>
+                                    <td><span class="badge bg-success">${asignatura.total_presentes}</span></td>
+                                    <td><span class="badge bg-danger">${asignatura.total_ausentes}</span></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-${asignatura.estado_clase} me-2">${asignatura.porcentaje_asistencia}%</span>
+                                            <div class="progress" style="width: 60px; height: 8px;">
+                                                <div class="progress-bar bg-${asignatura.estado_clase}" 
+                                                     style="width: ${asignatura.porcentaje_asistencia}%"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-${asignatura.estado_clase}">${asignatura.estado}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Mostrar reporte de asistencia general del curso (por estudiante)
+function mostrarReporteAsistenciaCursoGeneral(data) {
+    const container = document.getElementById('reporte-asistencia-curso');
+    
+    if (!data.estudiantes || data.estudiantes.length === 0) {
+        container.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No hay datos de asistencia disponibles para el curso ${data.curso.nombre}.
+            </div>
+        `;
+        return;
+    }
+    
+    const curso = data.curso;
+    const stats = data.estadisticas;
+    
+    container.innerHTML = `
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0"><i class="fas fa-users me-2"></i>Curso ${curso.nombre}</h5>
+                            <small>Total de Estudiantes: ${curso.total_estudiantes}</small>
+                        </div>
+                        <button type="button" class="btn btn-light btn-sm" onclick="descargarPDFAsistenciaCursoGeneral('${curso.id}')">
+                            <i class="fas fa-file-pdf me-1"></i>
+                            Descargar PDF
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="card bg-success text-white text-center">
+                                            <div class="card-body">
+                                                <h3>${stats.estudiantes_buenos}</h3>
+                                                <small>Buen Estado</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card bg-warning text-white text-center">
+                                            <div class="card-body">
+                                                <h3>${stats.estudiantes_riesgo}</h3>
+                                                <small>En Riesgo</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card bg-danger text-white text-center">
+                                            <div class="card-body">
+                                                <h3>${stats.estudiantes_criticos}</h3>
+                                                <small>Estado Crítico</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <h2 class="display-4">${stats.promedio_asistencia}%</h2>
+                                        <h6>Promedio del Curso</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-list me-2"></i>Detalle por Estudiante</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>RUT</th>
+                                <th>Total</th>
+                                <th>Presentes</th>
+                                <th>Ausentes</th>
+                                <th>Justificadas</th>
+                                <th>% Asistencia</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.estudiantes.map(est => {
+                                let estadoClass = 'success';
+                                if (est.estado === 'Crítico') estadoClass = 'danger';
+                                else if (est.estado === 'En Riesgo') estadoClass = 'warning';
+                                
+                                return `
+                                    <tr>
+                                        <td>${est.nombre}</td>
+                                        <td>${est.rut}</td>
+                                        <td>${est.total_clases}</td>
+                                        <td>${est.presentes}</td>
+                                        <td>${est.ausentes}</td>
+                                        <td>${est.justificados}</td>
+                                        <td><span class="badge bg-${estadoClass}">${est.porcentaje}%</span></td>
+                                        <td><span class="badge bg-${estadoClass}">${est.estado}</span></td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        ${data.asignaturas && data.asignaturas.length > 0 ? `
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Resumen por Asignatura</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Asignatura</th>
+                                <th>Total Clases</th>
+                                <th>Presentes</th>
+                                <th>% Asistencia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.asignaturas.map(asig => `
+                                <tr>
+                                    <td>${asig.asignatura}</td>
+                                    <td>${asig.total_clases}</td>
+                                    <td>${asig.total_presentes}</td>
+                                    <td><span class="badge bg-primary">${asig.porcentaje}%</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        ` : ''}
+    `;
 }
 
 // Generar reporte de asistencia
@@ -882,7 +1433,7 @@ function mostrarReporteEstudiantesRiesgo(data) {
                                             `).join('')}
                                         </tbody>
                                     </table>
-                                </div>
+                </div>
                             </div>
                         ` : ''}
                     </div>
@@ -1062,18 +1613,20 @@ function mostrarReporteEstudiantesRiesgo(data) {
     container.innerHTML = html;
 }
 
-// Generar reporte de evaluaciones
-function generarReporteEvaluaciones() {
-    const container = document.getElementById('reporte-evaluaciones');
+// Generar reporte general de evaluaciones
+function generarReporteEvaluacionesGeneral() {
+    const container = document.getElementById('reporte-evaluaciones-general');
+    
+    // Mostrar spinner
     container.innerHTML = `
         <div class="text-center">
-            <div class="spinner-border text-info" role="status">
+            <div class="spinner-border text-warning" role="status">
                 <span class="visually-hidden">Cargando...</span>
             </div>
         </div>
     `;
-
-    fetch('/api/reporte-evaluaciones/')
+    
+    fetch('/api/reporte-evaluaciones-general/')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -1082,70 +1635,164 @@ function generarReporteEvaluaciones() {
         })
         .then(data => {
             if (data.success) {
-                mostrarReporteEvaluaciones(data.data);
+                mostrarReporteEvaluacionesGeneralSimple(data.data);
             } else {
-                console.error('Error al cargar reporte de evaluaciones:', data.error);
-                mostrarErrorReporte('reporte-evaluaciones');
+                throw new Error(data.error || 'Error desconocido');
             }
         })
         .catch(error => {
-            console.error('Error al cargar reporte de evaluaciones:', error);
-            mostrarErrorReporte('reporte-evaluaciones');
+            console.error('Error al cargar el reporte:', error);
+            container.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error al cargar el reporte: ${error.message}
+                </div>
+            `;
         });
 }
 
-function mostrarReporteEvaluaciones(data) {
-    const container = document.getElementById('reporte-evaluaciones');
+// Función eliminada: verReporteEvaluacionesEstudiante ya no es necesaria
+// Los reportes de estudiantes ahora se descargan directamente como PDF
+
+// Mostrar reporte general simplificado
+function mostrarReporteEvaluacionesGeneralSimple(data) {
+    const container = document.getElementById('reporte-evaluaciones-general');
     
-    if (!data || data.length === 0) {
-        container.innerHTML = '<p class="text-muted text-center">No hay datos de evaluaciones disponibles</p>';
+    if (!data.cursos || data.cursos.length === 0) {
+        container.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No hay datos de evaluaciones disponibles.
+            </div>
+        `;
         return;
     }
-
+    
+    const stats = data.estadisticas_generales;
+    
     container.innerHTML = `
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th><i class="fas fa-book"></i> Asignatura</th>
-                        <th><i class="fas fa-clipboard-list"></i> Evaluaciones</th>
-                        <th><i class="fas fa-users"></i> Estudiantes Evaluados</th>
-                        <th><i class="fas fa-chart-line"></i> Promedio</th>
-                        <th><i class="fas fa-percentage"></i> Aprobación</th>
-                        <th><i class="fas fa-traffic-light"></i> Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${data.map(asignatura => {
-                        const promedio = asignatura.promedio || 0;
-                        const aprobacion = asignatura.porcentaje_aprobacion || 0;
-                        const estadoClass = promedio >= 6.0 ? 'success' : 
-                                          promedio >= 5.0 ? 'warning' : 'danger';
-                        const estadoTexto = promedio >= 6.0 ? 'Excelente' : 
-                                          promedio >= 5.0 ? 'Regular' : 'Crítico';
-                        return `
-                            <tr>
-                                <td><strong>${asignatura.asignatura}</strong></td>
-                                <td><span class="badge bg-secondary">${asignatura.total_evaluaciones}</span></td>
-                                <td><span class="badge bg-info">${asignatura.total_estudiantes || 'N/A'}</span></td>
-                                <td><strong>${promedio.toFixed(1)}</strong></td>
-                                <td>
-                                    <div class="progress" style="height: 20px;">
-                                        <div class="progress-bar bg-${estadoClass}" role="progressbar" 
-                                             style="width: ${aprobacion}%">
-                                            ${aprobacion.toFixed(1)}%
-    </div>
-</div> 
-                                </td>
-                                <td><span class="badge bg-${estadoClass}">${estadoTexto}</span></td>
-                            </tr>
-                        `;
-                    }).join('')}
-                </tbody>
-            </table>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Reporte General de Evaluaciones - Todos los Cursos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-primary">${stats.total_cursos}</h5>
+                                        <small class="text-muted">Cursos</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-info">${stats.total_estudiantes}</h5>
+                                        <small class="text-muted">Estudiantes</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-success">${stats.total_evaluaciones}</h5>
+                                        <small class="text-muted">Evaluaciones</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-warning">${stats.promedio_general}</h5>
+                                        <small class="text-muted">Promedio General</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Curso</th>
+                                        <th>Estudiantes</th>
+                                        <th>Evaluaciones</th>
+                                        <th>Asignaturas</th>
+                                        <th>Promedio</th>
+                                        <th>Aprobados</th>
+                                        <th>% Aprobación</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.cursos.map(curso => `
+                                        <tr>
+                                            <td><span class="badge bg-primary">${curso.curso}</span></td>
+                                            <td><span class="badge bg-info">${curso.total_estudiantes}</span></td>
+                                            <td><span class="badge bg-secondary">${curso.total_evaluaciones}</span></td>
+                                            <td><span class="badge bg-success">${curso.asignaturas_con_evaluaciones}</span></td>
+                                            <td><strong>${curso.promedio_curso}</strong></td>
+                                            <td><span class="badge bg-success">${curso.aprobados}</span></td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" role="progressbar" 
+                                                         style="width: ${curso.porcentaje_aprobacion}%">
+                                                        ${curso.porcentaje_aprobacion}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-${curso.estado_clase}">${curso.estado}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card border-info">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Resumen General del Colegio
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <p><strong>Total de Cursos:</strong> ${stats.total_cursos}</p>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <p><strong>Total de Estudiantes:</strong> ${stats.total_estudiantes}</p>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <p><strong>Total de Evaluaciones:</strong> ${stats.total_evaluaciones.toLocaleString()}</p>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <p><strong>% Aprobación General:</strong> ${stats.porcentaje_aprobacion_general}%</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     `;
 }
+
+// Eliminar funciones obsoletas y mantener solo las necesarias
+// Las funciones mostrarReporteEvaluacionesEstudiante y mostrarReporteEvaluacionesAsignaturas ya están definidas arriba
+
+// ... existing code ...
 
 // Funciones de utilidad
 function mostrarErrorTabla(tbodyId, numColumnas) {
@@ -1319,4 +1966,562 @@ document.addEventListener('DOMContentLoaded', function() {
                  });
      }
  });
+
+// Función para descargar PDF de asistencia por asignaturas del curso
+function descargarPDFAsistenciaAsignaturas(cursoId) {
+    if (!cursoId) {
+        alert('Error: ID de curso no disponible');
+        return;
+    }
+    
+    // Crear URL para la descarga
+    const url = `/pdf/asistencia-asignaturas-curso/?curso_id=${cursoId}`;
+    
+    // Abrir en nueva ventana para descargar
+    window.open(url, '_blank');
+}
+
+// Función para descargar PDF de asistencia general del curso
+function descargarPDFAsistenciaCursoGeneral(cursoId) {
+    if (!cursoId) {
+        alert('Error: ID de curso no disponible');
+        return;
+    }
+    
+    // Crear URL para la descarga
+    const url = `/pdf/reporte-asistencia-curso/?curso_id=${cursoId}`;
+    
+    // Abrir en nueva ventana para descargar
+    window.open(url, '_blank');
+}
+
+// Función para mostrar select de estudiantes
+function toggleEstudianteSelectEvaluaciones() {
+    const tipoReporte = document.getElementById('tipo-reporte-evaluaciones').value;
+    const rowEstudiante = document.getElementById('row-estudiante-evaluaciones');
+    
+    if (tipoReporte === 'evaluaciones_estudiante') {
+        rowEstudiante.style.display = 'block';
+        cargarEstudiantesEvaluaciones();
+    } else {
+        rowEstudiante.style.display = 'none';
+    }
+}
+
+// Función para cargar estudiantes cuando cambia el curso
+function cargarEstudiantesEvaluaciones() {
+    const cursoId = document.getElementById('select-curso-evaluaciones').value;
+    const selectEstudiante = document.getElementById('select-estudiante-evaluaciones');
+    
+    if (!cursoId) {
+        selectEstudiante.innerHTML = '<option value="">Primero seleccione un curso...</option>';
+        return;
+    }
+    
+    // Mostrar loading
+    selectEstudiante.innerHTML = '<option value="">Cargando estudiantes...</option>';
+    
+    // Cargar estudiantes del curso
+    fetch(`/api/lista-estudiantes/?curso_id=${cursoId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data.length > 0) {
+                selectEstudiante.innerHTML = '<option value="">Seleccione un estudiante...</option>' +
+                    data.data.map(estudiante => 
+                        `<option value="${estudiante.id}">${estudiante.nombre} (${estudiante.rut})</option>`
+                    ).join('');
+            } else {
+                selectEstudiante.innerHTML = '<option value="">No hay estudiantes en este curso</option>';
+            }
+        })
+        .catch(error => {
+            console.error('Error cargando estudiantes:', error);
+            selectEstudiante.innerHTML = '<option value="">Error cargando estudiantes</option>';
+        });
+}
+
+// Agregar event listener para cuando cambie el curso
+document.addEventListener('DOMContentLoaded', function() {
+    const selectCursoEvaluaciones = document.getElementById('select-curso-evaluaciones');
+    if (selectCursoEvaluaciones) {
+        selectCursoEvaluaciones.addEventListener('change', function() {
+            const tipoReporte = document.getElementById('tipo-reporte-evaluaciones').value;
+            if (tipoReporte === 'evaluaciones_estudiante') {
+                cargarEstudiantesEvaluaciones();
+            }
+        });
+    }
+});
+
+// Mostrar reporte de evaluaciones por asignaturas del curso
+function mostrarReporteEvaluacionesAsignaturas(data) {
+    const container = document.getElementById('reporte-evaluaciones-curso');
+    
+    if (!data.asignaturas || data.asignaturas.length === 0) {
+        container.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No hay datos de evaluaciones disponibles para el curso ${data.curso}.
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Evaluaciones por Asignatura - Curso ${data.curso}
+                        </h5>
+                        <button type="button" class="btn btn-light btn-sm" onclick="descargarPDFEvaluacionesAsignaturas('${data.curso_id}')">
+                            <i class="fas fa-file-pdf me-1"></i>
+                            Descargar PDF
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-primary">${data.total_estudiantes}</h5>
+                                        <small class="text-muted">Estudiantes</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-info">${data.total_asignaturas}</h5>
+                                        <small class="text-muted">Asignaturas</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-success">${data.total_evaluaciones}</h5>
+                                        <small class="text-muted">Evaluaciones</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-warning">${data.promedio_general_curso}</h5>
+                                        <small class="text-muted">Promedio General</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Asignatura</th>
+                                        <th>Docente</th>
+                                        <th>Evaluaciones</th>
+                                        <th>Est. Evaluados</th>
+                                        <th>Total Notas</th>
+                                        <th>Promedio</th>
+                                        <th>Aprobados</th>
+                                        <th>% Aprobación</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.asignaturas.map(asignatura => `
+                                        <tr>
+                                            <td><strong>${asignatura.asignatura}</strong></td>
+                                            <td>${asignatura.docente}</td>
+                                            <td><span class="badge bg-secondary">${asignatura.total_evaluaciones}</span></td>
+                                            <td><span class="badge bg-info">${asignatura.estudiantes_evaluados}</span></td>
+                                            <td><span class="badge bg-primary">${asignatura.total_notas}</span></td>
+                                            <td><strong>${asignatura.promedio_asignatura}</strong></td>
+                                            <td><span class="badge bg-success">${asignatura.aprobados}</span></td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" role="progressbar" 
+                                                         style="width: ${asignatura.porcentaje_aprobacion}%">
+                                                        ${asignatura.porcentaje_aprobacion}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-${asignatura.estado_clase}">${asignatura.estado}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card border-success">
+                                    <div class="card-header bg-success text-white">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-chart-pie me-2"></i>
+                                            Resumen General
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Total de Evaluaciones:</strong> ${data.total_evaluaciones}</p>
+                                        <p><strong>Total de Notas:</strong> ${data.total_notas.toLocaleString()}</p>
+                                        <p><strong>Promedio General:</strong> ${data.promedio_general_curso}</p>
+                                        <p class="mb-0"><strong>% Aprobación General:</strong> ${data.porcentaje_aprobacion_curso}%</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-info">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Estadísticas por Estado
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        ${(() => {
+                                            const estados = {};
+                                            data.asignaturas.forEach(a => {
+                                                estados[a.estado] = (estados[a.estado] || 0) + 1;
+                                            });
+                                            return Object.entries(estados).map(([estado, count]) => 
+                                                `<p><strong>${estado}:</strong> ${count} asignatura${count !== 1 ? 's' : ''}</p>`
+                                            ).join('');
+                                        })()}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Función para descargar PDF de evaluaciones por asignaturas del curso
+function descargarPDFEvaluacionesAsignaturas(cursoId) {
+    if (!cursoId) {
+        alert('Error: ID de curso no disponible');
+        return;
+    }
+    
+    // Crear URL para la descarga
+    const url = `/pdf/evaluaciones-asignaturas-curso/?curso_id=${cursoId}`;
+    
+    // Abrir en nueva ventana para descargar
+    window.open(url, '_blank');
+}
+
+// Función para mostrar select de estudiantes
+function toggleEstudianteSelectEvaluaciones() {
+    const tipoReporte = document.getElementById('tipo-reporte-evaluaciones').value;
+    const rowEstudiante = document.getElementById('row-estudiante-evaluaciones');
+    
+    if (tipoReporte === 'evaluaciones_estudiante') {
+        rowEstudiante.style.display = 'block';
+        cargarEstudiantesEvaluaciones();
+    } else {
+        rowEstudiante.style.display = 'none';
+    }
+}
+
+// Función para cargar estudiantes cuando cambia el curso
+function cargarEstudiantesEvaluaciones() {
+    const cursoId = document.getElementById('select-curso-evaluaciones').value;
+    const selectEstudiante = document.getElementById('select-estudiante-evaluaciones');
+    
+    if (!cursoId) {
+        selectEstudiante.innerHTML = '<option value="">Primero seleccione un curso...</option>';
+        return;
+    }
+    
+    // Mostrar loading
+    selectEstudiante.innerHTML = '<option value="">Cargando estudiantes...</option>';
+    
+    // Cargar estudiantes del curso
+    fetch(`/api/lista-estudiantes/?curso_id=${cursoId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data.length > 0) {
+                selectEstudiante.innerHTML = '<option value="">Seleccione un estudiante...</option>' +
+                    data.data.map(estudiante => 
+                        `<option value="${estudiante.id}">${estudiante.nombre} (${estudiante.rut})</option>`
+                    ).join('');
+            } else {
+                selectEstudiante.innerHTML = '<option value="">No hay estudiantes en este curso</option>';
+            }
+        })
+        .catch(error => {
+            console.error('Error cargando estudiantes:', error);
+            selectEstudiante.innerHTML = '<option value="">Error cargando estudiantes</option>';
+        });
+}
+
+// Agregar event listener para cuando cambie el curso
+document.addEventListener('DOMContentLoaded', function() {
+    const selectCursoEvaluaciones = document.getElementById('select-curso-evaluaciones');
+    if (selectCursoEvaluaciones) {
+        selectCursoEvaluaciones.addEventListener('change', function() {
+            const tipoReporte = document.getElementById('tipo-reporte-evaluaciones').value;
+            if (tipoReporte === 'evaluaciones_estudiante') {
+                cargarEstudiantesEvaluaciones();
+            }
+        });
+    }
+});
+
+// Mostrar reporte de evaluaciones por estudiante
+function mostrarReporteEvaluacionesEstudiante(data) {
+    const container = document.getElementById('reporte-evaluaciones-curso');
+    
+    if (!data.asignaturas || data.asignaturas.length === 0) {
+        container.innerHTML = `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No hay datos de evaluaciones disponibles para el estudiante ${data.estudiante.nombre}.
+            </div>
+        `;
+        return;
+    }
+    
+    const estudiante = data.estudiante;
+    const stats = data.estadisticas_generales;
+    
+    container.innerHTML = `
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-info">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user me-2"></i>
+                            Reporte de Evaluaciones - ${estudiante.nombre}
+                        </h5>
+                        <small>RUT: ${estudiante.rut} | Curso: ${estudiante.curso}</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-2">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-primary">${stats.total_asignaturas}</h5>
+                                        <small class="text-muted">Asignaturas</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-info">${stats.total_evaluaciones}</h5>
+                                        <small class="text-muted">Evaluaciones</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-warning">${stats.promedio_general}</h5>
+                                        <small class="text-muted">Promedio</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-success">${stats.mejor_nota}</h5>
+                                        <small class="text-muted">Mejor Nota</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-danger">${stats.peor_nota}</h5>
+                                        <small class="text-muted">Peor Nota</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5 class="text-success">${stats.porcentaje_aprobacion_general}%</h5>
+                                        <small class="text-muted">% Aprobación</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Asignatura</th>
+                                        <th>Docente</th>
+                                        <th>Evaluaciones</th>
+                                        <th>Promedio</th>
+                                        <th>Mejor Nota</th>
+                                        <th>Peor Nota</th>
+                                        <th>Aprobadas</th>
+                                        <th>% Aprobación</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.asignaturas.map(asignatura => `
+                                        <tr>
+                                            <td><strong>${asignatura.asignatura}</strong></td>
+                                            <td>${asignatura.docente}</td>
+                                            <td><span class="badge bg-secondary">${asignatura.total_evaluaciones}</span></td>
+                                            <td><strong>${asignatura.promedio_asignatura}</strong></td>
+                                            <td><span class="badge bg-success">${asignatura.nota_maxima}</span></td>
+                                            <td><span class="badge bg-danger">${asignatura.nota_minima}</span></td>
+                                            <td><span class="badge bg-success">${asignatura.aprobadas}</span></td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" role="progressbar" 
+                                                         style="width: ${asignatura.porcentaje_aprobacion}%">
+                                                        ${asignatura.porcentaje_aprobacion}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-${asignatura.estado_clase}">${asignatura.estado}</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Detalle de evaluaciones por asignatura -->
+                        <div class="mt-4">
+                            <h6><i class="fas fa-list me-2"></i>Detalle de Evaluaciones por Asignatura</h6>
+                            ${data.asignaturas.map(asignatura => `
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">${asignatura.asignatura} - ${asignatura.docente}</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Fecha</th>
+                                                        <th>Tipo</th>
+                                                        <th>Evaluación</th>
+                                                        <th>Nota</th>
+                                                        <th>Observaciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    ${asignatura.evaluaciones_detalle.map(eval => `
+                                                        <tr>
+                                                            <td>${eval.fecha}</td>
+                                                            <td><span class="badge bg-primary">${eval.tipo}</span></td>
+                                                            <td>${eval.nombre}</td>
+                                                            <td>
+                                                                <span class="badge ${eval.nota >= 4.0 ? 'bg-success' : 'bg-danger'}">
+                                                                    ${eval.nota}
+                                                                </span>
+                                                            </td>
+                                                            <td><small>${eval.observaciones}</small></td>
+                                                        </tr>
+                                                    `).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Generar reporte de evaluaciones por curso (simplificado)
+function generarReporteEvaluacionesCurso() {
+    const cursoId = document.getElementById('select-curso-evaluaciones').value;
+    const container = document.getElementById('reporte-evaluaciones-curso');
+    
+    if (!cursoId) {
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Por favor, seleccione un curso para generar el reporte.
+            </div>
+        `;
+        return;
+    }
+    
+    // Mostrar spinner
+    container.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Generando reporte...</span>
+            </div>
+            <p class="mt-2 text-muted">Generando reporte de evaluaciones...</p>
+        </div>
+    `;
+    
+    fetch(`/api/reporte-evaluaciones-asignaturas-curso/?curso_id=${cursoId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                mostrarReporteEvaluacionesAsignaturas(data.data);
+            } else {
+                throw new Error(data.error || 'Error desconocido');
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar el reporte:', error);
+            container.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error al cargar el reporte: ${error.message}
+                </div>
+            `;
+        });
+}
+
+// Inicializar reportes de evaluaciones cuando se activa la pestaña
+document.addEventListener('DOMContentLoaded', function() {
+    // Detectar cuando se activa la pestaña de evaluaciones
+    const evaluacionesTab = document.getElementById('evaluaciones-tab');
+    if (evaluacionesTab) {
+        evaluacionesTab.addEventListener('shown.bs.tab', function() {
+            // Cargar reporte general automáticamente
+            setTimeout(() => {
+                generarReporteEvaluacionesGeneral();
+            }, 100);
+        });
+        
+        // Si la pestaña de evaluaciones está activa al cargar la página
+        if (evaluacionesTab.classList.contains('active')) {
+            setTimeout(() => {
+                generarReporteEvaluacionesGeneral();
+            }, 100);
+        }
+    }
+    
+    // Detectar cambios en las sub-pestañas de evaluaciones
+    const evaluacionesSubTabs = document.querySelectorAll('#evaluacionesTabs .nav-link');
+    evaluacionesSubTabs.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function() {
+            const tabId = this.id;
+            if (tabId === 'evaluaciones-general-tab') {
+                generarReporteEvaluacionesGeneral();
+            }
+        });
+    });
+});
  </script> 

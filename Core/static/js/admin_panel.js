@@ -770,23 +770,7 @@ function mostrarReporteCurso(data, periodoInfo) {
     $('#reporte-asistencia-curso').html(html);
 }
 
-// Función para descargar PDF de asistencia de estudiante directamente desde la tabla
-window.descargarPDFEstudianteDirecto = function(estudianteId, nombreEstudiante) {
-    const periodo = 'ano_actual'; // Período fijo: año actual
-    const url = `/pdf/reporte-asistencia-estudiante/?estudiante_id=${estudianteId}&periodo=${periodo}`;
-    
-    // Mostrar notificación de descarga
-    Swal.fire({
-        icon: 'info',
-        title: 'Descargando PDF',
-        text: `Generando reporte de asistencia para ${nombreEstudiante}`,
-        timer: 2000,
-        showConfirmButton: false
-    });
-    
-    // Abrir en nueva ventana para descargar
-    window.open(url, '_blank');
-};
+// Función removida: ahora se usa enlace directo en el template
 
 
 

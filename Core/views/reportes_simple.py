@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.db.models import Count, Avg, Sum, Q, F
+from django.db.models import Count, Avg, Sum, Q, F, Max, Min
 from django.utils import timezone
 from datetime import datetime, date, timedelta
 from collections import defaultdict
@@ -67,6 +67,7 @@ class ReporteRendimientoCursosViewSimple(View):
                     if total_estudiantes == 0:
                         # Curso sin estudiantes
                         cursos_data.append({
+                            'curso_id': curso.id,
                             'curso': f"{curso.nivel}°{curso.letra}",
                             'total_estudiantes': 0,
                             'total_evaluaciones': 0,
@@ -142,6 +143,7 @@ class ReporteRendimientoCursosViewSimple(View):
                         estado_clase = "success"
                     
                     cursos_data.append({
+                        'curso_id': curso.id,
                         'curso': f"{curso.nivel}°{curso.letra}",
                         'total_estudiantes': int(total_estudiantes),
                         'total_evaluaciones': int(total_evaluaciones),
@@ -651,7 +653,7 @@ class ReporteAsistenciaCursoViewSimple(View):
                     estudiantes_buenos += 1
                 
                 estudiantes_detalle.append({
-                    'id': estudiante.id,
+                    'id': estudiante.pk,
                     'nombre': estudiante.usuario.get_full_name(),
                     'rut': estudiante.usuario.rut,
                     'total_clases': int(total_reg),
@@ -671,15 +673,17 @@ class ReporteAsistenciaCursoViewSimple(View):
             
             # Estadísticas por asignatura
             asignaturas_detalle = []
+            # Obtener asignaturas que tienen clases con asistencia registrada para este curso
             asignaturas = Asignatura.objects.filter(
-                asistencia__estudiante__curso=curso,
-                asistencia__fecha_registro__date__gte=fecha_inicio,
-                asistencia__fecha_registro__date__lte=fecha_fin
+                imparticiones__clases__asistencias__estudiante__curso=curso,
+                imparticiones__clases__asistencias__fecha_registro__date__gte=fecha_inicio,
+                imparticiones__clases__asistencias__fecha_registro__date__lte=fecha_fin
             ).distinct()
             
             for asignatura in asignaturas:
+                # Obtener asistencias de esta asignatura para el curso específico
                 asist_asignatura = Asistencia.objects.filter(
-                    asignatura=asignatura,
+                    clase__asignatura_impartida__asignatura=asignatura,
                     estudiante__curso=curso,
                     fecha_registro__date__gte=fecha_inicio,
                     fecha_registro__date__lte=fecha_fin
@@ -776,4 +780,565 @@ class ListaEstudiantesViewSimple(View):
             
         except Exception as e:
             print(f"Error en lista de estudiantes: {str(e)}")
-            return JsonResponse({'success': False, 'error': f'Error al obtener lista de estudiantes: {str(e)}'}) 
+            return JsonResponse({'success': False, 'error': f'Error al obtener lista de estudiantes: {str(e)}'})
+
+@method_decorator(login_required, name='dispatch')
+class ReporteAsistenciaAsignaturasCursoViewSimple(View):
+    """Vista para generar reporte de promedio de asistencia por asignatura de un curso específico"""
+    
+    def get(self, request):
+        # Verificar autorización
+        if not request.user.is_authenticated or not request.user.is_admin:
+            return JsonResponse({'error': 'No autorizado'}, status=403)
+            
+        try:
+            curso_id = request.GET.get('curso_id')
+            if not curso_id:
+                return JsonResponse({'success': False, 'error': 'ID de curso requerido'})
+            
+            # Obtener el curso
+            try:
+                curso = Curso.objects.get(id=curso_id)
+            except Curso.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Curso no encontrado'})
+            
+            # Obtener todas las asignaturas impartidas en el curso
+            asignaturas_curso = AsignaturaImpartida.objects.filter(
+                clases__curso=curso
+            ).distinct().select_related('asignatura', 'docente__usuario')
+            
+            asignaturas_data = []
+            
+            for asignatura_impartida in asignaturas_curso:
+                try:
+                    # Obtener todas las clases de esta asignatura en el curso
+                    clases_asignatura = asignatura_impartida.clases.filter(curso=curso)
+                    
+                    # Calcular asistencia para esta asignatura
+                    total_registros = 0
+                    total_presentes = 0
+                    estudiantes_evaluados = set()
+                    
+                    # Obtener estudiantes del curso
+                    estudiantes_curso = curso.estudiantes.all()
+                    
+                    for estudiante in estudiantes_curso:
+                        # Buscar registros de asistencia para las clases de esta asignatura
+                        asistencias_estudiante = Asistencia.objects.filter(
+                            estudiante=estudiante,
+                            clase__in=clases_asignatura
+                        )
+                        
+                        if asistencias_estudiante.exists():
+                            estudiantes_evaluados.add(estudiante.pk)
+                            total_registros += asistencias_estudiante.count()
+                            total_presentes += asistencias_estudiante.filter(presente=True).count()
+                    
+                    # Calcular porcentaje de asistencia
+                    porcentaje_asistencia = 0
+                    if total_registros > 0:
+                        porcentaje_asistencia = round((total_presentes * 100) / total_registros, 1)
+                    
+                    # Determinar estado basado en asistencia
+                    if porcentaje_asistencia >= 85:
+                        estado = "Excelente"
+                        estado_clase = "success"
+                    elif porcentaje_asistencia >= 75:
+                        estado = "Bueno"
+                        estado_clase = "info"
+                    elif porcentaje_asistencia >= 60:
+                        estado = "Regular"
+                        estado_clase = "warning"
+                    else:
+                        estado = "Deficiente"
+                        estado_clase = "danger"
+                    
+                    # Información del docente
+                    docente_nombre = "Sin asignar"
+                    if asignatura_impartida.docente:
+                        docente_nombre = asignatura_impartida.docente.usuario.get_full_name()
+                    
+                    asignaturas_data.append({
+                        'asignatura': asignatura_impartida.asignatura.nombre,
+                        'docente': docente_nombre,
+                        'total_clases': clases_asignatura.count(),
+                        'estudiantes_evaluados': len(estudiantes_evaluados),
+                        'total_registros': total_registros,
+                        'total_presentes': total_presentes,
+                        'total_ausentes': total_registros - total_presentes,
+                        'porcentaje_asistencia': porcentaje_asistencia,
+                        'estado': estado,
+                        'estado_clase': estado_clase
+                    })
+                    
+                except Exception as e:
+                    print(f"Error procesando asignatura {asignatura_impartida.asignatura.nombre}: {str(e)}")
+                    continue
+            
+            # Ordenar por porcentaje de asistencia descendente
+            asignaturas_data.sort(key=lambda x: x['porcentaje_asistencia'], reverse=True)
+            
+            # Calcular estadísticas generales del curso
+            if asignaturas_data:
+                promedio_asistencia_curso = sum(a['porcentaje_asistencia'] for a in asignaturas_data) / len(asignaturas_data)
+                total_estudiantes_curso = curso.estudiantes.count()
+                total_asignaturas = len(asignaturas_data)
+            else:
+                promedio_asistencia_curso = 0
+                total_estudiantes_curso = curso.estudiantes.count()
+                total_asignaturas = 0
+            
+            return JsonResponse({
+                'success': True,
+                'data': {
+                    'curso': f"{curso.nivel}°{curso.letra}",
+                    'curso_id': curso.id,
+                    'total_estudiantes': total_estudiantes_curso,
+                    'total_asignaturas': total_asignaturas,
+                    'promedio_asistencia_curso': round(promedio_asistencia_curso, 1),
+                    'asignaturas': asignaturas_data
+                }
+            })
+            
+        except Exception as e:
+            print(f"Error en reporte de asistencia por asignaturas: {str(e)}")
+            return JsonResponse({'success': False, 'error': f'Error generando reporte: {str(e)}'})
+
+@method_decorator(login_required, name='dispatch')
+class ReporteEvaluacionesAsignaturasCursoViewSimple(View):
+    """Vista para generar reporte de evaluaciones por asignatura de un curso específico"""
+    
+    def get(self, request):
+        # Verificar autorización
+        if not request.user.is_authenticated or not request.user.is_admin:
+            return JsonResponse({'error': 'No autorizado'}, status=403)
+            
+        try:
+            curso_id = request.GET.get('curso_id')
+            if not curso_id:
+                return JsonResponse({'success': False, 'error': 'ID de curso requerido'})
+            
+            # Obtener el curso
+            try:
+                curso = Curso.objects.get(id=curso_id)
+            except Curso.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Curso no encontrado'})
+            
+            # Obtener todas las asignaturas impartidas en el curso
+            asignaturas_curso = AsignaturaImpartida.objects.filter(
+                clases__curso=curso
+            ).distinct().select_related('asignatura', 'docente__usuario')
+            
+            asignaturas_data = []
+            
+            for asignatura_impartida in asignaturas_curso:
+                try:
+                    # Obtener todas las evaluaciones de esta asignatura en el curso
+                    evaluaciones_asignatura = Evaluacion.objects.filter(
+                        clase__asignatura_impartida=asignatura_impartida,
+                        clase__curso=curso
+                    )
+                    
+                    # Calcular estadísticas de evaluaciones
+                    total_evaluaciones = evaluaciones_asignatura.count()
+                    
+                    if total_evaluaciones > 0:
+                        # Obtener todas las notas de los estudiantes del curso para esta asignatura
+                        notas_curso = AlumnoEvaluacion.objects.filter(
+                            evaluacion__in=evaluaciones_asignatura,
+                            estudiante__curso=curso
+                        )
+                        
+                        total_notas = notas_curso.count()
+                        estudiantes_evaluados = notas_curso.values('estudiante').distinct().count()
+                        
+                        if total_notas > 0:
+                            promedio_asignatura = notas_curso.aggregate(promedio=Avg('nota'))['promedio']
+                            aprobados = notas_curso.filter(nota__gte=4.0).count()
+                            reprobados = notas_curso.filter(nota__lt=4.0).count()
+                            porcentaje_aprobacion = (aprobados / total_notas * 100)
+                            
+                            # Determinar estado basado en promedio
+                            if promedio_asignatura >= 5.5:
+                                estado = "Excelente"
+                                estado_clase = "success"
+                            elif promedio_asignatura >= 4.5:
+                                estado = "Bueno"
+                                estado_clase = "info"
+                            elif promedio_asignatura >= 4.0:
+                                estado = "Regular"
+                                estado_clase = "warning"
+                            else:
+                                estado = "Deficiente"
+                                estado_clase = "danger"
+                        else:
+                            promedio_asignatura = 0
+                            aprobados = 0
+                            reprobados = 0
+                            porcentaje_aprobacion = 0
+                            estado = "Sin datos"
+                            estado_clase = "secondary"
+                    else:
+                        total_notas = 0
+                        estudiantes_evaluados = 0
+                        promedio_asignatura = 0
+                        aprobados = 0
+                        reprobados = 0
+                        porcentaje_aprobacion = 0
+                        estado = "Sin evaluaciones"
+                        estado_clase = "secondary"
+                    
+                    # Información del docente
+                    docente_nombre = "Sin asignar"
+                    if asignatura_impartida.docente:
+                        docente_nombre = asignatura_impartida.docente.usuario.get_full_name()
+                    
+                    asignaturas_data.append({
+                        'asignatura': asignatura_impartida.asignatura.nombre,
+                        'docente': docente_nombre,
+                        'total_evaluaciones': total_evaluaciones,
+                        'estudiantes_evaluados': estudiantes_evaluados,
+                        'total_notas': total_notas,
+                        'promedio_asignatura': round(promedio_asignatura, 2) if promedio_asignatura else 0,
+                        'aprobados': aprobados,
+                        'reprobados': reprobados,
+                        'porcentaje_aprobacion': round(porcentaje_aprobacion, 1) if porcentaje_aprobacion else 0,
+                        'estado': estado,
+                        'estado_clase': estado_clase
+                    })
+                    
+                except Exception as e:
+                    print(f"Error procesando asignatura {asignatura_impartida.asignatura.nombre}: {str(e)}")
+                    continue
+            
+            # Ordenar por promedio descendente
+            asignaturas_data.sort(key=lambda x: x['promedio_asignatura'], reverse=True)
+            
+            # Calcular estadísticas generales del curso
+            if asignaturas_data:
+                # Filtrar asignaturas con datos
+                asignaturas_con_datos = [a for a in asignaturas_data if a['total_notas'] > 0]
+                
+                if asignaturas_con_datos:
+                    promedio_general_curso = sum(a['promedio_asignatura'] for a in asignaturas_con_datos) / len(asignaturas_con_datos)
+                    total_evaluaciones_curso = sum(a['total_evaluaciones'] for a in asignaturas_data)
+                    total_notas_curso = sum(a['total_notas'] for a in asignaturas_data)
+                    total_aprobados = sum(a['aprobados'] for a in asignaturas_data)
+                    porcentaje_aprobacion_curso = (total_aprobados / total_notas_curso * 100) if total_notas_curso > 0 else 0
+                else:
+                    promedio_general_curso = 0
+                    total_evaluaciones_curso = 0
+                    total_notas_curso = 0
+                    porcentaje_aprobacion_curso = 0
+                
+                total_estudiantes_curso = curso.estudiantes.count()
+                total_asignaturas = len(asignaturas_data)
+            else:
+                promedio_general_curso = 0
+                total_evaluaciones_curso = 0
+                total_notas_curso = 0
+                porcentaje_aprobacion_curso = 0
+                total_estudiantes_curso = curso.estudiantes.count()
+                total_asignaturas = 0
+            
+            return JsonResponse({
+                'success': True,
+                'data': {
+                    'curso': f"{curso.nivel}°{curso.letra}",
+                    'curso_id': curso.id,
+                    'total_estudiantes': total_estudiantes_curso,
+                    'total_asignaturas': total_asignaturas,
+                    'total_evaluaciones': total_evaluaciones_curso,
+                    'total_notas': total_notas_curso,
+                    'promedio_general_curso': round(promedio_general_curso, 2),
+                    'porcentaje_aprobacion_curso': round(porcentaje_aprobacion_curso, 1),
+                    'asignaturas': asignaturas_data
+                }
+            })
+            
+        except Exception as e:
+            print(f"Error en reporte de evaluaciones por asignaturas: {str(e)}")
+            return JsonResponse({'success': False, 'error': f'Error generando reporte: {str(e)}'})
+
+@method_decorator(login_required, name='dispatch')
+class ReporteEvaluacionesGeneralViewSimple(View):
+    """Vista para generar reporte general de evaluaciones"""
+    
+    def get(self, request):
+        # Verificar autorización
+        if not request.user.is_authenticated or not request.user.is_admin:
+            return JsonResponse({'error': 'No autorizado'}, status=403)
+            
+        try:
+            # Obtener todos los cursos con sus estudiantes
+            cursos = Curso.objects.all().order_by('nivel', 'letra')
+            
+            cursos_data = []
+            
+            for curso in cursos:
+                try:
+                    estudiantes_curso = curso.estudiantes.all()
+                    total_estudiantes = estudiantes_curso.count()
+                    
+                    if total_estudiantes > 0:
+                        # Obtener todas las evaluaciones de estudiantes de este curso
+                        evaluaciones_curso = AlumnoEvaluacion.objects.filter(
+                            estudiante__curso=curso
+                        )
+                        
+                        total_evaluaciones = evaluaciones_curso.count()
+                        
+                        if total_evaluaciones > 0:
+                            # Calcular estadísticas
+                            promedio_curso = evaluaciones_curso.aggregate(promedio=Avg('nota'))['promedio']
+                            aprobados = evaluaciones_curso.filter(nota__gte=4.0).count()
+                            reprobados = evaluaciones_curso.filter(nota__lt=4.0).count()
+                            porcentaje_aprobacion = (aprobados / total_evaluaciones * 100)
+                            
+                            # Obtener número de asignaturas con evaluaciones
+                            asignaturas_con_evaluaciones = evaluaciones_curso.values('evaluacion__clase__asignatura_impartida__asignatura').distinct().count()
+                            
+                            # Determinar estado basado en promedio
+                            if promedio_curso >= 5.5:
+                                estado = "Excelente"
+                                estado_clase = "success"
+                            elif promedio_curso >= 4.5:
+                                estado = "Bueno"
+                                estado_clase = "info"
+                            elif promedio_curso >= 4.0:
+                                estado = "Regular"
+                                estado_clase = "warning"
+                            else:
+                                estado = "Deficiente"
+                                estado_clase = "danger"
+                        else:
+                            promedio_curso = 0
+                            aprobados = 0
+                            reprobados = 0
+                            porcentaje_aprobacion = 0
+                            asignaturas_con_evaluaciones = 0
+                            estado = "Sin evaluaciones"
+                            estado_clase = "secondary"
+                    else:
+                        total_evaluaciones = 0
+                        promedio_curso = 0
+                        aprobados = 0
+                        reprobados = 0
+                        porcentaje_aprobacion = 0
+                        asignaturas_con_evaluaciones = 0
+                        estado = "Sin estudiantes"
+                        estado_clase = "secondary"
+                    
+                    cursos_data.append({
+                        'curso': f"{curso.nivel}°{curso.letra}",
+                        'curso_id': curso.pk,
+                        'total_estudiantes': total_estudiantes,
+                        'total_evaluaciones': total_evaluaciones,
+                        'asignaturas_con_evaluaciones': asignaturas_con_evaluaciones,
+                        'promedio_curso': round(promedio_curso, 2) if promedio_curso else 0,
+                        'aprobados': aprobados,
+                        'reprobados': reprobados,
+                        'porcentaje_aprobacion': round(porcentaje_aprobacion, 1),
+                        'estado': estado,
+                        'estado_clase': estado_clase
+                    })
+                    
+                except Exception as e:
+                    print(f"Error procesando curso {curso.nivel}°{curso.letra}: {str(e)}")
+                    continue
+            
+            # Ordenar por curso
+            cursos_data.sort(key=lambda x: x['curso'])
+            
+            # Calcular estadísticas generales
+            if cursos_data:
+                cursos_con_datos = [c for c in cursos_data if c['total_evaluaciones'] > 0]
+                
+                if cursos_con_datos:
+                    total_estudiantes_general = sum(c['total_estudiantes'] for c in cursos_data)
+                    total_evaluaciones_general = sum(c['total_evaluaciones'] for c in cursos_data)
+                    promedio_general = sum(c['promedio_curso'] for c in cursos_con_datos) / len(cursos_con_datos)
+                    total_aprobados_general = sum(c['aprobados'] for c in cursos_data)
+                    porcentaje_aprobacion_general = (total_aprobados_general / total_evaluaciones_general * 100) if total_evaluaciones_general > 0 else 0
+                else:
+                    total_estudiantes_general = sum(c['total_estudiantes'] for c in cursos_data)
+                    total_evaluaciones_general = 0
+                    promedio_general = 0
+                    porcentaje_aprobacion_general = 0
+                
+                total_cursos = len(cursos_data)
+            else:
+                total_estudiantes_general = 0
+                total_evaluaciones_general = 0
+                promedio_general = 0
+                porcentaje_aprobacion_general = 0
+                total_cursos = 0
+            
+            return JsonResponse({
+                'success': True,
+                'data': {
+                    'cursos': cursos_data,
+                    'estadisticas_generales': {
+                        'total_cursos': total_cursos,
+                        'total_estudiantes': total_estudiantes_general,
+                        'total_evaluaciones': total_evaluaciones_general,
+                        'promedio_general': round(promedio_general, 2),
+                        'porcentaje_aprobacion_general': round(porcentaje_aprobacion_general, 1)
+                    }
+                }
+            })
+            
+        except Exception as e:
+            print(f"Error en reporte general de evaluaciones: {str(e)}")
+            return JsonResponse({'success': False, 'error': f'Error generando reporte: {str(e)}'})
+
+@method_decorator(login_required, name='dispatch')
+class ReporteEvaluacionesEstudianteViewSimple(View):
+    """Vista para generar reporte de evaluaciones de un estudiante específico"""
+    
+    def get(self, request):
+        # Verificar autorización
+        if not request.user.is_authenticated or not request.user.is_admin:
+            return JsonResponse({'error': 'No autorizado'}, status=403)
+            
+        try:
+            estudiante_id = request.GET.get('estudiante_id')
+            if not estudiante_id:
+                return JsonResponse({'success': False, 'error': 'ID de estudiante requerido'})
+            
+            # Obtener el estudiante
+            try:
+                estudiante = Estudiante.objects.get(pk=estudiante_id)
+            except Estudiante.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Estudiante no encontrado'})
+            
+            # Obtener todas las evaluaciones del estudiante
+            evaluaciones_estudiante = AlumnoEvaluacion.objects.filter(
+                estudiante=estudiante
+            ).select_related(
+                'evaluacion__clase__asignatura_impartida__asignatura',
+                'evaluacion__clase__asignatura_impartida__docente__usuario'
+            ).order_by('evaluacion__fecha')
+            
+            asignaturas_data = []
+            
+            # Agrupar evaluaciones por asignatura
+            asignaturas_evaluaciones = {}
+            for eval_alumno in evaluaciones_estudiante:
+                asignatura_nombre = eval_alumno.evaluacion.clase.asignatura_impartida.asignatura.nombre
+                if asignatura_nombre not in asignaturas_evaluaciones:
+                    asignaturas_evaluaciones[asignatura_nombre] = {
+                        'asignatura': asignatura_nombre,
+                        'docente': eval_alumno.evaluacion.clase.asignatura_impartida.docente.usuario.get_full_name() if eval_alumno.evaluacion.clase.asignatura_impartida.docente else 'Sin asignar',
+                        'evaluaciones': []
+                    }
+                
+                asignaturas_evaluaciones[asignatura_nombre]['evaluaciones'].append({
+                    'fecha': eval_alumno.evaluacion.fecha.strftime('%d/%m/%Y'),
+                    'tipo': eval_alumno.evaluacion.evaluacion_base.nombre,
+                    'nombre': eval_alumno.evaluacion.evaluacion_base.nombre,
+                    'nota': eval_alumno.nota,
+                    'observaciones': eval_alumno.observaciones or ''
+                })
+            
+            # Calcular estadísticas por asignatura
+            for asignatura_nombre, data in asignaturas_evaluaciones.items():
+                evaluaciones = data['evaluaciones']
+                total_evaluaciones = len(evaluaciones)
+                notas = [e['nota'] for e in evaluaciones]
+                
+                if notas:
+                    promedio_asignatura = sum(notas) / len(notas)
+                    nota_maxima = max(notas)
+                    nota_minima = min(notas)
+                    aprobadas = len([n for n in notas if n >= 4.0])
+                    reprobadas = len([n for n in notas if n < 4.0])
+                    porcentaje_aprobacion = (aprobadas / total_evaluaciones * 100)
+                    
+                    # Determinar estado
+                    if promedio_asignatura >= 5.5:
+                        estado = "Excelente"
+                        estado_clase = "success"
+                    elif promedio_asignatura >= 4.5:
+                        estado = "Bueno"
+                        estado_clase = "info"
+                    elif promedio_asignatura >= 4.0:
+                        estado = "Regular"
+                        estado_clase = "warning"
+                    else:
+                        estado = "Deficiente"
+                        estado_clase = "danger"
+                else:
+                    promedio_asignatura = 0
+                    nota_maxima = 0
+                    nota_minima = 0
+                    aprobadas = 0
+                    reprobadas = 0
+                    porcentaje_aprobacion = 0
+                    estado = "Sin notas"
+                    estado_clase = "secondary"
+                
+                asignaturas_data.append({
+                    'asignatura': asignatura_nombre,
+                    'docente': data['docente'],
+                    'total_evaluaciones': total_evaluaciones,
+                    'promedio_asignatura': round(promedio_asignatura, 2),
+                    'nota_maxima': nota_maxima,
+                    'nota_minima': nota_minima,
+                    'aprobadas': aprobadas,
+                    'reprobadas': reprobadas,
+                    'porcentaje_aprobacion': round(porcentaje_aprobacion, 1),
+                    'estado': estado,
+                    'estado_clase': estado_clase,
+                    'evaluaciones_detalle': evaluaciones
+                })
+            
+            # Ordenar por asignatura
+            asignaturas_data.sort(key=lambda x: x['asignatura'])
+            
+            # Calcular estadísticas generales del estudiante
+            if evaluaciones_estudiante:
+                total_evaluaciones_estudiante = evaluaciones_estudiante.count()
+                promedio_general = evaluaciones_estudiante.aggregate(promedio=Avg('nota'))['promedio']
+                aprobadas_general = evaluaciones_estudiante.filter(nota__gte=4.0).count()
+                reprobadas_general = evaluaciones_estudiante.filter(nota__lt=4.0).count()
+                porcentaje_aprobacion_general = (aprobadas_general / total_evaluaciones_estudiante * 100)
+                
+                # Mejores y peores notas
+                mejor_nota = evaluaciones_estudiante.aggregate(max_nota=Max('nota'))['max_nota']
+                peor_nota = evaluaciones_estudiante.aggregate(min_nota=Min('nota'))['min_nota']
+            else:
+                total_evaluaciones_estudiante = 0
+                promedio_general = 0
+                aprobadas_general = 0
+                reprobadas_general = 0
+                porcentaje_aprobacion_general = 0
+                mejor_nota = 0
+                peor_nota = 0
+            
+            return JsonResponse({
+                'success': True,
+                'data': {
+                    'estudiante': {
+                        'nombre': estudiante.usuario.get_full_name(),
+                        'rut': estudiante.usuario.rut,
+                        'curso': f"{estudiante.curso.nivel}°{estudiante.curso.letra}",
+                        'estudiante_id': estudiante.pk
+                    },
+                    'estadisticas_generales': {
+                        'total_evaluaciones': total_evaluaciones_estudiante,
+                        'total_asignaturas': len(asignaturas_data),
+                        'promedio_general': round(promedio_general, 2) if promedio_general else 0,
+                        'aprobadas_general': aprobadas_general,
+                        'reprobadas_general': reprobadas_general,
+                        'porcentaje_aprobacion_general': round(porcentaje_aprobacion_general, 1),
+                        'mejor_nota': mejor_nota,
+                        'peor_nota': peor_nota
+                    },
+                    'asignaturas': asignaturas_data
+                }
+            })
+            
+        except Exception as e:
+            print(f"Error en reporte de evaluaciones por estudiante: {str(e)}")
+            return JsonResponse({'success': False, 'error': f'Error generando reporte: {str(e)}'}) 

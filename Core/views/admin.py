@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from Core.models import Usuario, Administrativo, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, ProfesorJefe, Especialidad, Comunicacion
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Q
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -14,6 +14,7 @@ from Core.servicios.repos.cursos import get_curso, get_estudiantes_por_curso
 from django.http import JsonResponse
 import json
 from datetime import datetime, date
+from Core.models.notas import Evaluacion, AlumnoEvaluacion
 
 def get_eventos_calendario_admin():
     """
@@ -140,7 +141,7 @@ class AdminPanelView(View):
                 'docente__usuario'
             ).prefetch_related('clases').all()
             
-            # Obtener cursos con sus profesores jefe
+            # Obtener cursos con sus profesores jefe y estadísticas
             cursos = Curso.objects.select_related('jefatura_actual__docente__usuario').all()
             
             # Obtener todas las especialidades
@@ -547,6 +548,71 @@ class AdminPanelModularView(View):
             for curso in cursos:
                 curso.total_estudiantes = Estudiante.objects.filter(curso=curso).count()
                 curso.total_asignaturas = AsignaturaImpartida.objects.filter(clases__curso=curso).distinct().count()
+                
+                # Calcular rendimiento académico del curso
+                # Obtener todas las evaluaciones del curso
+                evaluaciones_curso = Evaluacion.objects.filter(
+                    clase__curso=curso
+                ).distinct()
+                
+                # Calcular estadísticas de rendimiento
+                if evaluaciones_curso.exists():
+                    # Obtener notas de estudiantes del curso
+                    notas_curso = AlumnoEvaluacion.objects.filter(
+                        evaluacion__in=evaluaciones_curso,
+                        estudiante__curso=curso
+                    ).exclude(nota__isnull=True)
+                    
+                    if notas_curso.exists():
+                        # Promedio general del curso
+                        curso.promedio_general = round(notas_curso.aggregate(Avg('nota'))['nota__avg'] or 0, 2)
+                        
+                        # Calcular promedio por estudiante para clasificar correctamente
+                        estudiantes_promedios = []
+                        estudiantes_curso = Estudiante.objects.filter(curso=curso)
+                        
+                        for estudiante in estudiantes_curso:
+                            notas_estudiante = notas_curso.filter(estudiante=estudiante)
+                            if notas_estudiante.exists():
+                                promedio_estudiante = notas_estudiante.aggregate(Avg('nota'))['nota__avg'] or 0
+                                estudiantes_promedios.append(promedio_estudiante)
+                        
+                        # Contar estudiantes por estado de rendimiento basado en su promedio individual
+                        curso.estudiantes_excelente = sum(1 for p in estudiantes_promedios if p >= 5.5)
+                        curso.estudiantes_bueno = sum(1 for p in estudiantes_promedios if 4.5 <= p < 5.5)
+                        curso.estudiantes_regular = sum(1 for p in estudiantes_promedios if 4.0 <= p < 4.5)
+                        curso.estudiantes_deficiente = sum(1 for p in estudiantes_promedios if p < 4.0)
+                        
+                        # Calcular porcentaje de aprobación
+                        aprobados = curso.estudiantes_excelente + curso.estudiantes_bueno
+                        if curso.total_estudiantes > 0:
+                            curso.porcentaje_aprobacion = round((aprobados * 100) / curso.total_estudiantes, 1)
+                        else:
+                            curso.porcentaje_aprobacion = 0
+                        
+                        # Total de evaluaciones realizadas
+                        curso.total_evaluaciones = evaluaciones_curso.count()
+                        
+                        # Asignaturas con evaluaciones
+                        curso.asignaturas_con_evaluaciones = evaluaciones_curso.values('evaluacion_base__asignatura').distinct().count()
+                    else:
+                        curso.promedio_general = 0
+                        curso.estudiantes_excelente = 0
+                        curso.estudiantes_bueno = 0
+                        curso.estudiantes_regular = 0
+                        curso.estudiantes_deficiente = 0
+                        curso.porcentaje_aprobacion = 0
+                        curso.total_evaluaciones = 0
+                        curso.asignaturas_con_evaluaciones = 0
+                else:
+                    curso.promedio_general = 0
+                    curso.estudiantes_excelente = 0
+                    curso.estudiantes_bueno = 0
+                    curso.estudiantes_regular = 0
+                    curso.estudiantes_deficiente = 0
+                    curso.porcentaje_aprobacion = 0
+                    curso.total_evaluaciones = 0
+                    curso.asignaturas_con_evaluaciones = 0
             
             # Obtener todas las especialidades
             especialidades = Especialidad.objects.all()

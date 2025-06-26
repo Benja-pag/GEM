@@ -9,10 +9,31 @@
                     <h5 class="card-title mb-0">
                         <i class="fas fa-calendar-alt me-2"></i>Calendario General de Actividades
                     </h5>
-                    <div class="btn-group">
-                        <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalCrearEvento">
-                            <i class="fas fa-plus me-2"></i>Crear Evento
-                        </button>
+                    <div class="btn-group-vertical" role="group">
+                        <div class="btn-group mb-1" role="group">
+                            {% if cursos_profesor_jefe %}
+                            <button class="btn btn-sm btn-primary" onclick="abrirModalCrearEvento('REUNION')" title="Crear Reunión (Solo Profesor Jefe)">
+                                <i class="fas fa-users me-1"></i>Reunión
+                            </button>
+                            {% endif %}
+                            <button class="btn btn-sm btn-danger" onclick="abrirModalCrearEvento('EVALUACION')" title="Crear Evaluación">
+                                <i class="fas fa-clipboard-check me-1"></i>Evaluación
+                            </button>
+                            <button class="btn btn-sm btn-info" onclick="abrirModalCrearEvento('TAREA')" title="Crear Tarea">
+                                <i class="fas fa-tasks me-1"></i>Tarea
+                            </button>
+                        </div>
+                        <div class="btn-group mb-1" role="group">
+                            <button class="btn btn-sm btn-warning" onclick="abrirModalCrearEvento('MATERIAL')" title="Materiales de Clase">
+                                <i class="fas fa-book-open me-1"></i>Materiales
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="abrirModalCrearEvento('ENTREGA')" title="Crear Entrega">
+                                <i class="fas fa-upload me-1"></i>Entrega
+                            </button>
+                            <button class="btn btn-sm btn-dark" onclick="abrirModalCrearEvento('CANCELAR_CLASE')" title="Cancelar Clase">
+                                <i class="fas fa-times-circle me-1"></i>Cancelar
+                            </button>
+                        </div>
                     </div>
                                         </div>
                 <div class="card-body">
@@ -33,8 +54,72 @@
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
-                <div class="card-body p-0" id="proximos-eventos-container" style="max-height: 600px; overflow-y: auto;">
-                    <div class="p-4 text-center text-muted">Cargando eventos...</div>
+                <div class="card-body p-0" id="proximos-eventos-container" style="max-height: 600px; overflow-y: auto; overflow-x: hidden;">
+                    {% if eventos_proximos %}
+                        {% for evento in eventos_proximos %}
+                        <div class="event-list-item-general" data-tipo="{{ evento.tipo }}">
+                            <div class="d-flex align-items-start">
+                                <div class="event-icon 
+                                    {% if evento.tipo == 'Colegio' %}bg-primary{% endif %}
+                                    {% if evento.tipo == 'Asignatura' %}bg-success{% endif %}
+                                    {% if evento.tipo == 'Cancelacion' %}bg-danger{% endif %}
+                                ">
+                                    <i class="
+                                        {% if evento.tipo == 'Colegio' %}fas fa-school{% endif %}
+                                        {% if evento.tipo == 'Asignatura' %}fas fa-book{% endif %}
+                                        {% if evento.tipo == 'Cancelacion' %}fas fa-times-circle{% endif %}
+                                        text-white
+                                    "></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h6 class="mb-0 fw-bold">{{ evento.titulo }}</h6>
+                                        <span class="badge 
+                                            {% if evento.tipo == 'Colegio' %}bg-primary{% endif %}
+                                            {% if evento.tipo == 'Asignatura' %}bg-success{% endif %}
+                                            {% if evento.tipo == 'Cancelacion' %}bg-danger{% endif %}
+                                            event-badge">
+                                            {{ evento.tipo }}
+                                        </span>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-calendar-day text-muted me-2"></i>
+                                        <span class="event-time">
+                                            {{ evento.fecha|date:"j \d\e F, Y" }} - {{ evento.hora|time:"H:i" }}
+                                        </span>
+                                        {% if evento.dias_restantes == 0 %}
+                                            <span class="badge bg-warning text-dark ms-2">Hoy</span>
+                                        {% elif evento.dias_restantes == 1 %}
+                                            <span class="badge bg-info ms-2">Mañana</span>
+                                        {% elif evento.dias_restantes <= 7 %}
+                                            <span class="badge bg-secondary ms-2">{{ evento.dias_restantes }} días</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if evento.descripcion %}
+                                        <p class="mb-1 text-muted small">{{ evento.descripcion|truncatewords:15 }}</p>
+                                    {% endif %}
+                                    {% if evento.ubicacion %}
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-map-marker-alt text-muted me-2"></i>
+                                            <small class="text-muted">{{ evento.ubicacion }}</small>
+                                        </div>
+                                    {% endif %}
+                                    {% if evento.materia %}
+                                        <div class="d-flex align-items-center mt-1">
+                                            <i class="fas fa-book text-muted me-2"></i>
+                                            <small class="text-muted">{{ evento.materia }}</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="fas fa-calendar-times fa-2x mb-3 d-block"></i>
+                            No hay eventos próximos programados.
+                        </div>
+                    {% endif %}
                                 </div>
                                     </div>
                                 </div>
@@ -68,8 +153,11 @@
                                 <option value="CANCELAR_CLASE">❌ Cancelar Clase</option>
                                 <option value="OTRO">📌 Otro</option>
                             </select>
+                            <small class="form-text text-muted" id="tipo-bloqueado-msg" style="display: none;">
+                                <i class="fas fa-lock me-1"></i>Tipo seleccionado automáticamente
+                            </small>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-3" id="campo-asignatura">
                             <label for="asignatura-evento" class="form-label">Asignatura <span class="text-danger" id="asignatura-required" style="display: none;">*</span></label>
                             <select class="form-select" id="asignatura-evento">
                                 <option value="">Sin asignatura específica</option>
@@ -78,31 +166,60 @@
                                 {% endfor %}
                             </select>
                         </div>
+                        <div class="col-md-6 mb-3" id="campo-curso-reunion" style="display: none;">
+                            <label for="curso-reunion" class="form-label">Curso <span class="text-danger">*</span></label>
+                            <select class="form-select" id="curso-reunion">
+                                <option value="">Selecciona un curso</option>
+                                {% for curso in cursos_profesor_jefe %}
+                                <option value="{{ curso.id }}">{{ curso.nivel }}° {{ curso.letra }} ({{ curso.total_estudiantes }} estudiantes)</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">Solo cursos donde eres profesor jefe</small>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-md-8 mb-3">
                             <label for="titulo-evento" class="form-label">Título del Evento</label>
                             <input type="text" class="form-control" id="titulo-evento" required placeholder="Ej: Reunión de Departamento, Prueba de Matemáticas...">
                         </div>
-                        <div class="col-md-4 mb-3" id="campo-curso-info">
+                        <div class="col-md-4 mb-3" id="campo-curso-info" style="display: none;">
                             <label for="curso-info-evento" class="form-label">Curso</label>
                             <input type="text" class="form-control" id="curso-info-evento" readonly placeholder="Selecciona una asignatura">
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-3" id="campo-fecha-asignatura">
                             <label for="fecha-evento" class="form-label">Fecha</label>
                             <select class="form-select" id="fecha-evento" required disabled>
                                 <option value="">Selecciona una asignatura primero</option>
                             </select>
                             <small class="form-text text-muted">Solo se muestran días donde se imparte la asignatura</small>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-3" id="campo-fecha-reunion" style="display: none;">
+                            <label for="fecha-reunion" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha-reunion" required>
+                            <small class="form-text text-muted">Mínimo 5 días de anticipación</small>
+                        </div>
+                        <div class="col-md-6 mb-3" id="campo-bloque-asignatura">
                             <label for="bloque-evento" class="form-label">Bloque/Horario</label>
                             <select class="form-select" id="bloque-evento" required disabled>
                                 <option value="">Selecciona una fecha primero</option>
                             </select>
                             <small class="form-text text-muted">Se muestran los bloques de la asignatura en esa fecha</small>
+                        </div>
+                        <div class="col-md-6 mb-3" id="campo-hora-reunion" style="display: none;">
+                            <label for="hora-reunion" class="form-label">Hora</label>
+                            <select class="form-select" id="hora-reunion" required>
+                                <option value="">Selecciona la hora</option>
+                                <option value="16:00">16:00 - Después de clases</option>
+                                <option value="16:30">16:30 - Después de clases</option>
+                                <option value="17:00">17:00 - Después de clases</option>
+                                <option value="17:30">17:30 - Después de clases</option>
+                                <option value="18:00">18:00 - Después de clases</option>
+                                <option value="18:30">18:30 - Después de clases</option>
+                                <option value="19:00">19:00 - Después de clases</option>
+                            </select>
+                            <small class="form-text text-muted">Horarios disponibles después del término de clases</small>
                         </div>
                     </div>
                     <div class="mb-3" id="campo-ubicacion">
@@ -266,7 +383,33 @@
 .bg-entrega { background-color: #0d6efd; }
 .bg-evento-colegio { background-color: #6610f2; }
 .bg-capacitacion { background-color: #d63384; }
+.bg-purple { background-color: #6f42c1; }
 .bg-otro { background-color: #6c757d; }
+
+/* Estilos para los botones de crear evento */
+.btn-group-vertical .btn-group {
+    width: 100%;
+}
+
+.btn-group-vertical .btn-group .btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    white-space: nowrap;
+}
+
+/* Estilos para la sección de próximos eventos */
+#proximos-eventos-container {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    word-wrap: break-word;
+}
+
+#proximos-eventos-container * {
+    max-width: 100%;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    white-space: normal;
+}
 </style>
 
 <script>
@@ -314,89 +457,65 @@ document.addEventListener('DOMContentLoaded', function() {
         updateProximosEventos();
     }
 
+    // Función para actualizar próximos eventos (ya se muestran en HTML estático desde el backend)
     function updateProximosEventos() {
-        var container = document.getElementById('proximos-eventos-container');
-        var hoy = new Date();
-        var proximosEventos = allEvents.filter(event => {
-            var eventDate = new Date(event.start);
-            return eventDate >= hoy;
-        }).sort((a, b) => new Date(a.start) - new Date(b.start)).slice(0, 12);
-
-        if (proximosEventos.length === 0) {
-            container.innerHTML = '<div class="p-4 text-center text-muted"><i class="fas fa-calendar-times fa-2x mb-3 text-muted"></i><br>No hay eventos próximos.</div>';
-            return;
-        }
-
-        container.innerHTML = '';
-        proximosEventos.forEach(event => {
-            var eventDate = new Date(event.start);
-            var eventEl = document.createElement('div');
-            eventEl.className = 'event-list-item-general';
-            
-            var icon = getEventIcon(event.extendedProps.type);
-            var timeText = eventDate.toLocaleDateString('es-ES', { 
-                weekday: 'short', 
-                day: 'numeric', 
-                month: 'short'
-            });
-            var hourText = eventDate.toLocaleTimeString('es-ES', {
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
-            // Calcular días restantes
-            var diasRestantes = Math.ceil((eventDate - hoy) / (1000 * 60 * 60 * 24));
-            var tiempoTexto = diasRestantes === 0 ? 'Hoy' : 
-                            diasRestantes === 1 ? 'Mañana' :
-                            `En ${diasRestantes} días`;
-
-            // Prioridad si existe
-            var prioridadBadge = '';
-            if (event.extendedProps.prioridad) {
-                var prioridadColor = event.extendedProps.prioridad === 'URGENTE' ? 'bg-danger' :
-                                   event.extendedProps.prioridad === 'ALTA' ? 'bg-warning' : 'bg-info';
-                prioridadBadge = `<span class="badge priority-badge ${prioridadColor}">${event.extendedProps.prioridad}</span>`;
-            }
-
-            eventEl.innerHTML = `
-                <div class="d-flex align-items-start">
-                    <div class="event-icon ${getEventBg(event.extendedProps.type)}">
-                        <i class="${icon}"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h6 class="mb-1">${event.title}</h6>
-                        <div class="event-time mb-1">
-                            <i class="fas fa-clock me-1"></i>${timeText} - ${hourText}
-                    </div>
-                        <div class="mb-2">
-                            <span class="badge event-badge ${getEventBadge(event.extendedProps.type)}">${getEventTypeLabel(event.extendedProps.type)}</span>
-                            <span class="badge bg-secondary event-badge">${tiempoTexto}</span>
-                            ${prioridadBadge}
-                    </div>
-                        ${event.description ? `<small class="text-muted">${event.description}</small>` : ''}
-                        <div class="mt-2">
-                            ${event.extendedProps.puede_editar ? `
-                                <button class="btn btn-sm btn-outline-primary me-1" onclick="editarEvento('${event.id}', event)" title="Editar evento">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            ` : ''}
-                            ${event.extendedProps.puede_eliminar ? `
-                                <button class="btn btn-sm btn-outline-danger" onclick="eliminarEvento('${event.id}', '${event.title}', event)" title="Eliminar evento">
-                                    <i class="fas fa-trash"></i>
-                        </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            eventEl.addEventListener('click', function() {
-                showEventDetails(event);
-            });
-            
-            container.appendChild(eventEl);
-        });
+        console.log('Los eventos próximos se cargan directamente desde el backend');
+        // Los eventos se muestran directamente en el HTML generado por Django
+        // Esta función se mantiene para compatibilidad pero no es necesaria
     }
+
+        // Función para abrir modal con tipo de evento preseleccionado
+    window.abrirModalCrearEvento = function(tipoEvento) {
+        // Abrir el modal
+        var modal = new bootstrap.Modal(document.getElementById('modalCrearEvento'));
+        modal.show();
+        
+        // Preseleccionar el tipo de evento
+        setTimeout(function() {
+            var tipoSelect = document.getElementById('tipo-evento');
+            tipoSelect.value = tipoEvento;
+            
+            // Bloquear el dropdown de tipo para que no se pueda cambiar
+            tipoSelect.disabled = true;
+            tipoSelect.style.backgroundColor = '#f8f9fa';
+            tipoSelect.style.cursor = 'not-allowed';
+            
+            // Mostrar mensaje de tipo bloqueado
+            document.getElementById('tipo-bloqueado-msg').style.display = 'block';
+            
+            // Disparar el evento change para actualizar los campos
+            tipoSelect.dispatchEvent(new Event('change'));
+            
+            // Actualizar título del modal según el tipo
+            var modalTitle = document.getElementById('modalCrearEventoLabel');
+            var tipoLabels = {
+                'REUNION': '📅 Crear Reunión de Curso',
+                'EVALUACION': '📝 Crear Evaluación',
+                'TAREA': '📚 Crear Tarea/Actividad',
+                'MATERIAL': '📋 Crear Materiales de Clase',
+                'ENTREGA': '📤 Crear Entrega/Proyecto',
+                'CANCELAR_CLASE': '❌ Cancelar Clase',
+                'OTRO': '📌 Crear Otro Evento'
+            };
+            modalTitle.innerHTML = '<i class="fas fa-plus me-2"></i>' + (tipoLabels[tipoEvento] || 'Crear Evento');
+            
+            // Actualizar color del header según el tipo
+            var modalHeader = document.querySelector('#modalCrearEvento .modal-header');
+            modalHeader.className = 'modal-header text-white';
+            
+            var colorClasses = {
+                'REUNION': 'bg-primary',
+                'EVALUACION': 'bg-danger',
+                'TAREA': 'bg-info',
+                'MATERIAL': 'bg-warning',
+                'ENTREGA': 'bg-secondary',
+                'CANCELAR_CLASE': 'bg-dark',
+                'OTRO': 'bg-secondary'
+            };
+            
+            modalHeader.classList.add(colorClasses[tipoEvento] || 'bg-success');
+        }, 100);
+    };
 
     function getEventIcon(type) {
         switch(type) {
@@ -552,12 +671,30 @@ document.addEventListener('DOMContentLoaded', function() {
         var asignaturaRequired = document.getElementById('asignatura-required');
         var selectAsignatura = document.getElementById('asignatura-evento');
         var ubicacionField = document.getElementById('ubicacion-evento');
+        var campoAsignatura = document.getElementById('campo-asignatura');
+        var campoCursoReunion = document.getElementById('campo-curso-reunion');
+        var cursoReunion = document.getElementById('curso-reunion');
+        var campoFechaAsignatura = document.getElementById('campo-fecha-asignatura');
+        var campoFechaReunion = document.getElementById('campo-fecha-reunion');
+        var campoBloqueAsignatura = document.getElementById('campo-bloque-asignatura');
+        var campoHoraReunion = document.getElementById('campo-hora-reunion');
+        var fechaReunion = document.getElementById('fecha-reunion');
+        var horaReunion = document.getElementById('hora-reunion');
         
         // Resetear visibilidad
         campoMateriales.style.display = 'none';
         camposEvaluacion.style.display = 'none';
         asignaturaRequired.style.display = 'none';
         selectAsignatura.required = false;
+        campoAsignatura.style.display = 'block';
+        campoCursoReunion.style.display = 'none';
+        cursoReunion.required = false;
+        campoFechaAsignatura.style.display = 'block';
+        campoFechaReunion.style.display = 'none';
+        campoBloqueAsignatura.style.display = 'block';
+        campoHoraReunion.style.display = 'none';
+        fechaReunion.required = false;
+        horaReunion.required = false;
         
         // Resetear ubicación
         ubicacionField.readOnly = false;
@@ -565,6 +702,24 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mostrar campos específicos según tipo
         switch(tipo) {
+            case 'REUNION':
+                // Para reuniones: mostrar cursos y campos de fecha/hora específicos
+                campoAsignatura.style.display = 'none';
+                campoCursoReunion.style.display = 'block';
+                cursoReunion.required = true;
+                campoFechaAsignatura.style.display = 'none';
+                campoFechaReunion.style.display = 'block';
+                campoBloqueAsignatura.style.display = 'none';
+                campoHoraReunion.style.display = 'block';
+                fechaReunion.required = true;
+                horaReunion.required = true;
+                ubicacionField.value = 'Sala de Reuniones';
+                
+                // Establecer fecha mínima (5 días de anticipación)
+                var fechaMinima = new Date();
+                fechaMinima.setDate(fechaMinima.getDate() + 5);
+                fechaReunion.min = fechaMinima.toISOString().split('T')[0];
+                break;
             case 'MATERIAL':
             case 'TAREA':
                 campoMateriales.style.display = 'block';
@@ -834,37 +989,80 @@ document.addEventListener('DOMContentLoaded', function() {
         setupEventListeners();
     }
 
+    // Limpiar formulario cuando se cierre el modal
+    document.getElementById('modalCrearEvento').addEventListener('hidden.bs.modal', function() {
+        clearEventForm();
+    });
+
     // Manejar formulario de crear evento
     document.getElementById('form-crear-evento').addEventListener('submit', function(e) {
         e.preventDefault();
         
+        var tipoEvento = document.getElementById('tipo-evento').value;
+        
         var formData = {
-            tipo: document.getElementById('tipo-evento').value,
-            asignatura_id: document.getElementById('asignatura-evento').value || null,
+            tipo: tipoEvento,
             titulo: document.getElementById('titulo-evento').value,
             descripcion: document.getElementById('descripcion-evento').value,
-            fecha: document.getElementById('fecha-evento').value,
-            bloque_horario: document.getElementById('bloque-evento').value,
             ubicacion: document.getElementById('ubicacion-evento').value || null,
             materiales: document.getElementById('materiales-evento').value || null,
             ponderacion: document.getElementById('ponderacion-evento').value || null,
             tipo_evaluacion: document.getElementById('tipo-evaluacion').value || null
         };
 
+        // Para reuniones: usar curso_id y campos específicos de reunión
+        if (tipoEvento === 'REUNION') {
+            formData.curso_id = document.getElementById('curso-reunion').value || null;
+            formData.fecha = document.getElementById('fecha-reunion').value;
+            formData.hora_reunion = document.getElementById('hora-reunion').value;
+            formData.bloque_horario = '1'; // Bloque por defecto para reuniones
+        } else {
+            formData.asignatura_id = document.getElementById('asignatura-evento').value || null;
+            formData.fecha = document.getElementById('fecha-evento').value;
+            formData.bloque_horario = document.getElementById('bloque-evento').value;
+        }
+
         // Validación básica
-        if (!formData.tipo || !formData.titulo || !formData.fecha) {
+        if (!formData.tipo || !formData.titulo) {
             alert('Por favor completa los campos obligatorios');
             return;
         }
         
-        // Validación específica para evaluaciones y cancelaciones
-        if (formData.tipo === 'EVALUACION' || formData.tipo === 'CANCELAR_CLASE') {
+        // Validaciones específicas por tipo
+        if (tipoEvento === 'REUNION') {
+            if (!formData.curso_id) {
+                alert('Para reuniones, debes seleccionar un curso');
+                return;
+            }
+            if (!formData.fecha) {
+                alert('Para reuniones, debes seleccionar una fecha');
+                return;
+            }
+            if (!formData.hora_reunion) {
+                alert('Para reuniones, debes seleccionar una hora');
+                return;
+            }
+            
+            // Validar que la fecha sea al menos 5 días en el futuro
+            var fechaSeleccionada = new Date(formData.fecha);
+            var fechaMinima = new Date();
+            fechaMinima.setDate(fechaMinima.getDate() + 5);
+            
+            if (fechaSeleccionada < fechaMinima) {
+                alert('La fecha de la reunión debe ser al menos 5 días en el futuro');
+                return;
+            }
+        } else if (tipoEvento === 'EVALUACION' || tipoEvento === 'CANCELAR_CLASE') {
             if (!formData.asignatura_id) {
-                alert('Para ' + (formData.tipo === 'EVALUACION' ? 'evaluaciones' : 'cancelar clases') + ', debes seleccionar una asignatura');
+                alert('Para ' + (tipoEvento === 'EVALUACION' ? 'evaluaciones' : 'cancelar clases') + ', debes seleccionar una asignatura');
+                return;
+            }
+            if (!formData.fecha) {
+                alert('Debes seleccionar una fecha');
                 return;
             }
             if (!formData.bloque_horario) {
-                alert('Para ' + (formData.tipo === 'EVALUACION' ? 'evaluaciones' : 'cancelar clases') + ', debes seleccionar el bloque/horario');
+                alert('Para ' + (tipoEvento === 'EVALUACION' ? 'evaluaciones' : 'cancelar clases') + ', debes seleccionar el bloque/horario');
                 return;
             }
         }
@@ -937,11 +1135,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funciones globales
     window.refreshEventList = function() {
-        updateProximosEventos();
+        // Recargar la página para actualizar eventos
+        location.reload();
     };
 
     window.clearEventForm = function() {
         document.getElementById('form-crear-evento').reset();
+        
+        // Desbloquear el dropdown de tipo
+        var tipoSelect = document.getElementById('tipo-evento');
+        tipoSelect.disabled = false;
+        tipoSelect.style.backgroundColor = '';
+        tipoSelect.style.cursor = '';
+        document.getElementById('tipo-bloqueado-msg').style.display = 'none';
         
         // Resetear campos dependientes
         document.getElementById('fecha-evento').innerHTML = '<option value="">Selecciona una asignatura primero</option>';
@@ -951,6 +1157,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('curso-info-evento').value = '';
         document.getElementById('ubicacion-evento').value = '';
         document.getElementById('ubicacion-evento').readOnly = false;
+        
+        // Resetear visibilidad de campos
+        document.getElementById('campo-asignatura').style.display = 'block';
+        document.getElementById('campo-curso-reunion').style.display = 'none';
+        document.getElementById('campo-fecha-asignatura').style.display = 'block';
+        document.getElementById('campo-fecha-reunion').style.display = 'none';
+        document.getElementById('campo-bloque-asignatura').style.display = 'block';
+        document.getElementById('campo-hora-reunion').style.display = 'none';
         
         updateEventTypeFields(); // Resetear campos dinámicos
     };
@@ -1093,4 +1307,44 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-</script> 
+</script>
+
+<style>
+    /* Estilos para la lista de eventos */
+    .event-list-item-general {
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .event-list-item-general:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+    
+    .event-list-item-general:last-child {
+        border-bottom: none;
+    }
+    
+    .event-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .event-time {
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .event-badge {
+        font-size: 0.75rem;
+        margin-right: 0.5rem;
+    }
+</style> 

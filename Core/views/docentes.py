@@ -243,6 +243,83 @@ def get_eventos_calendario_docente(docente_id):
     except Docente.DoesNotExist:
         return []
 
+def get_eventos_proximos_docente(docente_id):
+    """
+    Obtiene los próximos eventos para mostrar en HTML estático
+    """
+    from datetime import datetime, timedelta
+    
+    try:
+        docente = Docente.objects.get(pk=docente_id)
+        
+        # Obtener IDs de asignaturas que imparte el docente
+        asignaturas_ids = AsignaturaImpartida.objects.filter(
+            docente=docente
+        ).values_list('asignatura_id', flat=True)
+
+        eventos_proximos = []
+        hoy = datetime.now().date()
+        
+        # Eventos del colegio próximos
+        eventos_colegio = CalendarioColegio.objects.filter(
+            fecha__gte=hoy
+        ).order_by('fecha', 'hora')[:5]
+        
+        for evento in eventos_colegio:
+            dias_restantes = (evento.fecha - hoy).days
+            eventos_proximos.append({
+                'titulo': evento.nombre_actividad,
+                'descripcion': evento.descripcion,
+                'fecha': evento.fecha,
+                'hora': evento.hora,
+                'tipo': 'Colegio',
+                'dias_restantes': dias_restantes,
+                'ubicacion': evento.ubicacion
+            })
+
+        # Eventos de las clases del docente próximos
+        eventos_clase = CalendarioClase.objects.filter(
+            asignatura_id__in=list(asignaturas_ids),
+            fecha__gte=hoy
+        ).order_by('fecha', 'hora')[:5]
+        
+        for evento in eventos_clase:
+            dias_restantes = (evento.fecha - hoy).days
+            eventos_proximos.append({
+                'titulo': f"{evento.nombre_actividad} - {evento.asignatura.nombre}",
+                'descripcion': evento.descripcion,
+                'fecha': evento.fecha,
+                'hora': evento.hora or datetime.now().time(),
+                'tipo': 'Asignatura',
+                'dias_restantes': dias_restantes,
+                'materia': evento.asignatura.nombre
+            })
+        
+        # Clases canceladas próximas
+        clases_canceladas = ClaseCancelada.objects.filter(
+            docente=docente,
+            fecha_cancelacion__gte=hoy
+        ).order_by('fecha_cancelacion', 'hora_cancelacion')[:3]
+        
+        for cancelacion in clases_canceladas:
+            dias_restantes = (cancelacion.fecha_cancelacion - hoy).days
+            eventos_proximos.append({
+                'titulo': f"CANCELADA: {cancelacion.asignatura_impartida.asignatura.nombre}",
+                'descripcion': f"Motivo: {cancelacion.get_motivo_display()}. {cancelacion.descripcion or ''}",
+                'fecha': cancelacion.fecha_cancelacion,
+                'hora': cancelacion.hora_cancelacion,
+                'tipo': 'Cancelacion',
+                'dias_restantes': dias_restantes
+            })
+
+        # Ordenar todos los eventos por fecha y hora
+        eventos_proximos.sort(key=lambda x: (x['fecha'], x['hora']))
+        
+        return eventos_proximos[:12]  # Máximo 12 eventos
+
+    except Docente.DoesNotExist:
+        return []
+
 def get_clases_canceladas_docente(docente_id):
     """
     Obtiene las clases canceladas por el docente
@@ -377,6 +454,7 @@ class ProfesorPanelModularView(View):
         # Obtener eventos del calendario y clases canceladas
         eventos_calendario_lista = get_eventos_calendario_docente(docente.pk)
         eventos_calendario = json.dumps(eventos_calendario_lista)  # Para el JavaScript
+        eventos_proximos = get_eventos_proximos_docente(docente.pk)  # Para HTML estático
         clases_canceladas = get_clases_canceladas_docente(docente.pk)
         
         # Obtener comunicaciones del docente
@@ -386,12 +464,14 @@ class ProfesorPanelModularView(View):
         cursos = Curso.objects.all().order_by('nivel', 'letra')
         
         context = {
+            'docente': docente,  # Agregar información del docente
             'cursos_profesor_jefe': cursos_profesor_jefe,
             'asignaturas': asignaturas,
             'evaluaciones_docente': evaluaciones_docente,
             'estadisticas_docente': estadisticas_docente,
             'estadisticas_asistencia': estadisticas_asistencia,
             'eventos_calendario': eventos_calendario,
+            'eventos_proximos': eventos_proximos,  # Eventos para HTML estático
             'clases_canceladas': clases_canceladas,
             'comunicaciones': datos_comunicaciones['comunicaciones'],
             'comunicaciones_stats': {

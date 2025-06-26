@@ -3,11 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseForbidden
 from django.utils.decorators import method_decorator
 from django.views import View
-from Core.models import Estudiante, Curso, Asistencia, AlumnoEvaluacion
+from django.utils import timezone
+from Core.models import Estudiante, Curso, Asistencia, AlumnoEvaluacion, AsignaturaImpartida, ProfesorJefe, Evaluacion, Clase
 from Core.views.alumnos import get_horario_estudiante, get_asistencia_estudiante, get_evaluaciones_estudiante, get_promedio_estudiante
-from .pdf_generators import generar_pdf_horario, generar_pdf_asistencia, generar_pdf_calificaciones, generar_pdf_asistencia_asignaturas_docente, generar_pdf_asistencia_curso_jefe
-from django.db.models import Avg
-from datetime import date, datetime, timezone
+from .pdf_generators import generar_pdf_horario, generar_pdf_asistencia, generar_pdf_calificaciones, generar_pdf_asistencia_asignaturas_docente, generar_pdf_asistencia_curso_jefe, generar_pdf_evaluaciones_asignaturas_docente, generar_pdf_evaluaciones_curso_jefe
+from django.db.models import Avg, Max, Min
+from datetime import date, datetime
 from Core.views.reportes_simple import get_periodo_fechas
 from .pdf_generators import generar_pdf_reporte_estudiantes_riesgo
 

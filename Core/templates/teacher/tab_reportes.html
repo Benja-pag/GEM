@@ -1,16 +1,61 @@
 <!-- Pestaña de Reportes -->
 <div class="tab-pane fade" id="reportes">
+    <style>
+        /* Estilos para los botones de colapso de reportes */
+        .collapse-toggle-btn {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+        
+        .collapse-toggle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            transform: scale(1.05);
+        }
+        
+        .collapse-toggle-btn i {
+            transition: transform 0.3s ease;
+        }
+        
+        .collapse-toggle-btn[aria-expanded="false"] i {
+            transform: rotate(180deg);
+        }
+        
+        /* Efecto de desvanecimiento en el colapso */
+        .collapse {
+            transition: all 0.4s ease;
+        }
+        
+        /* Animación suave para las tarjetas */
+        .card {
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        /* Estilo especial para headers colapsados */
+        .card-header-collapsed {
+            border-bottom: none !important;
+        }
+    </style>
     <div class="row">
         <!-- Panel Principal - Ahora ocupa todo el ancho -->
         <div class="col-12">
             <!-- Reporte de Asistencia de Mis Asignaturas -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-primary text-white">
+                <div class="card-header bg-gradient-primary text-white d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-user-check me-2"></i>Reporte de Asistencia - Mis Asignaturas
                     </h5>
+                    <button class="btn btn-sm btn-outline-light collapse-toggle-btn" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapse-asistencia-asignaturas" aria-expanded="true" 
+                            aria-controls="collapse-asistencia-asignaturas" title="Minimizar">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
                 </div>
-                <div class="card-body">
+                <div class="card-body collapse show" id="collapse-asistencia-asignaturas">
                     <div class="row mb-3">
                         <div class="col-md-8">
                             <p class="text-muted mb-0">
@@ -32,12 +77,17 @@
 
             <!-- Reporte de Asistencia del Curso Jefe -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-success text-white">
+                <div class="card-header bg-gradient-success text-white d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-users me-2"></i>Reporte de Asistencia - Curso Jefe
                     </h5>
+                    <button class="btn btn-sm btn-outline-light collapse-toggle-btn" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapse-asistencia-curso-jefe" aria-expanded="true" 
+                            aria-controls="collapse-asistencia-curso-jefe" title="Minimizar">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
                 </div>
-                <div class="card-body">
+                <div class="card-body collapse show" id="collapse-asistencia-curso-jefe">
                     <div class="row mb-3">
                         <div class="col-md-8">
                             <p class="text-muted mb-0">
@@ -59,12 +109,17 @@
 
             <!-- Reporte de Evaluaciones de Mis Asignaturas -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-info text-white">
+                <div class="card-header bg-gradient-info text-white d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-clipboard-list me-2"></i>Reporte de Evaluaciones - Mis Asignaturas
                     </h5>
+                    <button class="btn btn-sm btn-outline-light collapse-toggle-btn" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapse-evaluaciones-asignaturas" aria-expanded="true" 
+                            aria-controls="collapse-evaluaciones-asignaturas" title="Minimizar">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
                 </div>
-                <div class="card-body">
+                <div class="card-body collapse show" id="collapse-evaluaciones-asignaturas">
                     <div class="row mb-3">
                         <div class="col-md-8">
                             <p class="text-muted mb-0">
@@ -86,12 +141,17 @@
 
             <!-- Reporte de Evaluaciones de Curso Jefe -->
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-warning text-dark">
+                <div class="card-header bg-gradient-warning text-dark d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-users me-2"></i>Reporte de Evaluaciones - Curso Jefe
                     </h5>
+                    <button class="btn btn-sm btn-outline-dark collapse-toggle-btn" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapse-evaluaciones-curso-jefe" aria-expanded="true" 
+                            aria-controls="collapse-evaluaciones-curso-jefe" title="Minimizar">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
                 </div>
-                <div class="card-body">
+                <div class="card-body collapse show" id="collapse-evaluaciones-curso-jefe">
                     <div class="row mb-3">
                         <div class="col-md-8">
                             <p class="text-muted mb-0">
@@ -762,5 +822,37 @@ function descargarPDFAsistenciaAsignaturas() {
 function descargarPDFAsistenciaCursoJefe() {
     window.open('/pdf/reporte-asistencia-curso-jefe/', '_blank');
 }
+
+// Función para manejar el cambio de iconos en los botones de colapso
+document.addEventListener('DOMContentLoaded', function() {
+    // Lista de todos los collapses de reportes
+    const collapses = [
+        'collapse-asistencia-asignaturas',
+        'collapse-asistencia-curso-jefe', 
+        'collapse-evaluaciones-asignaturas',
+        'collapse-evaluaciones-curso-jefe'
+    ];
+    
+    collapses.forEach(collapseId => {
+        const collapseElement = document.getElementById(collapseId);
+        const toggleButton = document.querySelector(`[data-bs-target="#${collapseId}"]`);
+        
+        if (collapseElement && toggleButton) {
+            const icon = toggleButton.querySelector('i');
+            
+            // Evento cuando se está expandiendo
+            collapseElement.addEventListener('show.bs.collapse', function() {
+                icon.className = 'fas fa-chevron-up';
+                toggleButton.setAttribute('title', 'Minimizar');
+            });
+            
+            // Evento cuando se está colapsando
+            collapseElement.addEventListener('hide.bs.collapse', function() {
+                icon.className = 'fas fa-chevron-down';
+                toggleButton.setAttribute('title', 'Expandir');
+            });
+        }
+    });
+});
 
 </script> 

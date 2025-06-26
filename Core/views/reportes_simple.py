@@ -737,22 +737,36 @@ class ListaEstudiantesViewSimple(View):
         
         try:
             estudiantes_data = []
-            estudiantes = Estudiante.objects.all().order_by('curso__nivel', 'curso__letra', 'usuario__apellido_paterno', 'usuario__nombre')
             
-            for estudiante in estudiantes:
-                estudiantes_data.append({
-                    'id': estudiante.id,
-                    'nombre_completo': estudiante.usuario.get_full_name(),
-                    'nombre': estudiante.usuario.nombre,
-                    'apellido_paterno': estudiante.usuario.apellido_paterno,
-                    'apellido_materno': estudiante.usuario.apellido_materno,
-                    'rut': estudiante.usuario.rut,
-                    'div': estudiante.usuario.div or '',
-                    'rut_completo': f"{estudiante.usuario.rut}-{estudiante.usuario.div}" if estudiante.usuario.div else estudiante.usuario.rut,
-                    'correo': estudiante.usuario.correo,
-                    'curso': f"{estudiante.curso.nivel}°{estudiante.curso.letra}",
-                    'curso_id': estudiante.curso.id
-                })
+            # Consulta simple y rápida: obtener solo usuarios que tienen perfil de estudiante
+            usuarios_estudiantes = Usuario.objects.filter(
+                estudiante__isnull=False
+            ).select_related('estudiante__curso').order_by('apellido_paterno', 'nombre')
+            
+            for usuario in usuarios_estudiantes:
+                try:
+                    # Verificar que tenga perfil de estudiante y curso
+                    if hasattr(usuario, 'estudiante') and usuario.estudiante and usuario.estudiante.curso:
+                        estudiante = usuario.estudiante
+                        curso = estudiante.curso
+                        
+                        estudiantes_data.append({
+                            'id': estudiante.id,
+                            'nombre_completo': usuario.get_full_name(),
+                            'nombre': usuario.nombre,
+                            'apellido_paterno': usuario.apellido_paterno,
+                            'apellido_materno': usuario.apellido_materno or '',
+                            'rut': usuario.rut,
+                            'digito_verificador': usuario.div or '',
+                            'rut_completo': f"{usuario.rut}-{usuario.div}" if usuario.div else usuario.rut,
+                            'correo': usuario.correo,
+                            'curso': f"{curso.nivel}°{curso.letra}",
+                            'curso_id': curso.id
+                        })
+                except Exception as e:
+                    # Si hay error con un usuario específico, continuar
+                    print(f"Error procesando usuario {usuario.id}: {str(e)}")
+                    continue
             
             return JsonResponse({
                 'success': True,

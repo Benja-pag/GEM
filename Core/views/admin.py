@@ -514,6 +514,8 @@ class AdminPanelModularView(View):
             promedio_estudiantes = round(total_estudiantes / total_cursos) if total_cursos > 0 else 0
             asignaturas_sin_profesor = AsignaturaImpartida.objects.filter(docente__isnull=True).count()
             
+            # Los estudiantes se obtienen directamente desde la variable usuarios en el template
+            
             # Obtener todos los docentes con sus relaciones
             docentes = Docente.objects.select_related(
                 'usuario',
@@ -525,8 +527,12 @@ class AdminPanelModularView(View):
             # Obtener todos los estudiantes
             estudiantes_sin_curso = Estudiante.objects.all().select_related('usuario', 'curso')
             
-            # Obtener todos los usuarios ordenados por fecha de creación
-            usuarios = Usuario.objects.all().order_by('-fecha_creacion')
+            # Obtener todos los usuarios con sus relaciones (estudiante, docente, administrativo) y cursos
+            usuarios = Usuario.objects.select_related(
+                'estudiante__curso',
+                'docente__especialidad', 
+                'administrativo'
+            ).order_by('-fecha_creacion')
             
             # Obtener todas las asignaturas con sus relaciones
             asignaturas = AsignaturaImpartida.objects.select_related(
@@ -580,6 +586,7 @@ class AdminPanelModularView(View):
                 'asignaturas_sin_profesor': asignaturas_sin_profesor,
                 'docentes': docentes,
                 'estudiantes_sin_curso': estudiantes_sin_curso,
+
                 'usuarios': usuarios,
                 'asignaturas': asignaturas,
                 'cursos': cursos,

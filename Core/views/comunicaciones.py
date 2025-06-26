@@ -217,20 +217,22 @@ class EliminarComunicacionView(View):
             return JsonResponse({'success': False, 'message': 'Sin permisos'})
         
         try:
-            comunicacion.delete()
+            titulo = comunicacion.asunto  # Guardar el título antes de eliminar
+            comunicacion.delete()  # Esto elimina de la base de datos
             
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # Siempre devolver JSON para AJAX requests
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.content_type == 'application/json':
                 return JsonResponse({
                     'success': True, 
-                    'message': 'Comunicación eliminada exitosamente'
+                    'message': f'Comunicación "{titulo}" eliminada exitosamente de la base de datos'
                 })
             
             messages.success(request, 'Comunicación eliminada exitosamente')
             return redirect('bandeja_entrada')
             
         except Exception as e:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'message': str(e)})
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.content_type == 'application/json':
+                return JsonResponse({'success': False, 'message': f'Error al eliminar de la base de datos: {str(e)}'})
             
             messages.error(request, f'Error al eliminar comunicación: {str(e)}')
             return redirect('detalle_comunicacion', comunicacion_id=comunicacion_id)

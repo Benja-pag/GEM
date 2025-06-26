@@ -1,4 +1,5 @@
 <!-- Pestaña de Comunicaciones -->
+{% csrf_token %}
 <div class="tab-pane fade" id="comunicaciones" role="tabpanel" aria-labelledby="comunicaciones-tab">
     <!-- Dashboard de Estadísticas -->
     <div class="row mb-4">
@@ -128,31 +129,9 @@
                                             </div>
                                         </div>
                                         <div class="col-md-4 text-end">
-                                            <div class="dropdown">
-                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-v"></i> Acciones
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li>
-                                                        <a class="dropdown-item" href="{% url 'detalle_comunicacion' comunicacion.id %}">
-                                                            <i class="fas fa-eye me-2"></i>Ver Detalle
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="{% url 'editar_comunicacion' comunicacion.id %}">
-                                                            <i class="fas fa-edit me-2"></i>Editar
-                                                        </a>
-                                                    </li>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li>
-                                                        <a class="dropdown-item text-danger" href="#" 
-                                                           onclick="confirmarEliminarComunicacion({{ comunicacion.id }}, '{{ comunicacion.asunto|escapejs }}')">
-                                                            <i class="fas fa-trash me-2"></i>Eliminar
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                            <a href="{% url 'detalle_comunicacion' comunicacion.id %}" class="btn btn-outline-primary">
+                                                <i class="fas fa-eye me-2"></i>Ver Detalle
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -177,36 +156,7 @@
 
 
 
-<!-- Modal de Confirmación para Eliminar -->
-<div class="modal fade" id="modalEliminarComunicacion" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p class="mb-3">¿Estás seguro de que deseas eliminar la comunicación?</p>
-                <div class="alert alert-warning">
-                    <strong id="comunicacion-eliminar-titulo"></strong>
-                </div>
-                <p class="text-muted mb-0">Esta acción no se puede deshacer.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-2"></i>Cancelar
-                </button>
-                <button type="button" class="btn btn-danger" onclick="eliminarComunicacion()">
-                    <i class="fas fa-trash me-2"></i>
-                    <span class="btn-text">Eliminar</span>
-                    <span class="spinner-border spinner-border-sm d-none" role="status"></span>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <style>
 .comunicacion-item {
@@ -249,83 +199,36 @@
 </style>
 
 <script>
-let comunicacionEliminarId = null;
+$(document).ready(function() {
 
-function confirmarEliminarComunicacion(id, titulo) {
-    comunicacionEliminarId = id;
-    document.getElementById('comunicacion-eliminar-titulo').textContent = titulo;
-    const modal = new bootstrap.Modal(document.getElementById('modalEliminarComunicacion'));
-    modal.show();
-}
-
-function eliminarComunicacion() {
-    if (!comunicacionEliminarId) return;
-    
-    fetch(`{% url 'eliminar_comunicacion' 0 %}`.replace('0', comunicacionEliminarId), {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showNotification('Comunicación eliminada exitosamente', 'success');
-            setTimeout(() => location.reload(), 1500);
-        } else {
-            showNotification(data.message || 'Error al eliminar la comunicación', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('Error al eliminar la comunicación', 'error');
+    // Búsqueda en tiempo real
+    $('#buscar-comunicaciones').on('input', function() {
+        const termino = $(this).val().toLowerCase();
+        $('.comunicacion-item').each(function() {
+            const $item = $(this);
+            const asunto = $item.data('asunto') || '';
+            const autor = $item.data('autor') || '';
+            const contenido = $item.data('contenido') || '';
+            
+            if (asunto.includes(termino) || autor.includes(termino) || contenido.includes(termino)) {
+                $item.show();
+            } else {
+                $item.hide();
+            }
+        });
     });
-}
 
-// Búsqueda en tiempo real
-document.getElementById('buscar-comunicaciones').addEventListener('input', function() {
-    const termino = this.value.toLowerCase();
-    const comunicaciones = document.querySelectorAll('.comunicacion-item');
-    
-    comunicaciones.forEach(item => {
-        const asunto = item.dataset.asunto || '';
-        const autor = item.dataset.autor || '';
-        const contenido = item.dataset.contenido || '';
-        
-        if (asunto.includes(termino) || autor.includes(termino) || contenido.includes(termino)) {
-            item.style.display = 'block';
-        } else {
-            item.style.display = 'none';
-        }
+    // Filtro por tipo
+    $('#filtro-tipo').on('change', function() {
+        const tipo = $(this).val();
+        // Aquí puedes implementar el filtro por tipo si lo necesitas
+        console.log('Filtro por tipo:', tipo);
     });
 });
 
-
-
-function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        z-index: 9999;
-        min-width: 300px;
-        max-width: 500px;
-    `;
-    
-    notification.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, 5000);
+function updateComunicacionStats() {
+    const total = $('.comunicacion-item').length;
+    $('#total-comunicaciones').text(total);
+    // Actualizar otros contadores si es necesario
 }
 </script> 

@@ -6,6 +6,8 @@ from .asignaturas import *
 from .docentes import *
 from .evaluaciones import *
 from .template_vistas import *
+from .reportes import *
+from .reportes_simple import *
 from .template_vistas import HomeView, SurveysView, TasksView, TestsView
 from .admin import AdminPanelView, AdminPanelModularView, ToggleUserStatusView, CreateAdminView
 from .usuarios import UserManagementView, UserCreateView, UserDetailView, UserUpdateView, UserDeleteView

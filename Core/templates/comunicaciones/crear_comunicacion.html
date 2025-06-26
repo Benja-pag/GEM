@@ -1,112 +1,96 @@
 {% extends 'base/base.html' %}
 {% load static %}
 
+{% block title %}Crear Comunicación - Admin{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
+<div class="container-fluid mt-4">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2 class="text-primary mb-0">
-                        <i class="fas fa-plus-circle me-2"></i>Nueva Comunicación
-                    </h2>
-                    <small class="text-muted">Crea una nueva comunicación oficial para el colegio</small>
-                </div>
-                <a href="{% url 'bandeja_entrada' %}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>Volver
-                </a>
-            </div>
-
-            <!-- Formulario -->
-            <div class="card shadow-lg">
+            <div class="card shadow">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
-                        <i class="fas fa-edit me-2"></i>Información de la Comunicación
-                    </h5>
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus me-2"></i>Nueva Comunicación
+                    </h4>
                 </div>
                 <div class="card-body">
-                    <form id="formCrearComunicacion" enctype="multipart/form-data">
+                    <form id="form-crear-comunicacion" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         
                         <!-- Asunto -->
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label for="asunto" class="form-label fw-bold">
-                                <i class="fas fa-heading me-2"></i>Asunto <span class="text-danger">*</span>
+                                <i class="fas fa-heading me-1"></i>Asunto *
                             </label>
-                            <input type="text" class="form-control form-control-lg" id="asunto" name="asunto" 
+                            <input type="text" class="form-control" id="asunto" name="asunto" 
                                    placeholder="Ingresa el asunto de la comunicación" required>
-                            <div class="form-text">Escribe un asunto claro y descriptivo</div>
+                            <div class="invalid-feedback"></div>
                         </div>
 
                         <!-- Contenido -->
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label for="contenido" class="form-label fw-bold">
-                                <i class="fas fa-align-left me-2"></i>Contenido <span class="text-danger">*</span>
+                                <i class="fas fa-align-left me-1"></i>Contenido *
                             </label>
                             <textarea class="form-control" id="contenido" name="contenido" rows="8" 
-                                      placeholder="Escribe aquí el contenido de la comunicación..." required></textarea>
-                            <div class="form-text">Incluye toda la información relevante para los destinatarios</div>
+                                      placeholder="Escribe el contenido de la comunicación..." required></textarea>
+                            <div class="invalid-feedback"></div>
                         </div>
 
                         <!-- Destinatarios (Cursos) -->
-                        <div class="mb-4">
+                        <div class="mb-3">
                             <label for="cursos_destinatarios" class="form-label fw-bold">
-                                <i class="fas fa-users me-2"></i>Cursos Destinatarios
+                                <i class="fas fa-users me-1"></i>Cursos Destinatarios
                             </label>
                             <div class="row">
                                 {% for curso in cursos %}
-                                    <div class="col-md-4 mb-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" 
-                                                   name="cursos_destinatarios" value="{{ curso.id }}" 
-                                                   id="curso_{{ curso.id }}">
-                                            <label class="form-check-label" for="curso_{{ curso.id }}">
-                                                {{ curso.nivel }}°{{ curso.letra }}
-                                            </label>
-                                        </div>
+                                <div class="col-md-4 col-sm-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="cursos_destinatarios" value="{{ curso.id }}" 
+                                               id="curso-{{ curso.id }}">
+                                        <label class="form-check-label" for="curso-{{ curso.id }}">
+                                            {{ curso.nivel }}°{{ curso.letra }}
+                                        </label>
                                     </div>
+                                </div>
+                                {% empty %}
+                                <div class="col-12">
+                                    <p class="text-muted">No hay cursos disponibles</p>
+                                </div>
                                 {% endfor %}
                             </div>
-                            <div class="form-text">
-                                Selecciona los cursos que recibirán esta comunicación. 
-                                Si no seleccionas ninguno, será visible para todos.
-                            </div>
-                            <div class="mt-2">
-                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="seleccionarTodosCursos()">
-                                    <i class="fas fa-check-double me-1"></i>Seleccionar Todos
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="deseleccionarTodosCursos()">
-                                    <i class="fas fa-times me-1"></i>Deseleccionar Todos
-                                </button>
-                            </div>
+                            <small class="form-text text-muted">
+                                Selecciona los cursos que recibirán esta comunicación. Si no seleccionas ninguno, 
+                                será una comunicación general.
+                            </small>
                         </div>
 
                         <!-- Archivos Adjuntos -->
                         <div class="mb-4">
                             <label for="adjuntos" class="form-label fw-bold">
-                                <i class="fas fa-paperclip me-2"></i>Archivos Adjuntos
+                                <i class="fas fa-paperclip me-1"></i>Archivos Adjuntos
                             </label>
-                            <input type="file" class="form-control" id="adjuntos" name="adjuntos" multiple 
-                                   accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.xls,.xlsx">
-                            <div class="form-text">
-                                Puedes adjuntar varios archivos (PDF, Word, Excel, imágenes, etc.). 
-                                Tamaño máximo: 10MB por archivo.
-                            </div>
-                            <div id="archivos-preview" class="mt-2"></div>
+                            <input type="file" class="form-control" id="adjuntos" name="adjuntos" multiple>
+                            <small class="form-text text-muted">
+                                Puedes adjuntar múltiples archivos. Formatos permitidos: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG
+                            </small>
+                            <div class="invalid-feedback"></div>
                         </div>
 
-                        <!-- Botones de acción -->
+                        <!-- Botones de Acción -->
                         <div class="d-flex justify-content-between">
-                            <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
-                                <i class="fas fa-times me-2"></i>Cancelar
-                            </button>
+                            <a href="{% url 'admin_panel' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Volver al Panel
+                            </a>
                             <div>
-                                <button type="button" class="btn btn-success me-2" onclick="previsualizarComunicacion()">
+                                <button type="button" class="btn btn-outline-primary me-2" onclick="previsualizarComunicacion()">
                                     <i class="fas fa-eye me-2"></i>Previsualizar
                                 </button>
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-paper-plane me-2"></i>Enviar Comunicación
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    <span class="btn-text">Enviar Comunicación</span>
+                                    <span class="spinner-border spinner-border-sm d-none ms-2" role="status"></span>
                                 </button>
                             </div>
                         </div>
@@ -118,45 +102,91 @@
 </div>
 
 <!-- Modal de Previsualización -->
-<div class="modal fade" id="modalPreview" tabindex="-1">
+<div class="modal fade" id="modalPrevisualizacion" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-info text-white">
                 <h5 class="modal-title">
-                    <i class="fas fa-eye me-2"></i>Previsualización de la Comunicación
+                    <i class="fas fa-eye me-2"></i>Previsualización de Comunicación
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div id="preview-content">
-                    <!-- El contenido se llenará dinámicamente -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0" id="preview-asunto"></h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <strong>De:</strong> {{ request.user.get_full_name }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Para:</strong> <span id="preview-destinatarios"></span>
+                        </div>
+                        <hr>
+                        <div id="preview-contenido"></div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fas fa-edit me-2"></i>Seguir Editando
-                </button>
-                <button type="button" class="btn btn-primary" onclick="enviarDesdePrevisualizacion()">
-                    <i class="fas fa-paper-plane me-2"></i>Enviar Ahora
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cerrar
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- JavaScript -->
+<style>
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.btn {
+    border-radius: 0.375rem;
+}
+
+#contenido {
+    resize: vertical;
+    min-height: 150px;
+}
+
+.form-check {
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.form-check:hover {
+    background-color: #f8f9fa;
+}
+
+.form-check-input:checked + .form-check-label {
+    font-weight: 600;
+    color: #0d6efd;
+}
+</style>
+
 <script>
-// Manejar envío del formulario
-document.getElementById('formCrearComunicacion').addEventListener('submit', function(e) {
+document.getElementById('form-crear-comunicacion').addEventListener('submit', function(e) {
     e.preventDefault();
     
     const formData = new FormData(this);
-    const submitBtn = this.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
+    const btnSubmit = this.querySelector('button[type="submit"]');
+    const btnText = btnSubmit.querySelector('.btn-text');
+    const spinner = btnSubmit.querySelector('.spinner-border');
     
     // Mostrar loading
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
-    submitBtn.disabled = true;
+    btnSubmit.disabled = true;
+    btnText.textContent = 'Enviando...';
+    spinner.classList.remove('d-none');
     
     fetch('{% url "crear_comunicacion" %}', {
         method: 'POST',
@@ -170,108 +200,66 @@ document.getElementById('formCrearComunicacion').addEventListener('submit', func
         if (data.success) {
             showNotification('Comunicación creada exitosamente', 'success');
             setTimeout(() => {
-                window.location.href = '/comunicaciones/' + data.comunicacion_id + '/';
+                window.location.href = '{% url "admin_panel" %}';
             }, 1500);
         } else {
-            showNotification('Error: ' + data.message, 'error');
+            showNotification(data.message || 'Error al crear la comunicación', 'error');
         }
     })
     .catch(error => {
-        showNotification('Error de conexión', 'error');
+        console.error('Error:', error);
+        showNotification('Error al crear la comunicación', 'error');
     })
     .finally(() => {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
+        // Restaurar botón
+        btnSubmit.disabled = false;
+        btnText.textContent = 'Enviar Comunicación';
+        spinner.classList.add('d-none');
     });
 });
 
-// Previsualizar archivos seleccionados
-document.getElementById('adjuntos').addEventListener('change', function() {
-    const previewDiv = document.getElementById('archivos-preview');
-    previewDiv.innerHTML = '';
-    
-    if (this.files.length > 0) {
-        const filesList = document.createElement('div');
-        filesList.className = 'mt-2';
-        
-        Array.from(this.files).forEach(file => {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'badge bg-light text-dark me-2 mb-1 p-2';
-            fileItem.innerHTML = `
-                <i class="fas fa-file me-1"></i>
-                ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
-            `;
-            filesList.appendChild(fileItem);
-        });
-        
-        previewDiv.appendChild(filesList);
-    }
-});
-
-// Funciones para seleccionar cursos
-function seleccionarTodosCursos() {
-    document.querySelectorAll('input[name="cursos_destinatarios"]').forEach(checkbox => {
-        checkbox.checked = true;
-    });
-}
-
-function deseleccionarTodosCursos() {
-    document.querySelectorAll('input[name="cursos_destinatarios"]').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-}
-
-// Previsualización
 function previsualizarComunicacion() {
     const asunto = document.getElementById('asunto').value;
     const contenido = document.getElementById('contenido').value;
-    const cursosSeleccionados = Array.from(document.querySelectorAll('input[name="cursos_destinatarios"]:checked'))
-        .map(cb => cb.nextElementSibling.textContent.trim());
     
     if (!asunto || !contenido) {
-        showNotification('Por favor completa el asunto y contenido antes de previsualizar', 'warning');
+        showNotification('Completa el asunto y contenido para previsualizar', 'warning');
         return;
     }
     
-    const previewContent = `
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">${asunto}</h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <strong>De:</strong> {{ user.get_full_name|default:user.rut }}-{{ user.div }}<br>
-                    <strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES')}<br>
-                    <strong>Destinatarios:</strong> ${cursosSeleccionados.length > 0 ? cursosSeleccionados.join(', ') : 'Todos los cursos'}
-                </div>
-                <div class="comunicacion-contenido">
-                    ${contenido.replace(/\n/g, '<br>')}
-                </div>
-            </div>
-        </div>
+    // Obtener cursos seleccionados
+    const cursosSeleccionados = [];
+    document.querySelectorAll('input[name="cursos_destinatarios"]:checked').forEach(checkbox => {
+        const label = document.querySelector(`label[for="${checkbox.id}"]`);
+        cursosSeleccionados.push(label.textContent.trim());
+    });
+    
+    const destinatarios = cursosSeleccionados.length > 0 ? cursosSeleccionados.join(', ') : 'Comunicación general (todos los usuarios)';
+    
+    // Llenar el modal
+    document.getElementById('preview-asunto').textContent = asunto;
+    document.getElementById('preview-contenido').textContent = contenido;
+    document.getElementById('preview-destinatarios').textContent = destinatarios;
+    
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('modalPrevisualizacion'));
+    modal.show();
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        max-width: 500px;
     `;
     
-    document.getElementById('preview-content').innerHTML = previewContent;
-    new bootstrap.Modal(document.getElementById('modalPreview')).show();
-}
-
-function enviarDesdePrevisualizacion() {
-    bootstrap.Modal.getInstance(document.getElementById('modalPreview')).hide();
-    document.getElementById('formCrearComunicacion').dispatchEvent(new Event('submit'));
-}
-
-// Función para mostrar notificaciones
-function showNotification(message, type) {
-    const alertClass = type === 'success' ? 'alert-success' : 
-                     type === 'warning' ? 'alert-warning' : 'alert-danger';
-    const iconClass = type === 'success' ? 'fa-check-circle' : 
-                     type === 'warning' ? 'fa-exclamation-triangle' : 'fa-exclamation-triangle';
-    
-    const notification = document.createElement('div');
-    notification.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
-    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
     notification.innerHTML = `
-        <i class="fas ${iconClass} me-2"></i>${message}
+        ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     `;
     
@@ -284,31 +272,4 @@ function showNotification(message, type) {
     }, 5000);
 }
 </script>
-
-<style>
-.form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-.card {
-    border-radius: 10px;
-}
-
-.btn {
-    border-radius: 6px;
-}
-
-.form-check-input:checked {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-
-.comunicacion-contenido {
-    line-height: 1.6;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 5px;
-}
-</style>
 {% endblock %} 

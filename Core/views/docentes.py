@@ -428,7 +428,7 @@ class ProfesorPanelModularView(View):
         if not hasattr(request.user.usuario, 'docente'):
             messages.error(request, 'No tienes permiso para acceder a esta página')
             return redirect('home')
-        
+            
         docente = request.user.usuario.docente
         
         # Obtener cursos donde el docente es profesor jefe
@@ -1818,4 +1818,364 @@ class ResumenGeneralDocenteView(View):
             
         except Exception as e:
             return JsonResponse({'success': False, 'error': f'Error interno: {str(e)}'})
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class ObtenerHorariosAsignaturaView(View):
+    def get(self, request, asignatura_id):
+        if not hasattr(request.user.usuario, 'docente'):
+            return JsonResponse({'success': False, 'error': 'No tienes permiso'})
+        
+        try:
+            docente = request.user.usuario.docente
+            
+            # Verificar que la asignatura pertenezca al docente
+            asignatura_impartida = AsignaturaImpartida.objects.filter(
+                id=asignatura_id,
+                docente=docente
+            ).select_related('asignatura').first()
+            
+            if not asignatura_impartida:
+                return JsonResponse({'success': False, 'error': 'Asignatura no encontrada o no autorizada'})
+            
+            # Obtener todas las clases de esta asignatura
+            clases = Clase.objects.filter(
+                asignatura_impartida=asignatura_impartida
+            ).select_related('curso').order_by('fecha', 'horario')
+            
+            # Mapeo de bloques a horas
+            mapeo_bloques = {
+                '1': ('08:00', '08:45'),
+                '2': ('08:45', '09:30'),
+                '3': ('09:45', '10:30'),
+                '4': ('10:30', '11:15'),
+                '5': ('11:30', '12:15'),
+                '6': ('12:15', '13:00'),
+                '7': ('13:45', '14:30'),
+                '8': ('14:30', '15:15'),
+                '9': ('15:15', '16:00'),
+            }
+            
+            # Agrupar clases por día y bloques consecutivos
+            horarios_agrupados = {}
+            for clase in clases:
+                dia = clase.fecha
+                bloque = str(clase.horario)
+                sala = clase.get_sala_display() if hasattr(clase, 'get_sala_display') else clase.sala
+                curso = str(clase.curso) if clase.curso else 'Electivo'
+                
+                if dia not in horarios_agrupados:
+                    horarios_agrupados[dia] = []
+                
+                # Si hay bloques anteriores y son consecutivos, extender el último bloque
+                if horarios_agrupados[dia] and int(bloque) == int(horarios_agrupados[dia][-1]['bloque_fin']) + 1:
+                    horarios_agrupados[dia][-1]['bloque_fin'] = bloque
+                    horarios_agrupados[dia][-1]['hora_fin'] = mapeo_bloques[bloque][1]
+                else:
+                    horarios_agrupados[dia].append({
+                        'bloque_inicio': bloque,
+                        'bloque_fin': bloque,
+                        'hora_inicio': mapeo_bloques[bloque][0],
+                        'hora_fin': mapeo_bloques[bloque][1],
+                        'sala': sala,
+                        'curso': curso
+                    })
+            
+            # Convertir el diccionario a lista y formatear la salida
+            horarios = []
+            for dia, bloques in horarios_agrupados.items():
+                for bloque in bloques:
+                    horarios.append({
+                        'dia': dia,
+                        'bloque': f"{bloque['bloque_inicio']}-{bloque['bloque_fin']}" if bloque['bloque_inicio'] != bloque['bloque_fin'] else bloque['bloque_inicio'],
+                        'horario': f"{bloque['hora_inicio']} - {bloque['hora_fin']}",
+                        'sala': bloque['sala'],
+                        'curso': bloque['curso']
+                    })
+            
+            return JsonResponse({
+                'success': True,
+                'horarios': horarios,
+                'asignatura': asignatura_impartida.asignatura.nombre,
+                'codigo': asignatura_impartida.codigo
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class ObtenerAsistenciaAsignaturaView(View):
+    def get(self, request, asignatura_id):
+        if not hasattr(request.user.usuario, 'docente'):
+            return JsonResponse({'success': False, 'error': 'No tienes permiso'})
+        
+        try:
+            docente = request.user.usuario.docente
+            
+            # Verificar que la asignatura pertenezca al docente
+            asignatura_impartida = AsignaturaImpartida.objects.filter(
+                id=asignatura_id,
+                docente=docente
+            ).select_related('asignatura').first()
+            
+            if not asignatura_impartida:
+                return JsonResponse({'success': False, 'error': 'Asignatura no encontrada o no autorizada'})
+            
+            # Obtener la fecha actual
+            hoy = timezone.localtime(timezone.now())
+            
+            # Obtener el día de la semana en español
+            dia_semana = hoy.strftime('%A').upper()
+            mapeo_dias = {
+                'MONDAY': 'LUNES',
+                'TUESDAY': 'MARTES',
+                'WEDNESDAY': 'MIERCOLES',
+                'THURSDAY': 'JUEVES',
+                'FRIDAY': 'VIERNES',
+                'SATURDAY': 'SABADO',
+                'SUNDAY': 'DOMINGO'
+            }
+            dia_semana = mapeo_dias.get(dia_semana)
+            
+            # Obtener todas las clases de esta asignatura para el día actual
+            clases_hoy = Clase.objects.filter(
+                asignatura_impartida=asignatura_impartida,
+                fecha=dia_semana
+            ).select_related('curso').order_by('horario')
+            
+            # Si no hay clases hoy, buscar la próxima clase
+            if not clases_hoy:
+                # Obtener el siguiente día hábil
+                dias_habiles = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES']
+                idx_actual = dias_habiles.index(dia_semana) if dia_semana in dias_habiles else -1
+                
+                for i in range(1, 6):  # Buscar en los próximos 5 días
+                    idx_siguiente = (idx_actual + i) % 5
+                    dia_siguiente = dias_habiles[idx_siguiente]
+                    
+                    clases_siguiente = Clase.objects.filter(
+                        asignatura_impartida=asignatura_impartida,
+                        fecha=dia_siguiente
+                    ).order_by('horario')
+                    
+                    if clases_siguiente:
+                        clases_hoy = clases_siguiente
+                        # Ajustar la fecha al próximo día con clases
+                        dias_hasta_siguiente = (idx_siguiente - idx_actual) if idx_siguiente > idx_actual else (5 - idx_actual + idx_siguiente)
+                        hoy = hoy + timedelta(days=dias_hasta_siguiente)
+                        dia_semana = dia_siguiente
+                        break
+                
+                if not clases_hoy:
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'No hay clases programadas'
+                    })
+            
+            # Agrupar las clases por curso
+            clases_por_curso = {}
+            for clase in clases_hoy:
+                if clase.curso_id not in clases_por_curso:
+                    clases_por_curso[clase.curso_id] = {
+                        'curso': str(clase.curso),
+                        'clases': [],
+                        'estudiantes': []
+                    }
+                clases_por_curso[clase.curso_id]['clases'].append({
+                    'id': clase.id,
+                    'horario': clase.horario,
+                    'sala': clase.get_sala_display() if hasattr(clase, 'get_sala_display') else clase.sala,
+                })
+                
+                # Obtener estudiantes solo una vez por curso
+                if not clases_por_curso[clase.curso_id]['estudiantes']:
+                    estudiantes = clase.curso.estudiantes.all().select_related('usuario')
+                    
+                    # Obtener asistencias existentes para todas las clases de hoy
+                    asistencias = Asistencia.objects.filter(
+                        clase__in=clases_hoy,
+                        estudiante__in=estudiantes,
+                        fecha_registro__date=hoy
+                    ).select_related('estudiante', 'clase')
+                    
+                    # Crear diccionario para acceso rápido
+                    asistencias_dict = {}
+                    for asistencia in asistencias:
+                        key = f"{asistencia.estudiante.usuario.auth_user_id}_{asistencia.clase_id}"
+                        asistencias_dict[key] = asistencia
+                    
+                    # Preparar datos de estudiantes con su asistencia
+                    estudiantes_data = []
+                    for estudiante in estudiantes:
+                        asistencias_estudiante = []
+                        for clase in clases_hoy:
+                            key = f"{estudiante.usuario.auth_user_id}_{clase.id}"
+                            asistencia = asistencias_dict.get(key)
+                            asistencias_estudiante.append({
+                                'clase_id': clase.id,
+                                'presente': asistencia.presente if asistencia else None,
+                                'justificado': asistencia.justificado if asistencia else False,
+                                'observacion': asistencia.observaciones if asistencia else ''
+                            })
+                        
+                        estudiantes_data.append({
+                            'id': estudiante.usuario.auth_user_id,
+                            'nombre': f"{estudiante.usuario.nombre} {estudiante.usuario.apellido_paterno}",
+                            'rut': f"{estudiante.usuario.rut}-{estudiante.usuario.div}",
+                            'asistencias': asistencias_estudiante
+                        })
+                    
+                    clases_por_curso[clase.curso_id]['estudiantes'] = estudiantes_data
+            
+            # Convertir el diccionario a lista
+            datos_cursos = list(clases_por_curso.values())
+            
+            # Calcular estadísticas por curso
+            for curso_data in datos_cursos:
+                total_estudiantes = len(curso_data['estudiantes'])
+                presentes = 0
+                ausentes = 0
+                sin_registro = 0
+                
+                for estudiante in curso_data['estudiantes']:
+                    for asistencia in estudiante['asistencias']:
+                        if asistencia['presente'] is True:
+                            presentes += 1
+                        elif asistencia['presente'] is False:
+                            ausentes += 1
+                        else:
+                            sin_registro += 1
+                
+                curso_data.update({
+                    'total_estudiantes': total_estudiantes,
+                    'presentes': presentes,
+                    'ausentes': ausentes,
+                    'sin_registro': sin_registro
+                })
+            
+            return JsonResponse({
+                'success': True,
+                'asignatura': asignatura_impartida.asignatura.nombre,
+                'codigo': asignatura_impartida.codigo,
+                'fecha': hoy.strftime('%Y-%m-%d'),
+                'cursos': datos_cursos
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class GuardarAsistenciaView(View):
+    def post(self, request, clase_id):
+        if not hasattr(request.user.usuario, 'docente'):
+            return JsonResponse({'success': False, 'error': 'No tienes permiso'})
+        
+        try:
+            docente = request.user.usuario.docente
+            
+            # Obtener la clase y verificar que pertenezca al docente
+            clase = get_object_or_404(
+                Clase, 
+                id=clase_id,
+                asignatura_impartida__docente=docente
+            )
+            
+            # Obtener datos del request
+            data = json.loads(request.body)
+            
+            # Si es una lista de asistencias, procesarlas en lote
+            if isinstance(data, list):
+                # Primero, eliminar todas las asistencias existentes de hoy para esta clase
+                Asistencia.objects.filter(
+                    clase=clase,
+                    fecha_registro__date=timezone.now().date()
+                ).delete()
+                
+                # Preparar las nuevas asistencias
+                asistencias_a_crear = []
+                estudiantes_procesados = set()  # Para evitar duplicados
+                
+                for asistencia_data in data:
+                    estudiante_id = asistencia_data.get('estudiante_id')
+                    
+                    # Evitar duplicados del mismo estudiante
+                    if estudiante_id in estudiantes_procesados:
+                        continue
+                    
+                    estudiantes_procesados.add(estudiante_id)
+                    
+                    presente = asistencia_data.get('presente', False)
+                    justificado = asistencia_data.get('justificado', False)
+                    observaciones = asistencia_data.get('observaciones', '')
+                    
+                    # Obtener el estudiante usando auth_user_id
+                    estudiante = get_object_or_404(
+                        Estudiante,
+                        usuario__auth_user_id=estudiante_id,
+                        curso=clase.curso
+                    )
+                    
+                    # Preparar la asistencia para creación en lote
+                    asistencias_a_crear.append(
+                        Asistencia(
+                            clase=clase,
+                            estudiante=estudiante,
+                            presente=presente,
+                            justificado=justificado,
+                            observaciones=observaciones,
+                            fecha_registro=timezone.now()
+                        )
+                    )
+                
+                # Crear todas las asistencias en una sola operación
+                Asistencia.objects.bulk_create(asistencias_a_crear)
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': f'Se guardaron {len(asistencias_a_crear)} registros de asistencia correctamente'
+                })
+            
+            # Si es una sola asistencia, procesarla como antes
+            else:
+                estudiante_id = data.get('estudiante_id')
+                presente = data.get('presente', False)
+                justificado = data.get('justificado', False)
+                observaciones = data.get('observaciones', '')
+                
+                # Obtener el estudiante usando auth_user_id
+                estudiante = get_object_or_404(
+                    Estudiante,
+                    usuario__auth_user_id=estudiante_id,
+                    curso=clase.curso
+                )
+                
+                # Eliminar asistencias previas de hoy para este estudiante y clase
+                Asistencia.objects.filter(
+                    clase=clase,
+                    estudiante=estudiante,
+                    fecha_registro__date=timezone.now().date()
+                ).delete()
+                
+                # Crear la nueva asistencia
+                Asistencia.objects.create(
+                    clase=clase,
+                    estudiante=estudiante,
+                    presente=presente,
+                    justificado=justificado,
+                    observaciones=observaciones,
+                    fecha_registro=timezone.now()
+                )
+                
+                return JsonResponse({
+                    'success': True,
+                    'message': 'Asistencia guardada correctamente'
+                })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
 

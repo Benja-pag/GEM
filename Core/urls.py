@@ -106,6 +106,8 @@ urlpatterns += [
     
     # URLs para horarios de asignaturas
     path('obtener-horarios-asignatura/<int:asignatura_id>/', ObtenerHorariosAsignaturaView.as_view(), name='obtener_horarios_asignatura'),
+    path('obtener-asistencia-asignatura/<int:asignatura_id>/', ObtenerAsistenciaAsignaturaView.as_view(), name='obtener_asistencia_asignatura'),
+    path('guardar-asistencia/<int:clase_id>/', GuardarAsistenciaView.as_view(), name='guardar_asistencia'),
     
     # URLs para eventos del calendario (docentes)
     path('crear-evento-calendario/', CrearEventoCalendarioView.as_view(), name='crear_evento_calendario'),

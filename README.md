@@ -21,6 +21,8 @@ HTMLS:
 
 
 Descargas: 
+
+pip install -r requirements.txt
 python -m venv env
 pip install django
 pip install psycopg2

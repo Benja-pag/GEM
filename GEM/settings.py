@@ -157,3 +157,14 @@ DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', '')
 AUTHENTICATION_BACKENDS = [
     'Core.auth.EmailBackend',
 ]
+
+# OpenAI Configuration
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
+# Cache configuration for rate limiting
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}

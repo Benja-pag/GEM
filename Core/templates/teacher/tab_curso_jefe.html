@@ -1,37 +1,50 @@
 <!-- Pestaña de Curso Jefe -->
 <div class="tab-pane fade" id="curso-jefe">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-lg-10">
+            {% for curso in cursos_profesor_jefe %}
             <!-- Resumen del Curso -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-gradient-primary text-white">
                     <h5 class="card-title mb-0">
-                        <i class="fas fa-users me-2"></i>Curso 2°A - Resumen General
+                        <i class="fas fa-users me-2"></i>Curso {{ curso.nivel }}°{{ curso.letra }} - Resumen General
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">
                         <div class="col-md-3 text-center">
                             <div class="stats-card">
-                                <div class="stats-number text-primary">25</div>
+                                <div class="stats-number text-primary">{{ curso.total_estudiantes }}</div>
                                 <small class="text-muted">Estudiantes</small>
                             </div>
                         </div>
                         <div class="col-md-3 text-center">
                             <div class="stats-card">
-                                <div class="stats-number text-success">87%</div>
+                                <div class="stats-number text-success">
+                                    {% if curso.porcentaje_asistencia > 0 %}
+                                        {{ curso.porcentaje_asistencia }}%
+                                    {% else %}
+                                        <span class="text-muted">Sin datos</span>
+                                    {% endif %}
+                                </div>
                                 <small class="text-muted">Asistencia Promedio</small>
                             </div>
                         </div>
                         <div class="col-md-3 text-center">
                             <div class="stats-card">
-                                <div class="stats-number text-warning">6.8</div>
+                                <div class="stats-number text-warning">
+                                    {% if curso.promedio_general > 0 %}
+                                        {{ curso.promedio_general }}
+                                    {% else %}
+                                        <span class="text-muted">Sin datos</span>
+                                    {% endif %}
+                                </div>
                                 <small class="text-muted">Promedio General</small>
                             </div>
                         </div>
                         <div class="col-md-3 text-center">
                             <div class="stats-card">
-                                <div class="stats-number text-info">8</div>
+                                <div class="stats-number text-info">{{ curso.total_asignaturas }}</div>
                                 <small class="text-muted">Asignaturas</small>
                             </div>
                         </div>
@@ -39,13 +52,23 @@
                     
                     <!-- Acceso al Curso -->
                     <div class="text-center">
-                        <button class="btn btn-primary btn-lg" onclick="window.location.href='/curso/3/'">
-                            <i class="fas fa-arrow-right me-2"></i>Entrar al Curso 2°A
+                        <button class="btn btn-primary btn-lg" onclick="window.location.href='/curso/{{ curso.id }}/'">
+                            <i class="fas fa-arrow-right me-2"></i>Entrar al Curso {{ curso.nivel }}°{{ curso.letra }}
                         </button>
                         <p class="text-muted mt-2">Accede a la gestión completa del curso</p>
                     </div>
                 </div>
             </div>
+            {% empty %}
+            <!-- Mensaje si no es profesor jefe de ningún curso -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No eres profesor jefe de ningún curso</h4>
+                    <p class="text-muted">Esta sección solo está disponible para docentes que son profesores jefe.</p>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>

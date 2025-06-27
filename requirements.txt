@@ -1,12 +1,64 @@
+# Dependencias base
 Django==5.0.2
-python-dotenv==1.0.0
-Pillow==10.0.0
-django-crispy-forms==2.0
-crispy-bootstrap5==2023.10
-django-allauth==0.57.0
-django-filter==23.3
+python-dotenv==1.0.1
+
+# Dependencias de base de datos y cache
+psycopg2-binary==2.9.9
+redis==5.0.1
+
+# Dependencias de Django y REST
 djangorestframework==3.14.0
 django-cors-headers==4.3.0
-psycopg2-binary==2.9.9
-gunicorn==21.2.0
-whitenoise==6.6.0 
+whitenoise==6.6.0
+requests==2.31.0
+
+# Dependencias de UI
+django-crispy-forms==2.0
+crispy-bootstrap5==2023.10
+django-filter==23.3
+
+# Dependencias de desarrollo y debugging
+django-debug-toolbar==4.3.0
+
+# Dependencias de autenticación y seguridad
+django-allauth==0.57.0
+django-otp==1.3.0
+qrcode==7.4.2
+
+# Dependencias de internacionalización
+django-modeltranslation==0.18.11
+Babel==2.14.0
+
+# Dependencias de procesamiento de imágenes
+Pillow==11.0.0
+
+# Dependencias para reportes y PDF
+reportlab==4.0.8
+xhtml2pdf==0.2.15
+WeasyPrint==60.2
+
+# Dependencias para manejo de datos
+pandas==2.2.0
+numpy==1.26.3
+openpyxl==3.1.2
+
+# Dependencias para websockets y tiempo real
+channels==4.0.0
+channels-redis==4.2.0
+
+# Dependencias para tareas asíncronas
+celery==5.3.6
+django-redis==5.4.0
+
+# Dependencias de IA
+openai==1.12.0
+
+# Dependencias para desarrollo y testing
+pytest==8.0.0
+pytest-django==4.8.0
+coverage==7.4.1
+black==24.1.1
+flake8==7.0.0
+
+# Dependencias de despliegue
+gunicorn==21.2.0 

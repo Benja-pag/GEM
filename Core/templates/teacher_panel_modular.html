@@ -18,7 +18,9 @@
         {% include 'teacher/tab_resumen.html' %}
         
         <!-- Incluir pestaña de curso jefe -->
+        {% if cursos_profesor_jefe %}
         {% include 'teacher/tab_curso_jefe.html' %}
+        {% endif %}
         
         <!-- Incluir pestaña de asignaturas -->
         {% include 'teacher/tab_asignaturas.html' %}

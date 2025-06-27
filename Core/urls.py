@@ -5,7 +5,8 @@ from Core.views import (
     EstudiantePanelView, EstudiantePanelModularView, AttendanceView, LoginView, LogoutView,
     RegisterView, CreateAdminView, ChangePasswordView,
     UserDataView, SurveysView, TasksView, TestsView, ToggleUserStatusView,
-    CursoDetalleView, AsignaturaDetalleView, AsignaturaDetalleEstudianteView, CleanupAuthUsersView
+    CursoDetalleView, AsignaturaDetalleView, AsignaturaDetalleEstudianteView, CleanupAuthUsersView,
+    EstudianteDetalleView
 )
 from Core.views.alumnos import InscribirElectivoView, InscribirElectivosLoteView, BorrarInscripcionElectivosView
 from Core.views.docentes import CancelarClaseView, MarcarClaseRecuperadaView, ObtenerHorariosAsignaturaView, CrearEventoCalendarioView, EditarEventoCalendarioView, EliminarEventoCalendarioView, ReporteEvaluacionesAsignaturasDocenteView, ReporteEvaluacionesCursoJefeView, ReporteAsistenciaAsignaturasDocenteView, ReporteAsistenciaCursoJefeView, ResumenGeneralDocenteView
@@ -14,6 +15,16 @@ from Core.views.reportes import DashboardMetricasView, ReporteAsistenciaGeneralV
 from Core.views.reportes_simple import ReporteRendimientoCursosViewSimple, ReporteDocentesViewSimple, ReporteEstudiantesRiesgoViewSimple, ReporteAsistenciaGeneralViewSimple, ReporteAsistenciaEstudianteViewSimple, ReporteAsistenciaCursoViewSimple, ListaEstudiantesViewSimple, ReporteAsistenciaAsignaturasCursoViewSimple, ReporteEvaluacionesAsignaturasCursoViewSimple, ReporteEvaluacionesGeneralViewSimple, ReporteEvaluacionesEstudianteViewSimple
 from Core.views import foro as foro_views
 from Core.views import pdf_views as pdf_views
+from Core.views import cursos as curso_views
+from .views import ia_views
+from .views.cursos import *
+from .views.docentes import *
+from .views.alumnos import *
+from .views.admin import *
+from .views.auth import *
+from .views.comunicaciones import *
+from .views.foro import *
+from .views.usuarios import *
 
 urlpatterns = [
     # URLs de autenticación
@@ -55,6 +66,7 @@ urlpatterns = [
     path('curso/<int:curso_id>/', CursoDetalleView.as_view(), name='curso_detalle'),
     path('asignatura/<int:asignatura_id>/', AsignaturaDetalleView.as_view(), name='asignatura_detalle'),
     path('asignatura-estudiante/<int:asignatura_id>/', AsignaturaDetalleEstudianteView.as_view(), name='asignatura_detalle_estudiante'),
+    path('estudiante/<int:estudiante_id>/detalle/', EstudianteDetalleView.as_view(), name='estudiante_detalle'),
 
     # URLs para el Foro
     path('foro/', include('Core.urls_foro')),
@@ -142,5 +154,23 @@ urlpatterns += [
     path('api/reporte-asistencia-asignaturas-docente/', ReporteAsistenciaAsignaturasDocenteView.as_view(), name='reporte_asistencia_asignaturas_docente'),
     path('api/reporte-asistencia-curso-jefe/', ReporteAsistenciaCursoJefeView.as_view(), name='reporte_asistencia_curso_jefe'),
     path('api/resumen-general-docente/', ResumenGeneralDocenteView.as_view(), name='resumen_general_docente'),
+]
+
+urlpatterns += [
+    # Rutas para herramientas de IA
+    path('curso/ia/reporte/', curso_views.generar_reporte_ia, name='generar_reporte_ia'),
+    path('curso/ia/sugerencias/', curso_views.generar_sugerencias_ia, name='generar_sugerencias_ia'),
+    path('curso/ia/comunicado/', curso_views.generar_comunicado_ia, name='generar_comunicado_ia'),
+]
+
+urlpatterns += [
+    # Rutas de API para IA
+    path('api/ia/generar-reporte/', ia_views.generar_reporte, name='ia_generar_reporte'),
+    path('api/ia/generar-sugerencias/', ia_views.generar_sugerencias, name='ia_generar_sugerencias'),
+    path('api/ia/generar-comunicado/', ia_views.generar_comunicado, name='ia_generar_comunicado'),
+    path('api/ia/chat/', ia_views.chat_ia, name='ia_chat'),
+    path('api/ia/exportar-reporte/', ia_views.exportar_reporte, name='ia_exportar_reporte'),
+    path('api/ia/aplicar-sugerencias/', ia_views.aplicar_sugerencias, name='ia_aplicar_sugerencias'),
+    path('api/ia/enviar-comunicado/', ia_views.enviar_comunicado, name='ia_enviar_comunicado'),
 ]
 

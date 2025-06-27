@@ -3,6 +3,10 @@
 
 {% block title %}Detalles del Curso {{ curso }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/curso_detalle.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <!-- Encabezado visual del curso -->
@@ -55,9 +59,6 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="reportes-tab" data-bs-toggle="tab" data-bs-target="#reportes" type="button"><i class="fas fa-file-alt me-2"></i>Reportes</button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="ia-tab" data-bs-toggle="tab" data-bs-target="#ia" type="button"><i class="fas fa-robot me-2"></i>Herramientas IA</button>
-        </li>
     </ul>
 
     <div class="tab-content" id="cursoTabsContent">
@@ -84,41 +85,7 @@
             </div>
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-user-shield me-2 text-warning"></i>Apoderados (Prototipo)</h5>
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Estudiante</th>
-                                    <th>Apoderado</th>
-                                    <th>Teléfono</th>
-                                    <th>Email</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Juan Pérez</td>
-                                    <td>María López</td>
-                                    <td>+56 9 1234 5678</td>
-                                    <td>maria.lopez@email.com</td>
-                                    <td><button class="btn btn-sm btn-outline-info"><i class="fas fa-envelope"></i> Mensaje</button></td>
-                                </tr>
-                                <tr>
-                                    <td>María González</td>
-                                    <td>Carlos González</td>
-                                    <td>+56 9 8765 4321</td>
-                                    <td>carlos.gonzalez@email.com</td>
-                                    <td><button class="btn btn-sm btn-outline-info"><i class="fas fa-envelope"></i> Mensaje</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-clipboard-list me-2 text-info"></i>Observaciones y Seguimiento (Prototipo)</h5>
+                    <h5 class="card-title"><i class="fas fa-clipboard-list me-2 text-info"></i>Observaciones</h5>
                     <ul class="list-group">
                         <li class="list-group-item">
                             <strong>Juan Pérez:</strong> Participa activamente en clases. <span class="badge bg-success ms-2">Positiva</span>
@@ -140,15 +107,59 @@
                             <table class="table table-hover align-middle">
                                 <thead class="table-light">
                                     <tr>
-                                        <th><i class="fas fa-user"></i> Nombre</th>
+                                        <th><i class="fas fa-user"></i> Nombre Completo</th>
+                                        <th><i class="fas fa-envelope"></i> Correo Electrónico</th>
                                         <th><i class="fas fa-phone"></i> Teléfono</th>
+                                        <th><i class="fas fa-cogs"></i> Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for estudiante in estudiantes %}
                                     <tr>
-                                        <td>{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }} {{ estudiante.usuario.apellido_materno }}</td>
-                                        <td>{{ estudiante.usuario.telefono }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle me-3">
+                                                    <i class="fas fa-user-graduate"></i>
+                                                </div>
+                                                <div>
+                                                    <strong>{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }} {{ estudiante.usuario.apellido_materno }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">RUT: {{ estudiante.usuario.rut }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if estudiante.usuario.correo %}
+                                                <a href="mailto:{{ estudiante.usuario.correo }}" class="text-decoration-none">
+                                                    <i class="fas fa-envelope me-1"></i>{{ estudiante.usuario.correo }}
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">Sin correo registrado</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if estudiante.usuario.telefono %}
+                                                <a href="tel:{{ estudiante.usuario.telefono }}" class="text-decoration-none">
+                                                    <i class="fas fa-phone me-1"></i>{{ estudiante.usuario.telefono }}
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">Sin teléfono</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                        onclick="verDetalleEstudiante({{ estudiante.pk }})" 
+                                                        title="Ver detalle del estudiante">
+                                                    <i class="fas fa-eye"></i> Ver Detalle
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-info" 
+                                                        onclick="contactarEstudiante('{{ estudiante.usuario.correo }}', '{{ estudiante.usuario.telefono }}')" 
+                                                        title="Contactar estudiante">
+                                                    <i class="fas fa-envelope"></i>
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -159,326 +170,165 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="row mb-4">
-                <div class="col-md-6 mb-3">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-calendar-check me-2 text-success"></i>Asistencia (Prototipo)</h5>
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Juan Pérez
-                                    <span class="badge bg-success">98%</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    María González
-                                    <span class="badge bg-warning">85%</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-chart-line me-2 text-primary"></i>Rendimiento (Prototipo)</h5>
-                            <ul class="list-group">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    Juan Pérez
-                                    <span class="badge bg-primary">6.2</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    María González
-                                    <span class="badge bg-danger">4.1</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-id-card me-2 text-info"></i>Fichas de Estudiantes (Prototipo)</h5>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-body">
-                                    <h6 class="fw-bold">Juan Pérez</h6>
-                                    <p><strong>RUT:</strong> 12345678-9</p>
-                                    <p><strong>Promedio:</strong> 6.2</p>
-                                    <p><strong>Asistencia:</strong> 98%</p>
-                                    <p><strong>Observaciones:</strong> Participa activamente en clases.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-body">
-                                    <h6 class="fw-bold">María González</h6>
-                                    <p><strong>RUT:</strong> 98765432-1</p>
-                                    <p><strong>Promedio:</strong> 4.1</p>
-                                    <p><strong>Asistencia:</strong> 85%</p>
-                                    <p><strong>Observaciones:</strong> Necesita mejorar la puntualidad.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
         <!-- Rendimiento: Análisis detallado por asignatura -->
         <div class="tab-pane fade" id="rendimiento">
             <div class="row">
                 <div class="col-lg-8">
-                    <!-- Rendimiento por Asignatura -->
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-gradient-success text-white">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-book me-2"></i>Rendimiento por Asignatura
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Asignatura</th>
-                                            <th>Profesor</th>
-                                            <th>Promedio</th>
-                                            <th>Asistencia</th>
-                                            <th>Estudiantes en Riesgo</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Matemáticas</td>
-                                            <td>Prof. Juan Pérez</td>
-                                            <td><span class="badge bg-success">7.2</span></td>
-                                            <td>88%</td>
-                                            <td><span class="badge bg-danger">3</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i> Ver Detalles
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Lenguaje</td>
-                                            <td>Prof. María González</td>
-                                            <td><span class="badge bg-warning">6.5</span></td>
-                                            <td>82%</td>
-                                            <td><span class="badge bg-danger">5</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i> Ver Detalles
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Historia</td>
-                                            <td>Prof. Carlos López</td>
-                                            <td><span class="badge bg-info">6.9</span></td>
-                                            <td>85%</td>
-                                            <td><span class="badge bg-warning">2</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-eye"></i> Ver Detalles
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Ranking de Estudiantes -->
-                    <div class="card border-0 shadow-sm">
+                    <div class="card border-0 shadow-sm h-100">
                         <div class="card-header bg-gradient-info text-white">
                             <h5 class="card-title mb-0">
                                 <i class="fas fa-trophy me-2"></i>Ranking de Estudiantes del Curso
                             </h5>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
+                        <div class="card-body p-0">
+                            <div class="table-responsive ranking-table" style="max-height: 600px; overflow-y: auto;">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light sticky-top">
                                         <tr>
                                             <th>Posición</th>
                                             <th>Estudiante</th>
-                                            <th>Promedio General</th>
+                                            <th>Promedio</th>
                                             <th>Asistencia</th>
                                             <th>Mejor Asignatura</th>
                                             <th>Estado</th>
-                                            <th>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {% for estudiante_data in ranking_estudiantes %}
+                                        <tr {% if estudiante_data.estado_class == 'danger' %}class="table-danger"{% endif %}>
+                                            <td>
+                                                {% if estudiante_data.posicion == 1 %}
+                                                    <span class="badge" style="background: linear-gradient(45deg, #FFD700, #FFA500); color: white; font-weight: bold; font-size: 0.9em;">🥇 1°</span>
+                                                {% elif estudiante_data.posicion == 2 %}
+                                                    <span class="badge" style="background: linear-gradient(45deg, #C0C0C0, #A9A9A9); color: white; font-weight: bold; font-size: 0.9em;">🥈 2°</span>
+                                                {% elif estudiante_data.posicion == 3 %}
+                                                    <span class="badge" style="background: linear-gradient(45deg, #CD7F32, #A0522D); color: white; font-weight: bold; font-size: 0.9em;">🥉 3°</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ estudiante_data.posicion }}°</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="fw-medium">{{ estudiante_data.estudiante.usuario.get_full_name }}</td>
+                                            <td>
+                                                {% if estudiante_data.promedio_general >= 6.0 %}
+                                                    <span class="badge bg-success">{{ estudiante_data.promedio_general|floatformat:1 }}</span>
+                                                {% elif estudiante_data.promedio_general >= 5.0 %}
+                                                    <span class="badge bg-info">{{ estudiante_data.promedio_general|floatformat:1 }}</span>
+                                                {% elif estudiante_data.promedio_general >= 4.0 %}
+                                                    <span class="badge bg-warning">{{ estudiante_data.promedio_general|floatformat:1 }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">{{ estudiante_data.promedio_general|floatformat:1 }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if estudiante_data.porcentaje_asistencia >= 90 %}
+                                                    <span class="badge bg-success">{{ estudiante_data.porcentaje_asistencia|floatformat:1 }}%</span>
+                                                {% elif estudiante_data.porcentaje_asistencia >= 80 %}
+                                                    <span class="badge bg-info">{{ estudiante_data.porcentaje_asistencia|floatformat:1 }}%</span>
+                                                {% elif estudiante_data.porcentaje_asistencia >= 70 %}
+                                                    <span class="badge bg-warning">{{ estudiante_data.porcentaje_asistencia|floatformat:1 }}%</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">{{ estudiante_data.porcentaje_asistencia|floatformat:1 }}%</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="small">{{ estudiante_data.mejor_asignatura }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ estudiante_data.estado_class }}">{{ estudiante_data.estado }}</span>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
                                         <tr>
-                                            <td><span class="badge bg-warning">1°</span></td>
-                                            <td>Ana González</td>
-                                            <td><span class="badge bg-success">7.8</span></td>
-                                            <td>95%</td>
-                                            <td>Matemáticas (8.2)</td>
-                                            <td><span class="badge bg-success">Excelente</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-user"></i> Perfil
-                                                </button>
+                                            <td colspan="6" class="text-center text-muted py-4">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                No hay estudiantes registrados en este curso.
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td><span class="badge bg-secondary">2°</span></td>
-                                            <td>Carlos Ramírez</td>
-                                            <td><span class="badge bg-success">7.5</span></td>
-                                            <td>92%</td>
-                                            <td>Historia (8.0)</td>
-                                            <td><span class="badge bg-success">Bueno</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-user"></i> Perfil
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td><span class="badge bg-info">3°</span></td>
-                                            <td>María Silva</td>
-                                            <td><span class="badge bg-warning">7.2</span></td>
-                                            <td>88%</td>
-                                            <td>Lenguaje (7.8)</td>
-                                            <td><span class="badge bg-warning">Regular</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-user"></i> Perfil
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <tr class="table-danger">
-                                            <td><span class="badge bg-danger">25°</span></td>
-                                            <td>Pedro López</td>
-                                            <td><span class="badge bg-danger">4.2</span></td>
-                                            <td>65%</td>
-                                            <td>Educación Física (5.5)</td>
-                                            <td><span class="badge bg-danger">En Riesgo</span></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-outline-danger">
-                                                    <i class="fas fa-exclamation-triangle"></i> Intervenir
-                                                </button>
-                                            </td>
-                                        </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
+                            <!-- Espacio al final para mejor scroll -->
+                            <div style="height: 20px;"></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-4">
                     <!-- Herramientas IA -->
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-gradient-warning text-white">
-                            <h6 class="card-title mb-0">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">
                                 <i class="fas fa-robot me-2"></i>Herramientas IA
-                            </h6>
+                            </h5>
                         </div>
                         <div class="card-body">
-                            <div class="mb-3">
-                                <h6 class="text-primary">Generar Reporte Específico</h6>
-                                <select class="form-select mb-2">
-                                    <option>Reporte de Rendimiento</option>
-                                    <option>Reporte de Asistencia</option>
-                                    <option>Reporte de Comportamiento</option>
-                                    <option>Reporte para Apoderados</option>
-                                </select>
-                                <button class="btn btn-outline-primary btn-sm w-100">
-                                    <i class="fas fa-magic me-1"></i>Generar con IA
-                                </button>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <h6 class="text-success">Sugerencias de Intervención</h6>
-                                <div class="alert alert-info">
-                                    <small>
-                                        <i class="fas fa-lightbulb me-1"></i>
-                                        "3 estudiantes requieren atención inmediata en Matemáticas"
-                                    </small>
+                            <div class="row g-3">
+                                <!-- Reportes -->
+                                <div class="col-md-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-title">
+                                                <i class="fas fa-chart-line me-2"></i>Reportes
+                                            </h6>
+                                            <div class="d-grid gap-2">
+                                                <button class="btn btn-outline-primary btn-sm" onclick="generarReporteIA({{ curso.id }}, 'rendimiento')">
+                                                    <i class="fas fa-graduation-cap me-1"></i>Rendimiento
+                                                </button>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="generarReporteIA({{ curso.id }}, 'asistencia')">
+                                                    <i class="fas fa-calendar-check me-1"></i>Asistencia
+                                                </button>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="generarReporteIA({{ curso.id }}, 'comportamiento')">
+                                                    <i class="fas fa-user-friends me-1"></i>Comportamiento
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <button class="btn btn-outline-success btn-sm w-100">
-                                    <i class="fas fa-comments me-1"></i>Ver Sugerencias
-                                </button>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <h6 class="text-warning">Comunicación Asistida</h6>
-                                <button class="btn btn-outline-warning btn-sm w-100 mb-2">
-                                    <i class="fas fa-envelope me-1"></i>Generar Comunicación
-                                </button>
-                                <button class="btn btn-outline-info btn-sm w-100">
-                                    <i class="fas fa-bullhorn me-1"></i>Anuncio al Curso
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Alertas y Recomendaciones -->
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-gradient-danger text-white">
-                            <h6 class="card-title mb-0">
-                                <i class="fas fa-exclamation-triangle me-2"></i>Alertas y Recomendaciones
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-danger">
-                                <h6 class="alert-heading">Intervención Requerida</h6>
-                                <p class="mb-1">3 estudiantes requieren atención inmediata en Matemáticas</p>
-                                <small>Recomendación: Reunión individual</small>
-                            </div>
-                            <div class="alert alert-warning">
-                                <h6 class="alert-heading">Mejora Detectada</h6>
-                                <p class="mb-1">Asistencia mejoró 5% este mes</p>
-                                <small>¡Excelente progreso!</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Comunicación Rápida -->
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-gradient-primary text-white">
-                            <h6 class="card-title mb-0">
-                                <i class="fas fa-envelope me-2"></i>Comunicación Rápida
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <label class="form-label">Destinatarios</label>
-                                <select class="form-select">
-                                    <option>Todos los Estudiantes</option>
-                                    <option>Todos los Apoderados</option>
-                                    <option>Estudiantes en Riesgo</option>
-                                    <option>Estudiantes Destacados</option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Tipo de Mensaje</label>
-                                <select class="form-select">
-                                    <option>Recordatorio</option>
-                                    <option>Anuncio Importante</option>
-                                    <option>Felicitación</option>
-                                    <option>Convocatoria</option>
-                                </select>
-                            </div>
-                            
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-paper-plane me-1"></i>Enviar Mensaje
-                                </button>
-                                <button class="btn btn-outline-success btn-sm">
-                                    <i class="fas fa-calendar me-1"></i>Programar Reunión
-                                </button>
-                                <button class="btn btn-outline-warning btn-sm">
-                                    <i class="fas fa-phone me-1"></i>Llamar Apoderados
-                                </button>
+                                
+                                <!-- Sugerencias -->
+                                <div class="col-md-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-title">
+                                                <i class="fas fa-lightbulb me-2"></i>Sugerencias
+                                            </h6>
+                                            <div class="d-grid gap-2">
+                                                <button class="btn btn-outline-warning btn-sm" onclick="generarSugerenciasIA({{ curso.id }}, 'rendimiento')">
+                                                    <i class="fas fa-chart-bar me-1"></i>Mejora Académica
+                                                </button>
+                                                <button class="btn btn-outline-warning btn-sm" onclick="generarSugerenciasIA({{ curso.id }}, 'asistencia')">
+                                                    <i class="fas fa-user-clock me-1"></i>Asistencia
+                                                </button>
+                                                <button class="btn btn-outline-warning btn-sm" onclick="generarSugerenciasIA({{ curso.id }}, 'comportamiento')">
+                                                    <i class="fas fa-users me-1"></i>Convivencia
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Comunicados -->
+                                <div class="col-md-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-title">
+                                                <i class="fas fa-envelope me-2"></i>Comunicados
+                                            </h6>
+                                            <div class="d-grid gap-2">
+                                                <button class="btn btn-outline-success btn-sm" onclick="generarComunicadoIA({{ curso.id }}, 'rendimiento')">
+                                                    <i class="fas fa-chart-pie me-1"></i>Rendimiento
+                                                </button>
+                                                <button class="btn btn-outline-success btn-sm" onclick="generarComunicadoIA({{ curso.id }}, 'asistencia')">
+                                                    <i class="fas fa-calendar-alt me-1"></i>Asistencia
+                                                </button>
+                                                <button class="btn btn-outline-success btn-sm" onclick="generarComunicadoIA({{ curso.id }}, 'general')">
+                                                    <i class="fas fa-bullhorn me-1"></i>General
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -487,177 +337,62 @@
         </div>
         <!-- Asistencia: Control detallado de asistencia -->
         <div class="tab-pane fade" id="asistencia">
-            <div class="card border-0 shadow-sm mb-4">
+            <div class="card border-0 shadow-sm mb-4 h-100">
                 <div class="card-header bg-gradient-warning text-white">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-calendar-check me-2"></i>Control de Asistencia
                     </h5>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
+                <div class="card-body p-0">
+                    <div class="table-responsive ranking-table" style="max-height: 600px; overflow-y: auto;">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light sticky-top">
                                 <tr>
                                     <th>Estudiante</th>
                                     <th>Total Clases</th>
                                     <th>Presente</th>
                                     <th>Ausente</th>
+                                    <th>Justificados</th>
                                     <th>Tardanzas</th>
                                     <th>Porcentaje</th>
                                     <th>Estado</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for asistencia_data in asistencia_estudiantes %}
+                                <tr {% if asistencia_data.estado_class == 'danger' %}class="table-danger"{% endif %}>
+                                    <td class="fw-medium">{{ asistencia_data.estudiante.usuario.get_full_name }}</td>
+                                    <td><span class="badge bg-secondary">{{ asistencia_data.total_clases }}</span></td>
+                                    <td><span class="badge bg-success">{{ asistencia_data.presentes }}</span></td>
+                                    <td><span class="badge bg-danger">{{ asistencia_data.ausentes }}</span></td>
+                                    <td><span class="badge bg-info">{{ asistencia_data.justificados }}</span></td>
+                                    <td><span class="badge bg-warning">{{ asistencia_data.tardanzas }}</span></td>
+                                    <td>
+                                        {% if asistencia_data.porcentaje_asistencia >= 95 %}
+                                            <span class="badge bg-success">{{ asistencia_data.porcentaje_asistencia|floatformat:1 }}%</span>
+                                        {% elif asistencia_data.porcentaje_asistencia >= 85 %}
+                                            <span class="badge bg-info">{{ asistencia_data.porcentaje_asistencia|floatformat:1 }}%</span>
+                                        {% elif asistencia_data.porcentaje_asistencia >= 75 %}
+                                            <span class="badge bg-warning">{{ asistencia_data.porcentaje_asistencia|floatformat:1 }}%</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">{{ asistencia_data.porcentaje_asistencia|floatformat:1 }}%</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><span class="badge bg-{{ asistencia_data.estado_class }}">{{ asistencia_data.estado }}</span></td>
+                                </tr>
+                                {% empty %}
                                 <tr>
-                                    <td>Ana González</td>
-                                    <td>45</td>
-                                    <td><span class="badge bg-success">42</span></td>
-                                    <td><span class="badge bg-danger">2</span></td>
-                                    <td><span class="badge bg-warning">1</span></td>
-                                    <td><span class="badge bg-info">93%</span></td>
-                                    <td><span class="badge bg-success">Excelente</span></td>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        No hay datos de asistencia disponibles.
+                                    </td>
                                 </tr>
-                                <tr class="table-danger">
-                                    <td>Pedro López</td>
-                                    <td>45</td>
-                                    <td><span class="badge bg-success">29</span></td>
-                                    <td><span class="badge bg-danger">14</span></td>
-                                    <td><span class="badge bg-warning">2</span></td>
-                                    <td><span class="badge bg-danger">65%</span></td>
-                                    <td><span class="badge bg-danger">En Riesgo</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Carlos Ramírez</td>
-                                    <td>45</td>
-                                    <td><span class="badge bg-success">41</span></td>
-                                    <td><span class="badge bg-danger">3</span></td>
-                                    <td><span class="badge bg-warning">1</span></td>
-                                    <td><span class="badge bg-info">91%</span></td>
-                                    <td><span class="badge bg-success">Bueno</span></td>
-                                </tr>
-                                <tr>
-                                    <td>María Silva</td>
-                                    <td>45</td>
-                                    <td><span class="badge bg-success">39</span></td>
-                                    <td><span class="badge bg-danger">4</span></td>
-                                    <td><span class="badge bg-warning">2</span></td>
-                                    <td><span class="badge bg-warning">87%</span></td>
-                                    <td><span class="badge bg-warning">Regular</span></td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-
-            <!-- Registro de Asistencia -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-gradient-success text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-plus me-2"></i>Registrar Asistencia
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Fecha</label>
-                            <input type="date" class="form-control" value="2024-04-22">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Asignatura</label>
-                            <select class="form-select">
-                                <option>Matemáticas</option>
-                                <option>Lenguaje</option>
-                                <option>Historia</option>
-                                <option>Ciencias</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Hora</label>
-                            <input type="time" class="form-control" value="08:00">
-                        </div>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Estudiante</th>
-                                    <th>Estado</th>
-                                    <th>Observación</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Ana González</td>
-                                    <td>
-                                        <select class="form-select form-select-sm">
-                                            <option value="presente" selected>Presente</option>
-                                            <option value="ausente">Ausente</option>
-                                            <option value="tardanza">Tardanza</option>
-                                            <option value="justificado">Justificado</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" placeholder="Observación opcional">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Pedro López</td>
-                                    <td>
-                                        <select class="form-select form-select-sm">
-                                            <option value="presente">Presente</option>
-                                            <option value="ausente" selected>Ausente</option>
-                                            <option value="tardanza">Tardanza</option>
-                                            <option value="justificado">Justificado</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input type="text" class="form-control form-control-sm" placeholder="Observación opcional">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="text-end mt-3">
-                        <button class="btn btn-success">
-                            <i class="fas fa-save me-2"></i>Guardar Asistencia
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reportes de Asistencia -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-gradient-info text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-chart-bar me-2"></i>Reportes de Asistencia
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="card border">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-chart-pie fa-2x text-primary mb-2"></i>
-                                    <h6>Reporte Mensual</h6>
-                                    <p class="text-muted">Análisis de asistencia del mes</p>
-                                    <button class="btn btn-outline-primary btn-sm">Generar</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="card border">
-                                <div class="card-body text-center">
-                                    <i class="fas fa-file-excel fa-2x text-success mb-2"></i>
-                                    <h6>Exportar Excel</h6>
-                                    <p class="text-muted">Descargar datos de asistencia</p>
-                                    <button class="btn btn-outline-success btn-sm">Exportar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Espacio al final para mejor scroll -->
+                    <div style="height: 20px;"></div>
                 </div>
             </div>
         </div>
@@ -729,167 +464,92 @@
                 </div>
             </div>
         </div>
-        <!-- Comunicaciones: Comunicaciones, Documentos, Calendario -->
+        <!-- Comunicaciones del Curso -->
         <div class="tab-pane fade" id="comunicaciones">
             <div class="row">
-                <div class="col-lg-8">
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-gradient-primary text-white">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-envelope me-2"></i>Comunicación con el Curso
-                            </h5>
+                <!-- Panel Principal de Comunicaciones -->
+                <div class="col-12">
+                    <!-- Header con título y botón -->
+                    <div class="comunicacion-curso-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-1">
+                                <i class="fas fa-envelope me-2"></i>Comunicación para {{ curso.nivel }}°{{ curso.letra }}
+                            </h4>
+                            <p class="mb-0 opacity-75">Gestiona las comunicaciones de tu curso</p>
                         </div>
-                        <div class="card-body">
-                            <form>
-                                <div class="mb-3">
-                                    <label class="form-label">Destinatarios</label>
-                                    <select class="form-select">
-                                        <option>Todos los Estudiantes</option>
-                                        <option>Todos los Apoderados</option>
-                                        <option>Estudiantes en Riesgo</option>
-                                        <option>Estudiantes Destacados</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Asunto</label>
-                                    <input type="text" class="form-control" placeholder="Asunto del mensaje">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Mensaje</label>
-                                    <textarea class="form-control" rows="6" placeholder="Escribe tu mensaje aquí..."></textarea>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <button type="button" class="btn btn-outline-secondary">
-                                        <i class="fas fa-eye me-2"></i>Vista Previa
-                                    </button>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-paper-plane me-2"></i>Enviar Mensaje
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                        <a href="{% url 'crear_comunicacion' %}" class="btn btn-nueva-comunicacion-curso">
+                            <i class="fas fa-plus me-2"></i>Nueva Comunicación
+                        </a>
                     </div>
 
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-gradient-danger text-white">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-envelope-open-text me-2"></i>Comunicaciones y Circulares
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="list-group list-group-flush">
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Circular 01 - Reunión de Apoderados</h6>
-                                        <small class="text-muted">Enviado hace 2 días</small>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i> Ver</button>
-                                </div>
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Mensaje enviado a apoderados</h6>
-                                        <small class="text-muted">Enviado ayer</small>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-info"><i class="fas fa-envelope"></i> Ver</button>
-                                </div>
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Recordatorio Evaluación</h6>
-                                        <small class="text-muted">Enviado hace 1 semana</small>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-warning"><i class="fas fa-bell"></i> Ver</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-gradient-success text-white">
-                            <h6 class="card-title mb-0">
-                                <i class="fas fa-history me-2"></i>Mensajes Recientes
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="list-group list-group-flush">
-                                <div class="list-group-item px-0">
-                                    <h6 class="mb-1">Recordatorio Evaluación</h6>
-                                    <small class="text-muted">Enviado hace 2 horas</small>
-                                    <br>
-                                    <small class="text-success">25 leídos</small>
-                                </div>
-                                <div class="list-group-item px-0">
-                                    <h6 class="mb-1">Reunión de Apoderados</h6>
-                                    <small class="text-muted">Enviado ayer</small>
-                                    <br>
-                                    <small class="text-success">18 leídos</small>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Buscador -->
+                    <div class="comunicacion-curso-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" id="buscarComunicacionCurso" 
+                               placeholder="Buscar comunicaciones...">
                     </div>
 
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-gradient-warning text-white">
-                            <h6 class="card-title mb-0">
-                                <i class="fas fa-folder-open me-2"></i>Documentos y Materiales
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="list-group list-group-flush">
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Reglamento Interno</h6>
-                                        <small class="text-muted">PDF - 2.3 MB</small>
+                    <!-- Lista de Comunicaciones -->
+                    <div id="lista-comunicaciones">
+                        {% if comunicaciones_curso %}
+                            {% for comunicacion in comunicaciones_curso %}
+                                <div class="comunicacion-curso-item {% if request.user not in comunicacion.leido_por.all %}no-leida{% endif %}"
+                                     data-comunicacion-id="{{ comunicacion.id }}">
+                                    <div class="d-flex align-items-start">
+                                        <div class="flex-grow-1">
+                                            <h5 class="titulo">
+                                                <a href="{% url 'detalle_comunicacion' comunicacion.id %}" 
+                                                   class="text-decoration-none">
+                                                    {{ comunicacion.asunto }}
+                                                </a>
+                                            </h5>
+                                            <div class="metadata d-flex flex-wrap gap-3">
+                                                <span>
+                                                    <i class="fas fa-user"></i>
+                                                    {% if comunicacion.autor.usuario %}
+                                                        {{ comunicacion.autor.usuario.nombre }} {{ comunicacion.autor.usuario.apellido_paterno }}
+                                                    {% else %}
+                                                        {{ comunicacion.autor }}
+                                                    {% endif %}
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-calendar"></i>
+                                                    {{ comunicacion.fecha_envio|date:"d M, Y" }}
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-clock"></i>
+                                                    {{ comunicacion.fecha_envio|date:"H:i" }}
+                                                </span>
+                                                {% if comunicacion.adjuntos.count > 0 %}
+                                                <span class="text-warning">
+                                                    <i class="fas fa-paperclip"></i>
+                                                    {{ comunicacion.adjuntos.count }} adjunto{{ comunicacion.adjuntos.count|pluralize }}
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="preview">
+                                                {{ comunicacion.contenido|truncatewords:30|linebreaksbr }}
+                                            </div>
+                                        </div>
+                                        <div class="ms-3">
+                                            <a href="{% url 'detalle_comunicacion' comunicacion.id %}" 
+                                               class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
                                     </div>
-                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
                                 </div>
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Circular de Seguridad</h6>
-                                        <small class="text-muted">PDF - 1.1 MB</small>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
-                                </div>
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">Calendario Escolar</h6>
-                                        <small class="text-muted">PDF - 0.8 MB</small>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-primary"><i class="fas fa-download"></i></button>
-                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-inbox fa-4x text-muted mb-4"></i>
+                                <h5>No hay comunicaciones</h5>
+                                <p class="text-muted mb-4">No hay comunicaciones enviadas a este curso.</p>
+                                <a href="{% url 'crear_comunicacion' %}" class="btn btn-nueva-comunicacion-curso">
+                                    <i class="fas fa-plus me-2"></i>Crear Primera Comunicación
+                                </a>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-gradient-info text-white">
-                            <h6 class="card-title mb-0">
-                                <i class="fas fa-calendar-alt me-2"></i>Próximas Actividades
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="list-group list-group-flush">
-                                <div class="list-group-item px-0">
-                                    <h6 class="mb-1">Reunión de Apoderados</h6>
-                                    <small class="text-danger">Mañana - 19:00 PM</small>
-                                    <br>
-                                    <small class="text-muted">Sala de Reuniones</small>
-                                </div>
-                                <div class="list-group-item px-0">
-                                    <h6 class="mb-1">Evaluación Matemáticas</h6>
-                                    <small class="text-warning">En 2 días - 10:00 AM</small>
-                                    <br>
-                                    <small class="text-muted">Prof. Juan Pérez</small>
-                                </div>
-                                <div class="list-group-item px-0">
-                                    <h6 class="mb-1">Actividad de Historia</h6>
-                                    <small class="text-info">En 1 semana - 14:00 PM</small>
-                                    <br>
-                                    <small class="text-muted">Prof. Carlos López</small>
-                                </div>
-                            </div>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -926,26 +586,27 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="card border">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-users fa-2x text-warning mb-2"></i>
-                                            <h6>Reporte para Apoderados</h6>
-                                            <p class="text-muted">Información para padres y apoderados</p>
-                                            <button class="btn btn-outline-warning btn-sm">Generar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="card border">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
-                                            <h6>Reporte de Riesgo</h6>
-                                            <p class="text-muted">Estudiantes que requieren atención</p>
-                                            <button class="btn btn-outline-danger btn-sm">Generar</button>
-                                        </div>
-                                    </div>
-                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Herramientas IA -->
+                    <div class="card border-0 shadow-sm mt-4">
+                        <div class="card-header bg-gradient-info text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="fas fa-robot me-2"></i>Herramientas IA
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-robot me-1"></i>Generar Reporte Automático
+                                </button>
+                                <button class="btn btn-outline-success btn-sm">
+                                    <i class="fas fa-lightbulb me-1"></i>Sugerencias de Intervención
+                                </button>
+                                <button class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-envelope me-1"></i>Generar Comunicado IA
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -971,19 +632,6 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Herramientas IA (Prototipo) -->
-        <div class="tab-pane fade" id="ia">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-robot me-2 text-primary"></i>Herramientas de IA (Prototipo)</h5>
-                    <div class="mb-3">
-                        <button class="btn btn-outline-primary"><i class="fas fa-robot me-1"></i> Generar Reporte Automático</button>
-                        <button class="btn btn-outline-success ms-2"><i class="fas fa-lightbulb me-1"></i> Sugerencias de Intervención</button>
-                        <button class="btn btn-outline-info ms-2"><i class="fas fa-envelope me-1"></i> Generar Comunicado IA</button>
                     </div>
                 </div>
             </div>
@@ -1186,5 +834,121 @@
     .shadow-sm {
         box-shadow: 0 .125rem .25rem rgba(0,0,0,.075) !important;
     }
+    
+    /* Estilos para comunicaciones */
+    .comunicacion-item {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .hover-bg-light:hover {
+        background-color: #f8f9fa !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .comunicacion-no-leida {
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+    }
+
+    .comunicacion-link {
+        color: #495057;
+        transition: color 0.2s ease;
+    }
+
+    .comunicacion-link:hover {
+        color: #2196f3;
+    }
+
+    .comunicacion-meta {
+        font-size: 0.85rem;
+    }
+
+    .comunicacion-preview {
+        font-size: 0.8rem;
+        max-height: 40px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    }
+
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    }
+
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+    }
+
+    .bg-gradient-secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+    }
 </style>
+
+<script src="{% static 'js/main.js' %}"></script>
+<script>
+// Función de respaldo para ver detalle del estudiante
+function verDetalleEstudiante(estudianteId) {
+    window.location.href = '/estudiante/' + estudianteId + '/detalle/';
+}
+
+// Función de respaldo para contactar estudiante
+function contactarEstudiante(email, telefono) {
+    let opciones = [];
+    
+    if (email && email !== 'None' && email !== '') {
+        opciones.push('📧 Enviar correo: ' + email);
+    }
+    
+    if (telefono && telefono !== 'None' && telefono !== '') {
+        opciones.push('📱 Llamar: ' + telefono);
+    }
+    
+    if (opciones.length === 0) {
+        alert('No hay información de contacto disponible para este estudiante.');
+        return;
+    }
+    
+    let mensaje = 'Opciones de contacto:\n\n' + opciones.join('\n');
+    
+    if (confirm(mensaje + '\n\n¿Deseas continuar?')) {
+        if (email && email !== 'None' && email !== '') {
+            window.location.href = 'mailto:' + email + '?subject=Contacto desde el sistema escolar';
+        } else if (telefono && telefono !== 'None' && telefono !== '') {
+            window.location.href = 'tel:' + telefono;
+        }
+    }
+}
+
+// Búsqueda en tiempo real para comunicaciones del curso
+document.addEventListener('DOMContentLoaded', function() {
+    const buscarComunicacion = document.getElementById('buscarComunicacionCurso');
+    if (buscarComunicacion) {
+        buscarComunicacion.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const comunicaciones = document.querySelectorAll('.comunicacion-item');
+            
+            comunicaciones.forEach(function(item) {
+                const content = item.textContent.toLowerCase();
+                if (content.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+
+<!-- Scripts para herramientas IA -->
+<script src="{% static 'js/ia_tools.js' %}"></script>
 {% endblock %} 

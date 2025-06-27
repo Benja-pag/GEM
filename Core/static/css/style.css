@@ -185,3 +185,364 @@ p {
     color: #6c757d;
     font-size: 1.1rem;
 }
+
+/* Estilos para avatares de estudiantes */
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.avatar-circle i {
+    font-size: 18px;
+}
+
+/* Estilos para el ranking de estudiantes */
+.ranking-table {
+    font-size: 0.9em;
+}
+
+.ranking-table .sticky-top {
+    background-color: #f8f9fa !important;
+    z-index: 10;
+}
+
+.ranking-table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Estilos para badges de medallas */
+.medal-badge {
+    font-size: 0.9em;
+    padding: 0.5em 0.75em;
+    border-radius: 1rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Efectos de hover para filas del ranking */
+.ranking-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.ranking-table tbody tr:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Scrollbar personalizada para el ranking */
+.table-responsive::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Altura uniforme para cards */
+.h-100 {
+    height: 100% !important;
+}
+
+/* Mejoras visuales para badges de ranking */
+.ranking-position-1 {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.ranking-position-2 {
+    background: linear-gradient(45deg, #C0C0C0, #A9A9A9);
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.ranking-position-3 {
+    background: linear-gradient(45deg, #CD7F32, #A0522D);
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Estilos para las comunicaciones */
+.comunicaciones-stats .card {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.2s ease;
+}
+
+.comunicaciones-stats .card:hover {
+    transform: translateY(-5px);
+}
+
+.comunicaciones-stats .card-body {
+    padding: 1.5rem;
+}
+
+.comunicaciones-stats .display-6 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin: 0.5rem 0;
+}
+
+.comunicacion-item {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.comunicacion-item:hover {
+    background-color: var(--bg-color);
+    border-left-color: var(--primary-color);
+}
+
+.comunicacion-item .hover-bg-light:hover {
+    background-color: transparent !important;
+}
+
+.comunicacion-badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    border-radius: 50px;
+}
+
+.comunicacion-metadata {
+    font-size: 0.85rem;
+    color: var(--text-muted-color);
+}
+
+.comunicacion-metadata i {
+    width: 16px;
+    text-align: center;
+    margin-right: 4px;
+}
+
+.comunicacion-destinatarios .badge {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.comunicacion-acciones .btn {
+    border-radius: 50px;
+    padding: 0.4rem 1rem;
+}
+
+.comunicacion-busqueda .input-group {
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.comunicacion-busqueda .input-group-text {
+    background-color: transparent;
+    border-right: none;
+}
+
+.comunicacion-busqueda .form-control {
+    border-left: none;
+    padding-left: 0;
+}
+
+.comunicacion-busqueda .form-control:focus {
+    box-shadow: none;
+}
+
+.comunicacion-filtros .form-select {
+    border-radius: 50px;
+    padding: 0.5rem 1.5rem;
+}
+
+.btn-nueva-comunicacion {
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    font-weight: 500;
+    box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.btn-nueva-comunicacion:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Estilos actualizados para la vista de comunicaciones del curso */
+.comunicacion-curso-header {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.1);
+}
+
+.comunicacion-curso-header h4 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.75rem;
+}
+
+.comunicacion-curso-header p {
+    opacity: 0.9;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.comunicacion-curso-stats {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    transition: transform 0.2s ease;
+    border: 1px solid #e3e6f0;
+}
+
+.comunicacion-curso-stats:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.comunicacion-curso-stats .numero {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.comunicacion-curso-stats .etiqueta {
+    color: #6c757d;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.comunicacion-curso-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.comunicacion-curso-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    border-color: #cbd5e1;
+}
+
+.comunicacion-curso-item.no-leida {
+    background: #f8fafc;
+    border-left: 4px solid #6366f1;
+}
+
+.comunicacion-curso-item .titulo {
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.comunicacion-curso-item .titulo a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.comunicacion-curso-item .titulo a:hover {
+    color: #4f46e5;
+}
+
+.comunicacion-curso-item .metadata {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.comunicacion-curso-item .metadata i {
+    color: #94a3b8;
+    width: 16px;
+    text-align: center;
+    margin-right: 6px;
+}
+
+.comunicacion-curso-item .metadata span {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    background: #f1f5f9;
+    border-radius: 6px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.comunicacion-curso-item .preview {
+    color: #475569;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.comunicacion-curso-item .btn-outline-primary {
+    color: #4f46e5;
+    border-color: #6366f1;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.comunicacion-curso-item .btn-outline-primary:hover {
+    background: #4f46e5;
+    color: white;
+    border-color: #4f46e5;
+    transform: translateY(-1px);
+}
+
+.comunicacion-curso-item .text-warning {
+    color: #eab308 !important;
+}
+
+/* Estado vacío */
+.text-center.py-5 {
+    padding: 4rem 0;
+}
+
+.text-center.py-5 i {
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+}
+
+.text-center.py-5 h5 {
+    color: #1e293b;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.text-center.py-5 p {
+    color: #64748b;
+    margin-bottom: 2rem;
+}

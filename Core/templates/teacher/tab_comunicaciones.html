@@ -1,40 +1,40 @@
 <!-- Pestaña de Comunicaciones -->
 <div class="tab-pane fade" id="comunicaciones" role="tabpanel" aria-labelledby="comunicaciones-tab">
     <!-- Dashboard de Estadísticas -->
-    <div class="row mb-4">
+    <div class="row mb-4 comunicaciones-stats">
         <div class="col-md-3">
-            <div class="card bg-primary text-white shadow-sm">
+            <div class="card bg-primary text-white h-100">
                 <div class="card-body text-center">
-                    <h5 class="card-title"><i class="fas fa-bullhorn me-2"></i>Total</h5>
+                    <i class="fas fa-bullhorn fa-2x mb-2"></i>
                     <h2 class="display-6" id="total-comunicaciones">{{ comunicaciones_stats.total|default:0 }}</h2>
-                    <small>Comunicaciones</small>
+                    <h6 class="card-subtitle">Total Comunicaciones</h6>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-success text-white shadow-sm">
+            <div class="card bg-success text-white h-100">
                 <div class="card-body text-center">
-                    <h5 class="card-title"><i class="fas fa-paper-plane me-2"></i>Enviadas</h5>
+                    <i class="fas fa-paper-plane fa-2x mb-2"></i>
                     <h2 class="display-6" id="comunicaciones-enviadas">{{ comunicaciones_stats.enviadas|default:0 }}</h2>
-                    <small>Por mí</small>
+                    <h6 class="card-subtitle">Enviadas por mí</h6>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-info text-white shadow-sm">
+            <div class="card bg-info text-white h-100">
                 <div class="card-body text-center">
-                    <h5 class="card-title"><i class="fas fa-inbox me-2"></i>Recibidas</h5>
+                    <i class="fas fa-inbox fa-2x mb-2"></i>
                     <h2 class="display-6" id="comunicaciones-recibidas">{{ comunicaciones_stats.recibidas|default:0 }}</h2>
-                    <small>Para mí</small>
+                    <h6 class="card-subtitle">Recibidas</h6>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-warning text-white shadow-sm">
+            <div class="card bg-warning text-white h-100">
                 <div class="card-body text-center">
-                    <h5 class="card-title"><i class="fas fa-paperclip me-2"></i>Adjuntos</h5>
+                    <i class="fas fa-paperclip fa-2x mb-2"></i>
                     <h2 class="display-6" id="comunicaciones-adjuntos">{{ comunicaciones_stats.con_adjuntos|default:0 }}</h2>
-                    <small>Con archivos</small>
+                    <h6 class="card-subtitle">Con adjuntos</h6>
                 </div>
             </div>
         </div>
@@ -42,33 +42,35 @@
 
     <!-- Header con Acciones -->
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded shadow-sm">
-                <h4 class="mb-0"><i class="fas fa-comments me-2 text-primary"></i>Comunicaciones</h4>
-                <a href="{% url 'crear_comunicacion' %}" class="btn btn-primary btn-lg">
-                    <i class="fas fa-plus me-2"></i>Nueva Comunicación
-                </a>
-            </div>
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">
+                <i class="fas fa-comments text-primary me-2"></i>Comunicaciones
+            </h4>
+            <a href="{% url 'crear_comunicacion' %}" class="btn btn-primary btn-nueva-comunicacion">
+                <i class="fas fa-plus me-2"></i>Nueva Comunicación
+            </a>
         </div>
     </div>
 
     <!-- Buscador y Filtros -->
     <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-6 comunicacion-busqueda">
             <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" id="buscar-comunicaciones" 
+                <span class="input-group-text border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" id="buscar-comunicaciones" 
                        placeholder="Buscar por asunto, autor o contenido...">
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 comunicacion-filtros">
             <select class="form-select" id="filtro-tipo">
                 <option value="">Todas</option>
                 <option value="enviadas">Enviadas por mí</option>
                 <option value="recibidas">Recibidas</option>
             </select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 comunicacion-filtros">
             <select class="form-select" id="filtro-curso">
                 <option value="">Todos los cursos</option>
                 {% for curso in cursos %}
@@ -82,96 +84,82 @@
     <div class="row">
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-gradient-primary text-white">
-                    <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>Todas las Comunicaciones</h5>
-                </div>
                 <div class="card-body p-0">
                     <div id="lista-comunicaciones">
                         {% if comunicaciones %}
                             {% for comunicacion in comunicaciones %}
-                            <div class="comunicacion-item border-bottom" data-id="{{ comunicacion.id }}" 
+                            <div class="comunicacion-item" data-id="{{ comunicacion.id }}" 
                                  data-asunto="{{ comunicacion.asunto|lower }}" 
                                  data-autor="{{ comunicacion.autor.rut|lower }}"
                                  data-contenido="{{ comunicacion.contenido|lower }}"
                                  data-tipo="{% if comunicacion.autor == user.usuario.auth_user %}enviada{% else %}recibida{% endif %}">
-                                <div class="p-4 hover-bg-light">
+                                <div class="p-4">
                                     <div class="row align-items-center">
                                         <div class="col-md-8">
                                             <div class="d-flex align-items-start">
                                                 <div class="me-3">
                                                     {% if comunicacion.autor == user.usuario.auth_user %}
-                                                        <span class="badge bg-success fs-6">
+                                                        <span class="badge bg-success comunicacion-badge">
                                                             <i class="fas fa-paper-plane me-1"></i>Enviada
                                                         </span>
                                                     {% else %}
-                                                        <span class="badge bg-info fs-6">
+                                                        <span class="badge bg-info comunicacion-badge">
                                                             <i class="fas fa-inbox me-1"></i>Recibida
                                                         </span>
                                                     {% endif %}
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                    <h6 class="mb-1 fw-bold">{{ comunicacion.asunto }}</h6>
-                                                    <p class="mb-2 text-muted">
+                                                    <h5 class="mb-2">{{ comunicacion.asunto }}</h5>
+                                                    <p class="mb-3 text-muted">
                                                         {{ comunicacion.contenido|truncatewords:20 }}
                                                     </p>
-                                                    <div class="d-flex align-items-center gap-3">
-                                                        <small class="text-muted">
-                                                            <i class="fas fa-user me-1"></i>
+                                                    <div class="comunicacion-metadata d-flex flex-wrap gap-3">
+                                                        <span>
+                                                            <i class="fas fa-user"></i>
                                                             {% if comunicacion.autor == user.usuario.auth_user %}
                                                                 Yo
                                                             {% else %}
                                                                 {{ comunicacion.autor.rut }}-{{ comunicacion.autor.div }}
                                                             {% endif %}
-                                                        </small>
-                                                        <small class="text-muted">
-                                                            <i class="fas fa-calendar me-1"></i>{{ comunicacion.fecha_envio|date:"d/m/Y H:i" }}
-                                                        </small>
+                                                        </span>
+                                                        <span>
+                                                            <i class="fas fa-calendar"></i>
+                                                            {{ comunicacion.fecha_envio|date:"d/m/Y H:i" }}
+                                                        </span>
                                                         {% if comunicacion.adjuntos.count > 0 %}
-                                                        <small class="text-warning">
-                                                            <i class="fas fa-paperclip me-1"></i>{{ comunicacion.adjuntos.count }} adjunto{{ comunicacion.adjuntos.count|pluralize }}
-                                                        </small>
+                                                        <span class="text-warning">
+                                                            <i class="fas fa-paperclip"></i>
+                                                            {{ comunicacion.adjuntos.count }} adjunto{{ comunicacion.adjuntos.count|pluralize }}
+                                                        </span>
                                                         {% endif %}
                                                     </div>
-                                                    <div class="mt-2">
-                                                        <small class="text-muted">
-                                                            <i class="fas fa-users me-1"></i>Destinatarios: 
-                                                            {% for curso in comunicacion.destinatarios_cursos.all %}
-                                                                <span class="badge bg-light text-dark me-1">{{ curso.nivel }}°{{ curso.letra }}</span>
-                                                            {% empty %}
-                                                                <span class="text-muted">Sin cursos específicos</span>
-                                                            {% endfor %}
-                                                        </small>
+                                                    <div class="mt-2 comunicacion-destinatarios">
+                                                        <i class="fas fa-users me-2"></i>
+                                                        {% for curso in comunicacion.destinatarios_cursos.all %}
+                                                            <span class="badge me-1">{{ curso.nivel }}°{{ curso.letra }}</span>
+                                                        {% empty %}
+                                                            <span class="text-muted">Sin cursos específicos</span>
+                                                        {% endfor %}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4 text-end">
-                                            <div class="dropdown">
-                                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-v"></i> Acciones
+                                        <div class="col-md-4 text-end comunicacion-acciones">
+                                            <div class="btn-group">
+                                                <a href="{% url 'detalle_comunicacion' comunicacion.id %}" 
+                                                   class="btn btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i>Ver
+                                                </a>
+                                                {% if comunicacion.autor == user.usuario.auth_user %}
+                                                <a href="{% url 'editar_comunicacion' comunicacion.id %}" 
+                                                   class="btn btn-outline-secondary">
+                                                    <i class="fas fa-edit me-1"></i>Editar
+                                                </a>
+                                                <button class="btn btn-outline-danger" 
+                                                        onclick="confirmarEliminarComunicacion({{ comunicacion.id }}, '{{ comunicacion.asunto|escapejs }}')">
+                                                    <i class="fas fa-trash me-1"></i>
                                                 </button>
-                                                <ul class="dropdown-menu">
-                                                    <li>
-                                                        <a class="dropdown-item" href="{% url 'detalle_comunicacion' comunicacion.id %}">
-                                                            <i class="fas fa-eye me-2"></i>Ver Detalle
-                                                        </a>
-                                                    </li>
-                                                    {% if comunicacion.autor == user.usuario.auth_user %}
-                                                    <li>
-                                                        <a class="dropdown-item" href="{% url 'editar_comunicacion' comunicacion.id %}">
-                                                            <i class="fas fa-edit me-2"></i>Editar
-                                                        </a>
-                                                    </li>
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li>
-                                                        <a class="dropdown-item text-danger" href="#" 
-                                                           onclick="confirmarEliminarComunicacion({{ comunicacion.id }}, '{{ comunicacion.asunto|escapejs }}')">
-                                                            <i class="fas fa-trash me-2"></i>Eliminar
-                                                        </a>
-                                                    </li>
-                                                    {% endif %}
-                                                </ul>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -179,11 +167,11 @@
                             </div>
                             {% endfor %}
                         {% else %}
-                            <div class="text-center p-5">
-                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No hay comunicaciones</h5>
-                                <p class="text-muted">Crea tu primera comunicación para empezar</p>
-                                <a href="{% url 'crear_comunicacion' %}" class="btn btn-primary">
+                            <div class="text-center py-5">
+                                <i class="fas fa-inbox fa-4x text-muted mb-4"></i>
+                                <h5>No hay comunicaciones</h5>
+                                <p class="text-muted mb-4">Crea tu primera comunicación para empezar</p>
+                                <a href="{% url 'crear_comunicacion' %}" class="btn btn-primary btn-nueva-comunicacion">
                                     <i class="fas fa-plus me-2"></i>Crear Comunicación
                                 </a>
                             </div>

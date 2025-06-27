@@ -1,0 +1,452 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load evaluacion_tags %}
+
+{% block title %}Detalle de {{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+    .student-profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .student-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        margin-right: 2rem;
+        border: 4px solid rgba(255,255,255,0.3);
+    }
+    
+    .stats-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .asignatura-card {
+        transition: all 0.3s ease;
+    }
+    
+    .asignatura-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .asignatura-bar {
+        width: 6px;
+        height: 48px;
+        border-radius: 4px;
+        background: linear-gradient(180deg, #4e73df, #224abe);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header del Estudiante -->
+    <div class="student-profile-header">
+        <div class="d-flex align-items-center">
+            <div class="student-avatar">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h1 class="mb-2">{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }} {{ estudiante.usuario.apellido_materno }}</h1>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-1"><i class="fas fa-id-card me-2"></i><strong>RUT:</strong> {{ estudiante.usuario.rut }}-{{ estudiante.usuario.div }}</p>
+                        <p class="mb-1"><i class="fas fa-envelope me-2"></i><strong>Correo:</strong> {{ estudiante.usuario.correo }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if estudiante.curso %}
+                        <p class="mb-1"><i class="fas fa-graduation-cap me-2"></i><strong>Curso:</strong> {{ estudiante.curso }}</p>
+                        {% endif %}
+                        <p class="mb-1"><i class="fas fa-calendar me-2"></i><strong>Fecha de Nacimiento:</strong> {{ estudiante.usuario.fecha_nacimiento|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="text-end">
+                <button onclick="history.back()" class="btn btn-light btn-lg">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Generales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-primary mb-2">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="text-primary">{{ promedio_estudiante|floatformat:1 }}</h3>
+                    <p class="text-muted mb-0">Promedio General</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-success mb-2">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <h3 class="text-success">{{ asistencia_general.porcentaje|floatformat:1 }}%</h3>
+                    <p class="text-muted mb-0">Asistencia</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-info mb-2">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="text-info">{{ total_asignaturas }}</h3>
+                    <p class="text-muted mb-0">Asignaturas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <div class="display-4 text-warning mb-2">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3 class="text-warning">{{ total_evaluaciones }}</h3>
+                    <p class="text-muted mb-0">Evaluaciones</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información Detallada -->
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="asignaturas-tab" data-bs-toggle="tab" href="#asignaturas" role="tab">
+                        <i class="fas fa-book me-2"></i>Asignaturas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="evaluaciones-tab" data-bs-toggle="tab" href="#evaluaciones" role="tab">
+                        <i class="fas fa-clipboard-list me-2"></i>Evaluaciones
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="asistencia-tab" data-bs-toggle="tab" href="#asistencia" role="tab">
+                        <i class="fas fa-calendar-check me-2"></i>Asistencia
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
+                <!-- Pestaña Asignaturas (igual que el panel del estudiante) -->
+                <div class="tab-pane fade show active" id="asignaturas" role="tabpanel">
+                    <div class="row">
+                        {% for asignatura_inscrita in asignaturas_estudiante %}
+                        <div class="col-12 mb-3">
+                            <div class="card h-100 border-0 shadow-sm asignatura-card">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="asignatura-bar me-3"></div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                                            <div>
+                                                <h5 class="mb-1 fw-bold text-primary">{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}</h5>
+                                                <span class="badge bg-light text-primary border border-primary">{{ asignatura_inscrita.asignatura_impartida.codigo }}</span>
+                                            </div>
+                                            <div class="mt-2 mt-md-0 d-flex align-items-center">
+                                                <span class="text-muted small me-3">
+                                                    Prof. {{ asignatura_inscrita.asignatura_impartida.docente.usuario.nombre }} {{ asignatura_inscrita.asignatura_impartida.docente.usuario.apellido_paterno }}
+                                                </span>
+                                                <span class="badge bg-info">
+                                                    {% if asignatura_inscrita.asignatura_impartida.asignatura.es_electivo %}
+                                                        Electivo
+                                                    {% else %}
+                                                        Obligatorio
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No hay asignaturas inscritas.
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Pestaña Evaluaciones (igual que el panel del estudiante) -->
+                <div class="tab-pane fade" id="evaluaciones" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4><i class="fas fa-chart-line me-2 text-primary"></i>Resumen Académico</h4>
+                        <span class="badge bg-primary fs-6">{{ total_evaluaciones }} evaluaciones</span>
+                    </div>
+
+                    <div class="accordion" id="accordionCalificaciones">
+                        {% for asignatura_inscrita in asignaturas_estudiante %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading-{{ forloop.counter }}">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ forloop.counter }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse-{{ forloop.counter }}">
+                                        <i class="fas fa-book me-2 text-primary"></i>
+                                        <strong>{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}</strong>
+                                    </button>
+                                </h2>
+                                <div id="collapse-{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading-{{ forloop.counter }}" data-bs-parent="#accordionCalificaciones">
+                                    <div class="accordion-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Evaluación</th>
+                                                        <th>Fecha</th>
+                                                        <th>Ponderación</th>
+                                                        <th>Nota</th>
+                                                        <th>Estado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% with evaluaciones_asignatura=evaluaciones_estudiante|get_evaluaciones_asignatura:asignatura_inscrita.asignatura_impartida.asignatura.nombre %}
+                                                        {% for evaluacion in evaluaciones_asignatura %}
+                                                            <tr>
+                                                                <td>{{ evaluacion.nombre }}</td>
+                                                                <td>{{ evaluacion.fecha|date:"d/m/Y" }}</td>
+                                                                <td>{{ evaluacion.ponderacion }}%</td>
+                                                                <td>
+                                                                    {% if evaluacion.estado == 'Aprobado' %}
+                                                                        <span class="badge bg-success fs-6">{{ evaluacion.nota }}</span>
+                                                                    {% else %}
+                                                                        <span class="badge bg-danger fs-6">{{ evaluacion.nota }}</span>
+                                                                    {% endif %}
+                                                                </td>
+                                                                <td>
+                                                                    {% if evaluacion.estado == 'Aprobado' %}
+                                                                        <span class="text-success fw-bold">{{ evaluacion.estado }}</span>
+                                                                    {% else %}
+                                                                        <span class="text-danger fw-bold">{{ evaluacion.estado }}</span>
+                                                                    {% endif %}
+                                                                </td>
+                                                            </tr>
+                                                        {% empty %}
+                                                            <tr>
+                                                                <td colspan="5" class="text-center text-muted">
+                                                                    <i class="fas fa-info-circle me-2"></i>
+                                                                    No hay evaluaciones registradas para esta asignatura.
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    {% endwith %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <!-- Promedio de la asignatura -->
+                                        {% with evaluaciones_asignatura=evaluaciones_estudiante|get_evaluaciones_asignatura:asignatura_inscrita.asignatura_impartida.asignatura.nombre %}
+                                            {% if evaluaciones_asignatura %}
+                                                <div class="mt-3 p-3 bg-light rounded">
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <strong>Promedio:</strong>
+                                                            <span class="badge bg-info fs-6">{{ evaluaciones_asignatura|calcular_promedio_asignatura }}</span>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <strong>Aprobadas:</strong>
+                                                            <span class="badge bg-success">{{ evaluaciones_asignatura|contar_evaluaciones_aprobadas }}/{{ evaluaciones_asignatura|length }}</span>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <strong>Aprobación:</strong>
+                                                            <span class="badge bg-primary">{{ evaluaciones_asignatura|porcentaje_aprobacion }}%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="alert alert-info mt-4" role="alert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Aún no tienes asignaturas inscritas.
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Pestaña Asistencia (formato tabla) -->
+                <div class="tab-pane fade" id="asistencia" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4><i class="fas fa-calendar-check me-2 text-primary"></i>Detalle de Asistencia</h4>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-download me-1"></i>Descargar PDF
+                        </button>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="fas fa-book me-1"></i>Asignatura</th>
+                                    <th><i class="fas fa-chalkboard me-1"></i>Total Clases</th>
+                                    <th><i class="fas fa-check-circle me-1"></i>Presentes</th>
+                                    <th><i class="fas fa-times-circle me-1"></i>Ausencias</th>
+                                    <th><i class="fas fa-exclamation-triangle me-1"></i>Justificadas</th>
+                                    <th><i class="fas fa-percentage me-1"></i>Porcentaje</th>
+                                    <th><i class="fas fa-info-circle me-1"></i>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asignatura_inscrita in asignaturas_estudiante %}
+                                    {% with asistencia_asignatura=asistencia_estudiante|get_item:asignatura_inscrita.asignatura_impartida.asignatura.nombre %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-2" style="width: 8px; height: 8px; border-radius: 50%; background-color: #4e73df;"></div>
+                                                    <div>
+                                                        <strong>{{ asignatura_inscrita.asignatura_impartida.asignatura.nombre }}</strong>
+                                                        <br><small class="text-muted">{{ asignatura_inscrita.asignatura_impartida.docente.usuario.nombre }} {{ asignatura_inscrita.asignatura_impartida.docente.usuario.apellido_paterno }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {% if asistencia_asignatura and not asistencia_asignatura.sin_registro %}
+                                                    <span class="badge bg-secondary">{{ asistencia_asignatura.total }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-light text-muted">Sin registro</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if asistencia_asignatura and not asistencia_asignatura.sin_registro %}
+                                                    <span class="badge bg-success">{{ asistencia_asignatura.presentes }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if asistencia_asignatura and not asistencia_asignatura.sin_registro %}
+                                                    <span class="badge bg-danger">{{ asistencia_asignatura.ausentes }}</span>
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if asistencia_asignatura and not asistencia_asignatura.sin_registro %}
+                                                    {% if asistencia_asignatura.justificados > 0 %}
+                                                        <span class="badge bg-warning">{{ asistencia_asignatura.justificados }}</span>
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if asistencia_asignatura and not asistencia_asignatura.sin_registro %}
+                                                    {% if asistencia_asignatura.porcentaje >= 90 %}
+                                                        <span class="badge bg-success">{{ asistencia_asignatura.porcentaje|floatformat:1 }}%</span>
+                                                    {% elif asistencia_asignatura.porcentaje >= 75 %}
+                                                        <span class="badge bg-warning">{{ asistencia_asignatura.porcentaje|floatformat:1 }}%</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">{{ asistencia_asignatura.porcentaje|floatformat:1 }}%</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Sin clase aún</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if asistencia_asignatura and not asistencia_asignatura.sin_registro %}
+                                                    {% if asistencia_asignatura.porcentaje >= 90 %}
+                                                        <span class="text-success fw-bold"><i class="fas fa-star me-1"></i>Excelente</span>
+                                                    {% elif asistencia_asignatura.porcentaje >= 75 %}
+                                                        <span class="text-warning fw-bold"><i class="fas fa-triangle-exclamation me-1"></i>Regular</span>
+                                                    {% else %}
+                                                        <span class="text-danger fw-bold"><i class="fas fa-circle-exclamation me-1"></i>Crítico</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="text-muted fw-bold"><i class="fas fa-clock me-1"></i>Pendiente</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endwith %}
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No hay asignaturas inscritas.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Resumen general -->
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="text-primary">{{ asistencia_general.total }}</h5>
+                                    <small class="text-muted">Total Clases</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="text-success">{{ asistencia_general.presentes }}</h5>
+                                    <small class="text-muted">Presentes</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="text-danger">{{ asistencia_general.total|sub:asistencia_general.presentes }}</h5>
+                                    <small class="text-muted">Ausentes</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="text-primary">{{ asistencia_general.porcentaje|floatformat:1 }}%</h5>
+                                    <small class="text-muted">Promedio General</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/main.js' %}"></script>
+{% endblock %} 

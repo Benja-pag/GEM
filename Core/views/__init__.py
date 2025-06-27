@@ -8,7 +8,7 @@ from .reportes import *
 from .reportes_simple import *
 from .template_vistas import HomeView, SurveysView, TasksView, TestsView
 from .admin import AdminPanelView, AdminPanelModularView, ToggleUserStatusView, CreateAdminView
-from .usuarios import UserManagementView, UserCreateView, UserDetailView, UserUpdateView, UserDeleteView
+from .usuarios import UserManagementView, UserCreateView, UserDetailView, UserUpdateView, UserDeleteView, EstudianteDetalleView
 from .docentes import ProfesorPanelView
 from .alumnos import EstudiantePanelView, AttendanceView
 from .auth import LoginView, LogoutView, RegisterView, ChangePasswordView
@@ -37,5 +37,6 @@ __all__ = [
     'AttendanceView',
     'CursoDetalleView',
     'AsignaturaDetalleView',
-    'AsignaturaDetalleEstudianteView'
+    'AsignaturaDetalleEstudianteView',
+    'EstudianteDetalleView'
 ]

@@ -438,6 +438,42 @@ class ProfesorPanelModularView(View):
             total_estudiantes=Count('estudiantes')
         )
         
+        # Calcular estadísticas reales para cada curso
+        cursos_con_estadisticas = []
+        for curso in cursos_profesor_jefe:
+            # Calcular asistencia promedio del curso
+            asistencias_curso = Asistencia.objects.filter(estudiante__curso=curso)
+            if asistencias_curso.exists():
+                total_asistencias = asistencias_curso.count()
+                presentes = asistencias_curso.filter(presente=True).count()
+                porcentaje_asistencia = round((presentes / total_asistencias * 100), 1) if total_asistencias > 0 else 0
+            else:
+                porcentaje_asistencia = 0
+            
+            # Calcular promedio general del curso
+            evaluaciones_curso = Evaluacion.objects.filter(clase__curso=curso)
+            if evaluaciones_curso.exists():
+                notas_curso = AlumnoEvaluacion.objects.filter(
+                    evaluacion__in=evaluaciones_curso,
+                    estudiante__curso=curso
+                )
+                promedio_general = notas_curso.aggregate(promedio=Avg('nota'))['promedio']
+                promedio_general = round(promedio_general, 1) if promedio_general else 0.0
+            else:
+                promedio_general = 0.0
+            
+            # Contar asignaturas del curso
+            total_asignaturas = AsignaturaImpartida.objects.filter(
+                clases__curso=curso
+            ).distinct().count()
+            
+            # Agregar estadísticas al curso
+            curso.porcentaje_asistencia = porcentaje_asistencia
+            curso.promedio_general = promedio_general
+            curso.total_asignaturas = total_asignaturas
+            
+            cursos_con_estadisticas.append(curso)
+        
         # Obtener asignaturas que imparte el docente
         asignaturas = AsignaturaImpartida.objects.filter(
             docente=docente
@@ -465,7 +501,7 @@ class ProfesorPanelModularView(View):
         
         context = {
             'docente': docente,  # Agregar información del docente
-            'cursos_profesor_jefe': cursos_profesor_jefe,
+            'cursos_profesor_jefe': cursos_con_estadisticas,
             'asignaturas': asignaturas,
             'evaluaciones_docente': evaluaciones_docente,
             'estadisticas_docente': estadisticas_docente,

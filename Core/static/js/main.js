@@ -34,3 +34,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const temaGuardado = localStorage.getItem('theme') || 'light';
     setTema(temaGuardado);
 });
+
+// Funciones para manejo de estudiantes en curso detalle
+function verDetalleEstudiante(estudianteId) {
+    // Redirigir directamente a la página de detalle del estudiante
+    window.location.href = `/estudiante/${estudianteId}/detalle/`;
+}
+
+function contactarEstudiante(email, telefono) {
+    // Crear un modal o menú de opciones para contactar al estudiante
+    let opciones = [];
+    
+    if (email && email !== 'None') {
+        opciones.push(`📧 Enviar correo: ${email}`);
+    }
+    
+    if (telefono && telefono !== 'None') {
+        opciones.push(`📱 Llamar: ${telefono}`);
+    }
+    
+    if (opciones.length === 0) {
+        alert('No hay información de contacto disponible para este estudiante.');
+        return;
+    }
+    
+    // Mostrar opciones de contacto
+    let mensaje = 'Opciones de contacto:\n\n' + opciones.join('\n');
+    
+    if (confirm(mensaje + '\n\n¿Deseas continuar?')) {
+        // Si hay email, abrir cliente de correo
+        if (email && email !== 'None') {
+            window.location.href = `mailto:${email}?subject=Contacto desde el sistema escolar`;
+        }
+        // Si hay teléfono, intentar llamar
+        else if (telefono && telefono !== 'None') {
+            window.location.href = `tel:${telefono}`;
+        }
+    }
+}

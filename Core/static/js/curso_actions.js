@@ -236,12 +236,28 @@ $(document).ready(function() {
     }
 
     function mostrarError(mensaje) {
-        // Función para mostrar errores - integrar con el sistema de notificaciones existente
-        if (typeof mostrarNotificacion === 'function') {
-            mostrarNotificacion(mensaje, 'error');
-        } else {
-            alert(mensaje);
-        }
+        // Crear toast para mostrar error
+        const toast = document.createElement('div');
+        toast.className = 'toast align-items-center text-white bg-danger border-0';
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-exclamation-circle me-2"></i>${mensaje}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        const container = document.createElement('div');
+        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        container.appendChild(toast);
+        document.body.appendChild(container);
+        
+        new bootstrap.Toast(toast).show();
     }
 
     function mostrarExito(mensaje) {
@@ -251,5 +267,270 @@ $(document).ready(function() {
         } else {
             alert(mensaje);
         }
+    }
+
+    // Funciones para herramientas IA
+
+    async function generarReporteIA(cursoId, tipoReporte) {
+        try {
+            const response = await fetch('/curso/ia/reporte/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    curso_id: cursoId,
+                    tipo_reporte: tipoReporte
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al generar reporte');
+            }
+
+            const data = await response.json();
+            mostrarReporteIA(data);
+        } catch (error) {
+            mostrarError('Error al generar reporte: ' + error.message);
+        }
+    }
+
+    async function generarSugerenciasIA(cursoId, area) {
+        try {
+            const response = await fetch('/curso/ia/sugerencias/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    curso_id: cursoId,
+                    area: area
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al generar sugerencias');
+            }
+
+            const data = await response.json();
+            mostrarSugerenciasIA(data);
+        } catch (error) {
+            mostrarError('Error al generar sugerencias: ' + error.message);
+        }
+    }
+
+    async function generarComunicadoIA(cursoId, tipoComunicado) {
+        try {
+            const response = await fetch('/curso/ia/comunicado/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    curso_id: cursoId,
+                    tipo_comunicado: tipoComunicado
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al generar comunicado');
+            }
+
+            const data = await response.json();
+            mostrarComunicadoIA(data);
+        } catch (error) {
+            mostrarError('Error al generar comunicado: ' + error.message);
+        }
+    }
+
+    function mostrarReporteIA(data) {
+        // Crear modal para mostrar el reporte
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'reporteIAModal';
+        
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${data.titulo}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <h6 class="text-primary">Resumen Ejecutivo</h6>
+                            <p>${data.resumen_ejecutivo}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-primary">Análisis Detallado</h6>
+                            <ul class="list-unstyled">
+                                ${data.analisis_detallado.map(item => `
+                                    <li class="mb-2">• ${item.punto}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-primary">Conclusiones</h6>
+                            <p>${data.conclusiones}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-primary">Recomendaciones</h6>
+                            <ul class="list-unstyled">
+                                ${data.recomendaciones.map(rec => `
+                                    <li class="mb-2">• ${rec}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="descargarReporte(${JSON.stringify(data)})">
+                            <i class="fas fa-download me-1"></i>Descargar
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        new bootstrap.Modal(modal).show();
+    }
+
+    function mostrarSugerenciasIA(data) {
+        // Crear modal para mostrar las sugerencias
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'sugerenciasIAModal';
+        
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Sugerencias de Intervención</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <h6 class="text-primary">Área de Intervención</h6>
+                            <p>${data.area_intervencion}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-primary">Objetivos</h6>
+                            <ul class="list-unstyled">
+                                ${data.objetivos.map(obj => `
+                                    <li class="mb-2">• ${obj}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-primary">Estrategias</h6>
+                            <ul class="list-unstyled">
+                                ${data.estrategias.map(est => `
+                                    <li class="mb-2">• ${est.estrategia}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-primary">Recursos Necesarios</h6>
+                            <ul class="list-unstyled">
+                                ${data.recursos_necesarios.map(rec => `
+                                    <li class="mb-2">• ${rec}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6 class="text-primary">Indicadores de Éxito</h6>
+                            <ul class="list-unstyled">
+                                ${data.indicadores_exito.map(ind => `
+                                    <li class="mb-2">• ${ind}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="implementarSugerencias(${JSON.stringify(data)})">
+                            <i class="fas fa-check me-1"></i>Implementar
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        new bootstrap.Modal(modal).show();
+    }
+
+    function mostrarComunicadoIA(data) {
+        // Crear modal para mostrar el comunicado
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'comunicadoIAModal';
+        
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${data.asunto}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <p class="mb-3">${data.saludo}</p>
+                            <p class="mb-3">${data.cuerpo}</p>
+                            <p class="mb-3">${data.despedida}</p>
+                            <p class="text-end">${data.firma}</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="enviarComunicado(${JSON.stringify(data)})">
+                            <i class="fas fa-paper-plane me-1"></i>Enviar
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="editarComunicado(${JSON.stringify(data)})">
+                            <i class="fas fa-edit me-1"></i>Editar
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        new bootstrap.Modal(modal).show();
+    }
+
+    function getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    // Funciones auxiliares para acciones posteriores
+    function descargarReporte(data) {
+        // Implementar lógica para descargar el reporte
+        console.log('Descargando reporte:', data);
+    }
+
+    function implementarSugerencias(data) {
+        // Implementar lógica para guardar/implementar las sugerencias
+        console.log('Implementando sugerencias:', data);
+    }
+
+    function enviarComunicado(data) {
+        // Implementar lógica para enviar el comunicado
+        console.log('Enviando comunicado:', data);
+    }
+
+    function editarComunicado(data) {
+        // Implementar lógica para editar el comunicado
+        console.log('Editando comunicado:', data);
     }
 }); 

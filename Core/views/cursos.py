@@ -467,6 +467,98 @@ class AsignaturaDetalleView(View):
             'mensajes__autor'
         ).order_by('-es_anuncio', '-fecha')[:5]
 
+        # Obtener estadísticas detalladas de asistencia
+        asistencias = Asistencia.objects.filter(
+            clase__asignatura_impartida=asignatura
+        ).select_related(
+            'estudiante',
+            'estudiante__usuario',
+            'clase'
+        )
+
+        # Estadísticas generales
+        total_clases = Clase.objects.filter(asignatura_impartida=asignatura).count()
+        total_registros = asistencias.count()
+        presentes = asistencias.filter(presente=True).count()
+        ausentes = asistencias.filter(presente=False).count()
+        justificados = asistencias.filter(justificado=True).count()
+        porcentaje_asistencia = (presentes / total_registros * 100) if total_registros > 0 else 0
+
+        # Estadísticas por estudiante
+        estudiantes_asistencia = {}
+        for asistencia in asistencias:
+            est_id = asistencia.estudiante.pk
+            if est_id not in estudiantes_asistencia:
+                estudiantes_asistencia[est_id] = {
+                    'estudiante': asistencia.estudiante,
+                    'nombre': f"{asistencia.estudiante.usuario.nombre} {asistencia.estudiante.usuario.apellido_paterno}",
+                    'total': 0,
+                    'presentes': 0,
+                    'ausentes': 0,
+                    'justificados': 0
+                }
+            estudiantes_asistencia[est_id]['total'] += 1
+            if asistencia.presente:
+                estudiantes_asistencia[est_id]['presentes'] += 1
+            else:
+                estudiantes_asistencia[est_id]['ausentes'] += 1
+            if asistencia.justificado:
+                estudiantes_asistencia[est_id]['justificados'] += 1
+
+        # Convertir a lista y calcular porcentajes
+        estudiantes_asistencia_lista = []
+        for est_data in estudiantes_asistencia.values():
+            porcentaje = (est_data['presentes'] / est_data['total'] * 100) if est_data['total'] > 0 else 0
+            estudiantes_asistencia_lista.append({
+                'estudiante': est_data['estudiante'],
+                'nombre': est_data['nombre'],
+                'total': est_data['total'],
+                'presentes': est_data['presentes'],
+                'ausentes': est_data['ausentes'],
+                'justificados': est_data['justificados'],
+                'porcentaje': round(porcentaje, 1),
+                'estado': 'success' if porcentaje >= 85 else 'warning' if porcentaje >= 75 else 'danger'
+            })
+
+        # Ordenar por porcentaje de asistencia descendente
+        estudiantes_asistencia_lista.sort(key=lambda x: x['porcentaje'], reverse=True)
+
+        # Estadísticas por mes
+        meses_asistencia = {}
+        for asistencia in asistencias:
+            mes = asistencia.fecha_registro.strftime('%Y-%m')
+            if mes not in meses_asistencia:
+                meses_asistencia[mes] = {
+                    'mes': asistencia.fecha_registro.strftime('%B %Y'),
+                    'total': 0,
+                    'presentes': 0,
+                    'ausentes': 0,
+                    'justificados': 0
+                }
+            meses_asistencia[mes]['total'] += 1
+            if asistencia.presente:
+                meses_asistencia[mes]['presentes'] += 1
+            else:
+                meses_asistencia[mes]['ausentes'] += 1
+            if asistencia.justificado:
+                meses_asistencia[mes]['justificados'] += 1
+
+        # Convertir a lista y calcular porcentajes
+        meses_asistencia_lista = []
+        for mes_data in meses_asistencia.values():
+            porcentaje = (mes_data['presentes'] / mes_data['total'] * 100) if mes_data['total'] > 0 else 0
+            meses_asistencia_lista.append({
+                'mes': mes_data['mes'],
+                'total': mes_data['total'],
+                'presentes': mes_data['presentes'],
+                'ausentes': mes_data['ausentes'],
+                'justificados': mes_data['justificados'],
+                'porcentaje': round(porcentaje, 1)
+            })
+
+        # Ordenar por mes descendente
+        meses_asistencia_lista.sort(key=lambda x: x['mes'], reverse=True)
+
         context = {
             'asignatura': asignatura,
             'estudiantes': estudiantes,
@@ -475,7 +567,18 @@ class AsignaturaDetalleView(View):
             'proximas_actividades': proximas_actividades,
             'comunicaciones': comunicaciones_formateadas,
             'temas_foro': temas_foro,
-            'es_docente': request.user.usuario.auth_user == asignatura.docente.usuario.auth_user
+            'es_docente': request.user.usuario.auth_user == asignatura.docente.usuario.auth_user,
+            'asistencias': asistencias,
+            'estadisticas_asistencia': {
+                'total_clases': total_clases,
+                'total_registros': total_registros,
+                'presentes': presentes,
+                'ausentes': ausentes,
+                'justificados': justificados,
+                'porcentaje': round(porcentaje_asistencia, 1)
+            },
+            'estudiantes_asistencia': estudiantes_asistencia_lista,
+            'meses_asistencia': meses_asistencia_lista
         }
         return render(request, 'teacher/asignatura_detalle.html', context)
 

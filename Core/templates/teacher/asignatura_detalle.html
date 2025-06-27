@@ -494,10 +494,10 @@
         </div>
 
         <!-- Pestaña Asistencia -->
-        <div class="tab-pane fade fade-in" id="asistencia">
+        <div class="tab-pane fade" id="asistencia">
             <div class="row">
-                <!-- Resumen de Asistencia -->
-                <div class="col-lg-4">
+                <!-- Resumen General -->
+                <div class="col-12">
                     <div class="card mb-4">
                         <div class="card-header">
                             <h5 class="card-title mb-0">
@@ -505,27 +505,49 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <div class="text-center mb-4">
-                                <div class="display-4 text-primary mb-2">85%</div>
-                                <div class="text-muted">Asistencia Promedio</div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title">Total Clases</h6>
+                                            <h2 class="mb-0">{{ estadisticas_asistencia.total_clases }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card bg-success text-white">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title">Presentes</h6>
+                                            <h2 class="mb-0">{{ estadisticas_asistencia.presentes }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card bg-danger text-white">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title">Ausentes</h6>
+                                            <h2 class="mb-0">{{ estadisticas_asistencia.ausentes }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card bg-info text-white">
+                                        <div class="card-body text-center">
+                                            <h6 class="card-title">Justificados</h6>
+                                            <h2 class="mb-0">{{ estadisticas_asistencia.justificados }}</h2>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="row text-center">
-                                <div class="col-4">
-                                    <div class="stats-card">
-                                        <div class="h3 text-success mb-2">90%</div>
-                                        <small class="text-muted">Más Alto</small>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="stats-card">
-                                        <div class="h3 text-warning mb-2">75%</div>
-                                        <small class="text-muted">Más Bajo</small>
-                                    </div>
-                                </div>
-                                <div class="col-4">
-                                    <div class="stats-card">
-                                        <div class="h3 text-info mb-2">15</div>
-                                        <small class="text-muted">Total Clases</small>
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="progress" style="height: 25px;">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             style="width: {{ estadisticas_asistencia.porcentaje }}%"
+                                             aria-valuenow="{{ estadisticas_asistencia.porcentaje }}" 
+                                             aria-valuemin="0" aria-valuemax="100">
+                                            {{ estadisticas_asistencia.porcentaje }}% Asistencia
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -533,85 +555,88 @@
                     </div>
                 </div>
 
-                <!-- Registro de Asistencia -->
-                <div class="col-lg-8">
+                <!-- Asistencia por Estudiante -->
+                <div class="col-md-8">
                     <div class="card mb-4">
-                        <div class="card-header d-flex justify-content-between align-items-center">
+                        <div class="card-header">
                             <h5 class="card-title mb-0">
-                                <i class="fas fa-calendar-check me-2"></i>Registro de Asistencia
+                                <i class="fas fa-users me-2"></i>Asistencia por Estudiante
                             </h5>
-                            <div>
-                                <button class="btn btn-primary btn-sm me-2">
-                                    <i class="fas fa-plus me-1"></i>Registrar Asistencia
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-download me-1"></i>Descargar Reporte
-                                </button>
-                            </div>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
-                                <table class="table table-hover align-middle">
+                                <table class="table table-hover">
                                     <thead>
                                         <tr>
                                             <th>Estudiante</th>
-                                            <th>Total Clases</th>
+                                            <th>Total</th>
                                             <th>Presentes</th>
                                             <th>Ausentes</th>
+                                            <th>Justificados</th>
                                             <th>Porcentaje</th>
-                                            <th>Estado</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {% for estudiante in estudiantes_asistencia %}
                                         <tr>
+                                            <td>{{ estudiante.nombre }}</td>
+                                            <td>{{ estudiante.total }}</td>
+                                            <td class="text-success">{{ estudiante.presentes }}</td>
+                                            <td class="text-danger">{{ estudiante.ausentes }}</td>
+                                            <td class="text-info">{{ estudiante.justificados }}</td>
                                             <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="student-avatar me-3">
-                                                        <i class="fas fa-user-graduate"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="fw-bold">Juan Pérez</div>
-                                                        <small class="text-muted">1° Medio A</small>
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-{{ estudiante.estado }}" 
+                                                         role="progressbar" 
+                                                         style="width: {{ estudiante.porcentaje }}%"
+                                                         aria-valuenow="{{ estudiante.porcentaje }}" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                        {{ estudiante.porcentaje }}%
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>15</td>
-                                            <td class="text-success">14</td>
-                                            <td class="text-danger">1</td>
-                                            <td>
-                                                <div class="progress" style="height: 6px;">
-                                                    <div class="progress-bar bg-success" role="progressbar" style="width: 93%"></div>
-                                                </div>
-                                                <small class="text-muted">93%</small>
-                                            </td>
-                                            <td><span class="badge bg-success">Regular</span></td>
                                         </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="student-avatar me-3">
-                                                        <i class="fas fa-user-graduate"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="fw-bold">María González</div>
-                                                        <small class="text-muted">1° Medio A</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>15</td>
-                                            <td class="text-success">12</td>
-                                            <td class="text-danger">3</td>
-                                            <td>
-                                                <div class="progress" style="height: 6px;">
-                                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 80%"></div>
-                                                </div>
-                                                <small class="text-muted">80%</small>
-                                            </td>
-                                            <td><span class="badge bg-warning">En Riesgo</span></td>
-                                        </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Asistencia por Mes -->
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar me-2"></i>Asistencia por Mes
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% for mes in meses_asistencia %}
+                            <div class="mb-4">
+                                <h6 class="mb-2">{{ mes.mes }}</h6>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Total: {{ mes.total }}</small>
+                                    <small>{{ mes.porcentaje }}%</small>
+                                </div>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-success" 
+                                         role="progressbar" 
+                                         style="width: {{ mes.porcentaje }}%"
+                                         aria-valuenow="{{ mes.porcentaje }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small class="text-success">Presentes: {{ mes.presentes }}</small>
+                                    <small class="text-danger">Ausentes: {{ mes.ausentes }}</small>
+                                    <small class="text-info">Justificados: {{ mes.justificados }}</small>
+                                </div>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

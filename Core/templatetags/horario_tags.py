@@ -61,4 +61,32 @@ def get_hora_fin_bloque(numero_bloque, dia):
             return partes[0] # Si no hay rango, devuelve la única parte
         return f"B{numero_bloque}"
     except Exception:
-        return f"B{numero_bloque}" 
+        return f"B{numero_bloque}"
+
+@register.filter
+def dia_semana(fecha):
+    """Convierte una fecha en el nombre del día de la semana en español"""
+    dias = {
+        'LUNES': 'Lunes',
+        'MARTES': 'Martes',
+        'MIERCOLES': 'Miércoles',
+        'JUEVES': 'Jueves',
+        'VIERNES': 'Viernes',
+        'SABADO': 'Sábado',
+        'DOMINGO': 'Domingo',
+        'Monday': 'Lunes',
+        'Tuesday': 'Martes',
+        'Wednesday': 'Miércoles',
+        'Thursday': 'Jueves',
+        'Friday': 'Viernes',
+        'Saturday': 'Sábado',
+        'Sunday': 'Domingo'
+    }
+    
+    if isinstance(fecha, str):
+        return dias.get(fecha.upper(), fecha)
+    else:
+        try:
+            return dias[fecha.strftime('%A')]
+        except:
+            return str(fecha) 

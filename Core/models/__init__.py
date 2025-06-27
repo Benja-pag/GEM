@@ -18,8 +18,9 @@ __all__ = [
     # Modelos de Notas
     'EvaluacionBase', 'Evaluacion', 'AlumnoEvaluacion',
     
-    # Modelos de Chat
-    'Foro', 'MensajeForo', 'ChatClase', 'ChatGrupo',
+    # Modelos de Chat y Foro
+    'Foro', 'MensajeForo', 'ChatClase', 'ChatGrupo', 'MensajeChat',
+    'ForoAsignatura', 'MensajeForoAsignatura',
     
     # Modelos de Calendarios
     'CalendarioClase', 'CalendarioColegio',

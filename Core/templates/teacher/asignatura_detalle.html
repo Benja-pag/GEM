@@ -1,6 +1,7 @@
 {% extends 'base/base.html' %}
 {% load static %}
 {% load evaluacion_tags %}
+{% load horario_tags %}
 
 {% block title %}Detalles de {{ asignatura.asignatura.nombre }}{% endblock %}
 
@@ -168,18 +169,13 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="materiales-tab" data-bs-toggle="tab" data-bs-target="#materiales" type="button">
-                <i class="fas fa-folder-open me-2"></i>Materiales
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
             <button class="nav-link" id="evaluaciones-tab" data-bs-toggle="tab" data-bs-target="#evaluaciones" type="button">
-                <i class="fas fa-clipboard-check me-2"></i>Evaluaciones
+                <i class="fas fa-clipboard-check me-2"></i>Evaluaciones y Tareas
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tareas-tab" data-bs-toggle="tab" data-bs-target="#tareas" type="button">
-                <i class="fas fa-tasks me-2"></i>Tareas
+            <button class="nav-link" id="asistencia-tab" data-bs-toggle="tab" data-bs-target="#asistencia" type="button">
+                <i class="fas fa-user-check me-2"></i>Asistencia
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -301,17 +297,14 @@
                             <table class="table table-hover mb-0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 40%">
+                                        <th style="width: 45%">
                                             <i class="fas fa-user me-2"></i>Nombre Completo
                                         </th>
-                                        <th style="width: 20%">
+                                        <th style="width: 25%">
                                             <i class="fas fa-id-card me-2"></i>RUT
                                         </th>
-                                        <th style="width: 25%">
+                                        <th style="width: 30%">
                                             <i class="fas fa-envelope me-2"></i>Correo Electrónico
-                                        </th>
-                                        <th style="width: 15%" class="text-center">
-                                            <i class="fas fa-cogs me-2"></i>Acciones
                                         </th>
                                     </tr>
                                 </thead>
@@ -331,30 +324,6 @@
                                         </td>
                                         <td>{{ estudiante.usuario.rut }}-{{ estudiante.usuario.div }}</td>
                                         <td>{{ estudiante.usuario.correo }}</td>
-                                        <td class="text-center">
-                                            <div class="dropdown">
-                                                <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-v"></i>
-                                                </button>
-                                                <ul class="dropdown-menu">
-                                                    <li>
-                                                        <a class="dropdown-item" href="{% url 'estudiante_detalle' estudiante.usuario.auth_user_id %}">
-                                                            <i class="fas fa-eye me-2"></i>Ver Detalle
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="{% url 'descargar_asistencia_estudiante_pdf' %}?estudiante_id={{ estudiante.usuario.auth_user_id }}" target="_blank">
-                                                            <i class="fas fa-file-pdf me-2"></i>Descargar Asistencia
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="dropdown-item" href="{% url 'descargar_calificaciones_pdf' %}?estudiante_id={{ estudiante.usuario.auth_user_id }}" target="_blank">
-                                                            <i class="fas fa-file-pdf me-2"></i>Descargar Calificaciones
-                                                        </a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -394,16 +363,10 @@
                                 <tbody>
                                     {% for clase in clases %}
                                     <tr>
-                                        <td><span class="badge badge-primary">{{ clase.fecha }}</span></td>
-                                        <td>{{ clase.horario }}</td>
+                                        <td><span class="badge badge-primary">{{ clase.fecha|dia_semana }}</span></td>
+                                        <td><i class="fas fa-clock me-2"></i>{{ clase.horario }}</td>
                                         <td>{{ clase.sala }}</td>
-                                        <td>
-                                            {% if clase.curso %}
-                                                <span class="badge badge-primary">{{ clase.curso.nivel }}°{{ clase.curso.letra }}</span>
-                                            {% else %}
-                                                <span class="badge badge-secondary">Electivo</span>
-                                            {% endif %}
-                                        </td>
+                                        <td><span class="badge badge-primary">{{ clase.curso }}</span></td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -419,181 +382,235 @@
             </div>
         </div>
 
-        <!-- Pestaña Materiales -->
-        <div class="tab-pane fade fade-in" id="materiales">
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-folder-open me-2"></i>Materiales de la Asignatura
-                    </h5>
-                    <button class="btn btn-success btn-sm"><i class="fas fa-upload me-1"></i>Subir Material</button>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="material-card">
-                                <i class="fas fa-file-pdf material-icon text-danger"></i>
-                                <h6 class="card-title">Guía de Estudio</h6>
-                                <p class="card-text small text-muted">Material de apoyo para el estudio</p>
-                                <button class="btn btn-outline-primary btn-sm w-100">
-                                    <i class="fas fa-download me-1"></i>Descargar
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="material-card">
-                                <i class="fas fa-file-word material-icon text-primary"></i>
-                                <h6 class="card-title">Ejercicios Prácticos</h6>
-                                <p class="card-text small text-muted">Ejercicios para practicar</p>
-                                <button class="btn btn-outline-primary btn-sm w-100">
-                                    <i class="fas fa-download me-1"></i>Descargar
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="material-card">
-                                <i class="fas fa-video material-icon text-success"></i>
-                                <h6 class="card-title">Video Clase</h6>
-                                <p class="card-text small text-muted">Grabación de la última clase</p>
-                                <button class="btn btn-outline-success btn-sm w-100">
-                                    <i class="fas fa-play me-1"></i>Ver
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Pestaña Evaluaciones -->
         <div class="tab-pane fade fade-in" id="evaluaciones">
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-clipboard-check me-2"></i>Evaluaciones
-                    </h5>
-                    <button class="btn btn-success btn-sm"><i class="fas fa-plus me-1"></i>Crear Evaluación</button>
+            <div class="row">
+                <!-- Sección de Evaluaciones -->
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-clipboard-check me-2"></i>Evaluaciones
+                            </h5>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i>Nueva Evaluación
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Fecha</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-file-alt text-primary me-2"></i>
+                                                    <div>
+                                                        <div class="fw-bold">Prueba 1</div>
+                                                        <small class="text-muted">Unidad 1</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>15/04/2025</td>
+                                            <td>
+                                                <span class="badge bg-success">Completada</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-light btn-sm me-1">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-light btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
-                                <tr>
-                                    <th><i class="fas fa-clipboard me-2"></i>Evaluación</th>
-                                    <th><i class="fas fa-calendar me-2"></i>Fecha</th>
-                                    <th><i class="fas fa-percentage me-2"></i>Ponderación</th>
-                                    <th><i class="fas fa-star me-2"></i>Promedio</th>
-                                    <th><i class="fas fa-info-circle me-2"></i>Estado</th>
-                                    <th><i class="fas fa-eye me-2"></i>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Prueba N°1</td>
-                                    <td>15/03/2024</td>
-                                    <td>25%</td>
-                                    <td><span class="badge badge-success">6.5</span></td>
-                                    <td><span class="badge badge-success">Calificada</span></td>
-                                    <td>
-                                        <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver</button>
-                                        <button class="btn btn-outline-success btn-sm"><i class="fas fa-pen"></i> Calificar</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Prueba N°2</td>
-                                    <td>20/04/2024</td>
-                                    <td>25%</td>
-                                    <td><span class="badge badge-warning">Pendiente</span></td>
-                                    <td><span class="badge badge-warning">Pendiente</span></td>
-                                    <td>
-                                        <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver</button>
-                                        <button class="btn btn-outline-success btn-sm"><i class="fas fa-pen"></i> Calificar</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Ensayo Final</td>
-                                    <td>25/05/2024</td>
-                                    <td>50%</td>
-                                    <td><span class="badge badge-secondary">-</span></td>
-                                    <td><span class="badge badge-info">Programada</span></td>
-                                    <td>
-                                        <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver</button>
-                                        <button class="btn btn-outline-success btn-sm"><i class="fas fa-pen"></i> Calificar</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                <!-- Sección de Tareas -->
+                <div class="col-lg-6">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-tasks me-2"></i>Tareas
+                            </h5>
+                            <button class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus me-1"></i>Nueva Tarea
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Fecha Entrega</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-book text-warning me-2"></i>
+                                                    <div>
+                                                        <div class="fw-bold">Tarea 1</div>
+                                                        <small class="text-muted">Ejercicios prácticos</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>20/04/2025</td>
+                                            <td>
+                                                <span class="badge bg-warning">Pendiente</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-light btn-sm me-1">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-light btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Pestaña Tareas -->
-        <div class="tab-pane fade fade-in" id="tareas">
-            <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-tasks me-2"></i>Tareas
-                    </h5>
-                    <button class="btn btn-success btn-sm"><i class="fas fa-plus me-1"></i>Crear Tarea</button>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="list-group list-group-flush">
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">
-                                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                                            Tarea 1: Análisis de texto
-                                        </h6>
-                                        <span class="badge badge-warning">Pendiente</span>
-                                    </div>
-                                    <p class="mb-1">Realizar un análisis crítico del texto proporcionado en clase.</p>
-                                    <small class="text-muted">Fecha de entrega: 18/04/2024</small>
-                                    <div class="mt-2">
-                                        <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver Entregas</button>
-                                        <button class="btn btn-outline-success btn-sm"><i class="fas fa-pen"></i> Calificar</button>
+        <!-- Pestaña Asistencia -->
+        <div class="tab-pane fade fade-in" id="asistencia">
+            <div class="row">
+                <!-- Resumen de Asistencia -->
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-chart-pie me-2"></i>Resumen de Asistencia
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <div class="display-4 text-primary mb-2">85%</div>
+                                <div class="text-muted">Asistencia Promedio</div>
+                            </div>
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="stats-card">
+                                        <div class="h3 text-success mb-2">90%</div>
+                                        <small class="text-muted">Más Alto</small>
                                     </div>
                                 </div>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">
-                                            <i class="fas fa-check-circle text-success me-2"></i>
-                                            Tarea 2: Investigación
-                                        </h6>
-                                        <span class="badge badge-success">Completada</span>
+                                <div class="col-4">
+                                    <div class="stats-card">
+                                        <div class="h3 text-warning mb-2">75%</div>
+                                        <small class="text-muted">Más Bajo</small>
                                     </div>
-                                    <p class="mb-1">Investigación sobre el tema visto en clase.</p>
-                                    <small class="text-muted">Entregada: 10/04/2024</small>
-                                    <div class="mt-2">
-                                        <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver Entregas</button>
-                                        <button class="btn btn-outline-success btn-sm"><i class="fas fa-pen"></i> Calificar</button>
+                                </div>
+                                <div class="col-4">
+                                    <div class="stats-card">
+                                        <div class="h3 text-info mb-2">15</div>
+                                        <small class="text-muted">Total Clases</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Resumen de Tareas</h6>
-                                    <div class="text-center">
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="stats-card">
-                                                    <div class="stats-number text-warning">2</div>
-                                                    <small class="text-muted">Pendientes</small>
+                    </div>
+                </div>
+
+                <!-- Registro de Asistencia -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar-check me-2"></i>Registro de Asistencia
+                            </h5>
+                            <div>
+                                <button class="btn btn-primary btn-sm me-2">
+                                    <i class="fas fa-plus me-1"></i>Registrar Asistencia
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-download me-1"></i>Descargar Reporte
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>Estudiante</th>
+                                            <th>Total Clases</th>
+                                            <th>Presentes</th>
+                                            <th>Ausentes</th>
+                                            <th>Porcentaje</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="student-avatar me-3">
+                                                        <i class="fas fa-user-graduate"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold">Juan Pérez</div>
+                                                        <small class="text-muted">1° Medio A</small>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="stats-card">
-                                                    <div class="stats-number text-success">1</div>
-                                                    <small class="text-muted">Completadas</small>
+                                            </td>
+                                            <td>15</td>
+                                            <td class="text-success">14</td>
+                                            <td class="text-danger">1</td>
+                                            <td>
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-success" role="progressbar" style="width: 93%"></div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                                <small class="text-muted">93%</small>
+                                            </td>
+                                            <td><span class="badge bg-success">Regular</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="student-avatar me-3">
+                                                        <i class="fas fa-user-graduate"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold">María González</div>
+                                                        <small class="text-muted">1° Medio A</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>15</td>
+                                            <td class="text-success">12</td>
+                                            <td class="text-danger">3</td>
+                                            <td>
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 80%"></div>
+                                                </div>
+                                                <small class="text-muted">80%</small>
+                                            </td>
+                                            <td><span class="badge bg-warning">En Riesgo</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -603,59 +620,77 @@
 
         <!-- Pestaña Comunicación -->
         <div class="tab-pane fade fade-in" id="comunicacion">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-comments me-2"></i>Comunicaciones a Estudiantes
-                    </h5>
+            <div class="row">
+                <!-- Formulario para crear comunicación -->
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-paper-plane me-2"></i>Nueva Comunicación</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{% url 'asignatura_detalle' asignatura.id %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="asunto" class="form-label">Asunto</label>
+                                    <input type="text" class="form-control" id="asunto" name="asunto" required>
+                                    <small class="text-muted">Se agregará automáticamente el código [{{ asignatura.codigo }}]</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="contenido" class="form-label">Contenido</label>
+                                    <textarea class="form-control" id="contenido" name="contenido" rows="5" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-paper-plane me-2"></i>Enviar Comunicación
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="list-group list-group-flush">
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">
-                                            <i class="fas fa-bullhorn text-warning me-2"></i>
-                                            Aviso: Prueba N°2
-                                        </h6>
-                                        <small class="text-muted">Hace 2 días</small>
-                                    </div>
-                                    <p class="mb-1">Recuerden que la Prueba N°2 será el próximo lunes. Revisen el material de estudio.</p>
-                                </div>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">
-                                            <i class="fas fa-file-alt text-info me-2"></i>
-                                            Nuevo material subido
-                                        </h6>
-                                        <small class="text-muted">Hace 1 semana</small>
-                                    </div>
-                                    <p class="mb-1">Se ha subido la guía de estudio para el próximo tema.</p>
-                                </div>
+                
+                <!-- Lista de comunicaciones -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>Comunicaciones</h5>
+                            <div>
+                                <span class="badge bg-primary">Total: {{ estadisticas_comunicaciones.total_enviadas }}</span>
+                                <span class="badge bg-success ms-2">Tasa de lectura: {{ estadisticas_comunicaciones.tasa_lectura }}%</span>
                             </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">
-                                        <i class="fas fa-paper-plane me-2"></i>Enviar comunicación
-                                    </h6>
-                                    <form>
-                                        <div class="mb-3">
-                                            <label for="asunto" class="form-label">Asunto</label>
-                                            <input type="text" class="form-control" id="asunto" placeholder="Asunto del mensaje">
+                        <div class="card-body">
+                            {% if comunicaciones %}
+                                <div class="list-group">
+                                    {% for com in comunicaciones %}
+                                        <div class="list-group-item" id="comunicacion-{{ com.id }}">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="mb-1">{{ com.asunto }}</h6>
+                                                <div>
+                                                    <small class="text-muted me-3">{{ com.fecha|date:"d/m/Y H:i" }}</small>
+                                                    <button class="btn btn-sm btn-danger" onclick="eliminarComunicacion({{ com.id }})">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p class="mb-1">{{ com.descripcion }}</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    {% for tipo in com.destinatarios %}
+                                                        <span class="badge bg-info me-1">{{ tipo }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-eye me-1"></i>{{ com.total_lecturas }} lecturas
+                                                </small>
+                                            </div>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="mensaje" class="form-label">Mensaje</label>
-                                            <textarea class="form-control" id="mensaje" rows="4" placeholder="Escribe tu mensaje aquí..."></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary w-100">
-                                            <i class="fas fa-paper-plane me-1"></i>Enviar
-                                        </button>
-                                    </form>
+                                    {% endfor %}
                                 </div>
-                            </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">No hay comunicaciones para mostrar</p>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -671,68 +706,70 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="list-group list-group-flush">
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">
-                                            <i class="fas fa-question-circle text-info me-2"></i>
-                                            Duda de estudiante
-                                        </h6>
-                                        <small class="text-muted">Hace 1 hora</small>
-                                    </div>
-                                    <p class="mb-1">¿Profesor, puede explicar mejor el concepto visto hoy?</p>
-                                    <small class="text-muted">Por: María González</small>
-                                    <div class="mt-2">
-                                        <span class="badge badge-info me-2">3 respuestas</span>
-                                        <button class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-reply me-1"></i>Responder
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">
-                                            <i class="fas fa-lightbulb text-warning me-2"></i>
-                                            Material recomendado
-                                        </h6>
-                                        <small class="text-muted">Hace 2 días</small>
-                                    </div>
-                                    <p class="mb-1">Encontré este video que explica muy bien el tema.</p>
-                                    <small class="text-muted">Por: Juan Pérez</small>
-                                    <div class="mt-2">
-                                        <span class="badge badge-info me-2">1 respuesta</span>
-                                        <button class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-reply me-1"></i>Responder
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">
-                                        <i class="fas fa-plus me-2"></i>Crear nuevo tema
-                                    </h6>
-                                    <form>
-                                        <div class="mb-3">
-                                            <label for="titulo" class="form-label">Título</label>
-                                            <input type="text" class="form-control" id="titulo" placeholder="Título del tema">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label for="contenido" class="form-label">Contenido</label>
-                                            <textarea class="form-control" id="contenido" rows="4" placeholder="Escribe tu mensaje..."></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary w-100">
-                                            <i class="fas fa-plus me-1"></i>Crear Tema
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="text-center mb-4">
+                        <a href="{% url 'foro_asignatura' asignatura.id %}" class="btn btn-primary">
+                            <i class="fas fa-comments me-2"></i>Ir al Foro de la Asignatura
+                        </a>
                     </div>
+
+                    {% if temas_foro %}
+                        <div class="list-group list-group-flush">
+                            {% for tema in temas_foro %}
+                                <div class="list-group-item {% if tema.es_anuncio %}bg-light{% endif %}">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1 {% if tema.es_anuncio %}text-danger{% else %}text-primary{% endif %}">
+                                            {% if tema.es_anuncio %}
+                                                <i class="fas fa-bullhorn me-2"></i>
+                                            {% endif %}
+                                            {{ tema.titulo }}
+                                        </h6>
+                                        <small class="text-muted">{{ tema.fecha|date:"d M, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ tema.contenido|truncatewords:30 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            Por: {{ tema.autor.nombre }} {{ tema.autor.apellido_paterno }}
+                                        </small>
+                                        <div>
+                                            <span class="badge bg-info me-2">
+                                                <i class="fas fa-reply me-1"></i>{{ tema.mensajes.count }} respuestas
+                                            </span>
+                                            <a href="{% url 'tema_foro_asignatura' asignatura.id tema.id %}" class="btn btn-sm btn-outline-primary">
+                                                Ver tema
+                                            </a>
+                                        </div>
+                                    </div>
+                                    {% if tema.mensajes.exists %}
+                                        <div class="mt-3 ps-4 border-start">
+                                            <p class="text-muted mb-2 small">Última respuesta:</p>
+                                            {% with ultimo_mensaje=tema.mensajes.last %}
+                                                <div class="bg-light rounded p-3">
+                                                    <div class="d-flex justify-content-between">
+                                                        <small class="text-primary">{{ ultimo_mensaje.autor.nombre }} {{ ultimo_mensaje.autor.apellido_paterno }}</small>
+                                                        <small class="text-muted">{{ ultimo_mensaje.fecha|date:"d M, Y H:i" }}</small>
+                                                    </div>
+                                                    <p class="mb-0 small">{{ ultimo_mensaje.contenido|truncatewords:20 }}</p>
+                                                </div>
+                                            {% endwith %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            En el foro de la asignatura podrás:
+                            <ul class="mb-0 mt-2">
+                                <li>Crear temas de discusión</li>
+                                <li>Participar en discusiones existentes</li>
+                                <li>Hacer preguntas sobre la materia</li>
+                                {% if es_docente %}
+                                <li>Publicar anuncios importantes</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -763,5 +800,33 @@
             progressBar.style.width = '75%';
         }, 500);
     }
+</script>
+
+<script>
+function eliminarComunicacion(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta comunicación?')) {
+        fetch(`/comunicacion/${id}/eliminar/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Eliminar el elemento del DOM
+                document.getElementById(`comunicacion-${id}`).remove();
+                // Mostrar mensaje de éxito
+                alert('Comunicación eliminada exitosamente');
+            } else {
+                alert(data.message || 'Error al eliminar la comunicación');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al eliminar la comunicación');
+        });
+    }
+}
 </script>
 {% endblock %} 

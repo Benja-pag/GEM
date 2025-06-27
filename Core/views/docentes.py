@@ -647,15 +647,55 @@ class ObtenerHorariosAsignaturaView(View):
                 asignatura_impartida=asignatura_impartida
             ).select_related('curso').order_by('fecha', 'horario')
             
-            # Preparar los horarios
-            horarios = []
+            # Mapeo de bloques a horas
+            mapeo_bloques = {
+                '1': ('08:00', '08:45'),
+                '2': ('08:45', '09:30'),
+                '3': ('09:45', '10:30'),
+                '4': ('10:30', '11:15'),
+                '5': ('11:30', '12:15'),
+                '6': ('12:15', '13:00'),
+                '7': ('13:45', '14:30'),
+                '8': ('14:30', '15:15'),
+                '9': ('15:15', '16:00'),
+            }
+            
+            # Agrupar clases por día y bloques consecutivos
+            horarios_agrupados = {}
             for clase in clases:
-                horarios.append({
-                    'dia': clase.fecha,
-                    'bloque': clase.horario,
-                    'sala': clase.get_sala_display() if hasattr(clase, 'get_sala_display') else clase.sala,
-                    'curso': str(clase.curso) if clase.curso else 'Electivo'
-                })
+                dia = clase.fecha
+                bloque = str(clase.horario)
+                sala = clase.get_sala_display() if hasattr(clase, 'get_sala_display') else clase.sala
+                curso = str(clase.curso) if clase.curso else 'Electivo'
+                
+                if dia not in horarios_agrupados:
+                    horarios_agrupados[dia] = []
+                
+                # Si hay bloques anteriores y son consecutivos, extender el último bloque
+                if horarios_agrupados[dia] and int(bloque) == int(horarios_agrupados[dia][-1]['bloque_fin']) + 1:
+                    horarios_agrupados[dia][-1]['bloque_fin'] = bloque
+                    horarios_agrupados[dia][-1]['hora_fin'] = mapeo_bloques[bloque][1]
+                else:
+                    horarios_agrupados[dia].append({
+                        'bloque_inicio': bloque,
+                        'bloque_fin': bloque,
+                        'hora_inicio': mapeo_bloques[bloque][0],
+                        'hora_fin': mapeo_bloques[bloque][1],
+                        'sala': sala,
+                        'curso': curso
+                    })
+            
+            # Convertir el diccionario a lista y formatear la salida
+            horarios = []
+            for dia, bloques in horarios_agrupados.items():
+                for bloque in bloques:
+                    horarios.append({
+                        'dia': dia,
+                        'bloque': f"{bloque['bloque_inicio']}-{bloque['bloque_fin']}" if bloque['bloque_inicio'] != bloque['bloque_fin'] else bloque['bloque_inicio'],
+                        'horario': f"{bloque['hora_inicio']} - {bloque['hora_fin']}",
+                        'sala': bloque['sala'],
+                        'curso': bloque['curso']
+                    })
             
             return JsonResponse({
                 'success': True,

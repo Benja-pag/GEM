@@ -3,16 +3,19 @@ from django.views import View
 from django.contrib import messages
 from django.http import JsonResponse, FileResponse
 from Core.models import (
-    Usuario, Docente, Estudiante, Asistencia, CalendarioClase, 
-    CalendarioColegio, Clase, Foro, AuthUser, Asignatura, 
-    AsignaturaImpartida, Curso, ProfesorJefe, AlumnoEvaluacion, 
-    Comunicacion, Evaluacion
+    Usuario, Administrativo, Docente, Estudiante, Asistencia, 
+    CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, 
+    Asignatura, AsignaturaImpartida, Curso, ProfesorJefe, 
+    Evaluacion, AlumnoEvaluacion, EvaluacionBase, ClaseCancelada, 
+    Comunicacion, ForoAsignatura, MensajeForoAsignatura
 )
-from django.db.models import Count, Avg, Max, Q
+from django.db.models import Count, Avg, Max, Min, Q
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from Core.servicios.repos import usuarios
@@ -22,7 +25,7 @@ from Core.servicios.alumnos.helpers import get_promedio_estudiante, get_asistenc
 from django.core.exceptions import PermissionDenied
 import json
 from statistics import mean
-from datetime import datetime, timedelta
+from datetime import date, timedelta, datetime, time
 from decimal import Decimal
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
@@ -31,6 +34,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import os
 from django.conf import settings
 import time
+from collections import defaultdict
 
 @method_decorator(login_required, name='dispatch')
 class CursoDetalleView(View):
@@ -197,17 +201,47 @@ class CursoDetalleView(View):
                 'estado_class': estado_class
             })
         
-        # Obtener comunicaciones específicas del curso
-        comunicaciones_curso = Comunicacion.objects.filter(
-            destinatarios_cursos=curso
-        ).order_by('-fecha_envio')
+        # Obtener comunicaciones relacionadas con la asignatura
+        # Filtramos por el código de la asignatura en el asunto
+        cursos_asignatura = Curso.objects.filter(clases__asignatura_impartida=asignaturas.first()).distinct()
+        comunicaciones = Comunicacion.objects.filter(
+            Q(autor=request.user) &
+            (Q(asunto__startswith=f'[{asignaturas.first().codigo}]') | 
+             Q(destinatarios_cursos__in=cursos_asignatura))
+        ).select_related('autor').prefetch_related(
+            'leido_por', 
+            'destinatarios_usuarios',
+            'destinatarios_cursos'
+        ).order_by('-fecha_envio').distinct()
         
-        # Separar comunicaciones leídas y no leídas para el usuario actual
-        comunicaciones_no_leidas = comunicaciones_curso.exclude(leido_por=request.user)[:10]
-        comunicaciones_leidas = comunicaciones_curso.filter(leido_por=request.user)[:10]
+        # Calcular estadísticas de comunicaciones
+        total_comunicaciones = comunicaciones.count()
+        total_lecturas = sum(com.leido_por.count() for com in comunicaciones)
+        total_destinatarios = sum(
+            com.destinatarios_usuarios.filter(usuario__estudiante__isnull=False).count() + 
+            sum(curso.estudiantes.count() for curso in com.destinatarios_cursos.all())
+            for com in comunicaciones
+        )
         
-        # Obtener las últimas 10 comunicaciones para la vista general
-        comunicaciones_curso = comunicaciones_curso[:10]
+        # Calcular tasa de lectura
+        tasa_lectura = (total_lecturas / total_destinatarios * 100) if total_destinatarios > 0 else 0
+        
+        # Formatear comunicaciones para la vista
+        comunicaciones_formateadas = []
+        for com in comunicaciones:
+            # Obtener los cursos destinatarios
+            cursos_dest = [f"{curso.nivel}°{curso.letra}" for curso in com.destinatarios_cursos.all()]
+            cursos_str = ", ".join(cursos_dest) if cursos_dest else "Sin cursos asignados"
+            
+            comunicaciones_formateadas.append({
+                'id': com.id,  # Agregamos el ID para poder eliminar
+                'asunto': com.asunto,
+                'descripcion': com.contenido[:100] + '...' if len(com.contenido) > 100 else com.contenido,
+                'fecha': com.fecha_envio,
+                'destinatarios': [f"Asignatura {asignatura.codigo} - {cursos_str}"],
+                'estado': 'Enviada',
+                'total_lecturas': com.leido_por.count()
+            })
         
         context = {
             'curso': curso,
@@ -216,9 +250,12 @@ class CursoDetalleView(View):
             'profesor_jefe': profesor_jefe,
             'ranking_estudiantes': ranking_estudiantes,
             'asistencia_estudiantes': asistencia_estudiantes,
-            'comunicaciones_curso': comunicaciones_curso,
-            'comunicaciones_no_leidas': comunicaciones_no_leidas,
-            'comunicaciones_leidas': comunicaciones_leidas
+            'comunicaciones_curso': comunicaciones_formateadas,
+            'estadisticas_comunicaciones': {
+                'total_enviadas': total_comunicaciones,
+                'tasa_lectura': round(tasa_lectura, 1),
+                'total_lecturas': total_lecturas
+            }
         }
         return render(request, 'teacher/curso_detalle.html', context)
 
@@ -318,25 +355,186 @@ class AsignaturaDetalleView(View):
             asignaturas_inscritas__validada=True
         ).select_related('usuario', 'curso').distinct()
         
-        # Obtener clases de la asignatura
+        # Mapeo de bloques a horas
+        mapeo_bloques = {
+            '1': ('08:00', '08:45'),
+            '2': ('08:45', '09:30'),
+            '3': ('09:45', '10:30'),
+            '4': ('10:30', '11:15'),
+            '5': ('11:30', '12:15'),
+            '6': ('12:15', '13:00'),
+            '7': ('13:45', '14:30'),
+            '8': ('14:30', '15:15'),
+            '9': ('15:15', '16:00'),
+        }
+        
+        # Obtener clases de la asignatura y agrupar por día y bloques consecutivos
         clases = Clase.objects.filter(
             asignatura_impartida=asignatura
         ).order_by('fecha', 'horario')
+        
+        # Agrupar clases por día y bloques consecutivos
+        horarios_agrupados = {}
+        for clase in clases:
+            dia = clase.fecha
+            bloque = str(clase.horario)
+            sala = clase.get_sala_display() if hasattr(clase, 'get_sala_display') else clase.sala
+            curso = str(clase.curso) if clase.curso else 'Electivo'
+            
+            if dia not in horarios_agrupados:
+                horarios_agrupados[dia] = []
+            
+            # Si hay bloques anteriores y son consecutivos, extender el último bloque
+            if horarios_agrupados[dia] and int(bloque) == int(horarios_agrupados[dia][-1]['bloque_fin']) + 1:
+                horarios_agrupados[dia][-1]['bloque_fin'] = bloque
+                horarios_agrupados[dia][-1]['hora_fin'] = mapeo_bloques[bloque][1]
+            else:
+                horarios_agrupados[dia].append({
+                    'bloque_inicio': bloque,
+                    'bloque_fin': bloque,
+                    'hora_inicio': mapeo_bloques[bloque][0],
+                    'hora_fin': mapeo_bloques[bloque][1],
+                    'sala': sala,
+                    'curso': curso
+                })
+        
+        # Convertir el diccionario a lista y formatear la salida
+        clases_formateadas = []
+        for dia, bloques in horarios_agrupados.items():
+            for bloque in bloques:
+                clases_formateadas.append({
+                    'fecha': dia,
+                    'horario': f"{bloque['hora_inicio']} - {bloque['hora_fin']}",
+                    'sala': bloque['sala'],
+                    'curso': bloque['curso']
+                })
         
         # Obtener estadísticas
         estadisticas = get_estadisticas_asignatura(asignatura_id)
         
         # Obtener próximas actividades
         proximas_actividades = get_proximas_actividades(asignatura_id)
+
+        # Obtener comunicaciones relacionadas con la asignatura
+        # Filtramos por el código de la asignatura en el asunto
+        cursos_asignatura = Curso.objects.filter(clases__asignatura_impartida=asignatura).distinct()
+        comunicaciones = Comunicacion.objects.filter(
+            Q(autor=request.user) &
+            (Q(asunto__startswith=f'[{asignatura.codigo}]') | 
+             Q(destinatarios_cursos__in=cursos_asignatura))
+        ).select_related('autor').prefetch_related(
+            'leido_por', 
+            'destinatarios_usuarios',
+            'destinatarios_cursos'
+        ).order_by('-fecha_envio').distinct()
+
+        # Calcular estadísticas de comunicaciones
+        total_comunicaciones = comunicaciones.count()
+        total_lecturas = sum(com.leido_por.count() for com in comunicaciones)
+        total_destinatarios = sum(
+            com.destinatarios_usuarios.filter(usuario__estudiante__isnull=False).count() + 
+            sum(curso.estudiantes.count() for curso in com.destinatarios_cursos.all())
+            for com in comunicaciones
+        )
         
+        # Calcular tasa de lectura
+        tasa_lectura = (total_lecturas / total_destinatarios * 100) if total_destinatarios > 0 else 0
+        
+        # Formatear comunicaciones para la vista
+        comunicaciones_formateadas = []
+        for com in comunicaciones:
+            # Obtener los cursos destinatarios
+            cursos_dest = [f"{curso.nivel}°{curso.letra}" for curso in com.destinatarios_cursos.all()]
+            cursos_str = ", ".join(cursos_dest) if cursos_dest else "Sin cursos asignados"
+            
+            comunicaciones_formateadas.append({
+                'id': com.id,  # Agregamos el ID para poder eliminar
+                'asunto': com.asunto,
+                'descripcion': com.contenido[:100] + '...' if len(com.contenido) > 100 else com.contenido,
+                'fecha': com.fecha_envio,
+                'destinatarios': [f"Asignatura {asignatura.codigo} - {cursos_str}"],
+                'estado': 'Enviada',
+                'total_lecturas': com.leido_por.count()
+            })
+        
+        # Obtener los últimos temas del foro
+        temas_foro = ForoAsignatura.objects.filter(
+            asignatura=asignatura
+        ).select_related(
+            'autor'
+        ).prefetch_related(
+            'mensajes',
+            'mensajes__autor'
+        ).order_by('-es_anuncio', '-fecha')[:5]
+
         context = {
             'asignatura': asignatura,
             'estudiantes': estudiantes,
-            'clases': clases,
+            'clases': clases_formateadas,
             'estadisticas': estadisticas,
-            'proximas_actividades': proximas_actividades
+            'proximas_actividades': proximas_actividades,
+            'comunicaciones': comunicaciones_formateadas,
+            'temas_foro': temas_foro,
+            'es_docente': request.user.usuario.auth_user == asignatura.docente.usuario.auth_user
         }
         return render(request, 'teacher/asignatura_detalle.html', context)
+
+    def post(self, request, asignatura_id):
+        """
+        Método para crear una nueva comunicación para la asignatura
+        """
+        asignatura = get_object_or_404(AsignaturaImpartida, id=asignatura_id)
+        
+        # Verificar que el usuario sea el profesor de la asignatura
+        if not request.user.usuario.auth_user == asignatura.docente.usuario.auth_user:
+            messages.error(request, 'No tienes permiso para crear comunicaciones en esta asignatura')
+            return redirect('asignatura_detalle', asignatura_id=asignatura_id)
+        
+        # Obtener datos del formulario
+        asunto = request.POST.get('asunto')
+        contenido = request.POST.get('contenido')
+        
+        if not asunto or not contenido:
+            messages.error(request, 'El asunto y contenido son obligatorios')
+            return redirect('asignatura_detalle', asignatura_id=asignatura_id)
+        
+        try:
+            with transaction.atomic():
+                # Agregar el código de la asignatura al asunto
+                asunto_completo = f'[{asignatura.codigo}] {asunto}'
+                
+                # Crear la comunicación
+                comunicacion = Comunicacion.objects.create(
+                    asunto=asunto_completo,
+                    contenido=contenido,
+                    autor=request.user
+                )
+
+                # Obtener todos los cursos que tienen esta asignatura
+                cursos_asignatura = Curso.objects.filter(clases__asignatura_impartida=asignatura).distinct()
+                
+                # Agregar los cursos como destinatarios
+                comunicacion.destinatarios_cursos.add(*cursos_asignatura)
+
+                # Obtener todos los estudiantes de los cursos y agregarlos como destinatarios
+                estudiantes_auth = []
+                for curso in cursos_asignatura:
+                    # Obtener los AuthUser de los estudiantes del curso
+                    estudiantes_auth.extend([
+                        est.usuario.auth_user 
+                        for est in curso.estudiantes.select_related('usuario__auth_user').all()
+                    ])
+                
+                # Agregar estudiantes como destinatarios
+                if estudiantes_auth:
+                    comunicacion.destinatarios_usuarios.add(*estudiantes_auth)
+                
+                messages.success(request, 'Comunicación enviada exitosamente')
+                
+        except Exception as e:
+            messages.error(request, f'Error al crear la comunicación: {str(e)}')
+            
+        return redirect('asignatura_detalle', asignatura_id=asignatura_id)
 
 @method_decorator(login_required, name='dispatch')
 class AsignaturaDetalleEstudianteView(View):
@@ -691,6 +889,135 @@ def generar_pdf(request):
         error_msg = f"Error al generar PDF: {str(e)}\n{traceback.format_exc()}"
         print(error_msg)  # Para el log del servidor
         return JsonResponse({"error": f"Error al generar PDF: {str(e)}"}, status=500)
+
+@method_decorator(login_required, name='dispatch')
+class EliminarComunicacionView(View):
+    def post(self, request, comunicacion_id):
+        comunicacion = get_object_or_404(Comunicacion, id=comunicacion_id)
+        
+        # Verificar que el usuario sea el autor de la comunicación
+        if comunicacion.autor != request.user:
+            messages.error(request, 'No tienes permiso para eliminar esta comunicación')
+            return JsonResponse({'status': 'error', 'message': 'No tienes permiso para eliminar esta comunicación'}, status=403)
+        
+        try:
+            comunicacion.delete()
+            return JsonResponse({'status': 'success', 'message': 'Comunicación eliminada exitosamente'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    def get(self, request, comunicacion_id):
+        return self.post(request, comunicacion_id)
+
+@method_decorator(login_required, name='dispatch')
+class ForoAsignaturaView(View):
+    def get(self, request, asignatura_id):
+        asignatura = get_object_or_404(AsignaturaImpartida, id=asignatura_id)
+        
+        # Verificar que el usuario tenga acceso a la asignatura
+        if not (
+            request.user.usuario.auth_user == asignatura.docente.usuario.auth_user or
+            request.user.usuario.estudiante in asignatura.estudiantes_inscritos()
+        ):
+            messages.error(request, 'No tienes acceso a este foro')
+            return redirect('home')
+        
+        # Obtener todos los temas del foro
+        temas = ForoAsignatura.objects.filter(
+            asignatura=asignatura
+        ).select_related(
+            'autor'
+        ).prefetch_related(
+            'mensajes', 
+            'mensajes__autor'
+        ).order_by('-es_anuncio', '-fecha')
+        
+        context = {
+            'asignatura': asignatura,
+            'temas': temas,
+            'es_docente': request.user.usuario.auth_user == asignatura.docente.usuario.auth_user
+        }
+        return render(request, 'foro/foro_asignatura.html', context)
+
+    def post(self, request, asignatura_id):
+        asignatura = get_object_or_404(AsignaturaImpartida, id=asignatura_id)
+        
+        # Verificar que el usuario tenga acceso a la asignatura
+        if not (
+            request.user.usuario.auth_user == asignatura.docente.usuario.auth_user or
+            request.user.usuario.estudiante in asignatura.estudiantes_inscritos()
+        ):
+            messages.error(request, 'No tienes acceso a este foro')
+            return redirect('home')
+        
+        # Obtener datos del formulario
+        titulo = request.POST.get('titulo')
+        contenido = request.POST.get('contenido')
+        es_anuncio = request.POST.get('es_anuncio') == 'true' and request.user.usuario.auth_user == asignatura.docente.usuario.auth_user
+        
+        if not titulo or not contenido:
+            messages.error(request, 'El título y contenido son obligatorios')
+            return redirect('foro_asignatura', asignatura_id=asignatura_id)
+        
+        # Crear el tema
+        ForoAsignatura.objects.create(
+            titulo=titulo,
+            contenido=contenido,
+            autor=request.user.usuario,
+            asignatura=asignatura,
+            es_anuncio=es_anuncio
+        )
+        
+        messages.success(request, 'Tema creado exitosamente')
+        return redirect('foro_asignatura', asignatura_id=asignatura_id)
+
+@method_decorator(login_required, name='dispatch')
+class TemaForoAsignaturaView(View):
+    def get(self, request, asignatura_id, tema_id):
+        tema = get_object_or_404(ForoAsignatura, id=tema_id, asignatura_id=asignatura_id)
+        
+        # Verificar que el usuario tenga acceso a la asignatura
+        if not (
+            request.user.usuario.auth_user == tema.asignatura.docente.usuario.auth_user or
+            request.user.usuario.estudiante in tema.asignatura.estudiantes_inscritos()
+        ):
+            messages.error(request, 'No tienes acceso a este tema')
+            return redirect('home')
+        
+        context = {
+            'tema': tema,
+            'mensajes': tema.mensajes.select_related('autor').order_by('fecha'),
+            'es_docente': request.user.usuario.auth_user == tema.asignatura.docente.usuario.auth_user
+        }
+        return render(request, 'foro/tema_asignatura.html', context)
+
+    def post(self, request, asignatura_id, tema_id):
+        tema = get_object_or_404(ForoAsignatura, id=tema_id, asignatura_id=asignatura_id)
+        
+        # Verificar que el usuario tenga acceso a la asignatura
+        if not (
+            request.user.usuario.auth_user == tema.asignatura.docente.usuario.auth_user or
+            request.user.usuario.estudiante in tema.asignatura.estudiantes_inscritos()
+        ):
+            messages.error(request, 'No tienes acceso a este tema')
+            return redirect('home')
+        
+        # Obtener contenido del mensaje
+        contenido = request.POST.get('contenido')
+        
+        if not contenido:
+            messages.error(request, 'El contenido es obligatorio')
+            return redirect('tema_foro_asignatura', asignatura_id=asignatura_id, tema_id=tema_id)
+        
+        # Crear el mensaje
+        MensajeForoAsignatura.objects.create(
+            foro=tema,
+            autor=request.user.usuario,
+            contenido=contenido
+        )
+        
+        messages.success(request, 'Respuesta enviada exitosamente')
+        return redirect('tema_foro_asignatura', asignatura_id=asignatura_id, tema_id=tema_id)
 
 # from django.shortcuts import render, redirect, get_object_or_404
 # from django.views import View

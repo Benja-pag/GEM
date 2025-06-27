@@ -50,7 +50,7 @@ class ChatGrupo(models.Model):
 class MensajeChat(models.Model):
     autor = models.ForeignKey('Usuario', on_delete=models.CASCADE, related_name='mensajes_chat')
     contenido = models.TextField()
-    fecha_creacion = models.DateTimeField(default=timezone.now)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
     chat_clase = models.ForeignKey('ChatClase', on_delete=models.CASCADE, related_name='mensajes', null=True, blank=True)
     chat_grupo = models.ForeignKey('ChatGrupo', on_delete=models.CASCADE, related_name='mensajes', null=True, blank=True)
     es_publico = models.BooleanField(default=True)
@@ -65,3 +65,33 @@ class MensajeChat(models.Model):
             return f'Mensaje de {self.autor} en grupo {self.chat_grupo}'
         else:
             return f'Mensaje público de {self.autor}'
+
+
+# Foro específico para una asignatura
+class ForoAsignatura(models.Model):
+    titulo = models.CharField(max_length=200)
+    contenido = models.TextField()
+    autor = models.ForeignKey('Usuario', on_delete=models.CASCADE)
+    asignatura = models.ForeignKey('AsignaturaImpartida', on_delete=models.CASCADE, related_name='foros')
+    fecha = models.DateTimeField(auto_now_add=True)
+    es_anuncio = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.titulo} - {self.asignatura.codigo}'
+
+    class Meta:
+        ordering = ['-fecha']
+
+
+# Mensajes o respuestas dentro de un foro de asignatura
+class MensajeForoAsignatura(models.Model):
+    foro = models.ForeignKey('ForoAsignatura', on_delete=models.CASCADE, related_name='mensajes')
+    autor = models.ForeignKey('Usuario', on_delete=models.CASCADE)
+    contenido = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Respuesta de {self.autor} en {self.foro.titulo}'
+
+    class Meta:
+        ordering = ['fecha']

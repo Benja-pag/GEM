@@ -169,3 +169,14 @@ urlpatterns += [
     path('api/generar-pdf/', curso_views.generar_pdf, name='generar_pdf'),
 ]
 
+urlpatterns += [
+    # Comunicaciones
+    path('comunicacion/<int:comunicacion_id>/eliminar/', curso_views.EliminarComunicacionView.as_view(), name='eliminar_comunicacion'),
+]
+
+urlpatterns += [
+    # URLs del foro de asignatura
+    path('asignatura/<int:asignatura_id>/foro/', curso_views.ForoAsignaturaView.as_view(), name='foro_asignatura'),
+    path('asignatura/<int:asignatura_id>/foro/tema/<int:tema_id>/', curso_views.TemaForoAsignaturaView.as_view(), name='tema_foro_asignatura'),
+]
+

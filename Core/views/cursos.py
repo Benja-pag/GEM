@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from Core.models import (
     Usuario, Docente, Estudiante, Asistencia, CalendarioClase, 
     CalendarioColegio, Clase, Foro, AuthUser, Asignatura, 
@@ -24,6 +24,13 @@ import json
 from statistics import mean
 from datetime import datetime, timedelta
 from decimal import Decimal
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+import os
+from django.conf import settings
+import time
 
 @method_decorator(login_required, name='dispatch')
 class CursoDetalleView(View):
@@ -215,6 +222,91 @@ class CursoDetalleView(View):
         }
         return render(request, 'teacher/curso_detalle.html', context)
 
+def get_estadisticas_asignatura(asignatura_id):
+    """
+    Calcula las estadísticas generales de una asignatura
+    """
+    from django.db.models import Avg, Count
+    from Core.models import Evaluacion, AlumnoEvaluacion, Asistencia
+
+    # Obtener evaluaciones
+    evaluaciones = Evaluacion.objects.filter(clase__asignatura_impartida_id=asignatura_id)
+    total_evaluaciones = evaluaciones.count()
+    
+    # Calcular promedio general
+    notas = AlumnoEvaluacion.objects.filter(evaluacion__in=evaluaciones)
+    promedio_general = notas.aggregate(promedio=Avg('nota'))['promedio'] or 0.0
+    
+    # Calcular asistencia
+    asistencias = Asistencia.objects.filter(clase__asignatura_impartida_id=asignatura_id)
+    total_asistencias = asistencias.count()
+    presentes = asistencias.filter(presente=True).count()
+    porcentaje_asistencia = (presentes / total_asistencias * 100) if total_asistencias > 0 else 0
+    
+    # Calcular evaluaciones calificadas
+    evaluaciones_calificadas = evaluaciones.filter(resultados__isnull=False).distinct().count()
+    porcentaje_avance = (evaluaciones_calificadas / total_evaluaciones * 100) if total_evaluaciones > 0 else 0
+
+    return {
+        'promedio_general': round(promedio_general, 1),
+        'porcentaje_asistencia': round(porcentaje_asistencia, 1),
+        'porcentaje_avance': round(porcentaje_avance, 1),
+        'total_evaluaciones': total_evaluaciones,
+        'evaluaciones_calificadas': evaluaciones_calificadas
+    }
+
+def get_proximas_actividades(asignatura_id):
+    """
+    Obtiene las próximas actividades (evaluaciones y eventos) de una asignatura
+    para los próximos 7 días
+    """
+    from datetime import date, timedelta
+    from Core.models import Evaluacion, CalendarioClase, AsignaturaImpartida
+
+    hoy = date.today()
+    proxima_semana = hoy + timedelta(days=7)
+
+    # Obtener la asignatura impartida
+    asignatura_impartida = AsignaturaImpartida.objects.get(id=asignatura_id)
+    
+    # Obtener próximas evaluaciones
+    evaluaciones = Evaluacion.objects.filter(
+        clase__asignatura_impartida_id=asignatura_id,
+        fecha__gte=hoy,
+        fecha__lte=proxima_semana
+    ).select_related('evaluacion_base', 'clase__asignatura_impartida__asignatura').order_by('fecha')
+    
+    # Obtener próximos eventos del calendario
+    eventos = CalendarioClase.objects.filter(
+        asignatura=asignatura_impartida.asignatura,
+        fecha__gte=hoy,
+        fecha__lte=proxima_semana
+    ).order_by('fecha')
+    
+    actividades = []
+    
+    for evaluacion in evaluaciones:
+        actividades.append({
+            'tipo': 'Evaluación',
+            'titulo': evaluacion.evaluacion_base.nombre,
+            'descripcion': evaluacion.evaluacion_base.descripcion,
+            'fecha': evaluacion.fecha,
+            'dias_restantes': (evaluacion.fecha - hoy).days,
+            'asignatura': evaluacion.clase.asignatura_impartida.asignatura.nombre
+        })
+    
+    for evento in eventos:
+        actividades.append({
+            'tipo': 'Evento',
+            'titulo': evento.nombre_actividad,
+            'descripcion': evento.descripcion,
+            'fecha': evento.fecha,
+            'dias_restantes': (evento.fecha - hoy).days,
+            'asignatura': evento.asignatura.nombre
+        })
+    
+    return sorted(actividades, key=lambda x: x['fecha'])
+
 @method_decorator(login_required, name='dispatch')
 class AsignaturaDetalleView(View):
     def get(self, request, asignatura_id):
@@ -224,17 +316,25 @@ class AsignaturaDetalleView(View):
         estudiantes = Estudiante.objects.filter(
             asignaturas_inscritas__asignatura_impartida=asignatura,
             asignaturas_inscritas__validada=True
-        ).select_related('usuario')
+        ).select_related('usuario', 'curso').distinct()
         
         # Obtener clases de la asignatura
         clases = Clase.objects.filter(
             asignatura_impartida=asignatura
         ).order_by('fecha', 'horario')
         
+        # Obtener estadísticas
+        estadisticas = get_estadisticas_asignatura(asignatura_id)
+        
+        # Obtener próximas actividades
+        proximas_actividades = get_proximas_actividades(asignatura_id)
+        
         context = {
             'asignatura': asignatura,
             'estudiantes': estudiantes,
-            'clases': clases
+            'clases': clases,
+            'estadisticas': estadisticas,
+            'proximas_actividades': proximas_actividades
         }
         return render(request, 'teacher/asignatura_detalle.html', context)
 
@@ -435,7 +535,7 @@ def prediccion_riesgo(request, curso_id):
 @login_required
 @require_http_methods(["POST"])
 def obtener_recomendaciones(request, curso_id):
-    """Genera recomendaciones personalizadas usando datos reales"""
+    """Genera recomendaciones personalizadas para los estudiantes del curso"""
     try:
         # Obtener el curso y validar acceso
         try:
@@ -448,13 +548,15 @@ def obtener_recomendaciones(request, curso_id):
 
         recomendaciones = []
 
+        # Obtener datos históricos para cada estudiante
         for estudiante in curso.estudiantes.all():
-            # Obtener datos del estudiante
+            # Notas
             notas = list(AlumnoEvaluacion.objects.filter(
-                alumno=estudiante,
-                evaluacion__curso=curso
+                estudiante=estudiante,
+                evaluacion__clase__curso=curso
             ).values_list('nota', flat=True))
             
+            # Asistencia
             asistencias = Asistencia.objects.filter(
                 estudiante=estudiante,
                 estudiante__curso=curso
@@ -505,16 +607,90 @@ def obtener_recomendaciones(request, curso_id):
 def generar_pdf(request):
     """Genera un PDF con el análisis solicitado"""
     try:
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import letter
+        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from django.http import FileResponse
+        import os
+        from django.conf import settings
+        import json
+        import time
+        
         data = json.loads(request.body)
-        titulo = data.get('titulo')
-        contenido = data.get('contenido')
-
-        # Aquí implementarías la generación del PDF usando una biblioteca como ReportLab o WeasyPrint
-        # Por ahora retornamos un error indicando que la función está en desarrollo
-        return JsonResponse({"error": "Funcionalidad en desarrollo"}, status=501)
+        titulo = data.get('titulo', 'Reporte')
+        contenido = data.get('contenido', '')
+        
+        # Crear directorio para PDFs si no existe
+        pdf_dir = os.path.join(settings.MEDIA_ROOT, 'pdfs')
+        os.makedirs(pdf_dir, exist_ok=True)
+        
+        # Generar nombre único para el archivo
+        filename = f"reporte_{request.user.id}_{int(time.time())}.pdf"
+        filepath = os.path.join(pdf_dir, filename)
+        
+        # Crear el documento PDF
+        doc = SimpleDocTemplate(
+            filepath,
+            pagesize=letter,
+            rightMargin=72,
+            leftMargin=72,
+            topMargin=72,
+            bottomMargin=72
+        )
+        
+        # Contenido del PDF
+        styles = getSampleStyleSheet()
+        story = []
+        
+        # Título
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            spaceAfter=30
+        )
+        story.append(Paragraph(titulo, title_style))
+        story.append(Spacer(1, 12))
+        
+        # Contenido principal
+        content_style = ParagraphStyle(
+            'CustomBody',
+            parent=styles['Normal'],
+            fontSize=12,
+            spaceAfter=12
+        )
+        
+        # Dividir el contenido en párrafos y escapar caracteres especiales
+        paragraphs = contenido.split('\n')
+        for p in paragraphs:
+            if p.strip():
+                # Escapar caracteres especiales de HTML
+                p = p.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                story.append(Paragraph(p, content_style))
+                story.append(Spacer(1, 12))
+        
+        # Generar el PDF
+        doc.build(story)
+        
+        # Abrir y devolver el archivo como respuesta
+        response = FileResponse(
+            open(filepath, 'rb'),
+            content_type='application/pdf',
+            as_attachment=True,
+            filename=filename
+        )
+        
+        # Configurar para eliminar el archivo después de enviarlo
+        response._resource_closers.append(lambda: os.unlink(filepath))
+        
+        return response
 
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        import traceback
+        error_msg = f"Error al generar PDF: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)  # Para el log del servidor
+        return JsonResponse({"error": f"Error al generar PDF: {str(e)}"}, status=500)
 
 # from django.shortcuts import render, redirect, get_object_or_404
 # from django.views import View

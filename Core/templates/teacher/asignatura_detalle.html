@@ -1,5 +1,6 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% load evaluacion_tags %}
 
 {% block title %}Detalles de {{ asignatura.asignatura.nombre }}{% endblock %}
 
@@ -61,6 +62,43 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @media (max-width: 768px) { .asignatura-header { padding: 1.5rem; } .nav-tabs .nav-link { padding: 0.5rem 1rem; font-size: 0.9rem; } .stats-number { font-size: 2rem; } }
     ::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; } ::-webkit-scrollbar-thumb { background: var(--primary-gradient); border-radius: 10px; } ::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #5a6fd8 0%, #6a4c93 100%); }
+    .student-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .estudiantes-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .table th {
+        border-top: none;
+        border-bottom: 2px solid #dee2e6;
+        background-color: #f8f9fa;
+        padding: 1rem;
+    }
+    
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    
+    .curso-badge {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        background-color: #e9ecef;
+        color: #6c757d;
+    }
 </style>
 {% endblock %}
 
@@ -172,19 +210,19 @@
                             <div class="row mb-4">
                                 <div class="col-md-4">
                                     <div class="stats-card">
-                                        <div class="stats-number text-success">85%</div>
+                                        <div class="stats-number text-success">{{ estadisticas.porcentaje_asistencia }}%</div>
                                         <small class="text-muted">Asistencia Promedio</small>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="stats-card">
-                                        <div class="stats-number text-primary">6.2</div>
+                                        <div class="stats-number text-primary">{{ estadisticas.promedio_general }}</div>
                                         <small class="text-muted">Promedio General</small>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="stats-card">
-                                        <div class="stats-number text-warning">75%</div>
+                                        <div class="stats-number text-warning">{{ estadisticas.porcentaje_avance }}%</div>
                                         <small class="text-muted">Avance del Curso</small>
                                     </div>
                                 </div>
@@ -192,39 +230,57 @@
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="fw-bold">Progreso del curso</span>
-                                    <span class="text-muted">75%</span>
+                                    <span class="text-muted">{{ estadisticas.porcentaje_avance }}%</span>
                                 </div>
                                 <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: 75%"></div>
+                                    <div class="progress-bar" role="progressbar" style="width: {{ estadisticas.porcentaje_avance }}%"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="card">
+                    <div class="card mb-4">
                         <div class="card-header">
                             <h5 class="card-title mb-0">
-                                <i class="fas fa-bell me-2"></i>Próximas Actividades
+                                <i class="fas fa-calendar me-2"></i>Próximas Actividades
                             </h5>
                         </div>
-                        <div class="card-body">
-                            <div class="list-group list-group-flush">
+                        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                            {% if proximas_actividades %}
+                            <div class="list-group">
+                                {% for actividad in proximas_actividades %}
                                 <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">Prueba N°2</h6>
-                                        <small class="text-danger">Mañana</small>
+                                    <div class="d-flex w-100 justify-content-between mb-1">
+                                        <h6 class="mb-1">
+                                            {% if actividad.tipo == 'Evaluación' %}
+                                            <i class="fas fa-clipboard-check text-primary me-2"></i>
+                                            {% else %}
+                                            <i class="fas fa-calendar-day text-success me-2"></i>
+                                            {% endif %}
+                                            {{ actividad.titulo }}
+                                        </h6>
+                                        <small class="text-muted">{{ actividad.asignatura }}</small>
                                     </div>
-                                    <p class="mb-1">Evaluación de la unidad 3</p>
-                                </div>
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">Entrega Tarea</h6>
-                                        <small class="text-warning">En 3 días</small>
+                                    <p class="mb-1">{{ actividad.descripcion|default:"Sin descripción" }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">{{ actividad.fecha|date:"d/m/Y" }}</small>
+                                        <span class="badge {% if actividad.dias_restantes == 0 %}bg-danger{% elif actividad.dias_restantes <= 2 %}bg-warning{% else %}bg-info{% endif %}">
+                                            {% if actividad.dias_restantes == 0 %}
+                                            Hoy
+                                            {% elif actividad.dias_restantes == 1 %}
+                                            Mañana
+                                            {% else %}
+                                            En {{ actividad.dias_restantes }} días
+                                            {% endif %}
+                                        </span>
                                     </div>
-                                    <p class="mb-1">Análisis de texto</p>
                                 </div>
+                                {% endfor %}
                             </div>
+                            {% else %}
+                            <p class="text-muted text-center mb-0">No hay actividades programadas para los próximos 7 días</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -233,40 +289,71 @@
 
         <!-- Pestaña Estudiantes -->
         <div class="tab-pane fade fade-in" id="estudiantes">
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
+            <div class="card">
+                <div class="estudiantes-header">
+                    <h5 class="mb-0">
                         <i class="fas fa-user-friends me-2"></i>Estudiantes Inscritos
                     </h5>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     {% if estudiantes %}
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead class="table-light">
+                            <table class="table table-hover mb-0">
+                                <thead>
                                     <tr>
-                                        <th><i class="fas fa-user me-2"></i>Nombre</th>
-                                        <th><i class="fas fa-graduation-cap me-2"></i>Curso</th>
-                                        <th><i class="fas fa-id-card me-2"></i>RUT</th>
-                                        <th><i class="fas fa-envelope me-2"></i>Correo Electrónico</th>
-                                        <th><i class="fas fa-chart-line me-2"></i>Rendimiento</th>
-                                        <th><i class="fas fa-eye me-2"></i>Acciones</th>
+                                        <th style="width: 40%">
+                                            <i class="fas fa-user me-2"></i>Nombre Completo
+                                        </th>
+                                        <th style="width: 20%">
+                                            <i class="fas fa-id-card me-2"></i>RUT
+                                        </th>
+                                        <th style="width: 25%">
+                                            <i class="fas fa-envelope me-2"></i>Correo Electrónico
+                                        </th>
+                                        <th style="width: 15%" class="text-center">
+                                            <i class="fas fa-cogs me-2"></i>Acciones
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for estudiante in estudiantes %}
                                     <tr>
-                                        <td>{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }}</td>
-                                        <td><span class="badge badge-info">{{ estudiante.curso }}</span></td>
-                                        <td>{{ estudiante.usuario.rut }}-{{ estudiante.usuario.div }}</td>
-                                        <td>{{ estudiante.usuario.email }}</td>
                                         <td>
-                                            <div class="progress" style="height: 6px;">
-                                                <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
+                                            <div class="d-flex align-items-center">
+                                                <div class="student-avatar me-3">
+                                                    <i class="fas fa-user-graduate"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }} {{ estudiante.usuario.apellido_materno }}</div>
+                                                    <span class="curso-badge">{{ estudiante.curso }}</span>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td>
-                                            <button class="btn btn-outline-primary btn-sm"><i class="fas fa-eye"></i> Ver</button>
+                                        <td>{{ estudiante.usuario.rut }}-{{ estudiante.usuario.div }}</td>
+                                        <td>{{ estudiante.usuario.correo }}</td>
+                                        <td class="text-center">
+                                            <div class="dropdown">
+                                                <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li>
+                                                        <a class="dropdown-item" href="{% url 'estudiante_detalle' estudiante.usuario.auth_user_id %}">
+                                                            <i class="fas fa-eye me-2"></i>Ver Detalle
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="{% url 'descargar_asistencia_estudiante_pdf' %}?estudiante_id={{ estudiante.usuario.auth_user_id }}" target="_blank">
+                                                            <i class="fas fa-file-pdf me-2"></i>Descargar Asistencia
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item" href="{% url 'descargar_calificaciones_pdf' %}?estudiante_id={{ estudiante.usuario.auth_user_id }}" target="_blank">
+                                                            <i class="fas fa-file-pdf me-2"></i>Descargar Calificaciones
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -274,7 +361,11 @@
                             </table>
                         </div>
                     {% else %}
-                        <p class="text-muted">No hay estudiantes inscritos en esta asignatura.</p>
+                        <div class="p-4">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle me-2"></i>No hay estudiantes inscritos en esta asignatura.
+                            </div>
+                        </div>
                     {% endif %}
                 </div>
             </div>

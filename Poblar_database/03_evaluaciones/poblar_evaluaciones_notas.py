@@ -73,21 +73,20 @@ def crear_evaluaciones_base():
 
 def crear_evaluaciones_reales():
     """
-    Crea evaluaciones reales para cada clase basadas en las evaluaciones base
+    Crea evaluaciones reales para cada asignatura impartida (no por cada clase)
     """
     print("\n📋 CREANDO EVALUACIONES REALES")
     print("="*50)
     
     evaluaciones_creadas = 0
     
-    # Obtener todas las clases que tienen asignaturas impartidas
-    clases = Clase.objects.select_related('asignatura_impartida__asignatura', 'curso').all()
+    # Obtener todas las asignaturas impartidas
+    asignaturas_impartidas = AsignaturaImpartida.objects.select_related('asignatura').all()
     
-    for clase in clases:
-        asignatura = clase.asignatura_impartida.asignatura
-        curso = clase.curso
+    for asignatura_impartida in asignaturas_impartidas:
+        asignatura = asignatura_impartida.asignatura
         
-        print(f"\n🎯 Clase: {asignatura.nombre} - {curso}")
+        print(f"\n🎯 Asignatura Impartida: {asignatura_impartida}")
         
         # Obtener las evaluaciones base de esta asignatura
         evaluaciones_base = EvaluacionBase.objects.filter(asignatura=asignatura)
@@ -96,18 +95,25 @@ def crear_evaluaciones_reales():
             print(f"   ⚠️ No hay evaluaciones base para {asignatura.nombre}")
             continue
         
+        # Obtener una clase de referencia para esta asignatura impartida
+        clase_referencia = Clase.objects.filter(asignatura_impartida=asignatura_impartida).first()
+        
+        if not clase_referencia:
+            print(f"   ⚠️ No hay clases para {asignatura_impartida}")
+            continue
+        
         # Crear una evaluación real para cada evaluación base
         for i, evaluacion_base in enumerate(evaluaciones_base):
             # Generar fechas distribuidas a lo largo del semestre
-            fecha_base = date(2024, 3, 1)  # Inicio del semestre
+            fecha_base = date(2025, 3, 1)  # Inicio del semestre 2025
             fecha_evaluacion = fecha_base + timedelta(days=30 * (i + 1))  # Cada mes
             
             evaluacion, created = Evaluacion.objects.get_or_create(
                 evaluacion_base=evaluacion_base,
-                clase=clase,
+                clase=clase_referencia,
                 defaults={
                     'fecha': fecha_evaluacion,
-                    'observaciones': f"{evaluacion_base.nombre} aplicada en {curso}"
+                    'observaciones': f"{evaluacion_base.nombre} para {asignatura_impartida}"
                 }
             )
             

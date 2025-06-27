@@ -569,3 +569,947 @@ INFO 2025-06-27 05:28:02,379 autoreload 11064 30468 C:\Users\benja\Documents\Git
 INFO 2025-06-27 05:28:03,682 autoreload 5532 15484 Watching for file changes with StatReloader
 INFO 2025-06-27 05:28:27,734 autoreload 5532 15484 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
 INFO 2025-06-27 05:28:29,001 autoreload 16436 19248 Watching for file changes with StatReloader
+INFO 2025-06-27 06:20:18,348 autoreload 22972 31660 Watching for file changes with StatReloader
+INFO 2025-06-27 06:20:26,545 basehttp 22972 20564 "GET / HTTP/1.1" 200 6340
+INFO 2025-06-27 06:20:40,700 basehttp 22972 20564 "GET /profesor-panel/ HTTP/1.1" 200 189583
+INFO 2025-06-27 06:20:43,361 basehttp 22972 20564 "GET /api/resumen-general-docente/ HTTP/1.1" 200 745
+INFO 2025-06-27 06:20:44,850 basehttp 22972 20564 "GET /curso/1/ HTTP/1.1" 200 208476
+INFO 2025-06-27 06:20:44,899 basehttp 22972 20564 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+INFO 2025-06-27 06:20:48,667 basehttp 22972 20564 "POST /api/curso/1/analisis-rendimiento/ HTTP/1.1" 200 576
+ERROR 2025-06-27 06:20:50,463 log 22972 20564 Not Implemented: /api/generar-pdf/
+ERROR 2025-06-27 06:20:50,464 basehttp 22972 20564 "POST /api/generar-pdf/ HTTP/1.1" 501 40
+INFO 2025-06-27 06:20:52,327 basehttp 22972 20564 "POST /api/curso/1/prediccion-riesgo/ HTTP/1.1" 200 2040
+ERROR 2025-06-27 06:20:53,415 log 22972 20564 Not Implemented: /api/generar-pdf/
+ERROR 2025-06-27 06:20:53,415 basehttp 22972 20564 "POST /api/generar-pdf/ HTTP/1.1" 501 40
+ERROR 2025-06-27 06:20:54,129 log 22972 20564 Internal Server Error: /api/curso/1/recomendaciones/
+ERROR 2025-06-27 06:20:54,130 basehttp 22972 20564 "POST /api/curso/1/recomendaciones/ HTTP/1.1" 500 147
+ERROR 2025-06-27 06:20:55,131 log 22972 20564 Not Implemented: /api/generar-pdf/
+ERROR 2025-06-27 06:20:55,133 basehttp 22972 20564 "POST /api/generar-pdf/ HTTP/1.1" 501 40
+INFO 2025-06-27 06:23:17,062 autoreload 22972 31660 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 06:23:18,263 autoreload 6476 13380 Watching for file changes with StatReloader
+INFO 2025-06-27 06:23:32,674 autoreload 6476 13380 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 06:23:33,919 autoreload 32124 10168 Watching for file changes with StatReloader
+INFO 2025-06-27 06:25:48,213 basehttp 32124 28828 "GET / HTTP/1.1" 200 6340
+INFO 2025-06-27 06:25:52,093 basehttp 32124 28828 "GET /profesor-panel/ HTTP/1.1" 200 189583
+INFO 2025-06-27 06:25:54,181 basehttp 32124 28828 "GET /api/resumen-general-docente/ HTTP/1.1" 200 745
+INFO 2025-06-27 06:25:56,472 basehttp 32124 28828 "GET /curso/1/ HTTP/1.1" 200 208476
+INFO 2025-06-27 06:25:59,159 basehttp 32124 28828 "POST /api/curso/1/analisis-rendimiento/ HTTP/1.1" 200 576
+ERROR 2025-06-27 06:26:00,338 basehttp 32124 28828 "POST /api/generar-pdf/ HTTP/1.1" 500 59
+INFO 2025-06-27 06:26:16,571 basehttp 32124 28828 "POST /api/curso/1/prediccion-riesgo/ HTTP/1.1" 200 2040
+ERROR 2025-06-27 06:26:17,337 log 32124 28828 Internal Server Error: /api/generar-pdf/
+ERROR 2025-06-27 06:26:17,337 basehttp 32124 28828 "POST /api/generar-pdf/ HTTP/1.1" 500 318
+INFO 2025-06-27 06:26:27,159 basehttp 32124 28828 "POST /api/curso/1/recomendaciones/ HTTP/1.1" 200 2851
+ERROR 2025-06-27 06:26:28,160 basehttp 32124 28828 "POST /api/generar-pdf/ HTTP/1.1" 500 59
+INFO 2025-06-27 06:26:54,952 autoreload 32124 10168 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 06:26:56,250 autoreload 4200 16896 Watching for file changes with StatReloader
+INFO 2025-06-27 06:28:02,855 basehttp 4200 14940 "GET /curso/1/ HTTP/1.1" 200 208476
+INFO 2025-06-27 06:28:06,306 basehttp 4200 14940 "POST /api/curso/1/analisis-rendimiento/ HTTP/1.1" 200 576
+INFO 2025-06-27 06:28:07,779 basehttp 4200 14940 "POST /api/generar-pdf/ HTTP/1.1" 200 4122
+INFO 2025-06-27 06:30:01,718 autoreload 4200 16896 C:\Users\benja\Documents\GitHub\GEM\Core\templatetags\evaluacion_tags.py changed, reloading.
+INFO 2025-06-27 06:30:02,606 autoreload 16388 21784 Watching for file changes with StatReloader
+ERROR 2025-06-27 06:30:29,384 log 16388 36164 Internal Server Error: /curso/1/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 223, in get
+    return render(request, 'teacher/curso_detalle.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\backends\django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 961, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 481, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 479, in parse
+    filter_expression = self.compile_filter(token.contents)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 597, in compile_filter
+    return FilterExpression(token, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 693, in __init__
+    filter_func = parser.find_filter(filter_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 603, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'get_item'
+ERROR 2025-06-27 06:30:29,399 basehttp 16388 36164 "GET /curso/1/ HTTP/1.1" 500 366149
+INFO 2025-06-27 06:30:54,146 autoreload 26212 7472 Watching for file changes with StatReloader
+ERROR 2025-06-27 06:30:59,996 log 26212 35492 Internal Server Error: /curso/1/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 223, in get
+    return render(request, 'teacher/curso_detalle.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\backends\django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 961, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 481, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 479, in parse
+    filter_expression = self.compile_filter(token.contents)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 597, in compile_filter
+    return FilterExpression(token, self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 693, in __init__
+    filter_func = parser.find_filter(filter_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 603, in find_filter
+    raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
+django.template.exceptions.TemplateSyntaxError: Invalid filter: 'get_item'
+ERROR 2025-06-27 06:31:00,008 basehttp 26212 35492 "GET /curso/1/ HTTP/1.1" 500 366149
+ERROR 2025-06-27 06:31:28,519 log 26212 35492 Internal Server Error: /curso/1/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 502, in parse
+    compile_func = self.tags[command]
+                   ~~~~~~~~~^^^^^^^^^
+KeyError: 'break'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 223, in get
+    return render(request, 'teacher/curso_detalle.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\backends\django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 861, in do_for
+    nodelist_loop = parser.parse(
+                    ^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 961, in do_if
+    nodelist = parser.parse(("elif", "else", "endif"))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 504, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 555, in invalid_block_tag
+    raise self.error(
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 559: 'break', expected 'elif', 'else' or 'endif'. Did you forget to register or load this tag?
+ERROR 2025-06-27 06:31:28,524 basehttp 26212 35492 "GET /curso/1/ HTTP/1.1" 500 382279
+INFO 2025-06-27 06:31:48,303 autoreload 26212 7472 C:\Users\benja\Documents\GitHub\GEM\Core\templatetags\evaluacion_tags.py changed, reloading.
+INFO 2025-06-27 06:31:49,592 autoreload 20324 36236 Watching for file changes with StatReloader
+INFO 2025-06-27 06:32:26,078 basehttp 20324 26524 "GET /curso/1/ HTTP/1.1" 200 223856
+INFO 2025-06-27 06:32:26,185 basehttp 20324 26524 "GET /static/css/curso_detalle.css HTTP/1.1" 200 3754
+ERROR 2025-06-27 06:36:31,452 log 20324 26524 Internal Server Error: /curso/1/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 223, in get
+    return render(request, 'teacher/curso_detalle.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\backends\django.py", line 33, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loaders\cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loaders\base.py", line 28, in get_template
+    return Template(
+           ^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 295, in do_extends
+    nodelist = parser.parse()
+               ^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 510, in parse
+    raise self.error(token, e)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 228, in do_block
+    raise TemplateSyntaxError(
+django.template.exceptions.TemplateSyntaxError: 'block' tag with name 'extra_js' appears more than once
+ERROR 2025-06-27 06:36:31,459 basehttp 20324 26524 "GET /curso/1/ HTTP/1.1" 500 241682
+INFO 2025-06-27 06:38:06,718 autoreload 7084 28732 Watching for file changes with StatReloader
+ERROR 2025-06-27 06:38:12,191 log 7084 3916 Internal Server Error: /curso/1/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 223, in get
+    return render(request, 'teacher/curso_detalle.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 242, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\urls\base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\urls\resolvers.py", line 851, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'estudiante_detalle' with arguments '('',)' not found. 1 pattern(s) tried: ['estudiante/(?P<estudiante_id>[0-9]+)/detalle/\\Z']
+ERROR 2025-06-27 06:38:12,202 basehttp 7084 3916 "GET /curso/1/ HTTP/1.1" 500 358667
+ERROR 2025-06-27 06:39:08,203 log 7084 3916 Internal Server Error: /curso/1/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 223, in get
+    return render(request, 'teacher/curso_detalle.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 242, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\urls\base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\urls\resolvers.py", line 851, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'estudiante_detalle' with arguments '('',)' not found. 1 pattern(s) tried: ['estudiante/(?P<estudiante_id>[0-9]+)/detalle/\\Z']
+ERROR 2025-06-27 06:39:08,207 basehttp 7084 3916 "GET /curso/1/ HTTP/1.1" 500 358667
+INFO 2025-06-27 06:41:05,207 basehttp 7084 3916 "GET /curso/1/ HTTP/1.1" 200 100222
+INFO 2025-06-27 06:41:05,263 basehttp 7084 3916 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+INFO 2025-06-27 06:41:05,361 basehttp 7084 28076 "GET /static/js/curso_actions.js HTTP/1.1" 200 23108
+INFO 2025-06-27 06:42:05,495 basehttp 7084 28076 "GET /curso/1/ HTTP/1.1" 200 223856
+INFO 2025-06-27 06:44:30,797 basehttp 7084 28076 "GET /curso/1/ HTTP/1.1" 200 230452
+INFO 2025-06-27 06:44:30,833 basehttp 7084 28076 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+INFO 2025-06-27 06:44:30,838 basehttp 7084 3916 "GET /static/js/main.js HTTP/1.1" 304 0
+INFO 2025-06-27 06:45:26,702 basehttp 7084 3916 "GET /curso/1/ HTTP/1.1" 200 229801
+INFO 2025-06-27 06:45:29,129 basehttp 7084 3916 "GET /curso/1/ HTTP/1.1" 200 229801
+INFO 2025-06-27 06:46:25,090 basehttp 7084 3916 "GET /curso/1/ HTTP/1.1" 200 229801
+INFO 2025-06-27 06:46:25,153 basehttp 7084 3916 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+INFO 2025-06-27 06:46:38,583 basehttp 7084 3916 "GET /curso/1/ HTTP/1.1" 200 229801
+INFO 2025-06-27 06:46:41,507 basehttp 7084 3916 "POST /logout/ HTTP/1.1" 302 0
+INFO 2025-06-27 06:46:41,515 basehttp 7084 3916 "GET /login/ HTTP/1.1" 200 13537
+INFO 2025-06-27 06:46:46,339 basehttp 7084 3916 "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-27 06:46:46,735 basehttp 7084 3916 "GET /profesor-panel/ HTTP/1.1" 200 189583
+INFO 2025-06-27 06:46:47,731 basehttp 7084 3916 "GET /api/resumen-general-docente/ HTTP/1.1" 200 745
+INFO 2025-06-27 06:46:49,393 basehttp 7084 3916 "GET /curso/1/ HTTP/1.1" 200 229801
+INFO 2025-06-27 06:49:02,009 basehttp 7084 2040 "GET /curso/1/ HTTP/1.1" 200 229597
+INFO 2025-06-27 06:49:02,042 basehttp 7084 2040 "GET /static/css/style.css HTTP/1.1" 304 0
+INFO 2025-06-27 06:49:02,046 basehttp 7084 15504 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+INFO 2025-06-27 06:50:03,866 basehttp 7084 15504 "GET /curso/1/ HTTP/1.1" 200 230006
+INFO 2025-06-27 06:50:14,766 basehttp 7084 15504 "GET /curso/1/ HTTP/1.1" 200 219407
+INFO 2025-06-27 06:52:37,229 basehttp 7084 15504 "GET /curso/1/ HTTP/1.1" 200 237019
+INFO 2025-06-27 06:52:37,268 basehttp 7084 15504 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+INFO 2025-06-27 06:56:22,717 basehttp 7084 15504 "GET /curso/1/ HTTP/1.1" 200 219673
+INFO 2025-06-27 06:56:22,758 basehttp 7084 15504 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+INFO 2025-06-27 07:00:54,280 basehttp 7084 15504 "GET /curso/1/ HTTP/1.1" 200 238262
+INFO 2025-06-27 07:00:54,312 basehttp 7084 15504 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+INFO 2025-06-27 07:01:49,397 basehttp 7084 15504 "GET /curso/1/ HTTP/1.1" 200 217753
+WARNING 2025-06-27 07:02:01,144 log 7084 15504 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-27 07:02:01,146 basehttp 7084 15504 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 21710
+INFO 2025-06-27 07:02:58,079 basehttp 7084 15504 "GET /curso/1/ HTTP/1.1" 200 210938
+WARNING 2025-06-27 07:02:58,128 log 7084 15504 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-27 07:02:58,129 basehttp 7084 15504 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 21710
+INFO 2025-06-27 07:06:10,271 basehttp 7084 1524 "GET /asignatura/104/ HTTP/1.1" 200 67498
+INFO 2025-06-27 07:08:12,496 autoreload 7084 28732 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 07:08:13,166 autoreload 6520 15568 Watching for file changes with StatReloader
+ERROR 2025-06-27 07:09:01,296 log 6520 13520 Internal Server Error: /asignatura/104/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 322, in get
+    estadisticas = get_estadisticas_asignatura(asignatura_id)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 247, in get_estadisticas_asignatura
+    evaluaciones_calificadas = evaluaciones.filter(alumno_evaluaciones__isnull=False).distinct().count()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1613, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1645, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1495, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1307, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'alumno_evaluaciones' into field. Choices are: clase, clase_id, evaluacion_base, evaluacion_base_id, fecha, id, observaciones, resultados
+ERROR 2025-06-27 07:09:01,296 basehttp 6520 13520 "GET /asignatura/104/ HTTP/1.1" 500 156229
+INFO 2025-06-27 07:09:14,263 autoreload 17496 36912 Watching for file changes with StatReloader
+INFO 2025-06-27 07:09:20,392 basehttp 17496 12292 "GET / HTTP/1.1" 200 6340
+INFO 2025-06-27 07:09:23,764 basehttp 17496 12292 "GET /profesor-panel/ HTTP/1.1" 200 189583
+INFO 2025-06-27 07:09:24,862 basehttp 17496 12292 "GET /api/resumen-general-docente/ HTTP/1.1" 200 745
+ERROR 2025-06-27 07:09:29,010 log 17496 12292 Internal Server Error: /asignatura/104/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 322, in get
+    estadisticas = get_estadisticas_asignatura(asignatura_id)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 247, in get_estadisticas_asignatura
+    evaluaciones_calificadas = evaluaciones.filter(alumno_evaluaciones__isnull=False).distinct().count()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1613, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1645, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1495, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1307, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'alumno_evaluaciones' into field. Choices are: clase, clase_id, evaluacion_base, evaluacion_base_id, fecha, id, observaciones, resultados
+ERROR 2025-06-27 07:09:29,014 basehttp 17496 12292 "GET /asignatura/104/ HTTP/1.1" 500 156092
+INFO 2025-06-27 07:10:10,890 autoreload 17496 36912 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 07:10:11,638 autoreload 13716 15948 Watching for file changes with StatReloader
+ERROR 2025-06-27 07:10:23,047 log 13716 16004 Internal Server Error: /asignatura/104/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 325, in get
+    proximas_actividades = get_proximas_actividades(asignatura_id)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 277, in get_proximas_actividades
+    eventos = CalendarioClase.objects.filter(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1613, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1645, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1559, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1383, in build_lookup
+    lhs = self.try_transform(lhs, lookup_name)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1427, in try_transform
+    raise FieldError(
+django.core.exceptions.FieldError: Unsupported lookup 'asignaturaimpartida' for ForeignKey or join on the field not permitted.
+ERROR 2025-06-27 07:10:23,051 basehttp 13716 16004 "GET /asignatura/104/ HTTP/1.1" 500 151117
+INFO 2025-06-27 07:11:08,722 autoreload 13716 15948 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 07:11:09,339 autoreload 10308 2768 Watching for file changes with StatReloader
+INFO 2025-06-27 07:11:56,091 basehttp 10308 25512 "GET /asignatura/104/ HTTP/1.1" 200 79323
+INFO 2025-06-27 07:14:35,658 autoreload 10308 2768 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 07:14:37,115 autoreload 12524 3644 Watching for file changes with StatReloader
+INFO 2025-06-27 07:15:28,270 basehttp 12524 22000 "GET /asignatura/104/ HTTP/1.1" 200 82034
+INFO 2025-06-27 07:16:26,644 basehttp 12524 22000 "GET /asignatura/104/ HTTP/1.1" 200 82034
+INFO 2025-06-27 07:21:08,851 basehttp 12524 5100 "GET /asignatura/104/ HTTP/1.1" 200 70469
+ERROR 2025-06-27 07:24:30,239 log 12524 5100 Internal Server Error: /asignatura/104/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py", line 339, in get
+    return render(request, 'teacher/asignatura_detalle.html', context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 171, in render
+    return self._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 326, in render
+    return nodelist.render(context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 1000, in <listcomp>
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 242, in render
+    nodelist.append(node.render_annotated(context))
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\base.py", line 961, in render_annotated
+    return self.render(context)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\template\defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\urls\base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\urls\resolvers.py", line 851, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'estudiante_detalle' with arguments '('',)' not found. 1 pattern(s) tried: ['estudiante/(?P<estudiante_id>[0-9]+)/detalle/\\Z']
+ERROR 2025-06-27 07:24:30,247 basehttp 12524 5100 "GET /asignatura/104/ HTTP/1.1" 500 306331
+INFO 2025-06-27 07:25:36,881 autoreload 12524 3644 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 07:25:37,639 autoreload 37284 5520 Watching for file changes with StatReloader
+INFO 2025-06-27 07:25:44,422 basehttp 37284 26008 "GET /asignatura/104/ HTTP/1.1" 200 74343
+INFO 2025-06-27 07:26:08,442 autoreload 37284 5520 C:\Users\benja\Documents\GitHub\GEM\Core\views\usuarios.py changed, reloading.
+INFO 2025-06-27 07:26:09,099 autoreload 36484 11788 Watching for file changes with StatReloader
+INFO 2025-06-27 07:26:15,722 basehttp 36484 28604 "GET /asignatura/104/ HTTP/1.1" 200 74343
+INFO 2025-06-27 07:27:50,886 basehttp 36484 28604 "GET /asignatura/104/ HTTP/1.1" 200 77104
+INFO 2025-06-27 07:28:17,754 basehttp 36484 28604 "GET /asignatura/104/ HTTP/1.1" 200 77104
+INFO 2025-06-27 07:29:17,155 basehttp 36484 28604 "GET /asignatura/104/ HTTP/1.1" 200 74968
+WARNING 2025-06-27 07:29:29,976 log 36484 28604 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-27 07:29:29,976 basehttp 36484 28604 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 21710
+INFO 2025-06-27 07:31:43,992 basehttp 36484 28604 "GET /asignatura/104/ HTTP/1.1" 200 111332
+WARNING 2025-06-27 07:31:44,049 log 36484 28604 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-27 07:31:44,050 basehttp 36484 28604 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 21710
+ERROR 2025-06-27 07:31:51,847 log 36484 28604 Internal Server Error: /estudiante/203/detalle/
+Traceback (most recent call last):
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\utils\decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\contrib\auth\decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\views\generic\base.py", line 143, in dispatch
+    return handler(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\Core\views\usuarios.py", line 279, in get
+    ).get(id=estudiante_id)
+      ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 635, in get
+    clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1613, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1645, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1495, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1307, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\benja\Documents\GitHub\GEM\env311\Lib\site-packages\django\db\models\sql\query.py", line 1772, in names_to_path
+    raise FieldError(
+django.core.exceptions.FieldError: Cannot resolve keyword 'id' into field. Choices are: asignaturas_inscritas, asistencias, contacto_emergencia, curso, curso_id, notas, usuario, usuario_id
+ERROR 2025-06-27 07:31:51,852 basehttp 36484 28604 "GET /estudiante/203/detalle/ HTTP/1.1" 500 142116

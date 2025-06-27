@@ -3,12 +3,12 @@ from django.db.models import Avg
 
 register = template.Library()
 
-@register.filter
+@register.filter(name='get_item')
 def get_item(dictionary, key):
     """
-    Obtiene un elemento de un diccionario por clave
+    Obtiene un valor de un diccionario usando una clave
     """
-    return dictionary.get(key, [])
+    return dictionary.get(key)
 
 @register.filter
 def get_evaluaciones_asignatura(evaluaciones_estudiante, asignatura_nombre):

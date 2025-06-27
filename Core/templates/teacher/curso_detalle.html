@@ -1,5 +1,6 @@
 {% extends 'base/base.html' %}
 {% load static %}
+{% load evaluacion_tags %}
 
 {% block title %}Detalles del Curso {{ curso }}{% endblock %}
 
@@ -343,6 +344,99 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
+    <!-- Tarjetas de Estadísticas -->
+    <div class="row mb-4">
+        <!-- Promedio General -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Promedio General</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% if ranking_estudiantes %}
+                                    {{ ranking_estudiantes|dictsort:"promedio_general"|last|get_item:"promedio_general"|floatformat:1 }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-star fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asistencia General -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Asistencia General</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% if asistencia_estudiantes %}
+                                    {{ asistencia_estudiantes|dictsort:"porcentaje_asistencia"|last|get_item:"porcentaje_asistencia"|floatformat:1 }}%
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Asignaturas -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Asignaturas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {{ asignaturas|length }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estudiantes Destacados -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Estudiantes Destacados</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                {% with destacados=ranking_estudiantes|dictsortreversed:"promedio_general"|slice:":3"|length %}
+                                    {{ destacados }}
+                                {% endwith %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-medal fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Tabs agrupadas -->
     <ul class="nav nav-tabs mb-4" id="cursoTabs" role="tablist">
         <li class="nav-item" role="presentation">
@@ -363,45 +457,157 @@ document.addEventListener('DOMContentLoaded', function() {
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="comunicaciones-tab" data-bs-toggle="tab" data-bs-target="#comunicaciones" type="button"><i class="fas fa-envelope-open-text me-2"></i>Comunicaciones</button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="reportes-tab" data-bs-toggle="tab" data-bs-target="#reportes" type="button"><i class="fas fa-file-alt me-2"></i>Reportes</button>
-        </li>
     </ul>
 
     <div class="tab-content" id="cursoTabsContent">
         <!-- General: Información, Apoderados, Observaciones -->
         <div class="tab-pane fade show active" id="general">
             <div class="row">
+                <!-- Información del Curso -->
                 <div class="col-md-6 mb-3">
                     <div class="card border-0 shadow-sm h-100">
                         <div class="card-body">
-                            <h5 class="card-title"><i class="fas fa-info-circle me-2 text-primary"></i>Información del Curso</h5>
-                            <p><strong>Nivel:</strong> {{ curso.nivel }}°</p>
-                            <p><strong>Letra:</strong> {{ curso.letra }}</p>
-                            <p><strong>Total Estudiantes:</strong> {{ estudiantes|length }}</p>
-                            <p><strong>Profesor Jefe:</strong>
-                                {% if profesor_jefe %}
-                                    {{ profesor_jefe.docente.usuario.nombre }} {{ profesor_jefe.docente.usuario.apellido_paterno }} {{ profesor_jefe.docente.usuario.apellido_materno }}
-                                {% else %}
-                                    <span class="text-muted">Sin profesor asignado</span>
-                                {% endif %}
-                            </p>
+                            <h5 class="card-title mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Información del Curso</h5>
+                            <div class="table-responsive">
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row" class="text-muted" style="width: 40%;">Nivel:</th>
+                                            <td><span class="badge bg-primary">{{ curso.nivel }}°</span></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Letra:</th>
+                                            <td><span class="badge bg-info">{{ curso.letra }}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Total Estudiantes:</th>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-users me-1"></i>
+                                                    {{ estudiantes|length }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Total Asignaturas:</th>
+                                            <td>
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-book me-1"></i>
+                                                    {{ asignaturas|length }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Profesor Jefe:</th>
+                                            <td>
+                                                {% if profesor_jefe %}
+                                                    <span class="badge bg-dark">
+                                                        <i class="fas fa-user-tie me-1"></i>
+                                                        {{ profesor_jefe.docente.usuario.nombre }} {{ profesor_jefe.docente.usuario.apellido_paterno }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Sin profesor asignado</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estudiantes Destacados y Estado -->
+                <div class="col-md-6 mb-3">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3"><i class="fas fa-chart-bar me-2 text-success"></i>Resumen Académico</h5>
+                            <div class="table-responsive">
+                                <table class="table table-borderless">
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row" class="text-muted" style="width: 40%;">Estudiantes Destacados:</th>
+                                            <td>
+                                                {% with destacados=ranking_estudiantes|dictsortreversed:"promedio_general"|slice:":3" %}
+                                                    {% for estudiante in destacados %}
+                                                        <div class="mb-2">
+                                                            <span class="badge bg-warning text-dark">
+                                                                {% if forloop.counter == 1 %}
+                                                                    <i class="fas fa-medal text-warning me-1"></i>
+                                                                {% elif forloop.counter == 2 %}
+                                                                    <i class="fas fa-medal text-secondary me-1"></i>
+                                                                {% else %}
+                                                                    <i class="fas fa-medal text-info me-1"></i>
+                                                                {% endif %}
+                                                                {{ estudiante.estudiante.usuario.nombre }} {{ estudiante.estudiante.usuario.apellido_paterno }}
+                                                                ({{ estudiante.promedio_general|floatformat:1 }})
+                                                            </span>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endwith %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Estado General:</th>
+                                            <td>
+                                                {% with promedio=ranking_estudiantes|dictsort:"promedio_general"|last %}
+                                                    {% if promedio.promedio_general >= 6.0 %}
+                                                        <span class="badge bg-success">
+                                                            <i class="fas fa-check-circle me-1"></i>
+                                                            Excelente
+                                                        </span>
+                                                    {% elif promedio.promedio_general >= 5.0 %}
+                                                        <span class="badge bg-info">
+                                                            <i class="fas fa-thumbs-up me-1"></i>
+                                                            Bueno
+                                                        </span>
+                                                    {% elif promedio.promedio_general >= 4.0 %}
+                                                        <span class="badge bg-warning">
+                                                            <i class="fas fa-exclamation-circle me-1"></i>
+                                                            Regular
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">
+                                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                                            Necesita Atención
+                                                        </span>
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Promedio General:</th>
+                                            <td>
+                                                {% with promedio=ranking_estudiantes|dictsort:"promedio_general"|last %}
+                                                    <span class="badge bg-primary">
+                                                        <i class="fas fa-calculator me-1"></i>
+                                                        {{ promedio.promedio_general|floatformat:1 }}
+                                                    </span>
+                                                {% endwith %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th scope="row" class="text-muted">Asistencia General:</th>
+                                            <td>
+                                                {% with asistencia=asistencia_estudiantes|dictsort:"porcentaje_asistencia"|last %}
+                                                    <span class="badge {% if asistencia.porcentaje_asistencia >= 90 %}bg-success{% elif asistencia.porcentaje_asistencia >= 80 %}bg-info{% elif asistencia.porcentaje_asistencia >= 75 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                        <i class="fas fa-calendar-check me-1"></i>
+                                                        {{ asistencia.porcentaje_asistencia|floatformat:1 }}%
+                                                    </span>
+                                                {% endwith %}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-clipboard-list me-2 text-info"></i>Observaciones</h5>
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <strong>Juan Pérez:</strong> Participa activamente en clases. <span class="badge bg-success ms-2">Positiva</span>
-                        </li>
-                        <li class="list-group-item">
-                            <strong>María González:</strong> Necesita mejorar la puntualidad. <span class="badge bg-warning ms-2">Pendiente</span>
-                        </li>
-                    </ul>
-                </div>
+
+            <!-- Resto del contenido de la pestaña general -->
+            <div class="row mt-4">
+                <!-- ... existing content ... -->
             </div>
         </div>
         <!-- Estudiantes: Lista, Fichas, Reportes -->
@@ -609,39 +815,31 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                <div class="progress" style="height: 25px; border-radius: 15px;">
+                                                <div class="d-flex align-items-center">
                                                     {% if estudiante_data.porcentaje_asistencia >= 90 %}
-                                                        <div class="progress-bar bg-success" role="progressbar" 
-                                                             style="width: {{ estudiante_data.porcentaje_asistencia }}%; min-width: 2em;"
-                                                             aria-valuenow="{{ estudiante_data.porcentaje_asistencia }}" 
-                                                             aria-valuemin="0" 
-                                                             aria-valuemax="100">
+                                                        <span class="badge bg-success d-flex align-items-center" style="font-size: 1em; padding: 10px 15px;">
+                                                            <i class="fas fa-check-circle me-2"></i>
                                                             {{ estudiante_data.porcentaje_asistencia|floatformat:1 }}%
-                                                        </div>
+                                                            <i class="fas fa-trophy ms-2" data-bs-toggle="tooltip" title="Asistencia Excelente"></i>
+                                                        </span>
                                                     {% elif estudiante_data.porcentaje_asistencia >= 85 %}
-                                                        <div class="progress-bar bg-info" role="progressbar" 
-                                                             style="width: {{ estudiante_data.porcentaje_asistencia }}%; min-width: 2em;"
-                                                             aria-valuenow="{{ estudiante_data.porcentaje_asistencia }}" 
-                                                             aria-valuemin="0" 
-                                                             aria-valuemax="100">
+                                                        <span class="badge bg-info d-flex align-items-center" style="font-size: 1em; padding: 10px 15px;">
+                                                            <i class="fas fa-info-circle me-2"></i>
                                                             {{ estudiante_data.porcentaje_asistencia|floatformat:1 }}%
-                                                        </div>
+                                                            <i class="fas fa-thumbs-up ms-2" data-bs-toggle="tooltip" title="Buena Asistencia"></i>
+                                                        </span>
                                                     {% elif estudiante_data.porcentaje_asistencia >= 75 %}
-                                                        <div class="progress-bar bg-warning" role="progressbar" 
-                                                             style="width: {{ estudiante_data.porcentaje_asistencia }}%; min-width: 2em;"
-                                                             aria-valuenow="{{ estudiante_data.porcentaje_asistencia }}" 
-                                                             aria-valuemin="0" 
-                                                             aria-valuemax="100">
+                                                        <span class="badge bg-warning d-flex align-items-center" style="font-size: 1em; padding: 10px 15px;">
+                                                            <i class="fas fa-exclamation-circle me-2"></i>
                                                             {{ estudiante_data.porcentaje_asistencia|floatformat:1 }}%
-                                                        </div>
+                                                            <i class="fas fa-exclamation ms-2" data-bs-toggle="tooltip" title="Asistencia Regular"></i>
+                                                        </span>
                                                     {% else %}
-                                                        <div class="progress-bar bg-danger" role="progressbar" 
-                                                             style="width: {{ estudiante_data.porcentaje_asistencia }}%; min-width: 2em;"
-                                                             aria-valuenow="{{ estudiante_data.porcentaje_asistencia }}" 
-                                                             aria-valuemin="0" 
-                                                             aria-valuemax="100">
+                                                        <span class="badge bg-danger d-flex align-items-center" style="font-size: 1em; padding: 10px 15px;">
+                                                            <i class="fas fa-exclamation-triangle me-2"></i>
                                                             {{ estudiante_data.porcentaje_asistencia|floatformat:1 }}%
-                                                        </div>
+                                                            <i class="fas fa-bell ms-2" data-bs-toggle="tooltip" title="Asistencia Crítica"></i>
+                                                        </span>
                                                     {% endif %}
                                                 </div>
                                             </td>
@@ -882,122 +1080,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </a>
                             </div>
                         {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Reportes: Generación y descarga de informes -->
-        <div class="tab-pane fade" id="reportes">
-            <!-- Herramientas IA para Reportes -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-robot me-2 text-primary"></i>Reportes Inteligentes</h5>
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-primary w-100" onclick="generateIAReport('general')">
-                                <i class="fas fa-file-alt mb-2"></i>
-                                <br>Reporte General
-                            </button>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-info w-100" onclick="generateIAReport('asistencia')">
-                                <i class="fas fa-calendar-check mb-2"></i>
-                                <br>Reporte Asistencia
-                            </button>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-success w-100" onclick="generateIAReport('comportamiento')">
-                                <i class="fas fa-users mb-2"></i>
-                                <br>Reporte Comportamiento
-                            </button>
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-outline-warning w-100" onclick="generateIAReport('tendencias')">
-                                <i class="fas fa-chart-line mb-2"></i>
-                                <br>Análisis Tendencias
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Resto del contenido de reportes -->
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-gradient-info text-white">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-file-alt me-2"></i>Generar Reportes del Curso
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <div class="card border">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-chart-bar fa-2x text-primary mb-2"></i>
-                                            <h6>Reporte de Rendimiento</h6>
-                                            <p class="text-muted">Análisis completo del rendimiento académico</p>
-                                            <button class="btn btn-outline-primary btn-sm">Generar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="card border">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-calendar-check fa-2x text-success mb-2"></i>
-                                            <h6>Reporte de Asistencia</h6>
-                                            <p class="text-muted">Estadísticas detalladas de asistencia</p>
-                                            <button class="btn btn-outline-success btn-sm">Generar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Herramientas IA -->
-                    <div class="card border-0 shadow-sm mt-4">
-                        <div class="card-header bg-gradient-info text-white">
-                            <h6 class="card-title mb-0">
-                                <i class="fas fa-robot me-2"></i>Herramientas IA
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-robot me-1"></i>Generar Reporte Automático
-                                </button>
-                                <button class="btn btn-outline-success btn-sm">
-                                    <i class="fas fa-lightbulb me-1"></i>Sugerencias de Intervención
-                                </button>
-                                <button class="btn btn-outline-info btn-sm">
-                                    <i class="fas fa-envelope me-1"></i>Generar Comunicado IA
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-gradient-secondary text-white">
-                            <h6 class="card-title mb-0">
-                                <i class="fas fa-download me-2"></i>Exportar Reportes
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-file-pdf me-1"></i>Exportar PDF
-                                </button>
-                                <button class="btn btn-outline-success btn-sm">
-                                    <i class="fas fa-file-excel me-1"></i>Exportar Excel
-                                </button>
-                                <button class="btn btn-outline-info btn-sm">
-                                    <i class="fas fa-envelope me-1"></i>Enviar por Email
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

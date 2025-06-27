@@ -1,5 +1,5 @@
 # Ignorar el entorno virtual
-/env/
+/env311/
 
 # Ignorar archivos de Python compilados
 *.pyc
@@ -12,3 +12,6 @@ __pycache__/
 # Ignorar archivos del sistema operativo
 .DS_Store
 Thumbs.db
+
+# Ignorar archivos de configuración local
+.env

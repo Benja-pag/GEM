@@ -161,3 +161,11 @@ urlpatterns += [
     path('chat/', chat.ChatPublicoView.as_view(), name='chat_gem'),
 ]
 
+urlpatterns += [
+    # URLs para análisis IA
+    path('api/curso/<int:curso_id>/analisis-rendimiento/', curso_views.analisis_rendimiento, name='analisis_rendimiento'),
+    path('api/curso/<int:curso_id>/prediccion-riesgo/', curso_views.prediccion_riesgo, name='prediccion_riesgo'),
+    path('api/curso/<int:curso_id>/recomendaciones/', curso_views.obtener_recomendaciones, name='obtener_recomendaciones'),
+    path('api/generar-pdf/', curso_views.generar_pdf, name='generar_pdf'),
+]
+

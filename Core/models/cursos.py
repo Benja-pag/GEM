@@ -93,6 +93,40 @@ class Curso(models.Model):
 
     def __str__(self):
         return f"{self.nivel}°{self.letra}"  # Ej: "1A"
+        
+    def tiene_acceso(self, usuario):
+        """
+        Verifica si un usuario tiene acceso al curso.
+        
+        Args:
+            usuario: Usuario a verificar
+            
+        Returns:
+            bool: True si el usuario tiene acceso, False en caso contrario
+        """
+        # Si es admin, tiene acceso
+        if usuario.is_staff:
+            return True
+            
+        # Si es docente, verificar si es profesor jefe o imparte alguna asignatura
+        if hasattr(usuario.usuario, 'docente'):
+            docente = usuario.usuario.docente
+            
+            # Verificar si es profesor jefe
+            es_profesor_jefe = docente.jefaturas.filter(curso=self).exists()
+            if es_profesor_jefe:
+                return True
+                
+            # Verificar si imparte alguna asignatura en el curso
+            imparte_en_curso = docente.asignaturas_impartidas.filter(clases__curso=self).exists()
+            return imparte_en_curso
+            
+        # Si es estudiante, verificar si pertenece al curso
+        if hasattr(usuario.usuario, 'estudiante'):
+            estudiante = usuario.usuario.estudiante
+            return estudiante.curso == self
+            
+        return False
 
 #Tabla Asistencia#
 class Asistencia(models.Model):

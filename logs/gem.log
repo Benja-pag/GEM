@@ -440,3 +440,132 @@ INFO 2025-06-27 01:10:02,843 basehttp 1928 27512 "POST /chat/ HTTP/1.1" 200 396
 INFO 2025-06-27 01:10:19,172 basehttp 1928 27512 "POST /login/ HTTP/1.1" 302 0
 INFO 2025-06-27 01:10:20,368 basehttp 1928 27512 "GET /admin-panel/ HTTP/1.1" 200 2405669
 INFO 2025-06-27 01:10:20,630 basehttp 1928 27512 "GET /static/js/curso_actions.js HTTP/1.1" 304 0
+INFO 2025-06-27 04:38:40,440 autoreload 6188 27536 Watching for file changes with StatReloader
+INFO 2025-06-27 04:41:03,591 autoreload 9188 2212 Watching for file changes with StatReloader
+INFO 2025-06-27 04:41:12,942 basehttp 9188 10672 "GET / HTTP/1.1" 200 6536
+INFO 2025-06-27 04:41:13,021 basehttp 9188 10672 "GET /static/css/style.css HTTP/1.1" 304 0
+INFO 2025-06-27 04:43:14,009 basehttp 9188 10672 "GET /admin-panel/ HTTP/1.1" 200 2405669
+INFO 2025-06-27 04:43:14,628 basehttp 9188 10672 "GET /static/js/user_details.js HTTP/1.1" 304 0
+INFO 2025-06-27 04:43:14,631 basehttp 9188 4936 "GET /static/js/curso_actions.js HTTP/1.1" 304 0
+INFO 2025-06-27 04:43:14,632 basehttp 9188 14740 "GET /static/js/asignatura_actions.js HTTP/1.1" 304 0
+INFO 2025-06-27 04:46:38,029 basehttp 9188 14740 "GET /admin-panel/ HTTP/1.1" 200 2398573
+INFO 2025-06-27 04:46:41,516 basehttp 9188 4936 "GET /api/dashboard-metricas/ HTTP/1.1" 200 673
+INFO 2025-06-27 04:46:42,802 basehttp 9188 14740 "GET /api/reporte-rendimiento-cursos/ HTTP/1.1" 200 3076
+INFO 2025-06-27 04:46:43,695 basehttp 9188 14740 "POST /logout/ HTTP/1.1" 302 0
+INFO 2025-06-27 04:46:43,705 basehttp 9188 14740 "GET /login/ HTTP/1.1" 200 13537
+INFO 2025-06-27 04:46:47,237 basehttp 9188 14740 "POST /login/ HTTP/1.1" 302 0
+INFO 2025-06-27 04:46:47,593 basehttp 9188 14740 "GET /profesor-panel/ HTTP/1.1" 200 189890
+INFO 2025-06-27 04:46:47,646 basehttp 9188 14740 "GET /static/css/teacher_advanced.css HTTP/1.1" 304 0
+INFO 2025-06-27 04:46:48,543 basehttp 9188 14740 "GET /api/resumen-general-docente/ HTTP/1.1" 200 745
+INFO 2025-06-27 04:46:51,192 basehttp 9188 14740 "GET /curso/1/ HTTP/1.1" 200 159009
+INFO 2025-06-27 04:46:51,239 basehttp 9188 10672 "GET /static/js/main.js HTTP/1.1" 304 0
+WARNING 2025-06-27 04:46:51,272 basehttp 9188 14740 "GET /static/css/curso_detalle.css HTTP/1.1" 404 1822
+WARNING 2025-06-27 04:46:51,274 basehttp 9188 4936 "GET /static/js/ia_tools.js HTTP/1.1" 404 1801
+INFO 2025-06-27 04:49:53,092 basehttp 9188 37468 "GET /curso/1/ HTTP/1.1" 200 154240
+WARNING 2025-06-27 04:49:53,139 basehttp 9188 37468 "GET /static/css/curso_detalle.css HTTP/1.1" 404 1822
+WARNING 2025-06-27 04:49:53,142 basehttp 9188 9296 "GET /static/js/ia_tools.js HTTP/1.1" 404 1801
+INFO 2025-06-27 04:50:04,134 autoreload 9188 2212 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 04:50:05,972 autoreload 31956 1160 Watching for file changes with StatReloader
+INFO 2025-06-27 04:50:10,401 autoreload 31956 1160 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 04:50:11,837 autoreload 25428 8588 Watching for file changes with StatReloader
+INFO 2025-06-27 04:50:26,774 basehttp 25428 6120 "GET /curso/1/ HTTP/1.1" 200 159009
+WARNING 2025-06-27 04:50:26,850 basehttp 25428 2380 "GET /static/js/ia_tools.js HTTP/1.1" 404 1801
+WARNING 2025-06-27 04:50:26,852 basehttp 25428 6120 "GET /static/css/curso_detalle.css HTTP/1.1" 404 1822
+INFO 2025-06-27 04:51:22,991 basehttp 25428 35060 "GET /curso/1/ HTTP/1.1" 200 154970
+WARNING 2025-06-27 04:51:23,038 basehttp 25428 35060 "GET /static/css/curso_detalle.css HTTP/1.1" 404 1822
+INFO 2025-06-27 04:51:26,348 autoreload 25428 8588 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 04:51:28,884 autoreload 7624 36400 Watching for file changes with StatReloader
+INFO 2025-06-27 04:51:40,351 basehttp 7624 34080 "GET /curso/1/ HTTP/1.1" 200 154970
+WARNING 2025-06-27 04:51:40,394 basehttp 7624 34080 "GET /static/css/curso_detalle.css HTTP/1.1" 404 1822
+INFO 2025-06-27 04:53:22,173 basehttp 7624 36724 "GET /curso/1/ HTTP/1.1" 200 153228
+WARNING 2025-06-27 04:53:22,215 basehttp 7624 36724 "GET /static/css/curso_detalle.css HTTP/1.1" 404 1822
+INFO 2025-06-27 04:55:35,821 basehttp 7624 9392 "GET /curso/1/ HTTP/1.1" 200 187975
+INFO 2025-06-27 04:55:35,939 basehttp 7624 9392 "GET /static/css/curso_detalle.css HTTP/1.1" 200 1296
+INFO 2025-06-27 05:01:59,372 basehttp 7624 4088 "GET /curso/1/ HTTP/1.1" 200 195888
+INFO 2025-06-27 05:01:59,405 basehttp 7624 4088 "GET /static/css/curso_detalle.css HTTP/1.1" 200 1882
+INFO 2025-06-27 05:06:38,529 autoreload 7624 36400 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:06:39,651 autoreload 33892 36764 Watching for file changes with StatReloader
+INFO 2025-06-27 05:06:46,228 autoreload 33892 36764 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:06:46,943 autoreload 30492 11192 Watching for file changes with StatReloader
+INFO 2025-06-27 05:07:55,162 autoreload 30492 11192 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:07:56,551 autoreload 18800 8476 Watching for file changes with StatReloader
+INFO 2025-06-27 05:08:04,505 autoreload 18800 8476 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:08:05,659 autoreload 14192 36572 Watching for file changes with StatReloader
+INFO 2025-06-27 05:08:37,368 autoreload 14192 36572 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:08:38,601 autoreload 19088 37716 Watching for file changes with StatReloader
+INFO 2025-06-27 05:09:49,827 autoreload 19088 37716 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:09:51,055 autoreload 3628 18764 Watching for file changes with StatReloader
+INFO 2025-06-27 05:11:08,084 autoreload 3628 18764 C:\Users\benja\Documents\GitHub\GEM\Core\urls.py changed, reloading.
+INFO 2025-06-27 05:11:09,326 autoreload 1528 20172 Watching for file changes with StatReloader
+INFO 2025-06-27 05:11:25,367 autoreload 1528 20172 C:\Users\benja\Documents\GitHub\GEM\Core\urls.py changed, reloading.
+INFO 2025-06-27 05:11:26,630 autoreload 968 12796 Watching for file changes with StatReloader
+INFO 2025-06-27 05:12:00,798 basehttp 968 19728 "GET /curso/1/ HTTP/1.1" 200 196913
+INFO 2025-06-27 05:12:00,856 basehttp 968 19728 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+WARNING 2025-06-27 05:12:09,121 log 968 19728 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-27 05:12:09,122 basehttp 968 19728 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 21710
+INFO 2025-06-27 05:13:38,592 basehttp 968 19728 "GET /curso/1/ HTTP/1.1" 200 196913
+INFO 2025-06-27 05:13:38,644 basehttp 968 19728 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+WARNING 2025-06-27 05:13:38,724 log 968 19728 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-27 05:13:38,726 basehttp 968 19728 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 21710
+INFO 2025-06-27 05:15:23,202 basehttp 968 19728 "GET /curso/1/ HTTP/1.1" 200 197907
+INFO 2025-06-27 05:15:23,236 basehttp 968 19728 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+WARNING 2025-06-27 05:15:23,350 log 968 19728 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-27 05:15:23,351 basehttp 968 19728 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 21710
+INFO 2025-06-27 05:15:29,554 basehttp 968 19728 "GET /curso/1/ HTTP/1.1" 200 197907
+WARNING 2025-06-27 05:15:29,676 log 968 19728 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-27 05:15:29,678 basehttp 968 19728 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 21710
+INFO 2025-06-27 05:19:13,668 basehttp 968 24100 "GET /curso/1/ HTTP/1.1" 200 208372
+INFO 2025-06-27 05:19:13,729 basehttp 968 24100 "GET /static/css/style.css HTTP/1.1" 304 0
+INFO 2025-06-27 05:19:13,731 basehttp 968 14632 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+WARNING 2025-06-27 05:19:13,814 log 968 14632 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-27 05:19:13,816 basehttp 968 14632 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 21710
+ERROR 2025-06-27 05:19:19,015 log 968 14632 Internal Server Error: /api/curso/1/analisis-rendimiento/
+ERROR 2025-06-27 05:19:19,016 basehttp 968 14632 "POST /api/curso/1/analisis-rendimiento/ HTTP/1.1" 500 59
+INFO 2025-06-27 05:20:25,158 autoreload 968 12796 C:\Users\benja\Documents\GitHub\GEM\Core\models\cursos.py changed, reloading.
+INFO 2025-06-27 05:20:26,474 autoreload 33224 15208 Watching for file changes with StatReloader
+INFO 2025-06-27 05:20:49,468 autoreload 33224 15208 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:20:50,512 autoreload 36780 2368 Watching for file changes with StatReloader
+INFO 2025-06-27 05:21:01,507 autoreload 36780 2368 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:21:02,567 autoreload 36816 4164 Watching for file changes with StatReloader
+INFO 2025-06-27 05:21:07,494 basehttp 36816 4076 "GET /curso/1/ HTTP/1.1" 200 208372
+WARNING 2025-06-27 05:21:07,648 log 36816 4076 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-06-27 05:21:07,649 basehttp 36816 4076 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 21710
+ERROR 2025-06-27 05:21:11,896 log 36816 4076 Internal Server Error: /api/curso/1/analisis-rendimiento/
+ERROR 2025-06-27 05:21:11,897 basehttp 36816 4076 "POST /api/curso/1/analisis-rendimiento/ HTTP/1.1" 500 64
+ERROR 2025-06-27 05:21:18,551 log 36816 4076 Internal Server Error: /api/curso/1/prediccion-riesgo/
+ERROR 2025-06-27 05:21:18,552 basehttp 36816 4076 "POST /api/curso/1/prediccion-riesgo/ HTTP/1.1" 500 64
+ERROR 2025-06-27 05:21:20,068 log 36816 4076 Internal Server Error: /api/curso/1/recomendaciones/
+ERROR 2025-06-27 05:21:20,068 basehttp 36816 4076 "POST /api/curso/1/recomendaciones/ HTTP/1.1" 500 64
+INFO 2025-06-27 05:22:32,201 autoreload 36816 4164 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:22:33,482 autoreload 9364 37184 Watching for file changes with StatReloader
+INFO 2025-06-27 05:22:39,066 autoreload 9364 37184 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:22:40,199 autoreload 15388 8484 Watching for file changes with StatReloader
+INFO 2025-06-27 05:22:58,616 basehttp 15388 32356 "GET /curso/1/ HTTP/1.1" 200 208476
+INFO 2025-06-27 05:22:58,653 basehttp 15388 32356 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+ERROR 2025-06-27 05:23:01,771 log 15388 32356 Internal Server Error: /api/curso/1/analisis-rendimiento/
+ERROR 2025-06-27 05:23:01,774 basehttp 15388 32356 "POST /api/curso/1/analisis-rendimiento/ HTTP/1.1" 500 64
+INFO 2025-06-27 05:23:40,759 autoreload 15388 8484 C:\Users\benja\Documents\GitHub\GEM\Core\models\cursos.py changed, reloading.
+INFO 2025-06-27 05:23:42,090 autoreload 11760 4056 Watching for file changes with StatReloader
+INFO 2025-06-27 05:24:02,967 basehttp 11760 36016 "GET /curso/1/ HTTP/1.1" 200 208476
+ERROR 2025-06-27 05:24:06,225 log 11760 36016 Internal Server Error: /api/curso/1/analisis-rendimiento/
+ERROR 2025-06-27 05:24:06,225 basehttp 11760 36016 "POST /api/curso/1/analisis-rendimiento/ HTTP/1.1" 500 159
+INFO 2025-06-27 05:24:53,402 autoreload 11760 4056 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:24:54,664 autoreload 14832 6520 Watching for file changes with StatReloader
+INFO 2025-06-27 05:25:09,232 autoreload 14832 6520 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:25:10,331 autoreload 1208 7588 Watching for file changes with StatReloader
+INFO 2025-06-27 05:25:13,658 basehttp 1208 13548 "GET /curso/1/ HTTP/1.1" 200 208476
+ERROR 2025-06-27 05:25:17,321 log 1208 13548 Internal Server Error: /api/curso/1/analisis-rendimiento/
+ERROR 2025-06-27 05:25:17,321 basehttp 1208 13548 "POST /api/curso/1/analisis-rendimiento/ HTTP/1.1" 500 77
+INFO 2025-06-27 05:25:57,875 autoreload 1208 7588 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:25:59,180 autoreload 10420 2744 Watching for file changes with StatReloader
+INFO 2025-06-27 05:26:07,135 autoreload 10420 2744 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:26:08,707 autoreload 11064 30468 Watching for file changes with StatReloader
+INFO 2025-06-27 05:27:03,873 basehttp 11064 5520 "GET /curso/1/ HTTP/1.1" 200 208476
+INFO 2025-06-27 05:27:03,907 basehttp 11064 5520 "GET /static/css/curso_detalle.css HTTP/1.1" 304 0
+INFO 2025-06-27 05:27:07,556 basehttp 11064 5520 "POST /api/curso/1/analisis-rendimiento/ HTTP/1.1" 200 576
+ERROR 2025-06-27 05:27:15,574 log 11064 5520 Internal Server Error: /api/curso/1/prediccion-riesgo/
+ERROR 2025-06-27 05:27:15,574 basehttp 11064 5520 "POST /api/curso/1/prediccion-riesgo/ HTTP/1.1" 500 147
+INFO 2025-06-27 05:28:02,379 autoreload 11064 30468 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:28:03,682 autoreload 5532 15484 Watching for file changes with StatReloader
+INFO 2025-06-27 05:28:27,734 autoreload 5532 15484 C:\Users\benja\Documents\GitHub\GEM\Core\views\cursos.py changed, reloading.
+INFO 2025-06-27 05:28:29,001 autoreload 16436 19248 Watching for file changes with StatReloader

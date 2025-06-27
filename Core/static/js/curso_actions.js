@@ -235,31 +235,6 @@ $(document).ready(function() {
         $('#editCursoErrors').html(`<ul>${errorsHtml}</ul>`).show();
     }
 
-    function mostrarError(mensaje) {
-        // Crear toast para mostrar error
-        const toast = document.createElement('div');
-        toast.className = 'toast align-items-center text-white bg-danger border-0';
-        toast.setAttribute('role', 'alert');
-        toast.setAttribute('aria-live', 'assertive');
-        toast.setAttribute('aria-atomic', 'true');
-        
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">
-                    <i class="fas fa-exclamation-circle me-2"></i>${mensaje}
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-            </div>
-        `;
-        
-        const container = document.createElement('div');
-        container.className = 'toast-container position-fixed bottom-0 end-0 p-3';
-        container.appendChild(toast);
-        document.body.appendChild(container);
-        
-        new bootstrap.Toast(toast).show();
-    }
-
     function mostrarExito(mensaje) {
         // Función para mostrar éxito - integrar con el sistema de notificaciones existente
         if (typeof mostrarNotificacion === 'function') {
@@ -269,253 +244,12 @@ $(document).ready(function() {
         }
     }
 
-    // Funciones para herramientas IA
-
-    async function generarReporteIA(cursoId, tipoReporte) {
-        try {
-            const response = await fetch('/curso/ia/reporte/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken()
-                },
-                body: JSON.stringify({
-                    curso_id: cursoId,
-                    tipo_reporte: tipoReporte
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al generar reporte');
-            }
-
-            const data = await response.json();
-            mostrarReporteIA(data);
-        } catch (error) {
-            mostrarError('Error al generar reporte: ' + error.message);
-        }
-    }
-
-    async function generarSugerenciasIA(cursoId, area) {
-        try {
-            const response = await fetch('/curso/ia/sugerencias/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken()
-                },
-                body: JSON.stringify({
-                    curso_id: cursoId,
-                    area: area
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al generar sugerencias');
-            }
-
-            const data = await response.json();
-            mostrarSugerenciasIA(data);
-        } catch (error) {
-            mostrarError('Error al generar sugerencias: ' + error.message);
-        }
-    }
-
-    async function generarComunicadoIA(cursoId, tipoComunicado) {
-        try {
-            const response = await fetch('/curso/ia/comunicado/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken()
-                },
-                body: JSON.stringify({
-                    curso_id: cursoId,
-                    tipo_comunicado: tipoComunicado
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al generar comunicado');
-            }
-
-            const data = await response.json();
-            mostrarComunicadoIA(data);
-        } catch (error) {
-            mostrarError('Error al generar comunicado: ' + error.message);
-        }
-    }
-
-    function mostrarReporteIA(data) {
-        // Crear modal para mostrar el reporte
-        const modal = document.createElement('div');
-        modal.className = 'modal fade';
-        modal.id = 'reporteIAModal';
-        
-        modal.innerHTML = `
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">${data.titulo}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <h6 class="text-primary">Resumen Ejecutivo</h6>
-                            <p>${data.resumen_ejecutivo}</p>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <h6 class="text-primary">Análisis Detallado</h6>
-                            <ul class="list-unstyled">
-                                ${data.analisis_detallado.map(item => `
-                                    <li class="mb-2">• ${item.punto}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <h6 class="text-primary">Conclusiones</h6>
-                            <p>${data.conclusiones}</p>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <h6 class="text-primary">Recomendaciones</h6>
-                            <ul class="list-unstyled">
-                                ${data.recomendaciones.map(rec => `
-                                    <li class="mb-2">• ${rec}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" onclick="descargarReporte(${JSON.stringify(data)})">
-                            <i class="fas fa-download me-1"></i>Descargar
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        new bootstrap.Modal(modal).show();
-    }
-
-    function mostrarSugerenciasIA(data) {
-        // Crear modal para mostrar las sugerencias
-        const modal = document.createElement('div');
-        modal.className = 'modal fade';
-        modal.id = 'sugerenciasIAModal';
-        
-        modal.innerHTML = `
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Sugerencias de Intervención</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <h6 class="text-primary">Área de Intervención</h6>
-                            <p>${data.area_intervencion}</p>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <h6 class="text-primary">Objetivos</h6>
-                            <ul class="list-unstyled">
-                                ${data.objetivos.map(obj => `
-                                    <li class="mb-2">• ${obj}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <h6 class="text-primary">Estrategias</h6>
-                            <ul class="list-unstyled">
-                                ${data.estrategias.map(est => `
-                                    <li class="mb-2">• ${est.estrategia}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <h6 class="text-primary">Recursos Necesarios</h6>
-                            <ul class="list-unstyled">
-                                ${data.recursos_necesarios.map(rec => `
-                                    <li class="mb-2">• ${rec}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <h6 class="text-primary">Indicadores de Éxito</h6>
-                            <ul class="list-unstyled">
-                                ${data.indicadores_exito.map(ind => `
-                                    <li class="mb-2">• ${ind}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" onclick="implementarSugerencias(${JSON.stringify(data)})">
-                            <i class="fas fa-check me-1"></i>Implementar
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        new bootstrap.Modal(modal).show();
-    }
-
-    function mostrarComunicadoIA(data) {
-        // Crear modal para mostrar el comunicado
-        const modal = document.createElement('div');
-        modal.className = 'modal fade';
-        modal.id = 'comunicadoIAModal';
-        
-        modal.innerHTML = `
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">${data.asunto}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <p class="mb-3">${data.saludo}</p>
-                            <p class="mb-3">${data.cuerpo}</p>
-                            <p class="mb-3">${data.despedida}</p>
-                            <p class="text-end">${data.firma}</p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" onclick="enviarComunicado(${JSON.stringify(data)})">
-                            <i class="fas fa-paper-plane me-1"></i>Enviar
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="editarComunicado(${JSON.stringify(data)})">
-                            <i class="fas fa-edit me-1"></i>Editar
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        new bootstrap.Modal(modal).show();
-    }
-
     function getCsrfToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
     }
 
-    // Funciones auxiliares para acciones posteriores
     function descargarReporte(data) {
-        // Implementar lógica para descargar el reporte
+        // Implementar lógica para descargar reporte
         console.log('Descargando reporte:', data);
     }
 
@@ -532,5 +266,295 @@ $(document).ready(function() {
     function editarComunicado(data) {
         // Implementar lógica para editar el comunicado
         console.log('Editando comunicado:', data);
+    }
+
+    // Funciones auxiliares globales
+    function mostrarCargando(mensaje) {
+        const contenedor = document.getElementById('contenedor-resultados');
+        contenedor.style.display = 'block';
+        document.getElementById('titulo-resultados').textContent = mensaje;
+        document.getElementById('contenido-resultados').innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3 text-muted">${mensaje}</p>
+            </div>
+        `;
+    }
+
+    function ocultarCargando() {
+        // Esta función se deja vacía porque mostrarResultados ya maneja la visualización
+    }
+
+    function mostrarError(mensaje) {
+        const contenedor = document.getElementById('contenedor-resultados');
+        contenedor.style.display = 'block';
+        document.getElementById('titulo-resultados').textContent = 'Error';
+        document.getElementById('contenido-resultados').innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>${mensaje}
+            </div>
+        `;
+    }
+
+    // Funciones de Análisis IA
+    async function analizarRendimiento(cursoId) {
+        try {
+            mostrarCargando('Analizando rendimiento...');
+            const response = await fetch(`/api/curso/${cursoId}/analisis-rendimiento/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al analizar rendimiento');
+            }
+
+            const data = await response.json();
+            mostrarResultados('Análisis de Rendimiento', generarContenidoAnalisis(data));
+        } catch (error) {
+            mostrarError('Error: ' + error.message);
+        } finally {
+            ocultarCargando();
+        }
+    }
+
+    async function predecirRiesgo(cursoId) {
+        try {
+            mostrarCargando('Analizando riesgo académico...');
+            const response = await fetch(`/api/curso/${cursoId}/prediccion-riesgo/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al predecir riesgo');
+            }
+
+            const data = await response.json();
+            mostrarResultados('Predicción de Riesgo Académico', generarContenidoPrediccion(data));
+        } catch (error) {
+            mostrarError('Error: ' + error.message);
+        } finally {
+            ocultarCargando();
+        }
+    }
+
+    async function obtenerRecomendaciones(cursoId) {
+        try {
+            mostrarCargando('Generando recomendaciones...');
+            const response = await fetch(`/api/curso/${cursoId}/recomendaciones/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al obtener recomendaciones');
+            }
+
+            const data = await response.json();
+            mostrarResultados('Recomendaciones Personalizadas', generarContenidoRecomendaciones(data));
+        } catch (error) {
+            mostrarError('Error: ' + error.message);
+        } finally {
+            ocultarCargando();
+        }
+    }
+
+    function mostrarResultados(titulo, contenido) {
+        const contenedor = document.getElementById('contenedor-resultados');
+        contenedor.style.display = 'block';
+        document.getElementById('titulo-resultados').textContent = titulo;
+        document.getElementById('contenido-resultados').innerHTML = contenido;
+    }
+
+    function cerrarResultados() {
+        document.getElementById('contenedor-resultados').style.display = 'none';
+    }
+
+    async function descargarPDF() {
+        try {
+            const contenido = document.getElementById('contenido-resultados').innerHTML;
+            const titulo = document.getElementById('titulo-resultados').textContent;
+            
+            const response = await fetch('/api/generar-pdf/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    contenido: contenido,
+                    titulo: titulo
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al generar PDF');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            mostrarError('Error al descargar PDF: ' + error.message);
+        }
+    }
+
+    function generarContenidoAnalisis(data) {
+        return `
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>${data.resumen}
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <h3 class="text-primary mb-0">${data.promedio_general}</h3>
+                            <p class="text-muted">Promedio General</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card border-success">
+                        <div class="card-body text-center">
+                            <h3 class="text-success mb-0">${data.asistencia_promedio}</h3>
+                            <p class="text-muted">Asistencia Promedio</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card border-info">
+                        <div class="card-body text-center">
+                            <h3 class="text-info mb-0">${data.total_estudiantes}</h3>
+                            <p class="text-muted">Total Estudiantes</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <h6 class="mb-3">Distribución de Notas</h6>
+                    <div class="progress" style="height: 25px;">
+                        <div class="progress-bar bg-success" style="width: ${(data.distribucion.sobre_6 / data.total_estudiantes) * 100}%" 
+                             title="Sobre 6.0">
+                            ${data.distribucion.sobre_6} (≥6.0)
+                        </div>
+                        <div class="progress-bar bg-info" style="width: ${(data.distribucion.entre_5_6 / data.total_estudiantes) * 100}%" 
+                             title="Entre 5.0 y 5.9">
+                            ${data.distribucion.entre_5_6} (5.0-5.9)
+                        </div>
+                        <div class="progress-bar bg-warning" style="width: ${(data.distribucion.entre_4_5 / data.total_estudiantes) * 100}%" 
+                             title="Entre 4.0 y 4.9">
+                            ${data.distribucion.entre_4_5} (4.0-4.9)
+                        </div>
+                        <div class="progress-bar bg-danger" style="width: ${(data.distribucion.bajo_4 / data.total_estudiantes) * 100}%" 
+                             title="Bajo 4.0">
+                            ${data.distribucion.bajo_4} (<4.0)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function generarContenidoPrediccion(data) {
+        return `
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Se han identificado ${data.total_riesgo || 0} estudiantes en riesgo académico.
+                    </div>
+                </div>
+                ${(data.estudiantes || []).map(est => `
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 ${est.nivel_riesgo === 'alto' ? 'border-danger' : 'border-warning'}">
+                            <div class="card-body">
+                                <h6 class="card-title">${est.nombre}</h6>
+                                <p class="card-text small text-muted">RUT: ${est.rut}</p>
+                                <div class="mb-3">
+                                    <span class="badge bg-${est.nivel_riesgo === 'alto' ? 'danger' : 'warning'}">
+                                        Riesgo ${est.nivel_riesgo}
+                                    </span>
+                                </div>
+                                <p class="card-text">
+                                    <strong>Factores de riesgo:</strong><br>
+                                    ${est.factores.join('<br>')}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    function generarContenidoRecomendaciones(data) {
+        return `
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="alert alert-success">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Se han generado recomendaciones personalizadas para ${data.total_estudiantes || 0} estudiantes.
+                    </div>
+                </div>
+                ${(data.recomendaciones || []).map(rec => `
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="card-title mb-0">${rec.estudiante}</h6>
+                                <small class="text-muted">RUT: ${rec.rut}</small>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled mb-0">
+                                    ${rec.sugerencias.map(sug => `
+                                        <li class="mb-2">
+                                            <i class="fas fa-check-circle text-success me-2"></i>
+                                            ${sug}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    // Funciones auxiliares
+    function mostrarCargando(mensaje) {
+        const contenedor = document.getElementById('contenedor-resultados');
+        contenedor.style.display = 'block';
+        document.getElementById('titulo-resultados').textContent = mensaje;
+        document.getElementById('contenido-resultados').innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3 text-muted">${mensaje}</p>
+            </div>
+        `;
+    }
+
+    function ocultarCargando() {
+        // Esta función se deja vacía porque mostrarResultados ya maneja la visualización
     }
 }); 

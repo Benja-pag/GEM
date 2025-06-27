@@ -2,7 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.contrib import messages
 from django.http import JsonResponse
-from Core.models import Usuario, Docente, Estudiante, Asistencia, CalendarioClase, CalendarioColegio, Clase, Foro, AuthUser, Asignatura, AsignaturaImpartida, Curso, ProfesorJefe, AlumnoEvaluacion, Comunicacion
+from Core.models import (
+    Usuario, Docente, Estudiante, Asistencia, CalendarioClase, 
+    CalendarioColegio, Clase, Foro, AuthUser, Asignatura, 
+    AsignaturaImpartida, Curso, ProfesorJefe, AlumnoEvaluacion, 
+    Comunicacion, Evaluacion
+)
 from django.db.models import Count, Avg, Max, Q
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
@@ -16,6 +21,9 @@ from Core.servicios.repos.cursos import get_curso, get_estudiantes_por_curso
 from Core.servicios.alumnos.helpers import get_promedio_estudiante, get_asistencia_estudiante
 from django.core.exceptions import PermissionDenied
 import json
+from statistics import mean
+from datetime import datetime, timedelta
+from decimal import Decimal
 
 @method_decorator(login_required, name='dispatch')
 class CursoDetalleView(View):
@@ -264,104 +272,249 @@ class AsignaturaDetalleEstudianteView(View):
 
 @login_required
 @require_http_methods(["POST"])
-async def generar_reporte_ia(request):
-    """Vista para generar reportes usando IA"""
+def analisis_rendimiento(request, curso_id):
+    """Analiza el rendimiento del curso usando datos reales"""
     try:
-        data = json.loads(request.body)
-        curso_id = data.get('curso_id')
-        tipo_reporte = data.get('tipo_reporte')
+        # Obtener el curso y validar acceso
+        try:
+            curso = Curso.objects.get(id=curso_id)
+        except Curso.DoesNotExist:
+            return JsonResponse({"error": "Curso no encontrado"}, status=404)
+            
+        if not curso.tiene_acceso(request.user):
+            return JsonResponse({"error": "No tiene permisos para acceder a este curso"}, status=403)
+
+        # Obtener datos de evaluaciones
+        evaluaciones = Evaluacion.objects.filter(clase__curso=curso)
+        if not evaluaciones.exists():
+            return JsonResponse({"error": "No hay evaluaciones registradas para este curso"}, status=404)
+            
+        notas_curso = AlumnoEvaluacion.objects.filter(evaluacion__in=evaluaciones)
+        if not notas_curso.exists():
+            return JsonResponse({"error": "No hay notas registradas para este curso"}, status=404)
         
-        # Verificar permisos
-        curso = Curso.objects.get(id=curso_id)
-        if not request.user.is_staff and not curso.tiene_acceso(request.user):
-            raise PermissionDenied("No tiene permisos para acceder a este curso")
+        # Obtener datos de asistencia
+        asistencias = Asistencia.objects.filter(estudiante__curso=curso)
+        if not asistencias.exists():
+            return JsonResponse({"error": "No hay registros de asistencia para este curso"}, status=404)
         
-        # Determinar rol del usuario
-        user_role = "ADMIN" if request.user.is_staff else "PROFESOR_JEFE" if curso.es_profesor_jefe(request.user) else "DOCENTE"
+        # Calcular estadísticas
+        total_estudiantes = curso.estudiantes.count()
+        promedio_general = notas_curso.aggregate(Avg('nota'))['nota__avg'] or Decimal('0')
+        asistencia_promedio = Decimal(str(asistencias.filter(presente=True).count() / asistencias.count() if asistencias.count() > 0 else 0))
         
-        # Inicializar servicio IA
-        ia_service = IAService()
+        # Análisis de distribución de notas
+        notas = list(notas_curso.values_list('nota', flat=True))
+        distribucion = {
+            'sobre_6': sum(1 for n in notas if n >= Decimal('6.0')),
+            'entre_5_6': sum(1 for n in notas if Decimal('5.0') <= n < Decimal('6.0')),
+            'entre_4_5': sum(1 for n in notas if Decimal('4.0') <= n < Decimal('5.0')),
+            'bajo_4': sum(1 for n in notas if n < Decimal('4.0'))
+        }
+
+        # Análisis de tendencias
+        notas_por_fecha = {}
+        for eval in evaluaciones.order_by('fecha'):
+            fecha = eval.fecha.strftime('%Y-%m-%d')
+            notas_eval = AlumnoEvaluacion.objects.filter(evaluacion=eval)
+            promedio = notas_eval.aggregate(Avg('nota'))['nota__avg'] or Decimal('0')
+            notas_por_fecha[fecha] = float(promedio)  # Convertir a float para JSON
         
-        # Generar reporte
-        response = await ia_service.generate_response(
-            template_name=f"reporte_{tipo_reporte}",
-            user_role=user_role,
-            user_id=request.user.id,
-            curso_id=curso_id
-        )
+        tendencia = 'estable'
+        if notas_por_fecha:
+            valores = list(notas_por_fecha.values())
+            if len(valores) > 1:
+                diferencia = valores[-1] - valores[0]
+                if diferencia > 0.3:
+                    tendencia = 'mejorando'
+                elif diferencia < -0.3:
+                    tendencia = 'bajando'
+
+        # Generar resumen usando los datos reales
+        resumen = f"El curso presenta un promedio general de {float(promedio_general):.1f} con una asistencia promedio del {float(asistencia_promedio)*100:.1f}%. "
+        resumen += f"La tendencia general del curso es '{tendencia}'. "
         
-        return JsonResponse(response)
+        if distribucion['bajo_4'] > total_estudiantes * 0.2:
+            resumen += "Se observa un número significativo de estudiantes con rendimiento bajo 4.0, se recomienda implementar medidas de apoyo adicionales."
+        elif distribucion['sobre_6'] > total_estudiantes * 0.3:
+            resumen += "El curso muestra un excelente rendimiento con un alto porcentaje de estudiantes sobre 6.0."
         
+        return JsonResponse({
+            'resumen': resumen,
+            'promedio_general': f"{float(promedio_general):.1f}",
+            'asistencia_promedio': f"{float(asistencia_promedio)*100:.1f}%",
+            'total_estudiantes': total_estudiantes,
+            'distribucion': distribucion,
+            'tendencia': tendencia,
+            'notas_por_fecha': notas_por_fecha
+        })
+
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        import traceback
+        error_msg = f"Error al analizar rendimiento: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)  # Para el log del servidor
+        return JsonResponse({"error": str(e)}, status=500)
 
 @login_required
 @require_http_methods(["POST"])
-async def generar_sugerencias_ia(request):
-    """Vista para generar sugerencias de intervención usando IA"""
+def prediccion_riesgo(request, curso_id):
+    """Identifica estudiantes en riesgo usando datos reales"""
     try:
-        data = json.loads(request.body)
-        curso_id = data.get('curso_id')
-        area = data.get('area')
+        from decimal import Decimal
         
-        # Verificar permisos
-        curso = Curso.objects.get(id=curso_id)
-        if not request.user.is_staff and not curso.tiene_acceso(request.user):
-            raise PermissionDenied("No tiene permisos para acceder a este curso")
-        
-        # Determinar rol del usuario
-        user_role = "ADMIN" if request.user.is_staff else "PROFESOR_JEFE" if curso.es_profesor_jefe(request.user) else "DOCENTE"
-        
-        # Inicializar servicio IA
-        ia_service = IAService()
-        
-        # Generar sugerencias
-        response = await ia_service.generate_response(
-            template_name="sugerencias_intervencion",
-            user_role=user_role,
-            user_id=request.user.id,
-            curso_id=curso_id,
-            area=area
-        )
-        
-        return JsonResponse(response)
-        
+        # Obtener el curso y validar acceso
+        try:
+            curso = Curso.objects.get(id=curso_id)
+        except Curso.DoesNotExist:
+            return JsonResponse({"error": "Curso no encontrado"}, status=404)
+            
+        if not curso.tiene_acceso(request.user):
+            return JsonResponse({"error": "No tiene permisos para acceder a este curso"}, status=403)
+
+        estudiantes_riesgo = []
+        total_riesgo = 0
+
+        # Obtener datos históricos para cada estudiante
+        for estudiante in curso.estudiantes.all():
+            # Notas
+            notas = list(AlumnoEvaluacion.objects.filter(
+                estudiante=estudiante,
+                evaluacion__clase__curso=curso
+            ).values_list('nota', flat=True))
+            
+            # Asistencia
+            asistencias = Asistencia.objects.filter(
+                estudiante=estudiante,
+                estudiante__curso=curso
+            )
+            porcentaje_asistencia = Decimal(str(asistencias.filter(presente=True).count() / asistencias.count())) if asistencias.count() > 0 else Decimal('0')
+            
+            # Calcular factores de riesgo
+            factores = []
+            promedio = Decimal(str(sum(notas) / len(notas))) if notas else Decimal('0')
+            
+            if promedio < Decimal('4.0'):
+                factores.append(f"Promedio bajo ({float(promedio):.1f})")
+            
+            if porcentaje_asistencia < Decimal('0.85'):
+                factores.append(f"Baja asistencia ({float(porcentaje_asistencia)*100:.1f}%)")
+            
+            # Tendencia de notas
+            if len(notas) > 2:
+                ultimas_tres = [Decimal(str(nota)) for nota in notas[-3:]]
+                promedio_ultimas = sum(ultimas_tres) / len(ultimas_tres)
+                if ultimas_tres[-1] < promedio_ultimas:
+                    factores.append("Tendencia negativa en las últimas evaluaciones")
+
+            # Determinar nivel de riesgo
+            nivel_riesgo = 'bajo'
+            if len(factores) >= 2:
+                nivel_riesgo = 'alto'
+            elif len(factores) == 1:
+                nivel_riesgo = 'medio'
+
+            if factores:
+                estudiantes_riesgo.append({
+                    'nombre': f"{estudiante.usuario.nombre} {estudiante.usuario.apellido_paterno} {estudiante.usuario.apellido_materno}",
+                    'nivel_riesgo': nivel_riesgo,
+                    'factores': factores
+                })
+                total_riesgo += 1
+
+        return JsonResponse({
+            'total_riesgo': total_riesgo,
+            'estudiantes': estudiantes_riesgo
+        })
+
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        import traceback
+        error_msg = f"Error al predecir riesgo: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)  # Para el log del servidor
+        return JsonResponse({"error": str(e)}, status=500)
 
 @login_required
 @require_http_methods(["POST"])
-async def generar_comunicado_ia(request):
-    """Vista para generar comunicados usando IA"""
+def obtener_recomendaciones(request, curso_id):
+    """Genera recomendaciones personalizadas usando datos reales"""
+    try:
+        # Obtener el curso y validar acceso
+        try:
+            curso = Curso.objects.get(id=curso_id)
+        except Curso.DoesNotExist:
+            return JsonResponse({"error": "Curso no encontrado"}, status=404)
+            
+        if not curso.tiene_acceso(request.user):
+            return JsonResponse({"error": "No tiene permisos para acceder a este curso"}, status=403)
+
+        recomendaciones = []
+
+        for estudiante in curso.estudiantes.all():
+            # Obtener datos del estudiante
+            notas = list(AlumnoEvaluacion.objects.filter(
+                alumno=estudiante,
+                evaluacion__curso=curso
+            ).values_list('nota', flat=True))
+            
+            asistencias = Asistencia.objects.filter(
+                estudiante=estudiante,
+                estudiante__curso=curso
+            )
+            porcentaje_asistencia = (asistencias.filter(presente=True).count() / asistencias.count()) if asistencias.count() > 0 else 0
+            
+            promedio = mean(notas) if notas else 0
+            
+            # Generar recomendaciones basadas en los datos
+            if promedio < 4.0 or porcentaje_asistencia < 0.85:
+                recomendacion = ""
+                acciones = []
+
+                if promedio < 4.0:
+                    recomendacion = f"El estudiante presenta un promedio de {promedio:.1f}, lo cual es preocupante. "
+                    acciones.extend([
+                        "Programar sesiones de reforzamiento en las áreas más débiles",
+                        "Implementar evaluaciones formativas adicionales",
+                        "Establecer metas de mejora a corto plazo"
+                    ])
+
+                if porcentaje_asistencia < 0.85:
+                    recomendacion += f"La asistencia del {porcentaje_asistencia*100:.1f}% está bajo lo esperado. "
+                    acciones.extend([
+                        "Contactar al apoderado para discutir la situación",
+                        "Establecer un plan de recuperación de contenidos",
+                        "Monitorear la asistencia diariamente"
+                    ])
+
+                recomendaciones.append({
+                    'estudiante': f"{estudiante.usuario.nombre} {estudiante.usuario.apellido_paterno} {estudiante.usuario.apellido_materno}",
+                    'recomendacion': recomendacion,
+                    'acciones': acciones
+                })
+
+        return JsonResponse({
+            'recomendaciones': recomendaciones
+        })
+
+    except Exception as e:
+        import traceback
+        error_msg = f"Error al obtener recomendaciones: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)  # Para el log del servidor
+        return JsonResponse({"error": str(e)}, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def generar_pdf(request):
+    """Genera un PDF con el análisis solicitado"""
     try:
         data = json.loads(request.body)
-        curso_id = data.get('curso_id')
-        tipo_comunicado = data.get('tipo_comunicado')
-        
-        # Verificar permisos
-        curso = Curso.objects.get(id=curso_id)
-        if not request.user.is_staff and not curso.tiene_acceso(request.user):
-            raise PermissionDenied("No tiene permisos para acceder a este curso")
-        
-        # Determinar rol del usuario
-        user_role = "ADMIN" if request.user.is_staff else "PROFESOR_JEFE" if curso.es_profesor_jefe(request.user) else "DOCENTE"
-        
-        # Inicializar servicio IA
-        ia_service = IAService()
-        
-        # Generar comunicado
-        response = await ia_service.generate_response(
-            template_name="comunicado",
-            user_role=user_role,
-            user_id=request.user.id,
-            curso_id=curso_id,
-            tipo_comunicado=tipo_comunicado
-        )
-        
-        return JsonResponse(response)
-        
+        titulo = data.get('titulo')
+        contenido = data.get('contenido')
+
+        # Aquí implementarías la generación del PDF usando una biblioteca como ReportLab o WeasyPrint
+        # Por ahora retornamos un error indicando que la función está en desarrollo
+        return JsonResponse({"error": "Funcionalidad en desarrollo"}, status=501)
+
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return JsonResponse({"error": str(e)}, status=500)
 
 # from django.shortcuts import render, redirect, get_object_or_404
 # from django.views import View

@@ -19,3 +19,6 @@ IA_gem.env
 # Ignorar archivos de logs
 /logs/
 *.log
+
+# Ignorar archivo específico de logs
+logs/gem.log

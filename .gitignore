@@ -14,4 +14,4 @@ __pycache__/
 Thumbs.db
 
 # Ignorar archivos de configuración local
-.env
+IA_gem.env

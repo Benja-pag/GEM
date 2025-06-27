@@ -15,7 +15,6 @@ from Core.servicios.helpers import validadores, serializadores
 from Core.servicios.repos.cursos import get_curso, get_estudiantes_por_curso
 from Core.servicios.alumnos.helpers import get_promedio_estudiante, get_asistencia_estudiante
 from django.core.exceptions import PermissionDenied
-from ..servicios.helpers.ia_service import IAService
 import json
 
 @method_decorator(login_required, name='dispatch')

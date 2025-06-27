@@ -9,9 +9,10 @@ Documentación oficial:
 
 import os
 from pathlib import Path
-##from dotenv import load_dotenv  # Requiere instalar python-dotenv
+from dotenv import load_dotenv
 
-##load_dotenv()  # Carga las variables desde el archivo .env
+# Cargar variables de entorno desde .env
+load_dotenv('IA_gem.env')
 
 # Base directoryS
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -158,8 +159,8 @@ AUTHENTICATION_BACKENDS = [
     'Core.auth.EmailBackend',
 ]
 
-# OpenAI Configuration
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# Configuración de OpenAI
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 
 # Cache configuration for rate limiting
 CACHES = {
@@ -167,4 +168,38 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-snowflake',
     }
+}
+
+# Configuración de logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'gem.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+    },
 }

@@ -1,0 +1,237 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .chat-container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .chat-messages {
+        height: 400px;
+        overflow-y: auto;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .message {
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .message-user {
+        background-color: #e3f2fd;
+        margin-left: 20%;
+    }
+
+    .message-ai {
+        background-color: #f5f5f5;
+        margin-right: 20%;
+    }
+
+    .message-error {
+        background-color: #fee;
+        color: #c00;
+    }
+
+    .message-header {
+        font-size: 0.9em;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .message-content {
+        color: #212529;
+    }
+
+    .chat-input {
+        display: flex;
+        gap: 10px;
+    }
+
+    .chat-input textarea {
+        flex-grow: 1;
+        border-radius: 8px;
+        padding: 10px;
+        resize: none;
+    }
+
+    .btn-send {
+        align-self: flex-end;
+    }
+
+    .typing-indicator {
+        display: none;
+        padding: 10px;
+        color: #666;
+        font-style: italic;
+    }
+
+    .chat-controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="chat-container">
+        <h2 class="text-center mb-4">Chat GEM con IA</h2>
+
+        <div class="chat-controls">
+            <button id="new-chat" class="btn btn-outline-primary">
+                <i class="fas fa-plus me-1"></i>Nueva Conversación
+            </button>
+            <button id="clear-history" class="btn btn-outline-danger">
+                <i class="fas fa-trash me-1"></i>Limpiar Historial
+            </button>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message message-ai">
+                <div class="message-header">
+                    <span>Asistente GEM</span>
+                </div>
+                <div class="message-content">
+                    ¡Hola! Soy el asistente virtual de GEM. ¿En qué puedo ayudarte hoy?
+                </div>
+            </div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+            El asistente está escribiendo...
+        </div>
+
+        <form id="chatForm" class="chat-input">
+            {% csrf_token %}
+            <textarea 
+                class="form-control" 
+                rows="2" 
+                placeholder="Escribe tu mensaje aquí..."
+                required
+            ></textarea>
+            <button type="submit" class="btn btn-primary btn-send">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatForm = document.getElementById('chatForm');
+    const chatMessages = document.getElementById('chatMessages');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const newChatButton = document.getElementById('new-chat');
+    const clearHistoryButton = document.getElementById('clear-history');
+    const textarea = chatForm.querySelector('textarea');
+    const sendButton = chatForm.querySelector('button[type="submit"]');
+
+    let isProcessing = false;
+
+    function addMessage(content, isUser = false, isError = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'message-user' : 'message-ai'} ${isError ? 'message-error' : ''}`;
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('es-ES', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+
+        messageDiv.innerHTML = `
+            <div class="message-header">
+                <span>${isUser ? 'Tú' : 'Asistente GEM'}</span>
+                <small class="float-end">${timeString}</small>
+            </div>
+            <div class="message-content">
+                ${content}
+            </div>
+        `;
+
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function setLoading(isLoading) {
+        isProcessing = isLoading;
+        typingIndicator.style.display = isLoading ? 'block' : 'none';
+        textarea.disabled = isLoading;
+        sendButton.disabled = isLoading;
+    }
+
+    chatForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const mensaje = textarea.value.trim();
+        if (mensaje && !isProcessing) {
+            try {
+                addMessage(mensaje, true);
+                textarea.value = '';
+                setLoading(true);
+
+                const response = await fetch('', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ mensaje: mensaje })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    addMessage(data.respuesta_ia);
+                } else {
+                    addMessage(data.error || 'Ha ocurrido un error', false, true);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Error de conexión. Por favor, verifica tu conexión a internet e intenta de nuevo.', false, true);
+            } finally {
+                setLoading(false);
+            }
+        }
+    });
+
+    textarea.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey && !isProcessing) {
+            e.preventDefault();
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    newChatButton.addEventListener('click', function() {
+        if (!isProcessing) {
+            chatMessages.innerHTML = `
+                <div class="message message-ai">
+                    <div class="message-header">
+                        <span>Asistente GEM</span>
+                    </div>
+                    <div class="message-content">
+                        ¡Hola! Soy el asistente virtual de GEM. ¿En qué puedo ayudarte hoy?
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    clearHistoryButton.addEventListener('click', function() {
+        if (!isProcessing) {
+            chatMessages.innerHTML = '';
+        }
+    });
+});
+</script>
+{% endblock %} 

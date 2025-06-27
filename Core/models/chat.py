@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 
 # Foro principal creado por un usuario
@@ -47,12 +48,20 @@ class ChatGrupo(models.Model):
 
 # Mensajes enviados dentro de los chats (ya sea por clase o grupo)
 class MensajeChat(models.Model):
-    autor = models.ForeignKey('Usuario', on_delete=models.CASCADE)
+    autor = models.ForeignKey('Usuario', on_delete=models.CASCADE, related_name='mensajes_chat')
     contenido = models.TextField()
-    fecha_envio = models.DateTimeField(auto_now_add=True)
+    fecha_creacion = models.DateTimeField(default=timezone.now)
     chat_clase = models.ForeignKey('ChatClase', on_delete=models.CASCADE, related_name='mensajes', null=True, blank=True)
     chat_grupo = models.ForeignKey('ChatGrupo', on_delete=models.CASCADE, related_name='mensajes', null=True, blank=True)
+    es_publico = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-fecha_creacion']
 
     def __str__(self):
-        destino = self.chat_clase or self.chat_grupo
-        return f'Mensaje de {self.autor} en {destino}'
+        if self.chat_clase:
+            return f'Mensaje de {self.autor} en clase {self.chat_clase}'
+        elif self.chat_grupo:
+            return f'Mensaje de {self.autor} en grupo {self.chat_grupo}'
+        else:
+            return f'Mensaje público de {self.autor}'

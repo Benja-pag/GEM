@@ -7,7 +7,15 @@
 <link rel="stylesheet" href="{% static 'css/curso_detalle.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'js/curso_actions.js' %}"></script>
+<script src="{% static 'js/ia_tools.js' %}"></script>
+{% endblock %}
+
+{% block body_attrs %}data-curso-id="{{ curso.id }}"{% endblock %}
+
 {% block content %}
+{% csrf_token %}
 <div class="container mt-4">
     <!-- Encabezado visual del curso -->
     <div class="row mb-4">
@@ -58,6 +66,9 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="reportes-tab" data-bs-toggle="tab" data-bs-target="#reportes" type="button"><i class="fas fa-file-alt me-2"></i>Reportes</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="ia-tools-tab" data-bs-toggle="tab" data-bs-target="#ia-tools" type="button"><i class="fas fa-robot me-2"></i>IA</button>
         </li>
     </ul>
 
@@ -174,6 +185,35 @@
         <!-- Rendimiento: Análisis detallado por asignatura -->
         <div class="tab-pane fade" id="rendimiento">
             <div class="row">
+                <!-- Herramientas IA para Rendimiento -->
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-robot me-2 text-primary"></i>Análisis IA</h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <button class="btn btn-outline-primary w-100" onclick="generateIAReport('rendimiento')">
+                                        <i class="fas fa-graduation-cap mb-2"></i>
+                                        <br>Análisis de Rendimiento
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-outline-warning w-100" onclick="generateIASuggestions('academica')">
+                                        <i class="fas fa-lightbulb mb-2"></i>
+                                        <br>Sugerencias de Mejora
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-outline-success w-100" onclick="generateIACommunication('rendimiento')">
+                                        <i class="fas fa-envelope mb-2"></i>
+                                        <br>Generar Comunicado
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="col-lg-8">
                     <!-- Ranking de Estudiantes -->
                     <div class="card border-0 shadow-sm h-100">
@@ -554,8 +594,42 @@
                 </div>
             </div>
         </div>
-        <!-- Reportes: Generación de reportes del curso -->
+        <!-- Reportes: Generación y descarga de informes -->
         <div class="tab-pane fade" id="reportes">
+            <!-- Herramientas IA para Reportes -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-robot me-2 text-primary"></i>Reportes Inteligentes</h5>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-primary w-100" onclick="generateIAReport('general')">
+                                <i class="fas fa-file-alt mb-2"></i>
+                                <br>Reporte General
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-info w-100" onclick="generateIAReport('asistencia')">
+                                <i class="fas fa-calendar-check mb-2"></i>
+                                <br>Reporte Asistencia
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-success w-100" onclick="generateIAReport('comportamiento')">
+                                <i class="fas fa-users mb-2"></i>
+                                <br>Reporte Comportamiento
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-outline-warning w-100" onclick="generateIAReport('tendencias')">
+                                <i class="fas fa-chart-line mb-2"></i>
+                                <br>Análisis Tendencias
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Resto del contenido de reportes -->
             <div class="row">
                 <div class="col-lg-8">
                     <div class="card border-0 shadow-sm mb-4">
@@ -948,7 +1022,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-
-<!-- Scripts para herramientas IA -->
-<script src="{% static 'js/ia_tools.js' %}"></script>
 {% endblock %} 

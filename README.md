@@ -1,4 +1,4 @@
-"# GEM" 
+"# GEM - Gestión Educativa Moderna" 
 
 HTMLS:
 "admin_panel": Panel de control para el administrador: gestionar usuarios, asignaturas, encuestas, calendario, etc
@@ -23,6 +23,7 @@ HTMLS:
 Descargas: 
 
 pip install -r requirements.txt
+
 python -m venv env
 pip install django
 pip install psycopg2
@@ -68,3 +69,17 @@ benjamin
 surveys
 tasks
 test
+
+## Configuración del Entorno
+
+1. Crea un archivo `.env` en la raíz del proyecto:
+   ```bash
+   cp env.example .env
+   ```
+
+2. Edita el archivo `.env` y configura las siguientes variables:
+   - `SECRET_KEY`: Clave secreta para Django
+   - `DEBUG`: True para desarrollo, False para producción
+   - `DB_*`: Configuración de la base de datos
+   - `EMAIL_*`: Configuración del servidor de correo
+   - `OPENAI_API_KEY`: Tu clave de API de OpenAI (comienza con sk-)

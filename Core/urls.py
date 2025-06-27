@@ -16,7 +16,6 @@ from Core.views.reportes_simple import ReporteRendimientoCursosViewSimple, Repor
 from Core.views import foro as foro_views
 from Core.views import pdf_views as pdf_views
 from Core.views import cursos as curso_views
-from .views import ia_views
 from .views.cursos import *
 from .views.docentes import *
 from .views.alumnos import *
@@ -25,6 +24,7 @@ from .views.auth import *
 from .views.comunicaciones import *
 from .views.foro import *
 from .views.usuarios import *
+from Core.views import chat
 
 urlpatterns = [
     # URLs de autenticación
@@ -157,20 +157,7 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    # Rutas para herramientas de IA
-    path('curso/ia/reporte/', curso_views.generar_reporte_ia, name='generar_reporte_ia'),
-    path('curso/ia/sugerencias/', curso_views.generar_sugerencias_ia, name='generar_sugerencias_ia'),
-    path('curso/ia/comunicado/', curso_views.generar_comunicado_ia, name='generar_comunicado_ia'),
-]
-
-urlpatterns += [
-    # Rutas de API para IA
-    path('api/ia/generar-reporte/', ia_views.generar_reporte, name='ia_generar_reporte'),
-    path('api/ia/generar-sugerencias/', ia_views.generar_sugerencias, name='ia_generar_sugerencias'),
-    path('api/ia/generar-comunicado/', ia_views.generar_comunicado, name='ia_generar_comunicado'),
-    path('api/ia/chat/', ia_views.chat_ia, name='ia_chat'),
-    path('api/ia/exportar-reporte/', ia_views.exportar_reporte, name='ia_exportar_reporte'),
-    path('api/ia/aplicar-sugerencias/', ia_views.aplicar_sugerencias, name='ia_aplicar_sugerencias'),
-    path('api/ia/enviar-comunicado/', ia_views.enviar_comunicado, name='ia_enviar_comunicado'),
+    # Chat público (versión de prueba)
+    path('chat/', chat.ChatPublicoView.as_view(), name='chat_gem'),
 ]
 

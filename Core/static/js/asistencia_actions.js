@@ -58,7 +58,7 @@ $(document).ready(function() {
             <div class="alert alert-primary">
                 <h4 class="mb-0">
                     <i class="fas fa-calendar-day me-2"></i>
-                    Asistencia para el ${formatearFecha(response.fecha)}
+                    Registro de Asistencia
                 </h4>
             </div>
         `;

@@ -1938,43 +1938,56 @@ class ObtenerAsistenciaAsignaturaView(View):
             }
             dia_semana = mapeo_dias.get(dia_semana)
             
-            # Obtener todas las clases de esta asignatura para el día actual
+            # Verificar si hay clases programadas para hoy
             clases_hoy = Clase.objects.filter(
                 asignatura_impartida=asignatura_impartida,
                 fecha=dia_semana
             ).select_related('curso').order_by('horario')
             
-            # Si no hay clases hoy, buscar la próxima clase
-            if not clases_hoy:
-                # Obtener el siguiente día hábil
-                dias_habiles = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES']
-                idx_actual = dias_habiles.index(dia_semana) if dia_semana in dias_habiles else -1
+            # Si no hay clases hoy, buscar la próxima clase disponible
+            if not clases_hoy.exists():
+                # Mapeo de días de la semana a números (0 = Lunes, 6 = Domingo)
+                dias_semana = {
+                    'LUNES': 0,
+                    'MARTES': 1,
+                    'MIERCOLES': 2,
+                    'JUEVES': 3,
+                    'VIERNES': 4,
+                    'SABADO': 5,
+                    'DOMINGO': 6
+                }
                 
-                for i in range(1, 6):  # Buscar en los próximos 5 días
-                    idx_siguiente = (idx_actual + i) % 5
-                    dia_siguiente = dias_habiles[idx_siguiente]
-                    
-                    clases_siguiente = Clase.objects.filter(
-                        asignatura_impartida=asignatura_impartida,
-                        fecha=dia_siguiente
-                    ).order_by('horario')
-                    
-                    if clases_siguiente:
-                        clases_hoy = clases_siguiente
-                        # Ajustar la fecha al próximo día con clases
-                        dias_hasta_siguiente = (idx_siguiente - idx_actual) if idx_siguiente > idx_actual else (5 - idx_actual + idx_siguiente)
-                        hoy = hoy + timedelta(days=dias_hasta_siguiente)
-                        dia_semana = dia_siguiente
+                # Obtener el número del día actual
+                dia_actual = dias_semana[dia_semana]
+                
+                # Buscar la próxima clase
+                for i in range(1, 8):  # Buscar en los próximos 7 días
+                    proximo_dia = (dia_actual + i) % 7
+                    for dia, num in dias_semana.items():
+                        if num == proximo_dia:
+                            clases_siguiente = Clase.objects.filter(
+                                asignatura_impartida=asignatura_impartida,
+                                fecha=dia
+                            ).select_related('curso').order_by('horario')
+                            if clases_siguiente.exists():
+                                clases_hoy = clases_siguiente
+                                # Ajustar la fecha al próximo día con clases
+                                dias_hasta_siguiente = i
+                                hoy = hoy + timezone.timedelta(days=dias_hasta_siguiente)
+                                break
+                    if clases_hoy.exists():
                         break
-                
-                if not clases_hoy:
-                    return JsonResponse({
-                        'success': False,
-                        'error': 'No hay clases programadas'
-                    })
             
-            # Agrupar las clases por curso
+            # Si no se encontraron clases en los próximos 7 días
+            if not clases_hoy.exists():
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No hay clases programadas para los próximos días'
+                })
+            
+            # Organizar datos por curso
             clases_por_curso = {}
+            
             for clase in clases_hoy:
                 if clase.curso_id not in clases_por_curso:
                     clases_por_curso[clase.curso_id] = {
@@ -1996,7 +2009,7 @@ class ObtenerAsistenciaAsignaturaView(View):
                     asistencias = Asistencia.objects.filter(
                         clase__in=clases_hoy,
                         estudiante__in=estudiantes,
-                        fecha_registro__date=hoy
+                        fecha_registro__date=hoy.date()
                     ).select_related('estudiante', 'clase')
                     
                     # Crear diccionario para acceso rápido
@@ -2082,6 +2095,53 @@ class GuardarAsistenciaView(View):
                 asignatura_impartida__docente=docente
             )
             
+            # Verificar que la fecha de registro no sea anterior a hoy
+            hoy = timezone.localtime(timezone.now())
+            fecha_registro = timezone.localtime(timezone.now())
+            
+            # Obtener el día de la semana actual
+            dia_semana = hoy.strftime('%A').upper()
+            mapeo_dias = {
+                'MONDAY': 'LUNES',
+                'TUESDAY': 'MARTES',
+                'WEDNESDAY': 'MIERCOLES',
+                'THURSDAY': 'JUEVES',
+                'FRIDAY': 'VIERNES',
+                'SATURDAY': 'SABADO',
+                'SUNDAY': 'DOMINGO'
+            }
+            dia_actual = mapeo_dias.get(dia_semana)
+            
+            # Verificar que la clase corresponda al día actual o un día futuro
+            if clase.fecha != dia_actual:
+                # Mapeo de días a números (0 = Lunes, 6 = Domingo)
+                dias_semana = {
+                    'LUNES': 0,
+                    'MARTES': 1,
+                    'MIERCOLES': 2,
+                    'JUEVES': 3,
+                    'VIERNES': 4,
+                    'SABADO': 5,
+                    'DOMINGO': 6
+                }
+                
+                dia_actual_num = dias_semana[dia_actual]
+                dia_clase_num = dias_semana[clase.fecha]
+                
+                # Calcular días hasta la próxima clase
+                dias_hasta_clase = (dia_clase_num - dia_actual_num) % 7
+                if dias_hasta_clase == 0:
+                    # Si es el mismo día pero la clase ya pasó, no permitir registro
+                    hora_actual = hoy.strftime('%H:%M')
+                    if hora_actual > clase.horario.split('-')[1]:
+                        return JsonResponse({
+                            'success': False,
+                            'error': 'No se puede registrar asistencia para una clase que ya pasó'
+                        })
+                
+                # Ajustar la fecha de registro
+                fecha_registro = hoy + timezone.timedelta(days=dias_hasta_clase)
+            
             # Obtener datos del request
             data = json.loads(request.body)
             
@@ -2090,7 +2150,7 @@ class GuardarAsistenciaView(View):
                 # Primero, eliminar todas las asistencias existentes de hoy para esta clase
                 Asistencia.objects.filter(
                     clase=clase,
-                    fecha_registro__date=timezone.now().date()
+                    fecha_registro__date=fecha_registro.date()
                 ).delete()
                 
                 # Preparar las nuevas asistencias
@@ -2125,7 +2185,7 @@ class GuardarAsistenciaView(View):
                             presente=presente,
                             justificado=justificado,
                             observaciones=observaciones,
-                            fecha_registro=timezone.now()
+                            fecha_registro=fecha_registro
                         )
                     )
                 
@@ -2155,7 +2215,7 @@ class GuardarAsistenciaView(View):
                 Asistencia.objects.filter(
                     clase=clase,
                     estudiante=estudiante,
-                    fecha_registro__date=timezone.now().date()
+                    fecha_registro__date=fecha_registro.date()
                 ).delete()
                 
                 # Crear la nueva asistencia
@@ -2165,7 +2225,7 @@ class GuardarAsistenciaView(View):
                     presente=presente,
                     justificado=justificado,
                     observaciones=observaciones,
-                    fecha_registro=timezone.now()
+                    fecha_registro=fecha_registro
                 )
                 
                 return JsonResponse({

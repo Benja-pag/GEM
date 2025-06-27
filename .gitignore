@@ -15,3 +15,7 @@ Thumbs.db
 
 # Ignorar archivos de configuración local
 IA_gem.env
+
+# Ignorar archivos de logs
+/logs/
+*.log

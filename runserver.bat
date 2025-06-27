@@ -1,4 +1,3 @@
 @echo off
-set OPENAI_API_KEY=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
 call .\env311\Scripts\activate
 call python manage.py runserver

@@ -10,7 +10,7 @@ from Core.views import (
 )
 from Core.views.alumnos import InscribirElectivoView, InscribirElectivosLoteView, BorrarInscripcionElectivosView
 from Core.views.docentes import CancelarClaseView, MarcarClaseRecuperadaView, ObtenerHorariosAsignaturaView, CrearEventoCalendarioView, EditarEventoCalendarioView, EliminarEventoCalendarioView, ReporteEvaluacionesAsignaturasDocenteView, ReporteEvaluacionesCursoJefeView, ReporteAsistenciaAsignaturasDocenteView, ReporteAsistenciaCursoJefeView, ResumenGeneralDocenteView
-from Core.views.admin import AdminEventosCalendarioView, AdminCrearEventoCalendarioView, AdminEditarEventoCalendarioView, AdminEliminarEventoCalendarioView, AdminDetalleEventoCalendarioView, ApiCursosView, ApiAsignaturasView, CursoDataView, CursoUpdateView, CursoDeleteView, AsignaturaDataView, AsignaturaUpdateView
+from Core.views.admin import AdminEventosCalendarioView, AdminCrearEventoCalendarioView, AdminEditarEventoCalendarioView, AdminEliminarEventoCalendarioView, AdminDetalleEventoCalendarioView, ApiCursosView, ApiAsignaturasView, CursoDataView, CursoUpdateView, CursoDeleteView, AsignaturaDataView, AsignaturaUpdateView, AsignaturaDeleteView
 from Core.views.reportes import DashboardMetricasView, ReporteAsistenciaGeneralView, ReporteEvaluacionesView
 from Core.views.reportes_simple import ReporteRendimientoCursosViewSimple, ReporteDocentesViewSimple, ReporteEstudiantesRiesgoViewSimple, ReporteAsistenciaGeneralViewSimple, ReporteAsistenciaEstudianteViewSimple, ReporteAsistenciaCursoViewSimple, ListaEstudiantesViewSimple, ReporteAsistenciaAsignaturasCursoViewSimple, ReporteEvaluacionesAsignaturasCursoViewSimple, ReporteEvaluacionesGeneralViewSimple, ReporteEvaluacionesEstudianteViewSimple
 from Core.views import foro as foro_views
@@ -25,6 +25,7 @@ from .views.comunicaciones import *
 from .views.foro import *
 from .views.usuarios import *
 from Core.views import chat
+from Core.views.chat import ChatIAView
 
 urlpatterns = [
     # URLs de autenticación
@@ -131,8 +132,10 @@ urlpatterns += [
     path('cursos/<int:curso_id>/delete/', CursoDeleteView.as_view(), name='curso_delete'),
     
     # URLs para gestión de asignaturas
+    path('asignaturas/create/', AsignaturaCreateView.as_view(), name='asignatura_create'),
     path('asignaturas/<int:asignatura_id>/data/', AsignaturaDataView.as_view(), name='asignatura_data'),
     path('asignaturas/<int:asignatura_id>/update/', AsignaturaUpdateView.as_view(), name='asignatura_update'),
+    path('asignaturas/<int:asignatura_id>/delete/', AsignaturaDeleteView.as_view(), name='asignatura_delete'),
     
     # URLs para reportes del admin
     path('api/dashboard-metricas/', DashboardMetricasView.as_view(), name='dashboard_metricas'),
@@ -180,5 +183,10 @@ urlpatterns += [
     # URLs del foro de asignatura
     path('asignatura/<int:asignatura_id>/foro/', curso_views.ForoAsignaturaView.as_view(), name='foro_asignatura'),
     path('asignatura/<int:asignatura_id>/foro/tema/<int:tema_id>/', curso_views.TemaForoAsignaturaView.as_view(), name='tema_foro_asignatura'),
+]
+
+urlpatterns += [
+    # URLs para chat IA
+    path('api/chat-ia/', ChatIAView.as_view(), name='chat_ia'),
 ]
 

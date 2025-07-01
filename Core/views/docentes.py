@@ -1989,21 +1989,38 @@ class ObtenerAsistenciaAsignaturaView(View):
             clases_por_curso = {}
             
             for clase in clases_hoy:
-                if clase.curso_id not in clases_por_curso:
-                    clases_por_curso[clase.curso_id] = {
-                        'curso': str(clase.curso),
+                # Para asignaturas regulares, usar el curso de la clase
+                if clase.curso:
+                    curso_id = clase.curso_id
+                    curso_nombre = str(clase.curso)
+                    # Obtener estudiantes del curso
+                    estudiantes = clase.curso.estudiantes.all().select_related('usuario')
+                else:
+                    # Para electivos, usar un identificador especial
+                    curso_id = 'ELECTIVO'
+                    curso_nombre = 'Electivo'
+                    # Obtener estudiantes inscritos en la asignatura
+                    estudiantes = Estudiante.objects.filter(
+                        asignaturas_inscritas__asignatura_impartida=asignatura_impartida
+                    ).select_related('usuario')
+                
+                if curso_id not in clases_por_curso:
+                    clases_por_curso[curso_id] = {
+                        'curso': curso_nombre,
                         'clases': [],
                         'estudiantes': []
                     }
-                clases_por_curso[clase.curso_id]['clases'].append({
+                
+                clases_por_curso[curso_id]['clases'].append({
                     'id': clase.id,
                     'horario': clase.horario,
                     'sala': clase.get_sala_display() if hasattr(clase, 'get_sala_display') else clase.sala,
                 })
                 
-                # Obtener estudiantes solo una vez por curso
-                if not clases_por_curso[clase.curso_id]['estudiantes']:
-                    estudiantes = clase.curso.estudiantes.all().select_related('usuario')
+                # Obtener estudiantes solo una vez por curso/electivo
+                if not clases_por_curso[curso_id]['estudiantes']:
+                    if not estudiantes.exists():
+                        continue
                     
                     # Obtener asistencias existentes para todas las clases de hoy
                     asistencias = Asistencia.objects.filter(
@@ -2039,10 +2056,17 @@ class ObtenerAsistenciaAsignaturaView(View):
                             'asistencias': asistencias_estudiante
                         })
                     
-                    clases_por_curso[clase.curso_id]['estudiantes'] = estudiantes_data
+                    clases_por_curso[curso_id]['estudiantes'] = estudiantes_data
             
-            # Convertir el diccionario a lista
-            datos_cursos = list(clases_por_curso.values())
+            # Convertir el diccionario a lista y filtrar cursos sin estudiantes
+            datos_cursos = [curso_data for curso_data in clases_por_curso.values() if curso_data['estudiantes']]
+            
+            # Si no hay cursos con estudiantes
+            if not datos_cursos:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No hay estudiantes registrados en los cursos o inscritos en el electivo'
+                })
             
             # Calcular estadísticas por curso
             for curso_data in datos_cursos:
@@ -2170,24 +2194,56 @@ class GuardarAsistenciaView(View):
                     justificado = asistencia_data.get('justificado', False)
                     observaciones = asistencia_data.get('observaciones', '')
                     
-                    # Obtener el estudiante usando auth_user_id
-                    estudiante = get_object_or_404(
-                        Estudiante,
-                        usuario__auth_user_id=estudiante_id,
-                        curso=clase.curso
-                    )
+                    try:
+                        # Primero intentar obtener el estudiante por curso (asignaturas regulares)
+                        if clase.curso:
+                            estudiante = get_object_or_404(
+                                Estudiante,
+                                usuario__auth_user_id=estudiante_id,
+                                curso=clase.curso
+                            )
+                        else:
+                            # Para electivos, buscar por inscripción
+                            estudiante = get_object_or_404(
+                                Estudiante,
+                                usuario__auth_user_id=estudiante_id,
+                                asignaturas_inscritas__asignatura_impartida=clase.asignatura_impartida
+                            )
+                    except:
+                        continue
                     
-                    # Preparar la asistencia para creación en lote
-                    asistencias_a_crear.append(
-                        Asistencia(
-                            clase=clase,
-                            estudiante=estudiante,
-                            presente=presente,
-                            justificado=justificado,
-                            observaciones=observaciones,
-                            fecha_registro=fecha_registro
+                    # Si es un electivo, buscar todas las clases del mismo día
+                    if not clase.curso:
+                        clases_mismo_dia = Clase.objects.filter(
+                            asignatura_impartida=clase.asignatura_impartida,
+                            fecha=clase.fecha,
+                            curso__isnull=True
                         )
-                    )
+                        
+                        # Crear asistencia para cada bloque del electivo
+                        for clase_electivo in clases_mismo_dia:
+                            asistencias_a_crear.append(
+                                Asistencia(
+                                    clase=clase_electivo,
+                                    estudiante=estudiante,
+                                    presente=presente,
+                                    justificado=justificado,
+                                    observaciones=observaciones,
+                                    fecha_registro=fecha_registro
+                                )
+                            )
+                    else:
+                        # Para asignaturas regulares, solo crear una asistencia
+                        asistencias_a_crear.append(
+                            Asistencia(
+                                clase=clase,
+                                estudiante=estudiante,
+                                presente=presente,
+                                justificado=justificado,
+                                observaciones=observaciones,
+                                fecha_registro=fecha_registro
+                            )
+                        )
                 
                 # Crear todas las asistencias en una sola operación
                 Asistencia.objects.bulk_create(asistencias_a_crear)
@@ -2204,29 +2260,68 @@ class GuardarAsistenciaView(View):
                 justificado = data.get('justificado', False)
                 observaciones = data.get('observaciones', '')
                 
-                # Obtener el estudiante usando auth_user_id
-                estudiante = get_object_or_404(
-                    Estudiante,
-                    usuario__auth_user_id=estudiante_id,
-                    curso=clase.curso
-                )
+                try:
+                    # Primero intentar obtener el estudiante por curso (asignaturas regulares)
+                    if clase.curso:
+                        estudiante = get_object_or_404(
+                            Estudiante,
+                            usuario__auth_user_id=estudiante_id,
+                            curso=clase.curso
+                        )
+                    else:
+                        # Para electivos, buscar por inscripción
+                        estudiante = get_object_or_404(
+                            Estudiante,
+                            usuario__auth_user_id=estudiante_id,
+                            asignaturas_inscritas__asignatura_impartida=clase.asignatura_impartida
+                        )
+                except:
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'Estudiante no encontrado'
+                    })
                 
-                # Eliminar asistencias previas de hoy para este estudiante y clase
-                Asistencia.objects.filter(
-                    clase=clase,
-                    estudiante=estudiante,
-                    fecha_registro__date=fecha_registro.date()
-                ).delete()
-                
-                # Crear la nueva asistencia
-                Asistencia.objects.create(
-                    clase=clase,
-                    estudiante=estudiante,
-                    presente=presente,
-                    justificado=justificado,
-                    observaciones=observaciones,
-                    fecha_registro=fecha_registro
-                )
+                # Si es un electivo, buscar todas las clases del mismo día
+                if not clase.curso:
+                    clases_mismo_dia = Clase.objects.filter(
+                        asignatura_impartida=clase.asignatura_impartida,
+                        fecha=clase.fecha,
+                        curso__isnull=True
+                    )
+                    
+                    # Eliminar asistencias previas de hoy para todas las clases del electivo
+                    Asistencia.objects.filter(
+                        clase__in=clases_mismo_dia,
+                        estudiante=estudiante,
+                        fecha_registro__date=fecha_registro.date()
+                    ).delete()
+                    
+                    # Crear asistencia para cada bloque del electivo
+                    for clase_electivo in clases_mismo_dia:
+                        Asistencia.objects.create(
+                            clase=clase_electivo,
+                            estudiante=estudiante,
+                            presente=presente,
+                            justificado=justificado,
+                            observaciones=observaciones,
+                            fecha_registro=fecha_registro
+                        )
+                else:
+                    # Para asignaturas regulares, solo crear una asistencia
+                    Asistencia.objects.filter(
+                        clase=clase,
+                        estudiante=estudiante,
+                        fecha_registro__date=fecha_registro.date()
+                    ).delete()
+                    
+                    Asistencia.objects.create(
+                        clase=clase,
+                        estudiante=estudiante,
+                        presente=presente,
+                        justificado=justificado,
+                        observaciones=observaciones,
+                        fecha_registro=fecha_registro
+                    )
                 
                 return JsonResponse({
                     'success': True,
@@ -2234,8 +2329,5 @@ class GuardarAsistenciaView(View):
                 })
             
         except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            })
+            return JsonResponse({'success': False, 'error': str(e)})
 

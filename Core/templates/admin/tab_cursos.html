@@ -1,5 +1,7 @@
+{% load static %}
 <!-- Pestaña de Cursos -->
 <div class="tab-pane fade" id="cursos" role="tabpanel" aria-labelledby="cursos-tab">
+    {% csrf_token %}
     <div class="table-responsive">
         <table class="table table-striped align-middle shadow-sm">
             <thead>
@@ -53,45 +55,5 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-    
-    <!-- Estadísticas de Cursos -->
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Total Cursos</h5>
-                    <h2 class="display-6">{{ total_cursos }}</h2>
-                    <small>Activos</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Con Profesor Jefe</h5>
-                    <h2 class="display-6">{{ cursos_con_jefe }}</h2>
-                    <small>Asignados</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Sin Profesor Jefe</h5>
-                    <h2 class="display-6">{{ cursos_sin_jefe }}</h2>
-                    <small>Pendientes</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Promedio Estudiantes</h5>
-                    <h2 class="display-6">{{ promedio_estudiantes }}</h2>
-                    <small>Por curso</small>
-                </div>
-            </div>
-        </div>
     </div>
 </div> 

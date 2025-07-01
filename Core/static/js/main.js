@@ -72,3 +72,17 @@ function contactarEstudiante(email, telefono) {
         }
     }
 }
+
+$(document).ready(function() {
+    // Actualizar asistencia
+    $('#actualizarAsistencia').on('click', function() {
+        const $btn = $(this);
+        const originalHtml = $btn.html();
+        
+        // Mostrar loading
+        $btn.html('<i class="fas fa-spinner fa-spin me-1"></i>Actualizando...').prop('disabled', true);
+        
+        // Recargar la página
+        location.reload();
+    });
+});

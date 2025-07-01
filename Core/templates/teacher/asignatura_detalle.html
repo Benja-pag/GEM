@@ -104,6 +104,7 @@
 {% endblock %}
 
 {% block content %}
+{% csrf_token %}
 <div class="container mt-4">
     <!-- Header mejorado de la asignatura -->
     <div class="asignatura-header text-white">
@@ -169,8 +170,8 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="evaluaciones-tab" data-bs-toggle="tab" data-bs-target="#evaluaciones" type="button">
-                <i class="fas fa-clipboard-check me-2"></i>Evaluaciones y Tareas
+            <button class="nav-link" id="notas-tab" data-bs-toggle="tab" data-bs-target="#notas" type="button">
+                <i class="fas fa-graduation-cap me-2"></i>Notas
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -382,110 +383,100 @@
             </div>
         </div>
 
-        <!-- Pestaña Evaluaciones -->
-        <div class="tab-pane fade fade-in" id="evaluaciones">
+        <!-- Pestaña Notas -->
+        <div class="tab-pane fade fade-in" id="notas">
             <div class="row">
-                <!-- Sección de Evaluaciones -->
-                <div class="col-lg-6">
-                    <div class="card mb-4">
-                        <div class="card-header d-flex justify-content-between align-items-center">
+                <!-- Panel Principal de Notas -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-gradient-primary text-white">
                             <h5 class="card-title mb-0">
-                                <i class="fas fa-clipboard-check me-2"></i>Evaluaciones
+                                <i class="fas fa-graduation-cap me-2"></i>Gestión de Notas
                             </h5>
-                            <button class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus me-1"></i>Nueva Evaluación
-                            </button>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Título</th>
-                                            <th>Fecha</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-file-alt text-primary me-2"></i>
-                                                    <div>
-                                                        <div class="fw-bold">Prueba 1</div>
-                                                        <small class="text-muted">Unidad 1</small>
+                            <!-- Selector de Evaluación -->
+                            <div class="mb-4">
+                                <label class="form-label">Seleccionar Evaluación</label>
+                                <select class="form-select" id="selector-evaluacion">
+                                    <option value="">Seleccione una evaluación...</option>
+                                    {% for evaluacion in evaluaciones %}
+                                    <option value="{{ evaluacion.id }}">{{ evaluacion.nombre }}</option>
+                                    {% endfor %}
+                                </select>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td>15/04/2025</td>
-                                            <td>
-                                                <span class="badge bg-success">Completada</span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-light btn-sm me-1">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-light btn-sm">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+
+                            <!-- Tabla de Notas -->
+                            <div id="tabla-notas">
+                                <!-- La tabla se cargará dinámicamente -->
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Sección de Tareas -->
-                <div class="col-lg-6">
-                    <div class="card mb-4">
-                        <div class="card-header d-flex justify-content-between align-items-center">
+                <!-- Panel de Chat IA -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-gradient-info text-white">
                             <h5 class="card-title mb-0">
-                                <i class="fas fa-tasks me-2"></i>Tareas
+                                <i class="fas fa-robot me-2"></i>Asistente IA
                             </h5>
-                            <button class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus me-1"></i>Nueva Tarea
-                            </button>
                         </div>
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle">
-                                    <thead>
-                                        <tr>
-                                            <th>Título</th>
-                                            <th>Fecha Entrega</th>
-                                            <th>Estado</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-book text-warning me-2"></i>
-                                                    <div>
-                                                        <div class="fw-bold">Tarea 1</div>
-                                                        <small class="text-muted">Ejercicios prácticos</small>
+                            <!-- Área de Chat -->
+                            <div class="chat-container mb-3" style="height: 400px; overflow-y: auto;">
+                                <div id="chat-messages" class="mb-3">
+                                    <!-- Los mensajes se cargarán aquí dinámicamente -->
+                                    <div class="chat-message ai-message mb-2">
+                                        <div class="message-content bg-light p-2 rounded">
+                                            <i class="fas fa-robot text-info me-2"></i>
+                                            ¡Hola! Soy tu asistente IA. Puedo ayudarte con:
+                                            <ul class="mt-2 mb-0">
+                                                <li>Análisis de rendimiento</li>
+                                                <li>Sugerencias de retroalimentación</li>
+                                                <li>Estrategias de evaluación</li>
+                                                <li>Recomendaciones personalizadas</li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td>20/04/2025</td>
-                                            <td>
-                                                <span class="badge bg-warning">Pendiente</span>
-                                            </td>
-                                            <td>
-                                                <button class="btn btn-light btn-sm me-1">
-                                                    <i class="fas fa-eye"></i>
+
+                            <!-- Área de Consulta -->
+                            <div class="chat-input">
+                                <div class="input-group">
+                                    <input type="text" 
+                                           id="ia-consulta" 
+                                           class="form-control" 
+                                           placeholder="Escribe tu consulta..."
+                                           aria-label="Consulta IA">
+                                    <button class="btn btn-info" type="button" id="enviar-consulta">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted mt-2 d-block">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Puedes preguntar sobre análisis, recomendaciones o retroalimentación
+                                </small>
+                            </div>
+
+                            <!-- Sugerencias Rápidas -->
+                            <div class="quick-suggestions mt-4">
+                                <h6 class="text-muted mb-3">Sugerencias Rápidas:</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button class="btn btn-sm btn-outline-info suggestion-btn" 
+                                            data-query="Analizar rendimiento general">
+                                        📊 Análisis de Rendimiento
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info suggestion-btn" 
+                                            data-query="Sugerir retroalimentación para bajo rendimiento">
+                                        💡 Retroalimentación
                                                 </button>
-                                                <button class="btn btn-light btn-sm">
-                                                    <i class="fas fa-edit"></i>
+                                    <button class="btn btn-sm btn-outline-info suggestion-btn" 
+                                            data-query="Recomendar estrategias de evaluación">
+                                        📝 Estrategias
                                                 </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -662,6 +653,8 @@
 
 {% block extra_js %}
 <script src="{% static 'js/asistencia_actions.js' %}"></script>
+<script src="{% static 'js/chat_ia_actions.js' %}"></script>
+<script src="{% static 'js/notas_actions.js' %}"></script>
 <script>
     $(document).ready(function() {
         // Cargar asistencia cuando se muestra la pestaña

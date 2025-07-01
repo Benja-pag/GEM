@@ -185,8 +185,8 @@ class AdminPanelView(View):
                     if not nivel or not nivel.isdigit() or int(nivel) < 1 or int(nivel) > 4:
                         errores.append('El nivel debe estar entre 1 y 4')
                     
-                    if not letra or letra not in ['A', 'B', 'C']:
-                        errores.append('La letra debe ser A o B')
+                    if not letra or letra not in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']:
+                        errores.append('La letra debe ser entre A e I')
                     
                     if not profesor_jefe_id:
                         errores.append('Debe seleccionar un profesor jefe')
@@ -685,8 +685,8 @@ class AdminPanelModularView(View):
                     if not nivel or not nivel.isdigit() or int(nivel) < 1 or int(nivel) > 4:
                         errores.append('El nivel debe estar entre 1 y 4')
                     
-                    if not letra or letra not in ['A', 'B', 'C']:
-                        errores.append('La letra debe ser A o B')
+                    if not letra or letra not in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']:
+                        errores.append('La letra debe ser entre A e I')
                     
                     if not profesor_jefe_id:
                         errores.append('Debe seleccionar un profesor jefe')
@@ -1330,8 +1330,8 @@ class CursoUpdateView(View):
             if not nivel or not nivel.isdigit() or int(nivel) < 1 or int(nivel) > 4:
                 errores.append('El nivel debe estar entre 1 y 4')
             
-            if not letra or letra not in ['A', 'B', 'C']:
-                errores.append('La letra debe ser A, B o C')
+            if not letra or letra not in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']:
+                errores.append('La letra debe ser entre A e I')
             
             # Verificar si ya existe otro curso con el mismo nivel y letra
             curso_existente = Curso.objects.filter(nivel=nivel, letra=letra).exclude(id=curso_id).first()
@@ -1410,6 +1410,22 @@ class CursoDeleteView(View):
                     'error': f'No se puede eliminar el curso {curso.nivel}°{curso.letra} porque tiene {total_asignaturas} asignaturas asignadas'
                 })
             
+            # Verificar si el curso tiene comunicaciones
+            total_comunicaciones = curso.comunicaciones.count()
+            if total_comunicaciones > 0:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'No se puede eliminar el curso {curso.nivel}°{curso.letra} porque tiene {total_comunicaciones} comunicaciones asociadas'
+                })
+            
+            # Verificar si el curso tiene anotaciones
+            total_anotaciones = curso.anotaciones.count()
+            if total_anotaciones > 0:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'No se puede eliminar el curso {curso.nivel}°{curso.letra} porque tiene {total_anotaciones} anotaciones asociadas'
+                })
+            
             with transaction.atomic():
                 curso_nombre = f"{curso.nivel}°{curso.letra}"
                 
@@ -1441,63 +1457,55 @@ class AsignaturaDataView(View):
             if not request.user.is_admin:
                 return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
             
-            asignatura_impartida = get_object_or_404(AsignaturaImpartida, id=asignatura_id)
+            asignatura = get_object_or_404(Asignatura, id=asignatura_id)
             
-            # Obtener clases asociadas
-            clases = Clase.objects.filter(asignatura_impartida=asignatura_impartida).select_related('curso')
-            
-            # Obtener estudiantes inscritos
-            estudiantes_inscritos = []
-            for clase in clases:
-                estudiantes = Estudiante.objects.filter(curso=clase.curso).select_related('usuario')
-                for estudiante in estudiantes:
-                    if not any(e['id'] == estudiante.pk for e in estudiantes_inscritos):
-                        estudiantes_inscritos.append({
-                            'id': estudiante.pk,
-                            'nombre': estudiante.usuario.get_full_name(),
-                            'rut': f"{estudiante.usuario.rut}-{estudiante.usuario.div}",
-                            'curso': f"{estudiante.curso.nivel}°{estudiante.curso.letra}" if estudiante.curso else 'Sin curso'
-                        })
-            
-            # Obtener horarios
-            horarios = []
-            for clase in clases:
-                horarios.append({
-                    'dia': clase.get_fecha_display(),
-                    'horario': clase.horario,  # horario es CharField, no tiene choices
-                    'sala': clase.get_sala_display(),
-                    'curso': f"{clase.curso.nivel}°{clase.curso.letra}"
+            # Obtener imparticiones
+            imparticiones = []
+            for imparticion in asignatura.imparticiones.all().select_related('docente__usuario'):
+                imparticiones.append({
+                    'id': imparticion.id,
+                    'codigo': imparticion.codigo,
+                    'docente': imparticion.docente.usuario.get_full_name() if imparticion.docente else 'Sin docente'
                 })
             
-            # Obtener evaluaciones
-            evaluaciones = Evaluacion.objects.filter(clase__asignatura_impartida=asignatura_impartida).select_related('evaluacion_base')
-            evaluaciones_data = []
-            for evaluacion in evaluaciones:
-                evaluaciones_data.append({
+            # Obtener objetivos
+            objetivos = []
+            for objetivo in asignatura.objetivos.all():
+                objetivos.append({
+                    'id': objetivo.id,
+                    'descripcion': objetivo.descripcion,
+                    'completado': objetivo.completado
+                })
+            
+            # Obtener recursos
+            recursos = []
+            for recurso in asignatura.recursos.all():
+                recursos.append({
+                    'id': recurso.id,
+                    'titulo': recurso.titulo,
+                    'tipo': recurso.get_tipo_display(),
+                    'descripcion': recurso.descripcion
+                })
+            
+            # Obtener evaluaciones base
+            evaluaciones = []
+            for evaluacion in asignatura.evaluaciones_base.all():
+                evaluaciones.append({
                     'id': evaluacion.id,
-                    'nombre': evaluacion.evaluacion_base.nombre,
-                    'descripcion': evaluacion.evaluacion_base.descripcion,
-                    'fecha': evaluacion.fecha.strftime('%d/%m/%Y') if evaluacion.fecha else 'Sin fecha',
-                    'curso': f"{evaluacion.clase.curso.nivel}°{evaluacion.clase.curso.letra}"
+                    'nombre': evaluacion.nombre,
+                    'descripcion': evaluacion.descripcion,
+                    'ponderacion': float(evaluacion.ponderacion)
                 })
             
             data = {
-                'id': asignatura_impartida.id,
-                'codigo': asignatura_impartida.codigo,  # El código está en AsignaturaImpartida
-                'nombre': asignatura_impartida.asignatura.nombre,
-                'nivel': asignatura_impartida.asignatura.get_nivel_display(),
-                'es_electivo': asignatura_impartida.asignatura.es_electivo,
-                'docente': {
-                    'id': asignatura_impartida.docente.usuario.auth_user_id if asignatura_impartida.docente else None,
-                    'nombre': asignatura_impartida.docente.usuario.get_full_name() if asignatura_impartida.docente else 'Sin docente',
-                    'especialidad': asignatura_impartida.docente.especialidad.nombre if asignatura_impartida.docente and asignatura_impartida.docente.especialidad else 'Sin especialidad'
-                },
-                'total_estudiantes': len(estudiantes_inscritos),
-                'total_horarios': len(horarios),
-                'total_evaluaciones': len(evaluaciones_data),
-                'estudiantes': estudiantes_inscritos,
-                'horarios': horarios,
-                'evaluaciones': evaluaciones_data
+                'id': asignatura.id,
+                'nombre': asignatura.nombre,
+                'nivel': asignatura.nivel,
+                'es_electivo': asignatura.es_electivo,
+                'imparticiones': imparticiones,
+                'objetivos': objetivos,
+                'recursos': recursos,
+                'evaluaciones': evaluaciones
             }
             
             return JsonResponse({'success': True, 'data': data})
@@ -1513,49 +1521,133 @@ class AsignaturaUpdateView(View):
             if not request.user.is_admin:
                 return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
             
-            asignatura_impartida = get_object_or_404(AsignaturaImpartida, id=asignatura_id)
+            asignatura = get_object_or_404(Asignatura, id=asignatura_id)
             
-            codigo = request.POST.get('codigo')
-            nombre = request.POST.get('nombre')
-            descripcion = request.POST.get('descripcion', '')
-            docente_id = request.POST.get('docente_id')
+            data = json.loads(request.body)
+            nombre = data.get('nombre')
+            nivel = data.get('nivel')
+            es_electivo = data.get('es_electivo', False)
             
             errores = []
             
             # Validar datos
-            if not codigo:
-                errores.append('El código es obligatorio')
             if not nombre:
-                errores.append('El nombre es obligatorio')
+                errores.append('El nombre es requerido')
             
-            # Verificar si ya existe otra asignatura impartida con el mismo código
-            if AsignaturaImpartida.objects.filter(codigo=codigo).exclude(id=asignatura_impartida.id).exists():
-                errores.append(f'Ya existe otra asignatura impartida con el código {codigo}')
+            if not nivel or not str(nivel).isdigit() or int(nivel) < 1 or int(nivel) > 4:
+                errores.append('El nivel debe estar entre 1 y 4')
             
             if errores:
                 return JsonResponse({'success': False, 'errors': errores})
             
-            with transaction.atomic():
-                # Actualizar la asignatura base
-                asignatura_base = asignatura_impartida.asignatura
-                asignatura_base.nombre = nombre
-                asignatura_base.save()
-                
-                # Actualizar el código en AsignaturaImpartida
-                asignatura_impartida.codigo = codigo
-                
-                # Actualizar el docente si se especifica
-                if docente_id:
-                    docente = get_object_or_404(Docente, usuario__auth_user_id=docente_id)
-                    asignatura_impartida.docente = docente
-                
-                # Guardar los cambios en AsignaturaImpartida
-                asignatura_impartida.save()
-                
+            # Actualizar datos de la asignatura
+            asignatura.nombre = nombre
+            asignatura.nivel = int(nivel)
+            asignatura.es_electivo = es_electivo
+            asignatura.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Asignatura {asignatura.nombre} actualizada exitosamente'
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator([login_required, csrf_exempt], name='dispatch')
+class AsignaturaDeleteView(View):
+    """Vista para eliminar una asignatura"""
+    def post(self, request, asignatura_id):
+        try:
+            if not request.user.is_admin:
+                return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
+            
+            asignatura = get_object_or_404(Asignatura, id=asignatura_id)
+            
+            # Verificar si la asignatura tiene imparticiones
+            total_imparticiones = asignatura.imparticiones.count()
+            if total_imparticiones > 0:
                 return JsonResponse({
-                    'success': True,
-                    'message': f'Asignatura {nombre} actualizada exitosamente'
+                    'success': False,
+                    'error': f'No se puede eliminar la asignatura {asignatura.nombre} porque tiene {total_imparticiones} imparticiones'
                 })
-                
+            
+            # Verificar si la asignatura tiene objetivos
+            total_objetivos = asignatura.objetivos.count()
+            if total_objetivos > 0:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'No se puede eliminar la asignatura {asignatura.nombre} porque tiene {total_objetivos} objetivos'
+                })
+            
+            # Verificar si la asignatura tiene recursos
+            total_recursos = asignatura.recursos.count()
+            if total_recursos > 0:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'No se puede eliminar la asignatura {asignatura.nombre} porque tiene {total_recursos} recursos'
+                })
+            
+            # Verificar si la asignatura tiene evaluaciones base
+            total_evaluaciones = asignatura.evaluaciones_base.count()
+            if total_evaluaciones > 0:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'No se puede eliminar la asignatura {asignatura.nombre} porque tiene {total_evaluaciones} evaluaciones base'
+                })
+            
+            # Eliminar la asignatura
+            asignatura_nombre = asignatura.nombre
+            asignatura.delete()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Asignatura {asignatura_nombre} eliminada exitosamente'
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+@method_decorator([login_required, csrf_exempt], name='dispatch')
+class AsignaturaCreateView(View):
+    """Vista para crear una asignatura"""
+    def post(self, request):
+        try:
+            if not request.user.is_admin:
+                return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
+            
+            data = json.loads(request.body)
+            nombre = data.get('nombre')
+            nivel = data.get('nivel')
+            es_electivo = data.get('es_electivo', False)
+            
+            errores = []
+            
+            # Validar datos
+            if not nombre:
+                errores.append('El nombre es requerido')
+            
+            if not nivel or not str(nivel).isdigit() or int(nivel) < 1 or int(nivel) > 4:
+                errores.append('El nivel debe estar entre 1 y 4')
+            
+            # Verificar si ya existe una asignatura con el mismo nombre y nivel
+            if Asignatura.objects.filter(nombre=nombre, nivel=nivel).exists():
+                errores.append(f'Ya existe una asignatura con el nombre {nombre} en el nivel {nivel}°')
+            
+            if errores:
+                return JsonResponse({'success': False, 'errors': errores})
+            
+            # Crear la asignatura
+            asignatura = Asignatura.objects.create(
+                nombre=nombre,
+                nivel=int(nivel),
+                es_electivo=es_electivo
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Asignatura {asignatura.nombre} creada exitosamente'
+            })
+            
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})

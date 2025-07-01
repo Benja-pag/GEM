@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función para mostrar errores
     function mostrarErrores(errores) {
         const alertaError = document.querySelector('#crearCursoModal .alert-danger');
+        if (!alertaError) return;
+        
         if (Array.isArray(errores)) {
             alertaError.textContent = errores.join(', ');
         } else if (typeof errores === 'object') {
@@ -37,7 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Limpiar errores previos
             const alertaError = form.querySelector('.alert-danger');
-            alertaError.style.display = 'none';
+            if (alertaError) {
+                alertaError.style.display = 'none';
+            }
             form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
             
             // Validar campos
@@ -46,19 +50,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const profesorJefe = document.getElementById('profesor_jefe_id');
             const errores = [];
 
-            if (!nivel.value || nivel.value < 1 || nivel.value > 4) {
+            if (!nivel || !nivel.value || nivel.value < 1 || nivel.value > 4) {
                 errores.push('El nivel debe estar entre 1 y 4');
-                nivel.classList.add('is-invalid');
+                if (nivel) nivel.classList.add('is-invalid');
             }
 
-            if (!letra.value || !/^[A-B]$/i.test(letra.value)) {
-                errores.push('La letra debe ser A o B');
-                letra.classList.add('is-invalid');
+            if (!letra || !letra.value || !/^[A-I]$/i.test(letra.value)) {
+                errores.push('La letra debe ser entre A e I');
+                if (letra) letra.classList.add('is-invalid');
             }
 
-            if (!profesorJefe.value) {
+            if (!profesorJefe || !profesorJefe.value) {
                 errores.push('Debe seleccionar un profesor jefe');
-                profesorJefe.classList.add('is-invalid');
+                if (profesorJefe) profesorJefe.classList.add('is-invalid');
             }
 
             if (errores.length > 0) {
@@ -69,22 +73,33 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 // Preparar los datos del formulario
                 const formData = new FormData(form);
+                const url = form.getAttribute('action');
+                
+                if (!url) {
+                    throw new Error('URL del formulario no encontrada');
+                }
                 
                 // Enviar el formulario
-                const response = await fetch(form.action, {
+                const response = await fetch(url, {
                     method: 'POST',
                     body: formData,
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 });
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
                 
                 const data = await response.json();
                 
                 if (data.success) {
                     // Cerrar el modal
                     const modal = bootstrap.Modal.getInstance(document.getElementById('crearCursoModal'));
-                    modal.hide();
+                    if (modal) {
+                        modal.hide();
+                    }
                     
                     // Mostrar mensaje de éxito
                     mostrarMensajeExito('Curso creado exitosamente');
@@ -94,16 +109,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (error) {
                 console.error('Error:', error);
-                mostrarErrores('Error al procesar la solicitud');
+                mostrarErrores('Error al procesar la solicitud: ' + error.message);
             }
         });
 
         // Limpiar el formulario cuando se cierra el modal
         const modal = document.getElementById('crearCursoModal');
-        modal.addEventListener('hidden.bs.modal', function() {
-            form.reset();
-            form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-            form.querySelector('.alert-danger').style.display = 'none';
-        });
+        if (modal) {
+            modal.addEventListener('hidden.bs.modal', function() {
+                form.reset();
+                form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                const alertaError = form.querySelector('.alert-danger');
+                if (alertaError) {
+                    alertaError.style.display = 'none';
+                }
+            });
+        }
     }
 }); 

@@ -105,23 +105,8 @@ def get_promedio_estudiante(estudiante_id):
 
 def get_asistencia_estudiante(estudiante_id):
     """
-    Obtiene los datos de asistencia del estudiante para el mes actual
+    Obtiene los datos de asistencia del estudiante
     """
-    # Obtener fechas del mes actual
-    hoy = date.today()
-    primer_dia = date(hoy.year, hoy.month, 1)
-    
-    # Si estamos en el primer día del mes, usar el mes anterior
-    if hoy.day <= 5:
-        primer_dia = primer_dia - timedelta(days=30)
-        primer_dia = date(primer_dia.year, primer_dia.month, 1)
-    
-    # Obtener el último día del mes
-    if primer_dia.month == 12:
-        ultimo_dia = date(primer_dia.year + 1, 1, 1) - timedelta(days=1)
-    else:
-        ultimo_dia = date(primer_dia.year, primer_dia.month + 1, 1) - timedelta(days=1)
-    
     # Obtener todas las asignaturas inscritas del estudiante
     asignaturas_inscritas = AsignaturaInscrita.objects.filter(
         estudiante_id=estudiante_id,
@@ -141,11 +126,9 @@ def get_asistencia_estudiante(estudiante_id):
             'sin_registro': True  # Marcar como sin registro inicialmente
         }
     
-    # Obtener asistencias del estudiante para el mes
+    # Obtener asistencias del estudiante
     asistencias = Asistencia.objects.filter(
-        estudiante_id=estudiante_id,
-        fecha_registro__date__gte=primer_dia,
-        fecha_registro__date__lte=ultimo_dia
+        estudiante_id=estudiante_id
     ).select_related('clase__asignatura_impartida__asignatura')
     
     # Procesar las asistencias existentes

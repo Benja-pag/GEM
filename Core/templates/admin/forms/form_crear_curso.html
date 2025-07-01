@@ -16,13 +16,15 @@
                     
                     <div class="mb-3">
                         <label for="nivel" class="form-label">Nivel</label>
-                        <input type="number" class="form-control" id="nivel" name="nivel" min="1" max="12" required>
+                        <input type="number" class="form-control" id="nivel" name="nivel" min="1" max="4" required>
                         <div class="invalid-feedback"></div>
+                        <small class="text-muted">El nivel debe estar entre 1 y 4</small>
                     </div>
                     <div class="mb-3">
                         <label for="letra" class="form-label">Letra</label>
                         <input type="text" class="form-control" id="letra" name="letra" maxlength="1" required>
                         <div class="invalid-feedback"></div>
+                        <small class="text-muted">La letra debe ser A, B o C</small>
                     </div>
                     <div class="mb-3">
                         <label for="profesor_jefe_id" class="form-label">Profesor Jefe</label>

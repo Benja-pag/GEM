@@ -27,6 +27,7 @@
     
     <!-- Custom CSS -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'css/system_messages.css' %}" rel="stylesheet">
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -34,7 +35,10 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">GEM</a>
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="{% static 'img/icono_gem.png' %}" alt="GEM Icon" height="30" class="me-2">
+                GEM
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -85,15 +89,14 @@
 
     <!-- Main Content -->
     <div class="container-fluid">
-        {% if messages and request.resolver_match.url_name != 'login' %}
-        <div class="messages mt-3">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-            {% endfor %}
-        </div>
+        {% if messages %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                {% for message in messages %}
+                    GEMSystemMessage.{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}("{{ message|escapejs }}");
+                {% endfor %}
+            });
+        </script>
         {% endif %}
 
         {% block content %}{% endblock %}
@@ -126,6 +129,8 @@
     
     <!-- Custom JS -->
     <script src="{% static 'js/utils.js' %}"></script>
+    <script src="{% static 'js/system_messages.js' %}"></script>
+    <script src="{% static 'js/alerts.js' %}"></script>
     
     {% block extra_js %}{% endblock %}
 </body>

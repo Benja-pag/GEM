@@ -535,4 +535,92 @@ $(document).ready(function() {
             }
         });
     }
+
+    // Botón para agregar nuevo bloque de horario
+    document.getElementById('agregarBloque').addEventListener('click', function() {
+        const container = document.getElementById('bloquesContainer');
+        const bloqueTemplate = container.querySelector('.bloque-clase').cloneNode(true);
+        
+        // Limpiar valores seleccionados
+        bloqueTemplate.querySelectorAll('select').forEach(select => select.value = '');
+        
+        // Agregar evento para remover bloque
+        bloqueTemplate.querySelector('.remove-bloque').addEventListener('click', function() {
+            if (container.children.length > 1) {
+                this.closest('.bloque-clase').remove();
+            }
+        });
+        
+        container.appendChild(bloqueTemplate);
+    });
+
+    // Evento inicial para remover bloque
+    document.querySelectorAll('.remove-bloque').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const container = document.getElementById('bloquesContainer');
+            if (container.children.length > 1) {
+                this.closest('.bloque-clase').remove();
+            }
+        });
+    });
+
+    // Manejar creación de asignatura
+    document.getElementById('btnCrearAsignatura').addEventListener('click', function() {
+        const form = document.getElementById('crearAsignaturaForm');
+        const formData = new FormData(form);
+        
+        // Validar campos requeridos
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        // Construir datos para enviar
+        const data = {
+            codigo: formData.get('codigo'),
+            nombre: formData.get('nombre'),
+            nivel: formData.get('nivel'),
+            letra: formData.get('letra'),
+            bloques: []
+        };
+
+        // Recolectar bloques de horario
+        const dias = formData.getAll('dia[]');
+        const horarios = formData.getAll('horario[]');
+        
+        for (let i = 0; i < dias.length; i++) {
+            if (dias[i] && horarios[i]) {
+                data.bloques.push({
+                    dia: dias[i],
+                    horario: horarios[i]
+                });
+            }
+        }
+
+        // Enviar datos al servidor
+        fetch('/api/asignaturas/crear/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Cerrar modal y recargar página
+                const modal = bootstrap.Modal.getInstance(document.getElementById('crearAsignaturaModal'));
+                modal.hide();
+                window.location.reload();
+            } else {
+                // Mostrar error
+                showSystemMessage('error', data.message || 'Error al crear la asignatura');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showSystemMessage('error', 'Error al crear la asignatura');
+        });
+    });
 }); 

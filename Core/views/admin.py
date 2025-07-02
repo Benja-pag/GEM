@@ -139,8 +139,116 @@ class AdminPanelView(View):
             asignaturas = AsignaturaImpartida.objects.select_related(
                 'asignatura',
                 'docente__usuario'
-            ).prefetch_related('clases').all()
-            
+            ).prefetch_related(
+                'clases__curso'  # Agregamos la relación con curso
+            ).distinct().all()
+
+            # Mapeo de días en español
+            DIAS_SEMANA = {
+                'Monday': 'Lunes',
+                'Tuesday': 'Martes',
+                'Wednesday': 'Miércoles',
+                'Thursday': 'Jueves',
+                'Friday': 'Viernes',
+                'Saturday': 'Sábado',
+                'Sunday': 'Domingo'
+            }
+
+            # Mapeo de bloques a horarios
+            BLOQUES_HORARIO = {
+                '1': ('08:00', '08:45'),
+                '2': ('08:45', '09:30'),
+                '3': ('09:45', '10:30'),
+                '4': ('10:30', '11:15'),
+                '5': ('11:30', '12:15'),
+                '6': ('12:15', '13:00'),
+                '7': ('13:45', '14:30'),
+                '8': ('14:30', '15:15'),
+                '9': ('15:15', '16:00'),
+            }
+
+            def agrupar_bloques_consecutivos(bloques):
+                if not bloques:
+                    return []
+                
+                # Convertir bloques a números
+                bloques_num = []
+                for b in bloques:
+                    for num, (inicio, fin) in BLOQUES_HORARIO.items():
+                        if str(b) == num:
+                            bloques_num.append(int(num))
+                            break
+                
+                bloques_num.sort()
+                grupos = []
+                grupo_actual = [bloques_num[0]]
+
+                for i in range(1, len(bloques_num)):
+                    if bloques_num[i] == bloques_num[i-1] + 1:
+                        grupo_actual.append(bloques_num[i])
+                    else:
+                        grupos.append(grupo_actual)
+                        grupo_actual = [bloques_num[i]]
+                grupos.append(grupo_actual)
+
+                # Convertir grupos a rangos de horario
+                rangos = []
+                for grupo in grupos:
+                    inicio = BLOQUES_HORARIO[str(grupo[0])][0]
+                    fin = BLOQUES_HORARIO[str(grupo[-1])][1]
+                    rangos.append(f"{inicio} - {fin}")
+
+                return rangos
+
+            # Procesar las asignaturas para evitar duplicados en cursos y bloques
+            asignaturas_procesadas = []
+            for asignatura in asignaturas:
+                # Obtener cursos únicos
+                cursos = set()
+                for clase in asignatura.clases.all():
+                    if clase.curso:
+                        cursos.add((clase.curso.nivel, clase.curso.letra))
+                
+                # Si no hay cursos, marcar como electivo
+                if not cursos:
+                    cursos_texto = "Electivo"
+                else:
+                    # Ordenar los cursos
+                    cursos_ordenados = sorted(list(cursos))
+                    cursos_texto = ", ".join([
+                        f"{nivel}°{letra}" 
+                        for nivel, letra in cursos_ordenados
+                    ])
+                
+                # Obtener bloques por día
+                bloques_por_dia = {}
+                for clase in asignatura.clases.all():
+                    # Convertir la fecha a día de la semana
+                    try:
+                        if isinstance(clase.fecha, str):
+                            from datetime import datetime
+                            fecha_obj = datetime.strptime(clase.fecha, '%Y-%m-%d')
+                            dia = DIAS_SEMANA[fecha_obj.strftime('%A')]
+                        else:
+                            dia = DIAS_SEMANA[clase.fecha.strftime('%A')]
+                    except (ValueError, AttributeError, KeyError):
+                        dia = str(clase.fecha)
+                    
+                    if dia not in bloques_por_dia:
+                        bloques_por_dia[dia] = set()
+                    bloques_por_dia[dia].add(clase.horario)
+                
+                # Crear un registro por cada día
+                for dia, bloques in sorted(bloques_por_dia.items()):
+                    registro = {
+                        'codigo': asignatura.codigo,
+                        'nombre': asignatura.asignatura.nombre,
+                        'cursos': cursos_texto,
+                        'dia': dia,
+                        'horarios': agrupar_bloques_consecutivos(bloques)
+                    }
+                    asignaturas_procesadas.append(registro)
+
             # Obtener cursos con sus profesores jefe y estadísticas
             cursos = Curso.objects.select_related('jefatura_actual__docente__usuario').all()
             
@@ -157,7 +265,7 @@ class AdminPanelView(View):
                 'docentes': docentes,
                 'estudiantes_sin_curso': estudiantes_sin_curso,
                 'usuarios': usuarios,
-                'asignaturas': asignaturas,
+                'asignaturas': asignaturas_procesadas,
                 'cursos': cursos,
                 'especialidades': especialidades,
             }
@@ -539,8 +647,116 @@ class AdminPanelModularView(View):
             asignaturas = AsignaturaImpartida.objects.select_related(
                 'asignatura',
                 'docente__usuario'
-            ).prefetch_related('clases').all()
-            
+            ).prefetch_related(
+                'clases__curso'  # Agregamos la relación con curso
+            ).distinct().all()
+
+            # Mapeo de días en español
+            DIAS_SEMANA = {
+                'Monday': 'Lunes',
+                'Tuesday': 'Martes',
+                'Wednesday': 'Miércoles',
+                'Thursday': 'Jueves',
+                'Friday': 'Viernes',
+                'Saturday': 'Sábado',
+                'Sunday': 'Domingo'
+            }
+
+            # Mapeo de bloques a horarios
+            BLOQUES_HORARIO = {
+                '1': ('08:00', '08:45'),
+                '2': ('08:45', '09:30'),
+                '3': ('09:45', '10:30'),
+                '4': ('10:30', '11:15'),
+                '5': ('11:30', '12:15'),
+                '6': ('12:15', '13:00'),
+                '7': ('13:45', '14:30'),
+                '8': ('14:30', '15:15'),
+                '9': ('15:15', '16:00'),
+            }
+
+            def agrupar_bloques_consecutivos(bloques):
+                if not bloques:
+                    return []
+                
+                # Convertir bloques a números
+                bloques_num = []
+                for b in bloques:
+                    for num, (inicio, fin) in BLOQUES_HORARIO.items():
+                        if str(b) == num:
+                            bloques_num.append(int(num))
+                            break
+                
+                bloques_num.sort()
+                grupos = []
+                grupo_actual = [bloques_num[0]]
+
+                for i in range(1, len(bloques_num)):
+                    if bloques_num[i] == bloques_num[i-1] + 1:
+                        grupo_actual.append(bloques_num[i])
+                    else:
+                        grupos.append(grupo_actual)
+                        grupo_actual = [bloques_num[i]]
+                grupos.append(grupo_actual)
+
+                # Convertir grupos a rangos de horario
+                rangos = []
+                for grupo in grupos:
+                    inicio = BLOQUES_HORARIO[str(grupo[0])][0]
+                    fin = BLOQUES_HORARIO[str(grupo[-1])][1]
+                    rangos.append(f"{inicio} - {fin}")
+
+                return rangos
+
+            # Procesar las asignaturas para evitar duplicados en cursos y bloques
+            asignaturas_procesadas = []
+            for asignatura in asignaturas:
+                # Obtener cursos únicos
+                cursos = set()
+                for clase in asignatura.clases.all():
+                    if clase.curso:
+                        cursos.add((clase.curso.nivel, clase.curso.letra))
+                
+                # Si no hay cursos, marcar como electivo
+                if not cursos:
+                    cursos_texto = "Electivo"
+                else:
+                    # Ordenar los cursos
+                    cursos_ordenados = sorted(list(cursos))
+                    cursos_texto = ", ".join([
+                        f"{nivel}°{letra}" 
+                        for nivel, letra in cursos_ordenados
+                    ])
+                
+                # Obtener bloques por día
+                bloques_por_dia = {}
+                for clase in asignatura.clases.all():
+                    # Convertir la fecha a día de la semana
+                    try:
+                        if isinstance(clase.fecha, str):
+                            from datetime import datetime
+                            fecha_obj = datetime.strptime(clase.fecha, '%Y-%m-%d')
+                            dia = DIAS_SEMANA[fecha_obj.strftime('%A')]
+                        else:
+                            dia = DIAS_SEMANA[clase.fecha.strftime('%A')]
+                    except (ValueError, AttributeError, KeyError):
+                        dia = str(clase.fecha)
+                    
+                    if dia not in bloques_por_dia:
+                        bloques_por_dia[dia] = set()
+                    bloques_por_dia[dia].add(clase.horario)
+                
+                # Crear un registro por cada día
+                for dia, bloques in sorted(bloques_por_dia.items()):
+                    registro = {
+                        'codigo': asignatura.codigo,
+                        'nombre': asignatura.asignatura.nombre,
+                        'cursos': cursos_texto,
+                        'dia': dia,
+                        'horarios': agrupar_bloques_consecutivos(bloques)
+                    }
+                    asignaturas_procesadas.append(registro)
+
             # Obtener cursos con sus profesores jefe y estadísticas
             cursos = Curso.objects.select_related('jefatura_actual__docente__usuario').all()
             
@@ -654,7 +870,7 @@ class AdminPanelModularView(View):
                 'estudiantes_sin_curso': estudiantes_sin_curso,
 
                 'usuarios': usuarios,
-                'asignaturas': asignaturas,
+                'asignaturas': asignaturas_procesadas,  # Usamos la lista procesada
                 'cursos': cursos,
                 'especialidades': especialidades,
                 'eventos_calendario': eventos_calendario,

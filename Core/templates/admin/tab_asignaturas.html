@@ -14,31 +14,35 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead class="bg-light">
                                     <tr>
-                                        <th class="px-4">Nombre</th>
-                                        <th>Nivel</th>
-                                        <th>Tipo</th>
-                                        <th class="text-center">Imparticiones</th>
+                                        <th class="px-4">Código</th>
+                                        <th>Nombre</th>
+                                        <th>Curso</th>
+                                        <th>Día</th>
+                                        <th>Horario</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for asignatura in asignaturas %}
                                     <tr>
-                                        <td class="px-4 fw-medium">{{ asignatura.asignatura.nombre }}</td>
-                                        <td>{{ asignatura.asignatura.nivel }}°</td>
+                                        <td class="px-4">{{ asignatura.codigo }}</td>
+                                        <td class="fw-medium">{{ asignatura.nombre }}</td>
                                         <td>
-                                            {% if asignatura.asignatura.es_electivo %}
-                                            <span class="badge bg-info">Electivo</span>
+                                            {% if asignatura.cursos == "Electivo" %}
+                                                <span class="badge bg-warning text-dark">{{ asignatura.cursos }}</span>
                                             {% else %}
-                                            <span class="badge bg-primary">Obligatorio</span>
+                                                <span class="badge bg-secondary">{{ asignatura.cursos }}</span>
                                             {% endif %}
                                         </td>
-                                        <td class="text-center">
-                                            <span class="badge bg-secondary">{{ asignatura.asignatura.imparticiones.count }}</span>
+                                        <td>{{ asignatura.dia }}</td>
+                                        <td>
+                                            {% for horario in asignatura.horarios %}
+                                                {{ horario }}<br>
+                                            {% endfor %}
                                         </td>
                                     </tr>
                                     {% empty %}
                                     <tr>
-                                        <td colspan="4" class="text-center py-4 text-muted">
+                                        <td colspan="5" class="text-center py-4 text-muted">
                                             <i class="fas fa-book-open fa-2x mb-3"></i>
                                             <p class="mb-0">No hay asignaturas registradas</p>
                                         </td>
@@ -65,24 +69,71 @@
             <div class="modal-body">
                 <form id="crearAsignaturaForm">
                     <div class="mb-3">
+                        <label for="codigo" class="form-label">Código</label>
+                        <input type="text" class="form-control" id="codigo" name="codigo" required 
+                               pattern="[A-Za-z0-9_-]+" 
+                               title="Solo letras, números, guiones (-) y guiones bajos (_)">
+                        <small class="form-text text-muted">Ejemplo: MAT_101, BIO-2, HIS01</small>
+                    </div>
+                    <div class="mb-3">
                         <label for="nombre" class="form-label">Nombre</label>
                         <input type="text" class="form-control" id="nombre" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                        <label for="nivel" class="form-label">Nivel</label>
-                        <select class="form-select" id="nivel" name="nivel" required>
-                            <option value="">Seleccione un nivel</option>
-                            <option value="1">1°</option>
-                            <option value="2">2°</option>
-                            <option value="3">3°</option>
-                            <option value="4">4°</option>
-                        </select>
+                        <label for="nivel" class="form-label">Curso</label>
+                        <div class="row">
+                            <div class="col">
+                                <select class="form-select" id="nivel" name="nivel" required>
+                                    <option value="">Nivel</option>
+                                    <option value="1">1°</option>
+                                    <option value="2">2°</option>
+                                    <option value="3">3°</option>
+                                    <option value="4">4°</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <select class="form-select" id="letra" name="letra" required>
+                                    <option value="">Letra</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" id="es_electivo" name="es_electivo">
-                            <label class="form-check-label" for="es_electivo">Es electivo</label>
+                        <label class="form-label">Bloques de Clase</label>
+                        <div id="bloquesContainer">
+                            <div class="row mb-2 bloque-clase">
+                                <div class="col">
+                                    <select class="form-select dia" name="dia[]" required>
+                                        <option value="">Día</option>
+                                        <option value="LUNES">Lunes</option>
+                                        <option value="MARTES">Martes</option>
+                                        <option value="MIERCOLES">Miércoles</option>
+                                        <option value="JUEVES">Jueves</option>
+                                        <option value="VIERNES">Viernes</option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <select class="form-select horario" name="horario[]" required>
+                                        <option value="">Bloque</option>
+                                        <option value="08:00-09:30">1° (08:00-09:30)</option>
+                                        <option value="09:45-11:15">2° (09:45-11:15)</option>
+                                        <option value="11:30-13:00">3° (11:30-13:00)</option>
+                                        <option value="14:00-15:30">4° (14:00-15:30)</option>
+                                        <option value="15:45-17:15">5° (15:45-17:15)</option>
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-danger btn-sm remove-bloque">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                        <button type="button" class="btn btn-secondary btn-sm mt-2" id="agregarBloque">
+                            <i class="fas fa-plus"></i> Agregar Bloque
+                        </button>
                     </div>
                 </form>
             </div>

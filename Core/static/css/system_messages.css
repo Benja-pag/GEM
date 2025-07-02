@@ -1,0 +1,106 @@
+.gem-system-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    max-width: 500px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #e2e8f0;
+}
+
+.gem-system-message .icon-container {
+    margin-bottom: 20px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f7fafc;
+    border-radius: 50%;
+    padding: 10px;
+}
+
+.gem-system-message .icon-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.gem-system-message .message-header {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 15px;
+    text-align: center;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.gem-system-message .message-content {
+    color: #4a5568;
+    text-align: center;
+    margin-bottom: 25px;
+    line-height: 1.5;
+    font-size: 1.1em;
+}
+
+.gem-system-message .message-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.gem-system-message button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 1em;
+    min-width: 120px;
+}
+
+.gem-system-message .confirm-btn {
+    background-color: #4c51bf;
+    color: white;
+    box-shadow: 0 2px 4px rgba(76, 81, 191, 0.1);
+}
+
+.gem-system-message .confirm-btn:hover {
+    background-color: #434190;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(76, 81, 191, 0.2);
+}
+
+.gem-system-message .cancel-btn {
+    background-color: #edf2f7;
+    color: #2d3748;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.gem-system-message .cancel-btn:hover {
+    background-color: #e2e8f0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.gem-system-message-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9998;
+    backdrop-filter: blur(2px);
+    transition: opacity 0.3s ease;
+} 

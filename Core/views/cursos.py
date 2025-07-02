@@ -233,12 +233,22 @@ class CursoDetalleView(View):
             cursos_dest = [f"{curso.nivel}°{curso.letra}" for curso in com.destinatarios_cursos.all()]
             cursos_str = ", ".join(cursos_dest) if cursos_dest else "Sin cursos asignados"
             
+            # Obtener asignatura del asunto si existe
+            asunto_split = com.asunto.split(']')[0] if ']' in com.asunto else ''
+            codigo_asignatura = asunto_split[1:] if asunto_split.startswith('[') else ''
+            
+            destinatarios = []
+            if codigo_asignatura:
+                destinatarios.append(f"Asignatura {codigo_asignatura} - {cursos_str}")
+            else:
+                destinatarios.append(f"Cursos: {cursos_str}")
+            
             comunicaciones_formateadas.append({
                 'id': com.id,  # Agregamos el ID para poder eliminar
                 'asunto': com.asunto,
                 'descripcion': com.contenido[:100] + '...' if len(com.contenido) > 100 else com.contenido,
                 'fecha': com.fecha_envio,
-                'destinatarios': [f"Asignatura {asignatura.codigo} - {cursos_str}"],
+                'destinatarios': destinatarios,
                 'estado': 'Enviada',
                 'total_lecturas': com.leido_por.count()
             })
@@ -447,12 +457,22 @@ class AsignaturaDetalleView(View):
             cursos_dest = [f"{curso.nivel}°{curso.letra}" for curso in com.destinatarios_cursos.all()]
             cursos_str = ", ".join(cursos_dest) if cursos_dest else "Sin cursos asignados"
             
+            # Obtener asignatura del asunto si existe
+            asunto_split = com.asunto.split(']')[0] if ']' in com.asunto else ''
+            codigo_asignatura = asunto_split[1:] if asunto_split.startswith('[') else ''
+            
+            destinatarios = []
+            if codigo_asignatura:
+                destinatarios.append(f"Asignatura {codigo_asignatura} - {cursos_str}")
+            else:
+                destinatarios.append(f"Cursos: {cursos_str}")
+            
             comunicaciones_formateadas.append({
                 'id': com.id,  # Agregamos el ID para poder eliminar
                 'asunto': com.asunto,
                 'descripcion': com.contenido[:100] + '...' if len(com.contenido) > 100 else com.contenido,
                 'fecha': com.fecha_envio,
-                'destinatarios': [f"Asignatura {asignatura.codigo} - {cursos_str}"],
+                'destinatarios': destinatarios,
                 'estado': 'Enviada',
                 'total_lecturas': com.leido_por.count()
             })

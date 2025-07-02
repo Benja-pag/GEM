@@ -1,5 +1,7 @@
 from django import template
 from Core.models import HorarioCurso
+from itertools import groupby
+from operator import attrgetter
 
 register = template.Library()
 
@@ -89,4 +91,55 @@ def dia_semana(fecha):
         try:
             return dias[fecha.strftime('%A')]
         except:
-            return str(fecha) 
+            return str(fecha)
+
+@register.filter
+def regroup_by(queryset, attrs):
+    """
+    Agrupa un queryset por múltiples atributos y elimina duplicados.
+    Los atributos deben ser proporcionados como una cadena separada por comas.
+    """
+    if not queryset:
+        return []
+
+    # Convertir la cadena de atributos en una lista
+    attrs = [attr.strip() for attr in attrs.split(',')]
+    
+    # Función para obtener los valores de los atributos
+    def get_attrs(obj):
+        values = []
+        for attr in attrs:
+            value = obj
+            for part in attr.split('.'):
+                value = getattr(value, part, None)
+            values.append(value)
+        return tuple(values)
+
+    # Ordenar y agrupar por los atributos
+    sorted_qs = sorted(queryset, key=get_attrs)
+    grouped = groupby(sorted_qs, key=get_attrs)
+    
+    # Tomar solo el primer elemento de cada grupo
+    return [next(g) for k, g in grouped]
+
+@register.filter
+def unique_by(queryset, attr):
+    """
+    Elimina duplicados de un queryset basado en un atributo.
+    """
+    if not queryset:
+        return []
+
+    # Función para obtener el valor del atributo
+    def get_attr(obj):
+        value = obj
+        for part in attr.split('.'):
+            value = getattr(value, part, None)
+        return value
+
+    # Ordenar y agrupar por el atributo
+    sorted_qs = sorted(queryset, key=get_attr)
+    grouped = groupby(sorted_qs, key=get_attr)
+    
+    # Tomar solo el primer elemento de cada grupo
+    return [next(g) for k, g in grouped] 

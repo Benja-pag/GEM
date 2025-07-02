@@ -24,20 +24,10 @@ from Core.models import (
 from django.utils import timezone
 
 def obtener_fechas_mes_actual():
-    """Obtiene todas las fechas del mes actual que son días de semana"""
-    hoy = date.today()
-    primer_dia = date(hoy.year, hoy.month, 1)
-    
-    # Si estamos en el primer día del mes, usar el mes anterior
-    if hoy.day <= 5:
-        primer_dia = primer_dia - timedelta(days=30)
-        primer_dia = date(primer_dia.year, primer_dia.month, 1)
-    
-    # Obtener el último día del mes
-    if primer_dia.month == 12:
-        ultimo_dia = date(primer_dia.year + 1, 1, 1) - timedelta(days=1)
-    else:
-        ultimo_dia = date(primer_dia.year, primer_dia.month + 1, 1) - timedelta(days=1)
+    """Obtiene todas las fechas de junio que son días de semana"""
+    # Usar junio de 2025 específicamente
+    primer_dia = date(2025, 6, 1)
+    ultimo_dia = date(2025, 6, 30)
     
     fechas = []
     fecha_actual = primer_dia
@@ -56,12 +46,16 @@ def mapear_dia_semana(fecha):
     return dias[fecha.weekday()]
 
 def poblar_asistencia_mes():
-    """Pobla datos de asistencia para el mes actual"""
-    print("🎯 Iniciando poblamiento de asistencia del mes actual...")
+    """Pobla datos de asistencia para junio"""
+    print("🎯 Iniciando poblamiento de asistencia de junio 2025...")
+    
+    # Eliminar todas las asistencias existentes
+    print("🗑️ Eliminando asistencias existentes...")
+    Asistencia.objects.all().delete()
     
     # Obtener fechas del mes
     fechas_mes = obtener_fechas_mes_actual()
-    print(f"📅 Fechas del mes a procesar: {len(fechas_mes)} días")
+    print(f"📅 Fechas a procesar: {len(fechas_mes)} días de junio")
     for fecha in fechas_mes[:5]:  # Mostrar primeras 5 fechas
         print(f"  - {fecha.strftime('%d/%m/%Y')} ({mapear_dia_semana(fecha)})")
     if len(fechas_mes) > 5:
@@ -74,6 +68,9 @@ def poblar_asistencia_mes():
     # Contadores
     total_registros_creados = 0
     total_registros_existentes = 0
+    
+    # Lista para bulk create
+    asistencias_a_crear = []
     
     # Procesar cada fecha del mes
     for fecha in fechas_mes:
@@ -101,16 +98,6 @@ def poblar_asistencia_mes():
             
             # Crear registros de asistencia para cada estudiante
             for estudiante in estudiantes_inscritos:
-                # Verificar si ya existe un registro para esta clase y estudiante
-                asistencia_existente = Asistencia.objects.filter(
-                    clase=clase,
-                    estudiante=estudiante
-                ).first()
-                
-                if asistencia_existente:
-                    total_registros_existentes += 1
-                    continue
-                
                 # Generar datos de asistencia aleatorios pero realistas
                 # 85% de probabilidad de estar presente
                 presente = random.random() < 0.85
@@ -128,23 +115,47 @@ def poblar_asistencia_mes():
                         "Problema familiar"
                     ])
                 
-                # Crear el registro de asistencia
-                Asistencia.objects.create(
-                    clase=clase,
-                    estudiante=estudiante,
-                    presente=presente,
-                    justificado=justificado,
-                    observaciones=observaciones,
-                    fecha_registro=timezone.now()
+                # Crear el registro de asistencia con la fecha específica
+                fecha_registro = timezone.make_aware(datetime.combine(fecha, datetime.min.time()))
+                
+                asistencias_a_crear.append(
+                    Asistencia(
+                        clase=clase,
+                        estudiante=estudiante,
+                        presente=presente,
+                        justificado=justificado,
+                        observaciones=observaciones,
+                        fecha_registro=fecha_registro
+                    )
                 )
                 
                 total_registros_creados += 1
+                
+                # Hacer bulk create cada 1000 registros para no sobrecargar la memoria
+                if len(asistencias_a_crear) >= 1000:
+                    try:
+                        Asistencia.objects.bulk_create(asistencias_a_crear, batch_size=1000, ignore_conflicts=True)
+                        print(f"  ✅ Creados {len(asistencias_a_crear)} registros")
+                        asistencias_a_crear = []
+                    except Exception as e:
+                        print(f"  ❌ Error al crear registros: {str(e)}")
+    
+    # Crear los registros restantes
+    if asistencias_a_crear:
+        try:
+            Asistencia.objects.bulk_create(asistencias_a_crear, batch_size=1000, ignore_conflicts=True)
+            print(f"  ✅ Creados {len(asistencias_a_crear)} registros finales")
+        except Exception as e:
+            print(f"  ❌ Error al crear registros finales: {str(e)}")
     
     print(f"\n✅ Poblamiento completado!")
     print(f"📊 Resumen:")
     print(f"   - Registros creados: {total_registros_creados}")
     print(f"   - Registros existentes (omitidos): {total_registros_existentes}")
     print(f"   - Total procesados: {total_registros_creados + total_registros_existentes}")
+    
+    # Mostrar estadísticas
+    mostrar_estadisticas_asistencia()
 
 def mostrar_estadisticas_asistencia():
     """Muestra estadísticas de asistencia del mes actual"""
@@ -192,9 +203,6 @@ if __name__ == "__main__":
     try:
         # Poblar asistencia
         poblar_asistencia_mes()
-        
-        # Mostrar estadísticas
-        mostrar_estadisticas_asistencia()
         
         print("\n🎉 ¡Proceso completado exitosamente!")
         

@@ -1,8 +1,23 @@
 @echo off
 echo Iniciando el proyecto GEM...
 
-@REM echo Activando entorno virtual...
-@REM call .\env\Scripts\activate
+echo Verificando entorno virtual...
+if not exist "env311\Scripts\activate.bat" (
+    echo Error: No se encuentra el entorno virtual env311
+    echo Por favor, asegúrate de que el entorno virtual está creado correctamente
+    pause
+    exit /b 1
+)
+
+echo Activando entorno virtual...
+call env311\Scripts\activate.bat
+
+echo Verificando requisitos...
+python -c "import django" 2>nul
+if errorlevel 1 (
+    echo Instalando dependencias...
+    pip install -r requirements.txt
+)
 
 echo Limpiando la base de datos...
 call python manage.py flush --noinput
@@ -92,6 +107,6 @@ echo    - Foro con temas de ejemplo
 echo    - Comunicaciones de ejemplo
 echo    - Verificaciones de consistencia
 echo.
-REM echo Iniciando servidor...
-REM call python manage.py runserver
+
+echo Para iniciar el servidor, ejecuta: runserver.bat
 pause 

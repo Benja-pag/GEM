@@ -1923,7 +1923,12 @@ class ObtenerAsistenciaAsignaturaView(View):
                 return JsonResponse({'success': False, 'error': 'Asignatura no encontrada o no autorizada'})
             
             # Obtener la fecha actual
-            hoy = timezone.localtime(timezone.now())
+            now = timezone.localtime(timezone.now())
+            hoy = now.date()
+            
+            # Si es después de medianoche pero antes de las 3 AM, usar la fecha de ayer
+            if now.hour < 3:
+                hoy = hoy - timedelta(days=1)
             
             # Obtener el día de la semana en español
             dia_semana = hoy.strftime('%A').upper()
@@ -1973,7 +1978,9 @@ class ObtenerAsistenciaAsignaturaView(View):
                                 clases_hoy = clases_siguiente
                                 # Ajustar la fecha al próximo día con clases
                                 dias_hasta_siguiente = i
-                                hoy = hoy + timezone.timedelta(days=dias_hasta_siguiente)
+                                hoy = hoy + timedelta(days=dias_hasta_siguiente)
+                                dia_semana = hoy.strftime('%A').upper()
+                                dia_semana = mapeo_dias.get(dia_semana)
                                 break
                     if clases_hoy.exists():
                         break
@@ -1985,21 +1992,25 @@ class ObtenerAsistenciaAsignaturaView(View):
                     'error': 'No hay clases programadas para los próximos días'
                 })
             
+            # Crear datetime para inicio y fin del día
+            inicio_dia = datetime.combine(hoy, time.min)
+            fin_dia = datetime.combine(hoy, time.max)
+            
+            # Hacer consciente de zona horaria
+            inicio_dia = timezone.make_aware(inicio_dia)
+            fin_dia = timezone.make_aware(fin_dia)
+            
             # Organizar datos por curso
             clases_por_curso = {}
             
             for clase in clases_hoy:
-                # Para asignaturas regulares, usar el curso de la clase
                 if clase.curso:
                     curso_id = clase.curso_id
                     curso_nombre = str(clase.curso)
-                    # Obtener estudiantes del curso
                     estudiantes = clase.curso.estudiantes.all().select_related('usuario')
                 else:
-                    # Para electivos, usar un identificador especial
                     curso_id = 'ELECTIVO'
                     curso_nombre = 'Electivo'
-                    # Obtener estudiantes inscritos en la asignatura
                     estudiantes = Estudiante.objects.filter(
                         asignaturas_inscritas__asignatura_impartida=asignatura_impartida
                     ).select_related('usuario')
@@ -2017,7 +2028,6 @@ class ObtenerAsistenciaAsignaturaView(View):
                     'sala': clase.get_sala_display() if hasattr(clase, 'get_sala_display') else clase.sala,
                 })
                 
-                # Obtener estudiantes solo una vez por curso/electivo
                 if not clases_por_curso[curso_id]['estudiantes']:
                     if not estudiantes.exists():
                         continue
@@ -2026,7 +2036,7 @@ class ObtenerAsistenciaAsignaturaView(View):
                     asistencias = Asistencia.objects.filter(
                         clase__in=clases_hoy,
                         estudiante__in=estudiantes,
-                        fecha_registro__date=hoy.date()
+                        fecha_registro__range=(inicio_dia, fin_dia)
                     ).select_related('estudiante', 'clase')
                     
                     # Crear diccionario para acceso rápido
@@ -2084,11 +2094,24 @@ class ObtenerAsistenciaAsignaturaView(View):
                         else:
                             sin_registro += 1
                 
+                # Calcular estado de asistencia
+                if sin_registro == 0:  # Asistencia completa
+                    estado = 'completo'
+                    estado_texto = 'Asistencia Completa'
+                elif sin_registro == total_estudiantes:  # Sin registros
+                    estado = 'pendiente'
+                    estado_texto = 'Sin Registros'
+                else:  # Asistencia parcial
+                    estado = 'parcial'
+                    estado_texto = 'Asistencia Parcial'
+                
                 curso_data.update({
                     'total_estudiantes': total_estudiantes,
                     'presentes': presentes,
                     'ausentes': ausentes,
-                    'sin_registro': sin_registro
+                    'sin_registro': sin_registro,
+                    'estado': estado,
+                    'estado_texto': estado_texto
                 })
             
             return JsonResponse({
@@ -2096,35 +2119,53 @@ class ObtenerAsistenciaAsignaturaView(View):
                 'asignatura': asignatura_impartida.asignatura.nombre,
                 'codigo': asignatura_impartida.codigo,
                 'fecha': hoy.strftime('%Y-%m-%d'),
+                'dia_semana': dia_semana,
                 'cursos': datos_cursos
             })
             
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-@method_decorator(login_required, name='dispatch')
 @method_decorator(csrf_exempt, name='dispatch')
 class GuardarAsistenciaView(View):
     def post(self, request, clase_id):
         if not hasattr(request.user.usuario, 'docente'):
-            return JsonResponse({'success': False, 'error': 'No tienes permiso'})
+            return JsonResponse({
+                'success': False, 
+                'error': 'No tienes permiso para registrar asistencia'
+            })
         
         try:
+            # Obtener el docente
             docente = request.user.usuario.docente
             
-            # Obtener la clase y verificar que pertenezca al docente
-            clase = get_object_or_404(
-                Clase, 
-                id=clase_id,
-                asignatura_impartida__docente=docente
-            )
+            # Obtener y validar la clase
+            try:
+                clase = get_object_or_404(
+                    Clase.objects.select_related(
+                        'asignatura_impartida__asignatura',
+                        'asignatura_impartida__docente',
+                        'curso'
+                    ), 
+                    id=clase_id,
+                    asignatura_impartida__docente=docente
+                )
+            except Clase.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Clase no encontrada o no tienes permiso para registrar asistencia'
+                })
             
-            # Verificar que la fecha de registro no sea anterior a hoy
-            hoy = timezone.localtime(timezone.now())
-            fecha_registro = timezone.localtime(timezone.now())
+            # Verificar fecha y hora
+            now = timezone.now()
+            fecha_registro = now.date()
             
-            # Obtener el día de la semana actual
-            dia_semana = hoy.strftime('%A').upper()
+            # Si es después de medianoche pero antes de las 3 AM, usar la fecha de ayer
+            if now.hour < 3:
+                fecha_registro = fecha_registro - timezone.timedelta(days=1)
+            
+            # Obtener el día de la semana en español
+            dia_semana = fecha_registro.strftime('%A').upper()
             mapeo_dias = {
                 'MONDAY': 'LUNES',
                 'TUESDAY': 'MARTES',
@@ -2134,200 +2175,143 @@ class GuardarAsistenciaView(View):
                 'SATURDAY': 'SABADO',
                 'SUNDAY': 'DOMINGO'
             }
-            dia_actual = mapeo_dias.get(dia_semana)
+            dia_semana = mapeo_dias.get(dia_semana)
             
-            # Verificar que la clase corresponda al día actual o un día futuro
-            if clase.fecha != dia_actual:
-                # Mapeo de días a números (0 = Lunes, 6 = Domingo)
+            # Validar día de la clase
+            if clase.fecha != dia_semana:
                 dias_semana = {
-                    'LUNES': 0,
-                    'MARTES': 1,
-                    'MIERCOLES': 2,
-                    'JUEVES': 3,
-                    'VIERNES': 4,
-                    'SABADO': 5,
-                    'DOMINGO': 6
+                    'LUNES': 0, 'MARTES': 1, 'MIERCOLES': 2,
+                    'JUEVES': 3, 'VIERNES': 4, 'SABADO': 5, 'DOMINGO': 6
                 }
                 
-                dia_actual_num = dias_semana[dia_actual]
-                dia_clase_num = dias_semana[clase.fecha]
+                dia_actual = dias_semana[dia_semana]
+                dia_clase = dias_semana[clase.fecha]
                 
-                # Calcular días hasta la próxima clase
-                dias_hasta_clase = (dia_clase_num - dia_actual_num) % 7
+                dias_hasta_clase = (dia_clase - dia_actual) % 7
                 if dias_hasta_clase == 0:
-                    # Si es el mismo día pero la clase ya pasó, no permitir registro
-                    hora_actual = hoy.strftime('%H:%M')
+                    hora_actual = now.strftime('%H:%M')
                     if hora_actual > clase.horario.split('-')[1]:
                         return JsonResponse({
                             'success': False,
                             'error': 'No se puede registrar asistencia para una clase que ya pasó'
                         })
                 
-                # Ajustar la fecha de registro
-                fecha_registro = hoy + timezone.timedelta(days=dias_hasta_clase)
+                fecha_registro = fecha_registro + timezone.timedelta(days=dias_hasta_clase)
             
-            # Obtener datos del request
-            data = json.loads(request.body)
-            
-            # Si es una lista de asistencias, procesarlas en lote
-            if isinstance(data, list):
-                # Primero, eliminar todas las asistencias existentes de hoy para esta clase
-                Asistencia.objects.filter(
-                    clase=clase,
-                    fecha_registro__date=fecha_registro.date()
-                ).delete()
-                
-                # Preparar las nuevas asistencias
-                asistencias_a_crear = []
-                estudiantes_procesados = set()  # Para evitar duplicados
-                
-                for asistencia_data in data:
-                    estudiante_id = asistencia_data.get('estudiante_id')
-                    
-                    # Evitar duplicados del mismo estudiante
-                    if estudiante_id in estudiantes_procesados:
-                        continue
-                    
-                    estudiantes_procesados.add(estudiante_id)
-                    
-                    presente = asistencia_data.get('presente', False)
-                    justificado = asistencia_data.get('justificado', False)
-                    observaciones = asistencia_data.get('observaciones', '')
-                    
-                    try:
-                        # Primero intentar obtener el estudiante por curso (asignaturas regulares)
-                        if clase.curso:
-                            estudiante = get_object_or_404(
-                                Estudiante,
-                                usuario__auth_user_id=estudiante_id,
-                                curso=clase.curso
-                            )
-                        else:
-                            # Para electivos, buscar por inscripción
-                            estudiante = get_object_or_404(
-                                Estudiante,
-                                usuario__auth_user_id=estudiante_id,
-                                asignaturas_inscritas__asignatura_impartida=clase.asignatura_impartida
-                            )
-                    except:
-                        continue
-                    
-                    # Si es un electivo, buscar todas las clases del mismo día
-                    if not clase.curso:
-                        clases_mismo_dia = Clase.objects.filter(
-                            asignatura_impartida=clase.asignatura_impartida,
-                            fecha=clase.fecha,
-                            curso__isnull=True
-                        )
-                        
-                        # Crear asistencia para cada bloque del electivo
-                        for clase_electivo in clases_mismo_dia:
-                            asistencias_a_crear.append(
-                                Asistencia(
-                                    clase=clase_electivo,
-                                    estudiante=estudiante,
-                                    presente=presente,
-                                    justificado=justificado,
-                                    observaciones=observaciones,
-                                    fecha_registro=fecha_registro
-                                )
-                            )
-                    else:
-                        # Para asignaturas regulares, solo crear una asistencia
-                        asistencias_a_crear.append(
-                            Asistencia(
-                                clase=clase,
-                                estudiante=estudiante,
-                                presente=presente,
-                                justificado=justificado,
-                                observaciones=observaciones,
-                                fecha_registro=fecha_registro
-                            )
-                        )
-                
-                # Crear todas las asistencias en una sola operación
-                Asistencia.objects.bulk_create(asistencias_a_crear)
-                
+            # Obtener y validar datos del request
+            try:
+                data = json.loads(request.body)
+            except json.JSONDecodeError:
                 return JsonResponse({
-                    'success': True,
-                    'message': f'Se guardaron {len(asistencias_a_crear)} registros de asistencia correctamente'
+                    'success': False,
+                    'error': 'Formato de datos inválido'
                 })
             
-            # Si es una sola asistencia, procesarla como antes
+            # Validar que sea una lista de asistencias
+            if not isinstance(data, list):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Formato de datos inválido: se espera una lista de asistencias'
+                })
+            
+            # Procesar asistencias en lote
+            errores = []
+            asistencias_procesadas = 0
+            
+            # Obtener estudiantes válidos según el tipo de clase
+            if clase.curso:
+                estudiantes_validos = Estudiante.objects.filter(
+                    curso=clase.curso
+                ).select_related('usuario')
             else:
-                estudiante_id = data.get('estudiante_id')
-                presente = data.get('presente', False)
-                justificado = data.get('justificado', False)
-                observaciones = data.get('observaciones', '')
-                
+                estudiantes_validos = Estudiante.objects.filter(
+                    asignaturas_inscritas__asignatura_impartida=clase.asignatura_impartida,
+                    asignaturas_inscritas__validada=True
+                ).select_related('usuario')
+            
+            # Crear un diccionario para acceso rápido
+            estudiantes_dict = {
+                str(estudiante.usuario.auth_user_id): estudiante 
+                for estudiante in estudiantes_validos
+            }
+            
+            # Obtener todas las asistencias existentes para esta clase
+            asistencias_existentes = {
+                (a.clase_id, a.estudiante.usuario.auth_user_id): a 
+                for a in Asistencia.objects.filter(clase=clase).select_related('estudiante__usuario')
+            }
+            
+            for asistencia_data in data:
                 try:
-                    # Primero intentar obtener el estudiante por curso (asignaturas regulares)
-                    if clase.curso:
-                        estudiante = get_object_or_404(
-                            Estudiante,
-                            usuario__auth_user_id=estudiante_id,
-                            curso=clase.curso
-                        )
+                    estudiante_id = str(asistencia_data.get('estudiante_id'))
+                    
+                    # Validar datos requeridos
+                    if not all(key in asistencia_data for key in ['presente', 'justificado']):
+                        errores.append({
+                            'estudiante_id': estudiante_id,
+                            'error': "Datos incompletos",
+                            'detalles': f"Faltan campos requeridos: presente y/o justificado"
+                        })
+                        continue
+                    
+                    # Obtener estudiante del diccionario
+                    estudiante = estudiantes_dict.get(estudiante_id)
+                    if not estudiante:
+                        errores.append({
+                            'estudiante_id': estudiante_id,
+                            'error': "Estudiante no encontrado",
+                            'detalles': "El estudiante no está inscrito en este curso/asignatura"
+                        })
+                        continue
+                    
+                    # Buscar asistencia existente
+                    asistencia_existente = asistencias_existentes.get((clase.id, estudiante.usuario.auth_user_id))
+                    
+                    if asistencia_existente:
+                        # Actualizar asistencia existente
+                        asistencia_existente.presente = asistencia_data['presente']
+                        asistencia_existente.justificado = asistencia_data['justificado']
+                        asistencia_existente.observaciones = asistencia_data.get('observaciones', '')
+                        asistencia_existente.fecha_registro = now
+                        asistencia_existente.save()
                     else:
-                        # Para electivos, buscar por inscripción
-                        estudiante = get_object_or_404(
-                            Estudiante,
-                            usuario__auth_user_id=estudiante_id,
-                            asignaturas_inscritas__asignatura_impartida=clase.asignatura_impartida
-                        )
-                except:
-                    return JsonResponse({
-                        'success': False,
-                        'error': 'Estudiante no encontrado'
-                    })
-                
-                # Si es un electivo, buscar todas las clases del mismo día
-                if not clase.curso:
-                    clases_mismo_dia = Clase.objects.filter(
-                        asignatura_impartida=clase.asignatura_impartida,
-                        fecha=clase.fecha,
-                        curso__isnull=True
-                    )
-                    
-                    # Eliminar asistencias previas de hoy para todas las clases del electivo
-                    Asistencia.objects.filter(
-                        clase__in=clases_mismo_dia,
-                        estudiante=estudiante,
-                        fecha_registro__date=fecha_registro.date()
-                    ).delete()
-                    
-                    # Crear asistencia para cada bloque del electivo
-                    for clase_electivo in clases_mismo_dia:
+                        # Crear nueva asistencia
                         Asistencia.objects.create(
-                            clase=clase_electivo,
+                            clase=clase,
                             estudiante=estudiante,
-                            presente=presente,
-                            justificado=justificado,
-                            observaciones=observaciones,
-                            fecha_registro=fecha_registro
+                            presente=asistencia_data['presente'],
+                            justificado=asistencia_data['justificado'],
+                            observaciones=asistencia_data.get('observaciones', ''),
+                            fecha_registro=now
                         )
-                else:
-                    # Para asignaturas regulares, solo crear una asistencia
-                    Asistencia.objects.filter(
-                        clase=clase,
-                        estudiante=estudiante,
-                        fecha_registro__date=fecha_registro.date()
-                    ).delete()
                     
-                    Asistencia.objects.create(
-                        clase=clase,
-                        estudiante=estudiante,
-                        presente=presente,
-                        justificado=justificado,
-                        observaciones=observaciones,
-                        fecha_registro=fecha_registro
-                    )
-                
+                    asistencias_procesadas += 1
+                    
+                except Exception as e:
+                    errores.append({
+                        'estudiante_id': estudiante_id,
+                        'error': "Error al procesar asistencia",
+                        'detalles': str(e)
+                    })
+            
+            # Si hay errores, reportarlos junto con un resumen
+            if errores:
                 return JsonResponse({
-                    'success': True,
-                    'message': 'Asistencia guardada correctamente'
+                    'success': False,
+                    'error': 'Errores al procesar algunos estudiantes',
+                    'resumen': f'Se procesaron {asistencias_procesadas} asistencias correctamente. {len(errores)} registros tuvieron errores.',
+                    'errores': errores
                 })
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Se procesaron {asistencias_procesadas} asistencias correctamente'
+            })
             
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            return JsonResponse({
+                'success': False,
+                'error': f'Error al guardar las asistencias: {str(e)}',
+                'detalles': str(e)
+            })
 

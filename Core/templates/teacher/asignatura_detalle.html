@@ -509,31 +509,24 @@
                             <div class="chat-container mb-3" style="height: 400px; overflow-y: auto;">
                                 <div id="chat-messages" class="mb-3">
                                     <!-- Los mensajes se cargarán aquí dinámicamente -->
-                                    <div class="chat-message ai-message mb-2">
-                                        <div class="message-content bg-light p-2 rounded">
-                                            <i class="fas fa-robot text-info me-2"></i>
-                                            ¡Hola! Soy tu asistente IA. Puedo ayudarte con:
-                                            <ul class="mt-2 mb-0">
-                                                <li>Análisis de rendimiento</li>
-                                                <li>Sugerencias de retroalimentación</li>
-                                                <li>Estrategias de evaluación</li>
-                                                <li>Recomendaciones personalizadas</li>
-                                            </ul>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
                             <!-- Área de Consulta -->
                             <div class="chat-input">
                                 <div class="input-group">
-                                    <input type="text" 
-                                           id="ia-consulta" 
-                                           class="form-control" 
-                                           placeholder="Escribe tu consulta..."
-                                           aria-label="Consulta IA">
-                                    <button class="btn btn-info" type="button" id="enviar-consulta">
-                                        <i class="fas fa-paper-plane"></i>
+                                    <textarea 
+                                        id="ia-consulta" 
+                                        class="form-control" 
+                                        placeholder="Escribe tu consulta..."
+                                        aria-label="Consulta IA"
+                                        rows="1"
+                                        style="resize: none; min-height: 40px; max-height: 90px; overflow-y: auto; line-height: 1.5;">
+                                    </textarea>
+                                    <button class="btn btn-info chat-send-btn" type="button" id="enviar-consulta" style="padding:0; width:56px; height:56px; display:flex; align-items:center; justify-content:center; border-radius:0 30px 30px 0;">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 20L21 12L3 4V10L17 12L3 14V20Z" fill="white"/>
+                                        </svg>
                                     </button>
                                 </div>
                                 <small class="text-muted mt-2 d-block">
@@ -543,20 +536,26 @@
                             </div>
 
                             <!-- Sugerencias Rápidas -->
-                            <div class="quick-suggestions mt-4">
-                                <h6 class="text-muted mb-3">Sugerencias Rápidas:</h6>
-                                <div class="d-flex flex-wrap gap-2">
+                            <div class="quick-suggestions mt-3">
+                                <h6 class="text-muted mb-2">
+                                    <i class="fas fa-lightbulb me-1"></i>Sugerencias Rápidas:
+                                </h6>
+                                <div class="d-flex flex-wrap gap-1">
                                     <button class="btn btn-sm btn-outline-info suggestion-btn" 
-                                            data-query="Analizar rendimiento general">
-                                        📊 Análisis de Rendimiento
+                                            data-query="¿Cómo está el rendimiento de la clase?">
+                                        📊 Rendimiento
                                     </button>
                                     <button class="btn btn-sm btn-outline-info suggestion-btn" 
-                                            data-query="Sugerir retroalimentación para bajo rendimiento">
+                                            data-query="Necesito estrategias para mejorar la asistencia">
+                                        📈 Asistencia
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info suggestion-btn" 
+                                            data-query="¿Qué métodos de evaluación recomiendas?">
+                                        📝 Evaluación
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-info suggestion-btn" 
+                                            data-query="Dame sugerencias de retroalimentación">
                                         💡 Retroalimentación
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-info suggestion-btn" 
-                                            data-query="Recomendar estrategias de evaluación">
-                                        📝 Estrategias
                                     </button>
                                 </div>
                             </div>

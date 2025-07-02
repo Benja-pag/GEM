@@ -546,3 +546,36 @@ p {
     color: #64748b;
     margin-bottom: 2rem;
 }
+
+/* Estado de asistencia badges */
+.badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem !important;
+}
+
+.badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.badge.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+/* Animación para el ícono de estado pendiente */
+.badge .fa-hourglass {
+    animation: rotate 2s infinite linear;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

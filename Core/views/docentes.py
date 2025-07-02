@@ -2085,14 +2085,27 @@ class ObtenerAsistenciaAsignaturaView(View):
                 ausentes = 0
                 sin_registro = 0
                 
+                # Primero, verificar si hay al menos una asistencia registrada para cada estudiante
                 for estudiante in curso_data['estudiantes']:
+                    tiene_registro = False
+                    es_presente = False
+                    es_ausente = False
+                    
                     for asistencia in estudiante['asistencias']:
-                        if asistencia['presente'] is True:
+                        if asistencia['presente'] is not None:
+                            tiene_registro = True
+                            if asistencia['presente']:
+                                es_presente = True
+                            else:
+                                es_ausente = True
+                    
+                    if tiene_registro:
+                        if es_presente:
                             presentes += 1
-                        elif asistencia['presente'] is False:
+                        elif es_ausente:
                             ausentes += 1
-                        else:
-                            sin_registro += 1
+                    else:
+                        sin_registro += 1
                 
                 # Calcular estado de asistencia
                 if sin_registro == 0:  # Asistencia completa
@@ -2314,4 +2327,66 @@ class GuardarAsistenciaView(View):
                 'error': f'Error al guardar las asistencias: {str(e)}',
                 'detalles': str(e)
             })
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class ObtenerHistorialAsistenciaView(View):
+    def get(self, request, asignatura_id):
+        if not hasattr(request.user.usuario, 'docente'):
+            return JsonResponse({'success': False, 'error': 'No tienes permiso'})
+        
+        try:
+            docente = request.user.usuario.docente
+            
+            # Verificar que la asignatura pertenezca al docente
+            asignatura_impartida = AsignaturaImpartida.objects.filter(
+                id=asignatura_id,
+                docente=docente
+            ).first()
+            
+            if not asignatura_impartida:
+                return JsonResponse({'success': False, 'error': 'Asignatura no encontrada o no autorizada'})
+            
+            # Obtener los filtros
+            mes = request.GET.get('mes')
+            estado = request.GET.get('estado')
+            estudiante_id = request.GET.get('estudiante')
+            
+            # Construir el query base
+            asistencias = Asistencia.objects.filter(
+                clase__asignatura_impartida=asignatura_impartida
+            ).select_related(
+                'estudiante__usuario',
+                'clase'
+            ).order_by('-fecha_registro')
+            
+            # Aplicar filtros
+            if mes:
+                asistencias = asistencias.filter(fecha_registro__month=mes)
+            
+            if estado:
+                asistencias = asistencias.filter(presente=(estado == 'presente'))
+            
+            if estudiante_id:
+                asistencias = asistencias.filter(estudiante__usuario__auth_user_id=estudiante_id)
+            
+            # Preparar los datos para la respuesta
+            asistencias_data = []
+            for asistencia in asistencias:
+                asistencias_data.append({
+                    'fecha_registro': asistencia.fecha_registro.isoformat(),
+                    'estudiante_nombre': f"{asistencia.estudiante.usuario.nombre} {asistencia.estudiante.usuario.apellido_paterno}",
+                    'presente': asistencia.presente,
+                    'justificado': asistencia.justificado,
+                    'observaciones': asistencia.observaciones,
+                    'clase_horario': asistencia.clase.horario
+                })
+            
+            return JsonResponse({
+                'success': True,
+                'asistencias': asistencias_data
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
 

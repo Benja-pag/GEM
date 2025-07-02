@@ -17,7 +17,13 @@ from Core.views import foro as foro_views
 from Core.views import pdf_views as pdf_views
 from Core.views import cursos as curso_views
 from .views.cursos import *
-from .views.docentes import *
+from .views.docentes import (
+    ObtenerAsistenciaAsignaturaView,
+    ObtenerHistorialAsistenciaView,
+    GuardarAsistenciaView,
+    ProfesorPanelView,
+    ProfesorPanelModularView
+)
 from .views.alumnos import *
 from .views.admin import *
 from .views.auth import *
@@ -188,5 +194,10 @@ urlpatterns += [
 urlpatterns += [
     # URLs para chat IA
     path('api/chat-ia/', ChatIAView.as_view(), name='chat_ia'),
+]
+
+urlpatterns += [
+    # URLs de asistencia
+    path('obtener-historial-asistencia/<int:asignatura_id>/', ObtenerHistorialAsistenciaView.as_view(), name='obtener_historial_asistencia'),
 ]
 

@@ -404,7 +404,7 @@
                                     <option value="{{ evaluacion.id }}">{{ evaluacion.nombre }}</option>
                                     {% endfor %}
                                 </select>
-                                                    </div>
+                            </div>
 
                             <!-- Tabla de Notas -->
                             <div id="tabla-notas">
@@ -439,8 +439,8 @@
                                             </ul>
                                         </div>
                                     </div>
-                                                    </div>
-                                                </div>
+                                </div>
+                            </div>
 
                             <!-- Área de Consulta -->
                             <div class="chat-input">
@@ -470,12 +470,12 @@
                                     </button>
                                     <button class="btn btn-sm btn-outline-info suggestion-btn" 
                                             data-query="Sugerir retroalimentación para bajo rendimiento">
-                                        💡 Retroalimentación
-                                                </button>
+                                        �� Retroalimentación
+                                    </button>
                                     <button class="btn btn-sm btn-outline-info suggestion-btn" 
                                             data-query="Recomendar estrategias de evaluación">
                                         📝 Estrategias
-                                                </button>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -486,8 +486,113 @@
 
         <!-- Pestaña Asistencia -->
         <div class="tab-pane fade" id="asistencia">
-            <div id="asistenciaContent">
-                <!-- El contenido se cargará dinámicamente -->
+            <!-- Submenú de Asistencia -->
+            <div class="card mb-4">
+                <div class="card-body p-0">
+                    <ul class="nav nav-pills nav-fill p-2" id="asistenciaSubMenu" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" 
+                                    id="registro-asistencia-tab" 
+                                    data-bs-toggle="pill" 
+                                    data-bs-target="#registro-asistencia" 
+                                    type="button" 
+                                    role="tab">
+                                <i class="fas fa-clipboard-check me-2"></i>Registro de Asistencia
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" 
+                                    id="historial-asistencia-tab" 
+                                    data-bs-toggle="pill" 
+                                    data-bs-target="#historial-asistencia" 
+                                    type="button" 
+                                    role="tab">
+                                <i class="fas fa-history me-2"></i>Historial de Asistencia
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Contenido de las subpestañas -->
+            <div class="tab-content" id="asistenciaSubContent">
+                <!-- Subpestaña de Registro -->
+                <div class="tab-pane fade show active" id="registro-asistencia" role="tabpanel">
+                    <div id="asistenciaContent">
+                        <!-- El contenido del formulario se cargará dinámicamente aquí -->
+                    </div>
+                </div>
+
+                <!-- Subpestaña de Historial -->
+                <div class="tab-pane fade" id="historial-asistencia" role="tabpanel">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-history me-2"></i>Historial de Asistencia
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Filtros -->
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label">Mes</label>
+                                    <select class="form-select" id="mes-filtro">
+                                        <option value="">Todos los meses</option>
+                                        <option value="1">Enero</option>
+                                        <option value="2">Febrero</option>
+                                        <option value="3">Marzo</option>
+                                        <option value="4">Abril</option>
+                                        <option value="5">Mayo</option>
+                                        <option value="6">Junio</option>
+                                        <option value="7">Julio</option>
+                                        <option value="8">Agosto</option>
+                                        <option value="9">Septiembre</option>
+                                        <option value="10">Octubre</option>
+                                        <option value="11">Noviembre</option>
+                                        <option value="12">Diciembre</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Estado</label>
+                                    <select class="form-select" id="estado-filtro">
+                                        <option value="">Todos los estados</option>
+                                        <option value="presente">Presente</option>
+                                        <option value="ausente">Ausente</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Estudiante</label>
+                                    <select class="form-select" id="estudiante-filtro">
+                                        <option value="">Todos los estudiantes</option>
+                                        {% for estudiante in estudiantes %}
+                                        <option value="{{ estudiante.usuario.auth_user_id }}">
+                                            {{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Tabla de historial -->
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="tabla-historial">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Estudiante</th>
+                                            <th>Estado</th>
+                                            <th>Justificación</th>
+                                            <th>Observaciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Se llenará dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -98,13 +98,27 @@ $(document).ready(function() {
                                 ${response.asignatura} <small class="ms-2">(${response.codigo})</small>
                             </p>
                         </div>
-                        <div>
-                            <button class="btn btn-light btn-sm me-2 marcar-todos-presentes">
-                                <i class="fas fa-check-circle me-1"></i>Marcar Todos Presentes
-                            </button>
-                            <button class="btn btn-light btn-sm marcar-todos-ausentes">
-                                <i class="fas fa-times-circle me-1"></i>Marcar Todos Ausentes
-                            </button>
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                <span class="badge ${curso.estado === 'completo' ? 'bg-success' : 
+                                                    curso.estado === 'parcial' ? 'bg-warning' : 
+                                                    'bg-secondary'} p-2">
+                                    <i class="fas ${curso.estado === 'completo' ? 'fa-check-circle' : 
+                                                   curso.estado === 'parcial' ? 'fa-clock' : 
+                                                   'fa-hourglass'} me-1"></i>
+                                    ${curso.estado_texto}
+                                </span>
+                            </div>
+                            <div>
+                                <button class="btn btn-light btn-sm me-2 marcar-todos-presentes" 
+                                        ${curso.estado === 'completo' ? 'disabled' : ''}>
+                                    <i class="fas fa-check-circle me-1"></i>Marcar Todos Presentes
+                                </button>
+                                <button class="btn btn-light btn-sm marcar-todos-ausentes"
+                                        ${curso.estado === 'completo' ? 'disabled' : ''}>
+                                    <i class="fas fa-times-circle me-1"></i>Marcar Todos Ausentes
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -122,7 +136,7 @@ $(document).ready(function() {
                             <div class="card bg-success text-white">
                                 <div class="card-body text-center">
                                     <h6><i class="fas fa-check-circle me-1"></i>Presentes</h6>
-                                    <h4 class="presentes-count">0</h4>
+                                    <h4 class="presentes-count">${curso.presentes}</h4>
                                 </div>
                             </div>
                         </div>
@@ -130,7 +144,7 @@ $(document).ready(function() {
                             <div class="card bg-danger text-white">
                                 <div class="card-body text-center">
                                     <h6><i class="fas fa-times-circle me-1"></i>Ausentes</h6>
-                                    <h4 class="ausentes-count">0</h4>
+                                    <h4 class="ausentes-count">${curso.ausentes}</h4>
                                 </div>
                             </div>
                         </div>
@@ -138,7 +152,7 @@ $(document).ready(function() {
                             <div class="card bg-warning">
                                 <div class="card-body text-center">
                                     <h6><i class="fas fa-question-circle me-1"></i>Sin Registro</h6>
-                                    <h4 class="sin-registro-count">${curso.total_estudiantes}</h4>
+                                    <h4 class="sin-registro-count">${curso.sin_registro}</h4>
                                 </div>
                             </div>
                         </div>
@@ -164,10 +178,11 @@ $(document).ready(function() {
                                             <select class="form-select estado-asistencia" 
                                                     id="estado_${estudiante.id}"
                                                     name="estado_${estudiante.id}"
-                                                    data-estudiante-id="${estudiante.id}">
+                                                    data-estudiante-id="${estudiante.id}"
+                                                    ${curso.estado === 'completo' ? 'disabled' : ''}>
                                                 <option value="">Sin registro</option>
-                                                <option value="presente">Presente</option>
-                                                <option value="ausente">Ausente</option>
+                                                <option value="presente" ${estudiante.asistencias[0].presente === true ? 'selected' : ''}>Presente</option>
+                                                <option value="ausente" ${estudiante.asistencias[0].presente === false ? 'selected' : ''}>Ausente</option>
                                             </select>
                                         </td>
                                         <td>
@@ -177,7 +192,9 @@ $(document).ready(function() {
                                                        id="justificacion_${estudiante.id}"
                                                        name="justificacion_${estudiante.id}"
                                                        data-estudiante-id="${estudiante.id}" 
-                                                       disabled>
+                                                       ${estudiante.asistencias[0].presente === false ? '' : 'disabled'}
+                                                       ${curso.estado === 'completo' ? 'disabled' : ''}
+                                                       ${estudiante.asistencias[0].justificado ? 'checked' : ''}>
                                                 <label class="form-check-label" 
                                                        for="justificacion_${estudiante.id}">
                                                     Justificado
@@ -190,7 +207,9 @@ $(document).ready(function() {
                                                    id="observacion_${estudiante.id}"
                                                    name="observacion_${estudiante.id}"
                                                    data-estudiante-id="${estudiante.id}" 
-                                                   disabled
+                                                   ${estudiante.asistencias[0].presente === false ? '' : 'disabled'}
+                                                   ${curso.estado === 'completo' ? 'disabled' : ''}
+                                                   value="${estudiante.asistencias[0].observacion || ''}"
                                                    placeholder="Ingrese observación...">
                                         </td>
                                     </tr>
@@ -447,8 +466,86 @@ $(document).ready(function() {
         $card.find('.sin-registro-count').text(sinRegistro);
     }
     
+    // Función para cargar el historial de asistencia
+    function cargarHistorialAsistencia(asignaturaId, filtros = {}) {
+        const $tabla = $('#tabla-historial tbody');
+        $tabla.html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando historial...</td></tr>');
+
+        // Construir la URL con los filtros
+        let url = `/obtener-historial-asistencia/${asignaturaId}/`;
+        const params = new URLSearchParams(filtros);
+        if (Object.keys(filtros).length > 0) {
+            url += `?${params.toString()}`;
+        }
+
+        $.get(url)
+            .done(function(response) {
+                if (response.success) {
+                    if (response.asistencias && response.asistencias.length > 0) {
+                        let html = '';
+                        response.asistencias.forEach(asistencia => {
+                            const fecha = new Date(asistencia.fecha_registro).toLocaleDateString('es-ES', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            
+                            html += `
+                                <tr>
+                                    <td>${fecha}</td>
+                                    <td>${asistencia.estudiante_nombre}</td>
+                                    <td>
+                                        <span class="badge ${asistencia.presente ? 'bg-success' : 'bg-danger'}">
+                                            ${asistencia.presente ? 'Presente' : 'Ausente'}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        ${asistencia.justificado ? 
+                                            '<span class="badge bg-info">Justificado</span>' : 
+                                            '<span class="badge bg-secondary">Sin Justificar</span>'}
+                                    </td>
+                                    <td>${asistencia.observaciones || '-'}</td>
+                                </tr>
+                            `;
+                        });
+                        $tabla.html(html);
+                    } else {
+                        $tabla.html('<tr><td colspan="5" class="text-center">No hay registros de asistencia</td></tr>');
+                    }
+                } else {
+                    mostrarError('Error al cargar el historial: ' + response.error);
+                }
+            })
+            .fail(function() {
+                mostrarError('Error de conexión al cargar el historial');
+            });
+    }
+
+    // Inicializar eventos del historial
+    function inicializarEventosHistorial() {
+        // Manejar cambios en los filtros
+        $('#mes-filtro, #estado-filtro, #estudiante-filtro').on('change', function() {
+            const filtros = {
+                mes: $('#mes-filtro').val(),
+                estado: $('#estado-filtro').val(),
+                estudiante: $('#estudiante-filtro').val()
+            };
+            cargarHistorialAsistencia(asignaturaIdActual, filtros);
+        });
+
+        // Cargar historial cuando se muestra la pestaña
+        $('#historial-asistencia-tab').on('shown.bs.tab', function() {
+            cargarHistorialAsistencia(asignaturaIdActual);
+        });
+    }
+
     // Exponer funciones globalmente
     window.asistenciaActions = {
         cargarAsistencia: cargarAsistencia
     };
+
+    // Inicializar eventos del historial
+    inicializarEventosHistorial();
 }); 

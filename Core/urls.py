@@ -9,7 +9,7 @@ from Core.views import (
     EstudianteDetalleView
 )
 from Core.views.alumnos import InscribirElectivoView, InscribirElectivosLoteView, BorrarInscripcionElectivosView
-from Core.views.docentes import CancelarClaseView, MarcarClaseRecuperadaView, ObtenerHorariosAsignaturaView, CrearEventoCalendarioView, EditarEventoCalendarioView, EliminarEventoCalendarioView, ReporteEvaluacionesAsignaturasDocenteView, ReporteEvaluacionesCursoJefeView, ReporteAsistenciaAsignaturasDocenteView, ReporteAsistenciaCursoJefeView, ResumenGeneralDocenteView
+from Core.views.docentes import CancelarClaseView, MarcarClaseRecuperadaView, ObtenerHorariosAsignaturaView, ResumenGeneralDocenteView, ReporteEvaluacionesAsignaturasDocenteView, ReporteEvaluacionesCursoJefeView, ReporteAsistenciaAsignaturasDocenteView, ReporteAsistenciaCursoJefeView
 from Core.views.admin import AdminEventosCalendarioView, AdminCrearEventoCalendarioView, AdminEditarEventoCalendarioView, AdminEliminarEventoCalendarioView, AdminDetalleEventoCalendarioView, ApiCursosView, ApiAsignaturasView, CursoDataView, CursoUpdateView, CursoDeleteView, AsignaturaDataView, AsignaturaUpdateView, AsignaturaDeleteView
 from Core.views.reportes import DashboardMetricasView, ReporteAsistenciaGeneralView, ReporteEvaluacionesView
 from Core.views.reportes_simple import ReporteRendimientoCursosViewSimple, ReporteDocentesViewSimple, ReporteEstudiantesRiesgoViewSimple, ReporteAsistenciaGeneralViewSimple, ReporteAsistenciaEstudianteViewSimple, ReporteAsistenciaCursoViewSimple, ListaEstudiantesViewSimple, ReporteAsistenciaAsignaturasCursoViewSimple, ReporteEvaluacionesAsignaturasCursoViewSimple, ReporteEvaluacionesGeneralViewSimple, ReporteEvaluacionesEstudianteViewSimple
@@ -32,6 +32,7 @@ from .views.foro import *
 from .views.usuarios import *
 from Core.views import chat
 from Core.views.chat import ChatIAView
+from .views.docentes import GenerarEvaluacionBaseView, CrearEvaluacionEspecificaView, CrearEvaluacionesEstudiantesView, ObtenerEvaluacionesAsignaturaView, ObtenerNotasEvaluacionView, ActualizarNotaView, EliminarNotaView, ObtenerClasesDocenteView
 
 urlpatterns = [
     # URLs de autenticación
@@ -116,10 +117,10 @@ urlpatterns += [
     path('obtener-asistencia-asignatura/<int:asignatura_id>/', ObtenerAsistenciaAsignaturaView.as_view(), name='obtener_asistencia_asignatura'),
     path('guardar-asistencia/<int:clase_id>/', GuardarAsistenciaView.as_view(), name='guardar_asistencia'),
     
-    # URLs para eventos del calendario (docentes)
-    path('crear-evento-calendario/', CrearEventoCalendarioView.as_view(), name='crear_evento_calendario'),
-    path('editar-evento-calendario/<int:evento_id>/', EditarEventoCalendarioView.as_view(), name='editar_evento_calendario'),
-    path('eliminar-evento-calendario/<int:evento_id>/', EliminarEventoCalendarioView.as_view(), name='eliminar_evento_calendario'),
+    # URLs para eventos del calendario (docentes) - COMENTADAS TEMPORALMENTE
+    # path('crear-evento-calendario/', CrearEventoCalendarioView.as_view(), name='crear_evento_calendario'),
+    # path('editar-evento-calendario/<int:evento_id>/', EditarEventoCalendarioView.as_view(), name='editar_evento_calendario'),
+    # path('eliminar-evento-calendario/<int:evento_id>/', EliminarEventoCalendarioView.as_view(), name='eliminar_evento_calendario'),
     
     # URLs para eventos del calendario (administrador)
     path('admin-eventos-calendario/', AdminEventosCalendarioView.as_view(), name='admin_eventos_calendario'),
@@ -199,5 +200,30 @@ urlpatterns += [
 urlpatterns += [
     # URLs de asistencia
     path('obtener-historial-asistencia/<int:asignatura_id>/', ObtenerHistorialAsistenciaView.as_view(), name='obtener_historial_asistencia'),
+]
+
+urlpatterns += [
+    # URLs para el sistema de notas y evaluaciones
+    path('api/evaluacion-base/<int:asignatura_id>/generar/', 
+         GenerarEvaluacionBaseView.as_view(), name='generar_evaluacion_base'),
+    path('api/evaluacion-especifica/crear/', 
+         CrearEvaluacionEspecificaView.as_view(), name='crear_evaluacion_especifica'),
+    path('api/evaluacion/<int:evaluacion_id>/estudiantes/crear/', 
+         CrearEvaluacionesEstudiantesView.as_view(), name='crear_evaluaciones_estudiantes'),
+    path('api/asignatura/<int:asignatura_id>/evaluaciones/', 
+         ObtenerEvaluacionesAsignaturaView.as_view(), name='obtener_evaluaciones_asignatura'),
+    path('api/evaluacion/<int:evaluacion_id>/notas/', 
+         ObtenerNotasEvaluacionView.as_view(), name='obtener_notas_evaluacion'),
+    path('api/nota/<int:nota_id>/actualizar/', 
+         ActualizarNotaView.as_view(), name='actualizar_nota'),
+    path('api/nota/<int:nota_id>/eliminar/', 
+         EliminarNotaView.as_view(), name='eliminar_nota'),
+    path('api/asignatura/<int:asignatura_id>/clases/', 
+         ObtenerClasesDocenteView.as_view(), name='obtener_clases_asignatura'),
+]
+
+urlpatterns += [
+    # URLs para obtener clases del docente
+    path('api/clases-docente/<int:docente_id>/', ObtenerClasesDocenteView.as_view(), name='obtener_clases_docente'),
 ]
 

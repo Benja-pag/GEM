@@ -4,11 +4,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectorEvaluacion = document.getElementById('selector-evaluacion');
     const tablaNotas = document.getElementById('tabla-notas');
 
+    // Verificar si los elementos existen antes de continuar
+    if (!selectorEvaluacion || !tablaNotas) {
+        console.log('Elementos de notas no encontrados en esta página');
+        return;
+    }
+
     // Configuración para las peticiones fetch
     const fetchConfig = {
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
         }
     };
 
@@ -29,7 +35,11 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            renderizarTablaNotas(data);
+            if (data.success) {
+                renderizarTablaNotas(data.notas);
+            } else {
+                mostrarMensaje(data.error || 'Error al cargar las notas', 'error');
+            }
         })
         .catch(error => {
             mostrarMensaje('Error al cargar las notas', 'error');
@@ -38,7 +48,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Función para renderizar la tabla de notas
-    function renderizarTablaNotas(data) {
+    function renderizarTablaNotas(notas) {
+        if (!notas || notas.length === 0) {
+            tablaNotas.innerHTML = '<p class="text-muted">No hay notas registradas para esta evaluación</p>';
+            return;
+        }
+
         const tabla = `
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -51,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </tr>
                     </thead>
                     <tbody>
-                        ${data.map(nota => `
+                        ${notas.map(nota => `
                             <tr data-nota-id="${nota.id}">
                                 <td>${nota.estudiante_nombre}</td>
                                 <td>
@@ -113,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const notaId = fila.dataset.notaId;
         const nuevaNota = fila.querySelector('.nota-input').value;
 
-        fetch(`/api/nota/${notaId}/`, {
+        fetch(`/api/nota/${notaId}/actualizar/`, {
             ...fetchConfig,
             method: 'PUT',
             body: JSON.stringify({
@@ -125,18 +140,22 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            const notaSpan = fila.querySelector('.nota-valor');
-            const notaInput = fila.querySelector('.nota-input');
-            const editarBtn = fila.querySelector('.editar-nota');
-            const guardarBtn = fila.querySelector('.guardar-nota');
+            if (data.success) {
+                const notaSpan = fila.querySelector('.nota-valor');
+                const notaInput = fila.querySelector('.nota-input');
+                const editarBtn = fila.querySelector('.editar-nota');
+                const guardarBtn = fila.querySelector('.guardar-nota');
 
-            notaSpan.textContent = nuevaNota;
-            notaSpan.classList.remove('d-none');
-            notaInput.classList.add('d-none');
-            editarBtn.classList.remove('d-none');
-            guardarBtn.classList.add('d-none');
+                notaSpan.textContent = nuevaNota;
+                notaSpan.classList.remove('d-none');
+                notaInput.classList.add('d-none');
+                editarBtn.classList.remove('d-none');
+                guardarBtn.classList.add('d-none');
 
-            mostrarMensaje('Nota actualizada correctamente', 'success');
+                mostrarMensaje('Nota actualizada correctamente', 'success');
+            } else {
+                mostrarMensaje(data.error || 'Error al guardar la nota', 'error');
+            }
         })
         .catch(error => {
             mostrarMensaje('Error al guardar la nota', 'error');
@@ -151,14 +170,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const fila = event.target.closest('tr');
         const notaId = fila.dataset.notaId;
 
-        fetch(`/api/nota/${notaId}/`, {
+        fetch(`/api/nota/${notaId}/eliminar/`, {
             ...fetchConfig,
             method: 'DELETE'
         })
         .then(response => {
             if (!response.ok) throw new Error('Error al eliminar la nota');
-            fila.remove();
-            mostrarMensaje('Nota eliminada correctamente', 'success');
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                fila.remove();
+                mostrarMensaje('Nota eliminada correctamente', 'success');
+            } else {
+                mostrarMensaje(data.error || 'Error al eliminar la nota', 'error');
+            }
         })
         .catch(error => {
             mostrarMensaje('Error al eliminar la nota', 'error');

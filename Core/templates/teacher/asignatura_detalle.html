@@ -6,6 +6,7 @@
 {% block title %}Detalles de {{ asignatura.asignatura.nombre }}{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/system_messages.css' %}">
 <style>
     :root {
         --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -115,8 +116,8 @@
                         <i class="fas fa-book fa-2x"></i>
                     </div>
                     <div>
-                        <h1 class="mb-1 fw-bold">{{ asignatura.asignatura.nombre }}</h1>
-                        <p class="mb-0 opacity-75">
+                        <h1 class="mb-1 fw-bold" id="asignatura-nombre">{{ asignatura.asignatura.nombre }}</h1>
+                        <p class="mb-0 opacity-75" id="asignatura-docente">
                             <i class="fas fa-chalkboard-teacher me-2"></i>
                             Prof. {{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }}
                         </p>
@@ -126,7 +127,7 @@
                     <div class="col-md-4">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-hashtag me-2"></i>
-                            <span class="fw-bold">{{ asignatura.codigo }}</span>
+                            <span class="fw-bold" id="asignatura-codigo">{{ asignatura.codigo }}</span>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -385,44 +386,125 @@
 
         <!-- Pestaña Notas -->
         <div class="tab-pane fade fade-in" id="notas">
-            <div class="row">
-                <!-- Panel Principal de Notas -->
-                <div class="col-lg-8">
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-gradient-primary text-white">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-graduation-cap me-2"></i>Gestión de Notas
-                            </h5>
+            <div class="row align-items-stretch" style="min-height: 600px;">
+                <!-- Columna principal con las pestañas de notas -->
+                <div class="col-lg-8 d-flex flex-column" style="min-height: 600px;">
+                    <!-- Menú de Gestión de Notas -->
+                    <div class="card mb-4 flex-shrink-0">
+                        <div class="card-body p-0">
+                            <ul class="nav nav-pills nav-fill p-2" id="notasSubMenu" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" 
+                                            id="evaluaciones-base-tab" 
+                                            data-bs-toggle="pill" 
+                                            data-bs-target="#evaluaciones-base" 
+                                            type="button" 
+                                            role="tab">
+                                        <i class="fas fa-clipboard-list me-2"></i>Evaluaciones Base
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" 
+                                            id="evaluaciones-creadas-tab" 
+                                            data-bs-toggle="pill" 
+                                            data-bs-target="#evaluaciones-creadas" 
+                                            type="button" 
+                                            role="tab">
+                                        <i class="fas fa-calendar-check me-2"></i>Evaluaciones Creadas
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" 
+                                            id="notas-alumnos-tab" 
+                                            data-bs-toggle="pill" 
+                                            data-bs-target="#notas-alumnos" 
+                                            type="button" 
+                                            role="tab">
+                                        <i class="fas fa-graduation-cap me-2"></i>Notas de Alumnos
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
-                        <div class="card-body">
-                            <!-- Selector de Evaluación -->
-                            <div class="mb-4">
-                                <label class="form-label">Seleccionar Evaluación</label>
-                                <select class="form-select" id="selector-evaluacion">
-                                    <option value="">Seleccione una evaluación...</option>
-                                    {% for evaluacion in evaluaciones %}
-                                    <option value="{{ evaluacion.id }}">{{ evaluacion.nombre }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                    </div>
+                    <!-- Contenido de las subpestañas -->
+                    <div class="tab-content flex-grow-1" id="notasSubContent" style="min-height: 400px;">
+                        <!-- Subpestaña Evaluaciones Base -->
+                        <div class="tab-pane fade show active" id="evaluaciones-base" role="tabpanel">
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-header bg-gradient-primary text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-clipboard-list me-2"></i>Evaluaciones Base
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Botón para Generar Evaluación Base -->
+                                    <div class="mb-4">
+                                        <button class="btn btn-primary" id="btn-generar-evaluacion-base">
+                                            <i class="fas fa-plus me-2"></i>Generar Evaluación Base
+                                        </button>
+                                    </div>
 
-                            <!-- Tabla de Notas -->
-                            <div id="tabla-notas">
-                                <!-- La tabla se cargará dinámicamente -->
+                                    <!-- Lista de Evaluaciones Base -->
+                                    <div class="mb-4">
+                                        <h6 class="text-muted mb-3">Evaluaciones Base Disponibles</h6>
+                                        <div id="lista-evaluaciones-base" style="max-height: 350px; overflow-y: auto;">
+                                            <!-- Las evaluaciones base se cargarán dinámicamente -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subpestaña Evaluaciones Creadas -->
+                        <div class="tab-pane fade" id="evaluaciones-creadas" role="tabpanel">
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-header bg-gradient-success text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-calendar-check me-2"></i>Evaluaciones Creadas
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Lista de Evaluaciones Creadas -->
+                                    <div class="mb-4">
+                                        <h6 class="text-muted mb-3">Evaluaciones Específicas Creadas</h6>
+                                        <div id="lista-evaluaciones-creadas" style="max-height: 350px; overflow-y: auto;">
+                                            <!-- Las evaluaciones creadas se cargarán dinámicamente -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subpestaña Notas de Alumnos -->
+                        <div class="tab-pane fade" id="notas-alumnos" role="tabpanel">
+                            <div class="card border-0 shadow-sm mb-4">
+                                <div class="card-header bg-gradient-warning text-white">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-graduation-cap me-2"></i>Notas de Alumnos
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="tabla-notas">
+                                        <!-- Las notas se cargarán dinámicamente -->
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                                            <p class="text-muted">Selecciona una evaluación para ver las notas</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Panel de Chat IA -->
-                <div class="col-lg-4">
-                    <div class="card border-0 shadow-sm mb-4">
+                <!-- Panel de Chat IA - Siempre visible -->
+                <div class="col-lg-4 d-flex flex-column" style="min-height: 600px;">
+                    <div class="card border-0 shadow-sm mb-4 flex-grow-1 d-flex flex-column" style="height: 100%;">
                         <div class="card-header bg-gradient-info text-white">
                             <h5 class="card-title mb-0">
                                 <i class="fas fa-robot me-2"></i>Asistente IA
                             </h5>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body d-flex flex-column" style="flex: 1 1 auto;">
                             <!-- Área de Chat -->
                             <div class="chat-container mb-3" style="height: 400px; overflow-y: auto;">
                                 <div id="chat-messages" class="mb-3">
@@ -470,7 +552,7 @@
                                     </button>
                                     <button class="btn btn-sm btn-outline-info suggestion-btn" 
                                             data-query="Sugerir retroalimentación para bajo rendimiento">
-                                        �� Retroalimentación
+                                        💡 Retroalimentación
                                     </button>
                                     <button class="btn btn-sm btn-outline-info suggestion-btn" 
                                             data-query="Recomendar estrategias de evaluación">
@@ -754,12 +836,195 @@
     </div>
 </div>
 
+<!-- Modal para Generar Evaluación Base -->
+<div class="modal fade" id="modalEvaluacionBase" tabindex="-1" aria-labelledby="modalEvaluacionBaseLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEvaluacionBaseLabel">
+                    <i class="fas fa-clipboard-list me-2"></i>Generar Evaluación Base
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Información de la asignatura -->
+                <div class="alert alert-info mb-3">
+                    <h6 class="alert-heading">
+                        <i class="fas fa-book me-2"></i>{{ asignatura.asignatura.nombre }}
+                    </h6>
+                    <p class="mb-1">
+                        <strong>Código:</strong> {{ asignatura.codigo }} | 
+                        <strong>Docente:</strong> {{ asignatura.docente.usuario.nombre }} {{ asignatura.docente.usuario.apellido_paterno }}
+                    </p>
+                </div>
+
+                <!-- Horario de la asignatura -->
+                <div class="mb-4">
+                    <h6 class="text-muted mb-3">
+                        <i class="fas fa-calendar-alt me-2"></i>Horario de Clases
+                    </h6>
+                    {% if clases %}
+                        <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
+                            <table class="table table-sm table-hover align-middle">
+                                <thead class="table-light sticky-top">
+                                    <tr>
+                                        <th><i class="fas fa-calendar-day me-1"></i>Día</th>
+                                        <th><i class="fas fa-clock me-1"></i>Horario</th>
+                                        <th><i class="fas fa-door-open me-1"></i>Sala</th>
+                                        <th><i class="fas fa-users me-1"></i>Curso</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for clase in clases %}
+                                    <tr>
+                                        <td><span class="badge bg-primary">{{ clase.fecha|date:"l"|title }}</span></td>
+                                        <td><i class="fas fa-clock me-1 text-muted"></i>{{ clase.horario }}</td>
+                                        <td>{{ clase.sala }}</td>
+                                        <td><span class="badge bg-info">{{ clase.curso }}</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-calendar-times fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">No hay clases registradas para esta asignatura.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <form id="formEvaluacionBase">
+                    <div class="mb-3">
+                        <label for="nombreEvaluacion" class="form-label">
+                            <i class="fas fa-clipboard-list me-2"></i>Nombre de la Evaluación
+                        </label>
+                        <input type="text" class="form-control" id="nombreEvaluacion" 
+                               placeholder="Ej: Control 1, Prueba 2, etc." required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcionEvaluacion" class="form-label">
+                            <i class="fas fa-align-left me-2"></i>Descripción
+                        </label>
+                        <textarea class="form-control" id="descripcionEvaluacion" rows="3"
+                                  placeholder="Describe los objetivos y contenidos de la evaluación..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ponderacionEvaluacion" class="form-label">
+                            <i class="fas fa-percentage me-2"></i>Ponderación (%)
+                        </label>
+                        <input type="number" class="form-control" id="ponderacionEvaluacion" 
+                               min="1" max="100" placeholder="Ej: 20" required>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            La ponderación debe estar entre 1% y 100%
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarEvaluacionBase">
+                    <i class="fas fa-save me-2"></i>Guardar Evaluación Base
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Crear Evaluación Específica -->
+<div class="modal fade" id="modalEvaluacionEspecifica" tabindex="-1" aria-labelledby="modalEvaluacionEspecificaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEvaluacionEspecificaLabel">
+                    <i class="fas fa-calendar-plus me-2"></i>Crear Evaluación Específica
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Información de la evaluación base seleccionada -->
+                <div id="evaluacionBaseInfo" class="mb-3">
+                    <!-- Se cargará dinámicamente -->
+                </div>
+                
+                <!-- Información de la asignatura -->
+                <div id="asignaturaInfo" class="mb-3">
+                    <!-- Se cargará dinámicamente -->
+                </div>
+                
+                <form id="formEvaluacionEspecifica">
+                    <div class="mb-3">
+                        <label for="claseSelect" class="form-label">
+                            <i class="fas fa-calendar-alt me-2"></i>Seleccionar Clase
+                        </label>
+                        <select class="form-select" id="claseSelect" required>
+                            <option value="">Selecciona una clase...</option>
+                        </select>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Los bloques están agrupados por pares (2-4, 6-8) e impares (1-2, 3-4)
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fechaEvaluacion" class="form-label">
+                            <i class="fas fa-calendar me-2"></i>Fecha de Evaluación
+                        </label>
+                        <input type="date" class="form-control" id="fechaEvaluacion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="observacionesEvaluacion" class="form-label">
+                            <i class="fas fa-sticky-note me-2"></i>Observaciones
+                        </label>
+                        <textarea class="form-control" id="observacionesEvaluacion" rows="3" 
+                                  placeholder="Observaciones adicionales sobre la evaluación..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnGuardarEvaluacionEspecifica">
+                    <i class="fas fa-save me-2"></i>Crear Evaluación
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Crear Evaluaciones de Estudiantes -->
+<div class="modal fade" id="modalEvaluacionesEstudiantes" tabindex="-1" aria-labelledby="modalEvaluacionesEstudiantesLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEvaluacionesEstudiantesLabel">
+                    <i class="fas fa-users me-2"></i>Crear Evaluaciones para Estudiantes
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro de que desea crear evaluaciones para todos los estudiantes de esta evaluación?</p>
+                <div id="infoEvaluacionEstudiantes">
+                    <!-- Información de la evaluación se cargará aquí -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnCrearEvaluacionesEstudiantes">
+                    <i class="fas fa-user-plus me-2"></i>Crear Evaluaciones
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'js/system_messages.js' %}"></script>
 <script src="{% static 'js/asistencia_actions.js' %}"></script>
 <script src="{% static 'js/chat_ia_actions.js' %}"></script>
 <script src="{% static 'js/notas_actions.js' %}"></script>
+<script src="{% static 'js/evaluaciones_actions.js' %}"></script>
 <script>
     $(document).ready(function() {
         // Cargar asistencia cuando se muestra la pestaña
@@ -794,29 +1059,36 @@
 
 <script>
 function eliminarComunicacion(id) {
-    if (confirm('¿Estás seguro de que deseas eliminar esta comunicación?')) {
-        fetch(`/comunicacion/${id}/eliminar/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Eliminar el elemento del DOM
-                document.getElementById(`comunicacion-${id}`).remove();
-                // Mostrar mensaje de éxito
-                alert('Comunicación eliminada exitosamente');
-            } else {
-                alert(data.message || 'Error al eliminar la comunicación');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error al eliminar la comunicación');
-        });
-    }
+    GEMSystemMessage.confirm(
+        '¿Estás seguro de que deseas eliminar esta comunicación?',
+        () => {
+            // Usuario confirmó, proceder con la eliminación
+            fetch(`/comunicacion/${id}/eliminar/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Eliminar el elemento del DOM
+                    document.getElementById(`comunicacion-${id}`).remove();
+                    // Mostrar mensaje de éxito
+                    GEMSystemMessage.success('Comunicación eliminada exitosamente');
+                } else {
+                    GEMSystemMessage.error(data.message || 'Error al eliminar la comunicación');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                GEMSystemMessage.error('Error al eliminar la comunicación');
+            });
+        },
+        () => {
+            // Usuario canceló, no hacer nada
+        }
+    );
 }
 </script>
 {% endblock %} 

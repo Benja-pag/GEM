@@ -264,7 +264,7 @@ function mostrarReporteEvaluacionesAsignaturas(data) {
                             <div class="col-md-2">
                                 <div class="card bg-light">
                                     <div class="card-body text-center">
-                                        <h5 class="text-info">${stats.total_evaluaciones}</h5>
+                                        <h5 class="text-info">${Number.isFinite(Number(stats.total_evaluaciones)) && Number(stats.total_evaluaciones) > 0 ? stats.total_evaluaciones : 'Sin datos'}</h5>
                                         <small class="text-muted">Evaluaciones</small>
                                     </div>
                                 </div>
@@ -274,22 +274,6 @@ function mostrarReporteEvaluacionesAsignaturas(data) {
                                     <div class="card-body text-center">
                                         <h5 class="text-secondary">${stats.total_notas}</h5>
                                         <small class="text-muted">Notas</small>
-                            </div>
-                        </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5 class="text-warning">${stats.promedio_general}</h5>
-                                        <small class="text-muted">Promedio General</small>
-                            </div>
-                        </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5 class="text-success">${stats.porcentaje_aprobacion_general}%</h5>
-                                        <small class="text-muted">% Aprobación</small>
                             </div>
                         </div>
                             </div>
@@ -433,30 +417,6 @@ function mostrarReporteEvaluacionesCursoJefe(data) {
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-2">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5 class="text-secondary">${stats.total_evaluaciones}</h5>
-                                        <small class="text-muted">Evaluaciones</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5 class="text-warning">${stats.promedio_general_curso}</h5>
-                                        <small class="text-muted">Promedio Curso</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card bg-light">
-                                    <div class="card-body text-center">
-                                        <h5 class="text-success">${stats.porcentaje_aprobacion_curso}%</h5>
-                                        <small class="text-muted">% Aprobación</small>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         
                         <div class="table-responsive mt-3">
@@ -486,7 +446,7 @@ function mostrarReporteEvaluacionesCursoJefe(data) {
                                                          style="width: ${asignatura.porcentaje_aprobacion}%">
                                                         ${asignatura.porcentaje_aprobacion}%
                                                     </div>
-                        </div>
+                                                </div>
                                             </td>
                                             <td><span class="badge bg-${asignatura.estado_clase}">${asignatura.estado}</span></td>
                                         </tr>
@@ -715,7 +675,7 @@ function mostrarReporteAsistenciaCursoJefe(data) {
                 <div class="card bg-primary text-white">
                     <div class="card-body text-center">
                         <h4>${stats.total_estudiantes}</h4>
-                        <small>Estudiantes</small>
+                        <small class="text-muted">Estudiantes</small>
                     </div>
                 </div>
             </div>
@@ -723,23 +683,7 @@ function mostrarReporteAsistenciaCursoJefe(data) {
                 <div class="card bg-info text-white">
                     <div class="card-body text-center">
                         <h4>${stats.total_asignaturas}</h4>
-                        <small>Asignaturas</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-success text-white">
-                    <div class="card-body text-center">
-                        <h4>${stats.porcentaje_asistencia_curso}%</h4>
-                        <small>Asistencia del Curso</small>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-warning text-white">
-                    <div class="card-body text-center">
-                        <h4>${stats.total_estudiantes_riesgo}</h4>
-                        <small>Estudiantes en Riesgo</small>
+                        <small class="text-muted">Asignaturas</small>
                     </div>
                 </div>
             </div>
@@ -787,8 +731,8 @@ function mostrarReporteAsistenciaCursoJefe(data) {
                         <div class="progress-bar bg-${porcentajeColor}" 
                              style="width: ${asignatura.porcentaje_asistencia}%">
                             ${asignatura.porcentaje_asistencia}%
-    </div>
-</div> 
+                        </div>
+                    </div>
                 </td>
                 <td>
                     ${asignatura.estudiantes_en_riesgo > 0 ? 

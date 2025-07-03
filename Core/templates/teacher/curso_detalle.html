@@ -66,12 +66,11 @@ async function analizarRendimiento(cursoId) {
                 'X-CSRFToken': getCsrfToken()
             }
         });
-
         if (!response.ok) {
             throw new Error('Error al analizar rendimiento');
         }
-
         const data = await response.json();
+        window.__analisisIAData = data; // Guardar para el PDF
         mostrarResultados('Análisis de Rendimiento', generarContenidoAnalisis(data));
     } catch (error) {
         mostrarError('Error: ' + error.message);
@@ -130,34 +129,62 @@ async function obtenerRecomendaciones(cursoId) {
 
 async function descargarPDF() {
     try {
-        const contenido = document.getElementById('contenido-resultados').innerHTML;
         const titulo = document.getElementById('titulo-resultados').textContent;
-        
-        const response = await fetch('/api/generar-pdf/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCsrfToken()
-            },
-            body: JSON.stringify({
-                contenido: contenido,
-                titulo: titulo
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Error al generar PDF');
+        if (titulo === 'Análisis de Rendimiento') {
+            // Obtener los datos estructurados del análisis IA
+            // (Idealmente, deberías guardar el último resultado de análisis IA en una variable global)
+            const data = window.__analisisIAData;
+            if (!data) {
+                mostrarError('No se encontraron los datos del análisis IA. Por favor, vuelve a generar el análisis antes de descargar.');
+                return;
+            }
+            const response = await fetch('/pdf/analisis-ia/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                throw new Error('Error al generar PDF');
+            }
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'analisis_ia.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } else {
+            // PDF genérico para otros casos (HTML)
+            const contenido = document.getElementById('contenido-resultados').innerHTML;
+            const response = await fetch('/api/generar-pdf/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({
+                    contenido: contenido,
+                    titulo: titulo
+                })
+            });
+            if (!response.ok) {
+                throw new Error('Error al generar PDF');
+            }
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
         }
-
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${titulo.toLowerCase().replace(/\s+/g, '_')}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
     } catch (error) {
         mostrarError('Error al descargar PDF: ' + error.message);
     }
@@ -662,14 +689,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <button type="button" class="btn btn-sm btn-outline-primary" 
-                                                        onclick="verDetalleEstudiante({{ estudiante.pk }})" 
+                                                        onclick="verDetalleEstudiante({{ estudiante.usuario.auth_user_id }})" 
                                                         title="Ver detalle del estudiante">
                                                     <i class="fas fa-eye"></i> Ver Detalle
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-outline-info" 
-                                                        onclick="contactarEstudiante('{{ estudiante.usuario.correo }}', '{{ estudiante.usuario.telefono }}')" 
-                                                        title="Contactar estudiante">
-                                                    <i class="fas fa-envelope"></i>
                                                 </button>
                                             </div>
                                         </td>

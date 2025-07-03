@@ -66,17 +66,17 @@
                 <i class="fas fa-user-graduate"></i>
             </div>
             <div class="flex-grow-1">
-                <h1 class="mb-2">{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }} {{ estudiante.usuario.apellido_materno }}</h1>
+                <h1 class="mb-2" style="color: #fff;">{{ estudiante.usuario.nombre }} {{ estudiante.usuario.apellido_paterno }} {{ estudiante.usuario.apellido_materno }}</h1>
                 <div class="row">
                     <div class="col-md-6">
-                        <p class="mb-1"><i class="fas fa-id-card me-2"></i><strong>RUT:</strong> {{ estudiante.usuario.rut }}-{{ estudiante.usuario.div }}</p>
-                        <p class="mb-1"><i class="fas fa-envelope me-2"></i><strong>Correo:</strong> {{ estudiante.usuario.correo }}</p>
+                        <p class="mb-1" style="color: #fff;"><i class="fas fa-id-card me-2"></i><strong>RUT:</strong> {{ estudiante.usuario.rut }}-{{ estudiante.usuario.div }}</p>
+                        <p class="mb-1" style="color: #fff;"><i class="fas fa-envelope me-2"></i><strong>Correo:</strong> {{ estudiante.usuario.correo }}</p>
                     </div>
                     <div class="col-md-6">
                         {% if estudiante.curso %}
-                        <p class="mb-1"><i class="fas fa-graduation-cap me-2"></i><strong>Curso:</strong> {{ estudiante.curso }}</p>
+                        <p class="mb-1" style="color: #fff;"><i class="fas fa-graduation-cap me-2"></i><strong>Curso:</strong> {{ estudiante.curso }}</p>
                         {% endif %}
-                        <p class="mb-1"><i class="fas fa-calendar me-2"></i><strong>Fecha de Nacimiento:</strong> {{ estudiante.usuario.fecha_nacimiento|date:"d/m/Y" }}</p>
+                        <p class="mb-1" style="color: #fff;"><i class="fas fa-calendar me-2"></i><strong>Fecha de Nacimiento:</strong> {{ estudiante.usuario.fecha_nacimiento|date:"d/m/Y" }}</p>
                     </div>
                 </div>
             </div>

@@ -276,7 +276,7 @@ class EstudianteDetalleView(View):
             # Obtener el estudiante
             estudiante = Estudiante.objects.select_related(
                 'usuario', 'curso'
-            ).get(id=estudiante_id)
+            ).get(usuario__auth_user_id=estudiante_id)
             
             # Verificar permisos
             # Verificar si es administrador

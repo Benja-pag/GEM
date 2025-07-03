@@ -3947,3 +3947,87 @@ def generar_pdf_asistencia_curso_jefe(data):
     doc.build(elements)
     buffer.seek(0)
     return buffer
+
+def generar_pdf_analisis_ia(data):
+    """
+    Genera un PDF con el análisis IA del curso (promedio, asistencia, total estudiantes, resumen y distribución de notas)
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.8*inch, bottomMargin=0.8*inch)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Cabecera
+    logo_path = os.path.join(settings.BASE_DIR, 'Core', 'static', 'img', 'logo_gem.png')
+    logo = Image(logo_path, width=0.8*inch, height=0.8*inch)
+    header_style = ParagraphStyle('HeaderStyle', parent=styles['Normal'], fontSize=18, textColor=colors.HexColor('#2c3e50'), alignment=TA_LEFT, fontName='Helvetica-Bold')
+    header_text = Paragraph("Análisis de Rendimiento IA", header_style)
+    header_table = Table([[logo, header_text]], colWidths=[1*inch, 6.5*inch])
+    header_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (1, 0), (1, 0), 0),
+    ]))
+    elements.append(header_table)
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Resumen
+    resumen_style = ParagraphStyle('Resumen', parent=styles['Normal'], fontSize=12, textColor=colors.HexColor('#34495e'), spaceAfter=16)
+    resumen = Paragraph(f"<b>Resumen:</b> {data.get('resumen', 'Sin resumen')}", resumen_style)
+    elements.append(resumen)
+
+    # Estadísticas principales
+    stats_data = [
+        [Paragraph('<b>Promedio General</b>', styles['Normal']), Paragraph('<b>Asistencia Promedio</b>', styles['Normal']), Paragraph('<b>Total Estudiantes</b>', styles['Normal'])],
+        [
+            str(data.get('promedio_general', 'N/A')),
+            str(data.get('asistencia_promedio', 'N/A')),
+            str(data.get('total_estudiantes', 'N/A'))
+        ]
+    ]
+    stats_table = Table(stats_data, colWidths=[2.2*inch]*3)
+    stats_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4e73df')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('FONTSIZE', (0, 1), (-1, 1), 14),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+        ('BOTTOMPADDING', (0, 1), (-1, 1), 10),
+    ]))
+    elements.append(stats_table)
+    elements.append(Spacer(1, 0.3*inch))
+
+    # Distribución de notas
+    elements.append(Paragraph('<b>Distribución de Notas</b>', styles['Normal']))
+    dist = data.get('distribucion', {})
+    dist_data = [
+        ['≥6.0', dist.get('sobre_6', 0)],
+        ['5.0-5.9', dist.get('entre_5_6', 0)],
+        ['4.0-4.9', dist.get('entre_4_5', 0)],
+        ['<4.0', dist.get('bajo_4', 0)]
+    ]
+    dist_table = Table(dist_data, colWidths=[2*inch, 2*inch])
+    dist_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f8f9fc')),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
+    ]))
+    elements.append(dist_table)
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Pie de página
+    def footer(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica', 9)
+        footer_text = f"GEM - Gestión Educativa Modular | Página {doc.page}"
+        canvas.drawCentredString(A4[0] / 2, 0.3 * inch, footer_text)
+        generation_text = f"Generado el: {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+        canvas.drawString(0.5 * inch, 0.3 * inch, generation_text)
+        canvas.restoreState()
+
+    doc.build(elements, onFirstPage=footer, onLaterPages=footer)
+    buffer.seek(0)
+    return buffer

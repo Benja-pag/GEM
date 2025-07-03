@@ -33,6 +33,7 @@ from .views.usuarios import *
 from Core.views import chat
 from Core.views.chat import ChatIAView
 from .views.docentes import GenerarEvaluacionBaseView, CrearEvaluacionEspecificaView, CrearEvaluacionesEstudiantesView, ObtenerEvaluacionesAsignaturaView, ObtenerNotasEvaluacionView, ActualizarNotaView, EliminarNotaView, ObtenerClasesDocenteView
+from Core.views.pdf_views import DescargarAnalisisIAPDFView
 
 urlpatterns = [
     # URLs de autenticación
@@ -101,6 +102,7 @@ urlpatterns = [
     path('pdf/reporte-evaluaciones-curso-jefe/', pdf_views.DescargarReporteEvaluacionesCursoJefePDFView.as_view(), name='descargar_reporte_evaluaciones_curso_jefe_pdf'),
     path('pdf/reporte-asistencia-asignaturas-docente/', pdf_views.DescargarReporteAsistenciaAsignaturasDocentePDFView.as_view(), name='descargar_reporte_asistencia_asignaturas_docente_pdf'),
     path('pdf/reporte-asistencia-curso-jefe/', pdf_views.DescargarReporteAsistenciaCursoJefePDFView.as_view(), name='descargar_reporte_asistencia_curso_jefe_pdf'),
+    path('pdf/analisis-ia/', DescargarAnalisisIAPDFView.as_view(), name='descargar_analisis_ia_pdf'),
 ]
 
 urlpatterns += [

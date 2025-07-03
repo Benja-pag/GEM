@@ -6,11 +6,14 @@ from django.views import View
 from django.utils import timezone
 from Core.models import Estudiante, Curso, Asistencia, AlumnoEvaluacion, AsignaturaImpartida, ProfesorJefe, Evaluacion, Clase
 from Core.views.alumnos import get_horario_estudiante, get_asistencia_estudiante, get_evaluaciones_estudiante, get_promedio_estudiante
-from .pdf_generators import generar_pdf_horario, generar_pdf_asistencia, generar_pdf_calificaciones, generar_pdf_asistencia_asignaturas_docente, generar_pdf_asistencia_curso_jefe, generar_pdf_evaluaciones_asignaturas_docente, generar_pdf_evaluaciones_curso_jefe
+from .pdf_generators import generar_pdf_horario, generar_pdf_asistencia, generar_pdf_calificaciones, generar_pdf_asistencia_asignaturas_docente, generar_pdf_asistencia_curso_jefe, generar_pdf_evaluaciones_asignaturas_docente, generar_pdf_evaluaciones_curso_jefe, generar_pdf_analisis_ia
 from django.db.models import Avg, Max, Min
 from datetime import date, datetime
 from Core.views.reportes_simple import get_periodo_fechas
 from .pdf_generators import generar_pdf_reporte_estudiantes_riesgo
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 
 @method_decorator(login_required, name='dispatch')
 class DescargarHorarioPDFView(View):
@@ -1772,3 +1775,15 @@ class DescargarReporteAsistenciaCursoJefePDFView(View):
             
         except Exception as e:
             return HttpResponse(f'Error al generar PDF: {str(e)}', status=500)
+
+@method_decorator(csrf_exempt, name='dispatch')
+class DescargarAnalisisIAPDFView(View):
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            pdf_buffer = generar_pdf_analisis_ia(data)
+            response = HttpResponse(pdf_buffer, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="analisis_ia.pdf"'
+            return response
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})

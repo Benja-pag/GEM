@@ -32,8 +32,8 @@ from .views.foro import *
 from .views.usuarios import *
 from Core.views import chat
 from Core.views.chat import ChatIAView
-from .views.docentes import GenerarEvaluacionBaseView, CrearEvaluacionEspecificaView, CrearEvaluacionesEstudiantesView, ObtenerEvaluacionesAsignaturaView, ObtenerNotasEvaluacionView, ActualizarNotaView, EliminarNotaView, ObtenerClasesDocenteView
-from Core.views.pdf_views import DescargarAnalisisIAPDFView
+from .views.docentes import GenerarEvaluacionBaseView, CrearEvaluacionEspecificaView, CrearEvaluacionesEstudiantesView, ObtenerEvaluacionesAsignaturaView, ObtenerNotasEvaluacionView, ActualizarNotaView, EliminarNotaView, ObtenerClasesDocenteView, CrearEventoCalendarioView, EditarEventoCalendarioView, EliminarEventoCalendarioView
+from Core.views.pdf_views import DescargarAnalisisIAPDFView, DescargarPrediccionRiesgoPDFView, DescargarRecomendacionesPDFView
 
 urlpatterns = [
     # URLs de autenticación
@@ -103,6 +103,8 @@ urlpatterns = [
     path('pdf/reporte-asistencia-asignaturas-docente/', pdf_views.DescargarReporteAsistenciaAsignaturasDocentePDFView.as_view(), name='descargar_reporte_asistencia_asignaturas_docente_pdf'),
     path('pdf/reporte-asistencia-curso-jefe/', pdf_views.DescargarReporteAsistenciaCursoJefePDFView.as_view(), name='descargar_reporte_asistencia_curso_jefe_pdf'),
     path('pdf/analisis-ia/', DescargarAnalisisIAPDFView.as_view(), name='descargar_analisis_ia_pdf'),
+    path('pdf/prediccion-riesgo/', DescargarPrediccionRiesgoPDFView.as_view(), name='descargar_prediccion_riesgo_pdf'),
+    path('pdf/recomendaciones/', DescargarRecomendacionesPDFView.as_view(), name='descargar_recomendaciones_pdf'),
 ]
 
 urlpatterns += [
@@ -119,10 +121,10 @@ urlpatterns += [
     path('obtener-asistencia-asignatura/<int:asignatura_id>/', ObtenerAsistenciaAsignaturaView.as_view(), name='obtener_asistencia_asignatura'),
     path('guardar-asistencia/<int:clase_id>/', GuardarAsistenciaView.as_view(), name='guardar_asistencia'),
     
-    # URLs para eventos del calendario (docentes) - COMENTADAS TEMPORALMENTE
-    # path('crear-evento-calendario/', CrearEventoCalendarioView.as_view(), name='crear_evento_calendario'),
-    # path('editar-evento-calendario/<int:evento_id>/', EditarEventoCalendarioView.as_view(), name='editar_evento_calendario'),
-    # path('eliminar-evento-calendario/<int:evento_id>/', EliminarEventoCalendarioView.as_view(), name='eliminar_evento_calendario'),
+    # URLs para eventos del calendario (docentes)
+    path('crear-evento-calendario/', CrearEventoCalendarioView.as_view(), name='crear_evento_calendario'),
+    path('editar-evento-calendario/<str:evento_id>/', EditarEventoCalendarioView.as_view(), name='editar_evento_calendario'),
+    path('eliminar-evento-calendario/<str:evento_id>/', EliminarEventoCalendarioView.as_view(), name='eliminar_evento_calendario'),
     
     # URLs para eventos del calendario (administrador)
     path('admin-eventos-calendario/', AdminEventosCalendarioView.as_view(), name='admin_eventos_calendario'),

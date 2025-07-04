@@ -95,6 +95,7 @@ async function predecirRiesgo(cursoId) {
         }
 
         const data = await response.json();
+        window.__prediccionRiesgoData = data; // Guardar para el PDF
         mostrarResultados('Predicción de Riesgo Académico', generarContenidoPrediccion(data));
     } catch (error) {
         mostrarError('Error: ' + error.message);
@@ -119,6 +120,7 @@ async function obtenerRecomendaciones(cursoId) {
         }
 
         const data = await response.json();
+        window.__recomendacionesData = data; // Guardar para el PDF
         mostrarResultados('Recomendaciones Personalizadas', generarContenidoRecomendaciones(data));
     } catch (error) {
         mostrarError('Error: ' + error.message);
@@ -132,7 +134,6 @@ async function descargarPDF() {
         const titulo = document.getElementById('titulo-resultados').textContent;
         if (titulo === 'Análisis de Rendimiento') {
             // Obtener los datos estructurados del análisis IA
-            // (Idealmente, deberías guardar el último resultado de análisis IA en una variable global)
             const data = window.__analisisIAData;
             if (!data) {
                 mostrarError('No se encontraron los datos del análisis IA. Por favor, vuelve a generar el análisis antes de descargar.');
@@ -154,6 +155,60 @@ async function descargarPDF() {
             const a = document.createElement('a');
             a.href = url;
             a.download = 'analisis_ia.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } else if (titulo === 'Predicción de Riesgo Académico') {
+            // Obtener los datos estructurados de la predicción de riesgo
+            const data = window.__prediccionRiesgoData;
+            if (!data) {
+                mostrarError('No se encontraron los datos de predicción de riesgo. Por favor, vuelve a generar el análisis antes de descargar.');
+                return;
+            }
+            const response = await fetch('/pdf/prediccion-riesgo/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                throw new Error('Error al generar PDF');
+            }
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'prediccion_riesgo_academico.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } else if (titulo === 'Recomendaciones Personalizadas') {
+            // Obtener los datos estructurados de las recomendaciones
+            const data = window.__recomendacionesData;
+            if (!data) {
+                mostrarError('No se encontraron los datos de recomendaciones. Por favor, vuelve a generar las recomendaciones antes de descargar.');
+                return;
+            }
+            const response = await fetch('/pdf/recomendaciones/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                throw new Error('Error al generar PDF');
+            }
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'recomendaciones_personalizadas.pdf';
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -253,6 +308,8 @@ function generarContenidoPrediccion(data) {
             <div class="col-12 mb-4">
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
+                    <h6 class="card-title">Predicción de Riesgo Académico</h6>
+                    <p class="card-text small text-muted">Identifica primero a los estudiantes en riesgo académico</p>
                     Se han identificado ${data.total_riesgo || 0} estudiantes en riesgo académico.
                 </div>
             </div>
@@ -736,8 +793,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="card h-100 border-warning">
                                     <div class="card-body text-center">
                                         <i class="fas fa-exclamation-triangle fa-2x text-warning mb-3"></i>
-                                        <h6 class="card-title">Predicción de Riesgo</h6>
-                                        <p class="card-text small text-muted">Identifica estudiantes en riesgo académico</p>
+                                        <h6 class="card-title">Predicción de Riesgo Académico</h6>
+                                        <p class="card-text small text-muted">Identifica primero a los estudiantes en riesgo académico</p>
                                         <button class="btn btn-outline-warning btn-sm w-100" data-action="predecir-riesgo">
                                             Predecir
                                         </button>

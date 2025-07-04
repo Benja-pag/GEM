@@ -3506,13 +3506,13 @@ def generar_pdf_evaluaciones_curso_jefe(data):
     
     # --- Estadísticas Generales del Curso ---
     stats = data.get('estadisticas_generales', {})
-    def safe_num(val):
+    def safe_num(val, default=None):
         try:
             if val is None or val == '' or str(val).lower() == 'undefined':
-                return None
+                return default or 'N/A'
             return str(val)
         except:
-            return None
+            return default or 'N/A'
     def safe_percent(val):
         try:
             if val is None or val == '' or str(val).lower() == 'undefined':
@@ -3579,7 +3579,7 @@ def generar_pdf_evaluaciones_curso_jefe(data):
                 Paragraph(asignatura.get('docente','N/A'), styles['Normal']),
                 Paragraph(safe_num(asignatura.get('total_evaluaciones')), styles['Normal']),
                 Paragraph(safe_num(asignatura.get('estudiantes_evaluados')), styles['Normal']),
-                Paragraph(safe_num(asignatura.get('promedio_asignatura'),'N/A'), styles['Normal']),
+                Paragraph(safe_num(asignatura.get('promedio_asignatura'), 'N/A'), styles['Normal']),
                 Paragraph(safe_percent(asignatura.get('porcentaje_aprobacion')), styles['Normal']),
                 Paragraph(f'<font color="{estado_color}">{asignatura.get("estado","N/A")}</font>', styles['Normal'])
             ])
@@ -3832,6 +3832,26 @@ def generar_pdf_asistencia_curso_jefe(data):
     elements.append(Paragraph(info_curso, styles['Normal']))
     elements.append(Spacer(1, 20))
     
+    # Funciones auxiliares para manejo seguro de valores
+    def safe_num(val, default=None):
+        try:
+            if val is None or val == '' or str(val).lower() == 'undefined':
+                return default or 'N/A'
+            return str(val)
+        except:
+            return default or 'N/A'
+    
+    def safe_percent(val, default=None):
+        try:
+            if val is None or val == '' or str(val).lower() == 'undefined':
+                return default or 'N/A'
+            val = float(val)
+            if val < 0 or val > 100:
+                return default or 'N/A'
+            return f"{val:.1f}%"
+        except:
+            return default or 'N/A'
+
     # Estadísticas generales del curso
     stats = data.get('estadisticas_generales', {})
     elements.append(Paragraph("Resumen del Curso", subtitle_style))
@@ -3957,68 +3977,619 @@ def generar_pdf_analisis_ia(data):
     elements = []
     styles = getSampleStyleSheet()
 
+    # Estilos personalizados
+    title_style = ParagraphStyle('Title', parent=styles['Title'], fontSize=20, textColor=colors.HexColor('#2c3e50'), alignment=TA_CENTER, spaceAfter=20)
+    subtitle_style = ParagraphStyle('Subtitle', parent=styles['Heading2'], fontSize=14, textColor=colors.HexColor('#34495e'), spaceAfter=12)
+    normal_style = ParagraphStyle('Normal', parent=styles['Normal'], fontSize=10, spaceAfter=8)
+    alert_style = ParagraphStyle('Alert', parent=styles['Normal'], fontSize=10, backColor=colors.HexColor('#d1ecf1'), borderColor=colors.HexColor('#bee5eb'), borderWidth=1, borderPadding=8, spaceAfter=12)
+
     # Cabecera
     logo_path = os.path.join(settings.BASE_DIR, 'Core', 'static', 'img', 'logo_gem.png')
-    logo = Image(logo_path, width=0.8*inch, height=0.8*inch)
-    header_style = ParagraphStyle('HeaderStyle', parent=styles['Normal'], fontSize=18, textColor=colors.HexColor('#2c3e50'), alignment=TA_LEFT, fontName='Helvetica-Bold')
-    header_text = Paragraph("Análisis de Rendimiento IA", header_style)
-    header_table = Table([[logo, header_text]], colWidths=[1*inch, 6.5*inch])
-    header_table.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('LEFTPADDING', (1, 0), (1, 0), 0),
-    ]))
-    elements.append(header_table)
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=0.8*inch, height=0.8*inch)
+        header_style = ParagraphStyle('HeaderStyle', parent=styles['Normal'], fontSize=18, textColor=colors.HexColor('#2c3e50'), alignment=TA_LEFT, fontName='Helvetica-Bold')
+        header_text = Paragraph("Análisis de Rendimiento IA", header_style)
+        header_table = Table([[logo, header_text]], colWidths=[1*inch, 6.5*inch])
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('LEFTPADDING', (1, 0), (1, 0), 0),
+        ]))
+        elements.append(header_table)
+    else:
+        elements.append(Paragraph("Análisis de Rendimiento IA", title_style))
+    
     elements.append(Spacer(1, 0.2*inch))
 
     # Resumen
-    resumen_style = ParagraphStyle('Resumen', parent=styles['Normal'], fontSize=12, textColor=colors.HexColor('#34495e'), spaceAfter=16)
-    resumen = Paragraph(f"<b>Resumen:</b> {data.get('resumen', 'Sin resumen')}", resumen_style)
-    elements.append(resumen)
+    resumen_text = data.get('resumen', 'Sin resumen disponible')
+    resumen_paragraph = Paragraph(f"<b>Resumen del Análisis:</b><br/>{resumen_text}", alert_style)
+    elements.append(resumen_paragraph)
+    elements.append(Spacer(1, 0.3*inch))
 
     # Estadísticas principales
+    elements.append(Paragraph("Estadísticas Principales", subtitle_style))
+    
+    # Crear tabla de estadísticas principales
     stats_data = [
-        [Paragraph('<b>Promedio General</b>', styles['Normal']), Paragraph('<b>Asistencia Promedio</b>', styles['Normal']), Paragraph('<b>Total Estudiantes</b>', styles['Normal'])],
-        [
-            str(data.get('promedio_general', 'N/A')),
-            str(data.get('asistencia_promedio', 'N/A')),
-            str(data.get('total_estudiantes', 'N/A'))
-        ]
+        ['Métrica', 'Valor']
     ]
-    stats_table = Table(stats_data, colWidths=[2.2*inch]*3)
+    
+    promedio = data.get('promedio_general', 'N/A')
+    asistencia = data.get('asistencia_promedio', 'N/A')
+    total_estudiantes = data.get('total_estudiantes', 'N/A')
+    
+    stats_data.append(['Promedio General', str(promedio)])
+    stats_data.append(['Asistencia Promedio', str(asistencia)])
+    stats_data.append(['Total Estudiantes', str(total_estudiantes)])
+    
+    stats_table = Table(stats_data, colWidths=[3*inch, 2*inch])
     stats_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4e73df')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('FONTSIZE', (0, 0), (-1, 0), 12),
-        ('FONTSIZE', (0, 1), (-1, 1), 14),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
-        ('BOTTOMPADDING', (0, 1), (-1, 1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fc')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 11),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
+    
     elements.append(stats_table)
     elements.append(Spacer(1, 0.3*inch))
 
     # Distribución de notas
-    elements.append(Paragraph('<b>Distribución de Notas</b>', styles['Normal']))
-    dist = data.get('distribucion', {})
-    dist_data = [
-        ['≥6.0', dist.get('sobre_6', 0)],
-        ['5.0-5.9', dist.get('entre_5_6', 0)],
-        ['4.0-4.9', dist.get('entre_4_5', 0)],
-        ['<4.0', dist.get('bajo_4', 0)]
-    ]
-    dist_table = Table(dist_data, colWidths=[2*inch, 2*inch])
-    dist_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#f8f9fc')),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 11),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.lightgrey),
-    ]))
-    elements.append(dist_table)
+    elements.append(Paragraph("Distribución de Notas", subtitle_style))
+    
+    distribucion = data.get('distribucion', {})
+    if distribucion and total_estudiantes and total_estudiantes != 'N/A':
+        try:
+            total = int(total_estudiantes)
+            if total > 0:
+                # Crear tabla de distribución
+                dist_data = [
+                    ['Rango de Notas', 'Cantidad', 'Porcentaje']
+                ]
+                
+                sobre_6 = distribucion.get('sobre_6', 0)
+                entre_5_6 = distribucion.get('entre_5_6', 0)
+                entre_4_5 = distribucion.get('entre_4_5', 0)
+                bajo_4 = distribucion.get('bajo_4', 0)
+                
+                dist_data.append(['≥6.0 (Excelente)', sobre_6, f"{(sobre_6/total)*100:.1f}%"])
+                dist_data.append(['5.0-5.9 (Bueno)', entre_5_6, f"{(entre_5_6/total)*100:.1f}%"])
+                dist_data.append(['4.0-4.9 (Regular)', entre_4_5, f"{(entre_4_5/total)*100:.1f}%"])
+                dist_data.append(['<4.0 (Deficiente)', bajo_4, f"{(bajo_4/total)*100:.1f}%"])
+                
+                dist_table = Table(dist_data, colWidths=[2*inch, 1.5*inch, 1.5*inch])
+                dist_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#28a745')),
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (-1, 0), 11),
+                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                    ('BACKGROUND', (0, 1), (0, 1), colors.HexColor('#d4edda')),
+                    ('BACKGROUND', (0, 2), (0, 2), colors.HexColor('#d1ecf1')),
+                    ('BACKGROUND', (0, 3), (0, 3), colors.HexColor('#fff3cd')),
+                    ('BACKGROUND', (0, 4), (0, 4), colors.HexColor('#f8d7da')),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                    ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                    ('FONTSIZE', (0, 1), (-1, -1), 10),
+                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ]))
+                
+                elements.append(dist_table)
+            else:
+                elements.append(Paragraph("No hay estudiantes registrados para mostrar distribución.", normal_style))
+        except (ValueError, TypeError):
+            elements.append(Paragraph("Error al calcular la distribución de notas.", normal_style))
+    else:
+        elements.append(Paragraph("No hay datos de distribución disponibles.", normal_style))
+    
+    elements.append(Spacer(1, 0.3*inch))
+
+    # Información adicional si está disponible
+    if 'estudiantes_riesgo' in data or 'recomendaciones' in data:
+        elements.append(Paragraph("Información Adicional", subtitle_style))
+        
+        if 'estudiantes_riesgo' in data:
+            estudiantes_riesgo = data.get('estudiantes_riesgo', [])
+            if estudiantes_riesgo:
+                elements.append(Paragraph(f"<b>Estudiantes en Riesgo:</b> {len(estudiantes_riesgo)} identificados", normal_style))
+        
+        if 'recomendaciones' in data:
+            recomendaciones = data.get('recomendaciones', [])
+            if recomendaciones:
+                elements.append(Paragraph(f"<b>Recomendaciones Generadas:</b> {len(recomendaciones)} para estudiantes", normal_style))
+    
+    # Pie de página
+    elements.append(Spacer(1, 0.5*inch))
+    
+    def footer(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica', 9)
+        footer_text = f"GEM - Gestión Educativa Modular | Página {doc.page}"
+        canvas.drawCentredString(A4[0] / 2, 0.3 * inch, footer_text)
+        generation_text = f"Generado el: {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+        canvas.drawString(0.5 * inch, 0.3 * inch, generation_text)
+        canvas.restoreState()
+
+    doc.build(elements, onFirstPage=footer, onLaterPages=footer)
+    buffer.seek(0)
+    return buffer
+
+def generar_pdf_recomendaciones(data):
+    """
+    Genera un PDF específico para las recomendaciones personalizadas
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.8*inch, bottomMargin=0.8*inch)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Estilos personalizados
+    title_style = ParagraphStyle('Title', parent=styles['Title'], fontSize=20, textColor=colors.HexColor('#28a745'), alignment=TA_CENTER, spaceAfter=20)
+    subtitle_style = ParagraphStyle('Subtitle', parent=styles['Heading2'], fontSize=14, textColor=colors.HexColor('#34495e'), spaceAfter=12)
+    normal_style = ParagraphStyle('Normal', parent=styles['Normal'], fontSize=10, spaceAfter=8)
+    info_style = ParagraphStyle('Info', parent=styles['Normal'], fontSize=10, backColor=colors.HexColor('#d4edda'), borderColor=colors.HexColor('#c3e6cb'), borderWidth=1, borderPadding=8, spaceAfter=12)
+
+    # Cabecera con logo
+    logo_path = os.path.join(settings.BASE_DIR, 'Core', 'static', 'img', 'logo_gem.png')
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=0.8*inch, height=0.8*inch)
+        header_style = ParagraphStyle('HeaderStyle', parent=styles['Normal'], fontSize=18, textColor=colors.HexColor('#28a745'), alignment=TA_LEFT, fontName='Helvetica-Bold')
+        header_text = Paragraph("Recomendaciones Personalizadas", header_style)
+        header_table = Table([[logo, header_text]], colWidths=[1*inch, 6.5*inch])
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('LEFTPADDING', (1, 0), (1, 0), 0),
+        ]))
+        elements.append(header_table)
+    else:
+        elements.append(Paragraph("Recomendaciones Personalizadas", title_style))
+    
     elements.append(Spacer(1, 0.2*inch))
 
+    # Fecha de generación
+    fecha_actual = datetime.now().strftime('%d/%m/%Y a las %H:%M hrs')
+    fecha_paragraph = Paragraph(f"<b>Fecha de generación:</b> {fecha_actual}", normal_style)
+    elements.append(fecha_paragraph)
+    elements.append(Spacer(1, 0.1*inch))
+
+    # Resumen ejecutivo
+    recomendaciones_list = data.get('recomendaciones', [])
+    total_recomendaciones = len(recomendaciones_list)
+    
+    if total_recomendaciones > 0:
+        resumen_text = f"Se han generado <b>{total_recomendaciones}</b> recomendaciones personalizadas para estudiantes que requieren apoyo académico o de asistencia."
+        resumen_paragraph = Paragraph(resumen_text, info_style)
+    else:
+        resumen_text = "¡Excelente! Todos los estudiantes del curso están dentro de los parámetros esperados. No se requieren recomendaciones especiales en este momento."
+        resumen_paragraph = Paragraph(resumen_text, ParagraphStyle('Success', parent=styles['Normal'], fontSize=10, backColor=colors.HexColor('#d4edda'), borderColor=colors.HexColor('#c3e6cb'), borderWidth=1, borderPadding=8, spaceAfter=12))
+    
+    elements.append(resumen_paragraph)
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Estadísticas generales
+    if total_recomendaciones > 0:
+        elements.append(Paragraph("Resumen de Recomendaciones", subtitle_style))
+        
+        # Categorizar recomendaciones por tipo de problema
+        problemas_academicos = []
+        problemas_asistencia = []
+        problemas_mixtos = []
+        
+        for rec in recomendaciones_list:
+            recomendacion_text = rec.get('recomendacion', '').lower()
+            if 'promedio' in recomendacion_text and 'asistencia' in recomendacion_text:
+                problemas_mixtos.append(rec)
+            elif 'promedio' in recomendacion_text:
+                problemas_academicos.append(rec)
+            elif 'asistencia' in recomendacion_text:
+                problemas_asistencia.append(rec)
+            else:
+                problemas_mixtos.append(rec)
+        
+        # Crear tabla de estadísticas
+        stats_data = [
+            ['Tipo de Problema', 'Cantidad', 'Porcentaje', 'Prioridad']
+        ]
+        
+        stats_data.append([
+            'Problemas Académicos',
+            str(len(problemas_academicos)),
+            f"{(len(problemas_academicos)/total_recomendaciones)*100:.1f}%" if total_recomendaciones > 0 else "0%",
+            '🔴 Alta'
+        ])
+        
+        stats_data.append([
+            'Problemas de Asistencia', 
+            str(len(problemas_asistencia)),
+            f"{(len(problemas_asistencia)/total_recomendaciones)*100:.1f}%" if total_recomendaciones > 0 else "0%",
+            '🟡 Media'
+        ])
+        
+        stats_data.append([
+            'Problemas Mixtos',
+            str(len(problemas_mixtos)),
+            f"{(len(problemas_mixtos)/total_recomendaciones)*100:.1f}%" if total_recomendaciones > 0 else "0%",
+            '🔴 Crítica'
+        ])
+        
+        stats_table = Table(stats_data, colWidths=[2*inch, 1*inch, 1.5*inch, 1.5*inch])
+        stats_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#28a745')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fc')),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        
+        elements.append(stats_table)
+        elements.append(Spacer(1, 0.3*inch))
+
+        # Recomendaciones detalladas por estudiante
+        elements.append(Paragraph("Recomendaciones Detalladas por Estudiante", subtitle_style))
+        
+        # Estilo para texto en tabla
+        table_text_style = ParagraphStyle('TableText', parent=styles['Normal'], fontSize=9, leading=12, wordWrap='CJK')
+        
+        # Crear tabla para recomendaciones
+        rec_data = [['N°', 'Estudiante', 'Diagnóstico', 'Acciones Recomendadas']]
+        
+        for i, rec in enumerate(recomendaciones_list, 1):
+            estudiante_nombre = rec.get('estudiante', 'N/A')
+            diagnostico = rec.get('recomendacion', 'Sin diagnóstico')
+            acciones_list = rec.get('acciones', [])
+            
+            # Formatear acciones como lista con viñetas
+            acciones_text = '<br/>'.join([f"• {accion}" for accion in acciones_list])
+            
+            rec_data.append([
+                Paragraph(str(i), table_text_style),
+                Paragraph(estudiante_nombre, table_text_style),
+                Paragraph(diagnostico, table_text_style),
+                Paragraph(acciones_text, table_text_style)
+            ])
+        
+        rec_table = Table(rec_data, colWidths=[0.3*inch, 1.7*inch, 2.5*inch, 2.3*inch], rowHeights=[None] + [0.8*inch] * (len(rec_data) - 1))
+        rec_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#28a745')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fc')),
+            ('PADDING', (0, 0), (-1, -1), 6),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#f8f9fc'), colors.white]),
+        ]))
+        
+        elements.append(rec_table)
+        elements.append(Spacer(1, 0.3*inch))
+
+    # Plan de implementación
+    elements.append(Paragraph("Plan de Implementación y Seguimiento", subtitle_style))
+    
+    if total_recomendaciones > 0:
+        plan_items = [
+            "📅 <b>Semana 1:</b> Contactar a los apoderados de estudiantes identificados para informar sobre la situación académica",
+            "📚 <b>Semana 2:</b> Implementar las estrategias de reforzamiento específicas para cada estudiante",
+            "📊 <b>Semana 3:</b> Realizar primera evaluación del progreso y ajustar estrategias si es necesario",
+            "🔄 <b>Semana 4:</b> Seguimiento continuo y documentación de resultados obtenidos",
+            "📈 <b>Mensual:</b> Evaluación integral del progreso y planificación de próximas intervenciones"
+        ]
+    else:
+        plan_items = [
+            "✅ <b>Monitoreo Preventivo:</b> Mantener observación regular del rendimiento académico",
+            "👀 <b>Seguimiento Proactivo:</b> Identificar tempranamente cualquier cambio en el desempeño",
+            "📊 <b>Evaluación Continua:</b> Revisar periódicamente los indicadores académicos y de asistencia",
+            "🎯 <b>Mejora Continua:</b> Buscar oportunidades de optimización en las metodologías actuales"
+        ]
+    
+    for item in plan_items:
+        plan_paragraph = Paragraph(item, ParagraphStyle('PlanParagraph', parent=styles['Normal'], fontSize=10, spaceAfter=8, leftIndent=15))
+        elements.append(plan_paragraph)
+    
+    elements.append(Spacer(1, 0.3*inch))
+
+    # Recursos y herramientas recomendadas
+    elements.append(Paragraph("Recursos y Herramientas Complementarias", subtitle_style))
+    
+    recursos = [
+        "📖 <b>Plataformas de Apoyo:</b> Khan Academy, Coursera para reforzamiento académico",
+        "👥 <b>Tutorías Grupales:</b> Organizar grupos de estudio con estudiantes aventajados",
+        "📱 <b>Aplicaciones de Seguimiento:</b> Utilizar herramientas digitales para monitorear progreso",
+        "🏫 <b>Espacios de Estudio:</b> Facilitar acceso a biblioteca y salas de estudio",
+        "🤝 <b>Red de Apoyo:</b> Coordinar con orientador escolar y equipo psicopedagógico"
+    ]
+    
+    for recurso in recursos:
+        recurso_paragraph = Paragraph(recurso, ParagraphStyle('RecursoParagraph', parent=styles['Normal'], fontSize=10, spaceAfter=6, leftIndent=15))
+        elements.append(recurso_paragraph)
+    
+    elements.append(Spacer(1, 0.3*inch))
+
+    # Nota importante
+    nota_text = "<b>NOTA IMPORTANTE:</b> Estas recomendaciones están basadas en el análisis de datos académicos y de asistencia. Se recomienda complementar con la evaluación directa del docente y considerar factores socioemocionales individuales."
+    nota_paragraph = Paragraph(nota_text, ParagraphStyle('Nota', parent=styles['Normal'], fontSize=9, textColor=colors.HexColor('#6c757d'), alignment=TA_CENTER, spaceAfter=20))
+    elements.append(nota_paragraph)
+
     # Pie de página
+    elements.append(Spacer(1, 0.3*inch))
+    
+    def footer(canvas, doc):
+        canvas.saveState()
+        canvas.setFont('Helvetica', 9)
+        footer_text = f"GEM - Gestión Educativa Modular | Página {doc.page}"
+        canvas.drawCentredString(A4[0] / 2, 0.3 * inch, footer_text)
+        generation_text = f"Generado el: {datetime.now().strftime('%d/%m/%Y %H:%M')}"
+        canvas.drawString(0.5 * inch, 0.3 * inch, generation_text)
+        canvas.restoreState()
+
+    doc.build(elements, onFirstPage=footer, onLaterPages=footer)
+    buffer.seek(0)
+    return buffer
+
+def generar_pdf_prediccion_riesgo(data):
+    """
+    Genera un PDF específico para la predicción de riesgo académico
+    """
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.8*inch, bottomMargin=0.8*inch)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Estilos personalizados
+    title_style = ParagraphStyle('Title', parent=styles['Title'], fontSize=20, textColor=colors.HexColor('#e53e3e'), alignment=TA_CENTER, spaceAfter=20)
+    subtitle_style = ParagraphStyle('Subtitle', parent=styles['Heading2'], fontSize=14, textColor=colors.HexColor('#34495e'), spaceAfter=12)
+    normal_style = ParagraphStyle('Normal', parent=styles['Normal'], fontSize=10, spaceAfter=8)
+    alert_style = ParagraphStyle('Alert', parent=styles['Normal'], fontSize=10, backColor=colors.HexColor('#f8d7da'), borderColor=colors.HexColor('#f5c6cb'), borderWidth=1, borderPadding=8, spaceAfter=12)
+    warning_style = ParagraphStyle('Warning', parent=styles['Normal'], fontSize=10, backColor=colors.HexColor('#fff3cd'), borderColor=colors.HexColor('#ffeaa7'), borderWidth=1, borderPadding=8, spaceAfter=12)
+
+    # Cabecera con logo
+    logo_path = os.path.join(settings.BASE_DIR, 'Core', 'static', 'img', 'logo_gem.png')
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=0.8*inch, height=0.8*inch)
+        header_style = ParagraphStyle('HeaderStyle', parent=styles['Normal'], fontSize=18, textColor=colors.HexColor('#e53e3e'), alignment=TA_LEFT, fontName='Helvetica-Bold')
+        header_text = Paragraph("Predicción de Riesgo Académico", header_style)
+        header_table = Table([[logo, header_text]], colWidths=[1*inch, 6.5*inch])
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('LEFTPADDING', (1, 0), (1, 0), 0),
+        ]))
+        elements.append(header_table)
+    else:
+        elements.append(Paragraph("Predicción de Riesgo Académico", title_style))
+    
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Fecha de generación
+    fecha_actual = datetime.now().strftime('%d/%m/%Y a las %H:%M hrs')
+    fecha_paragraph = Paragraph(f"<b>Fecha de generación:</b> {fecha_actual}", normal_style)
+    elements.append(fecha_paragraph)
+    elements.append(Spacer(1, 0.1*inch))
+
+    # Resumen ejecutivo
+    total_riesgo = data.get('total_riesgo', 0)
+    estudiantes_riesgo = data.get('estudiantes', [])
+    
+    if total_riesgo > 0:
+        resumen_text = f"Se han identificado <b>{total_riesgo}</b> estudiantes en situación de riesgo académico que requieren atención inmediata."
+        resumen_paragraph = Paragraph(resumen_text, alert_style)
+    else:
+        resumen_text = "¡Excelente! No se han identificado estudiantes en riesgo académico en este momento."
+        resumen_paragraph = Paragraph(resumen_text, ParagraphStyle('Success', parent=styles['Normal'], fontSize=10, backColor=colors.HexColor('#d4edda'), borderColor=colors.HexColor('#c3e6cb'), borderWidth=1, borderPadding=8, spaceAfter=12))
+    
+    elements.append(resumen_paragraph)
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Estadísticas generales
+    elements.append(Paragraph("Estadísticas del Análisis", subtitle_style))
+    
+    # Crear tabla de estadísticas
+    stats_data = [
+        ['Métrica', 'Valor', 'Estado']
+    ]
+    
+    # Contar por nivel de riesgo
+    riesgo_alto = len([e for e in estudiantes_riesgo if e.get('nivel_riesgo') == 'alto'])
+    riesgo_medio = len([e for e in estudiantes_riesgo if e.get('nivel_riesgo') == 'medio'])
+    riesgo_bajo = len([e for e in estudiantes_riesgo if e.get('nivel_riesgo') == 'bajo'])
+    
+    stats_data.append(['Total Estudiantes en Riesgo', str(total_riesgo), '🔴 Crítico' if total_riesgo > 5 else '🟡 Alerta' if total_riesgo > 0 else '✅ Óptimo'])
+    stats_data.append(['Riesgo Alto', str(riesgo_alto), '⚠️ Urgente' if riesgo_alto > 0 else '✅ Ninguno'])
+    stats_data.append(['Riesgo Medio', str(riesgo_medio), '📋 Seguimiento' if riesgo_medio > 0 else '✅ Ninguno'])
+    stats_data.append(['Riesgo Bajo', str(riesgo_bajo), '👀 Monitoreo' if riesgo_bajo > 0 else '✅ Ninguno'])
+    
+    stats_table = Table(stats_data, colWidths=[2.5*inch, 1.5*inch, 2*inch])
+    stats_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#dc3545')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 11),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8f9fc')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    
+    elements.append(stats_table)
+    elements.append(Spacer(1, 0.3*inch))
+
+    # Detalle de estudiantes en riesgo
+    if estudiantes_riesgo:
+        elements.append(Paragraph("Estudiantes Identificados en Riesgo", subtitle_style))
+        
+        # Separar por nivel de riesgo
+        estudiantes_alto = [e for e in estudiantes_riesgo if e.get('nivel_riesgo') == 'alto']
+        estudiantes_medio = [e for e in estudiantes_riesgo if e.get('nivel_riesgo') == 'medio']
+        estudiantes_bajo = [e for e in estudiantes_riesgo if e.get('nivel_riesgo') == 'bajo']
+        
+        # Riesgo Alto
+        if estudiantes_alto:
+            elements.append(Paragraph("🔴 RIESGO ALTO - Intervención Inmediata", ParagraphStyle('RiesgoAlto', parent=styles['Normal'], fontSize=12, fontName='Helvetica-Bold', textColor=colors.HexColor('#dc3545'), spaceAfter=10)))
+            
+            # Estilo para texto en tabla
+            table_text_style = ParagraphStyle('TableText', parent=styles['Normal'], fontSize=9, leading=12, wordWrap='CJK')
+            
+            alto_data = [['N°', 'Estudiante', 'Factores de Riesgo', 'Acción Requerida']]
+            
+            for i, estudiante in enumerate(estudiantes_alto, 1):
+                factores_list = estudiante.get('factores', [])
+                factores_text = '<br/>'.join([f"• {factor}" for factor in factores_list])
+                factores_paragraph = Paragraph(factores_text, table_text_style)
+                
+                accion_text = 'Reunión urgente con apoderados<br/>Plan de reforzamiento inmediato'
+                accion_paragraph = Paragraph(accion_text, table_text_style)
+                
+                alto_data.append([
+                    Paragraph(str(i), table_text_style),
+                    Paragraph(estudiante.get('nombre', 'N/A'), table_text_style),
+                    factores_paragraph,
+                    accion_paragraph
+                ])
+            
+            alto_table = Table(alto_data, colWidths=[0.3*inch, 1.8*inch, 2.7*inch, 2*inch], rowHeights=[None] + [0.6*inch] * (len(alto_data) - 1))
+            alto_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#dc3545')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f8d7da')),
+                ('PADDING', (0, 0), (-1, -1), 6),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#f8d7da'), colors.white]),
+            ]))
+            
+            elements.append(alto_table)
+            elements.append(Spacer(1, 0.2*inch))
+        
+        # Riesgo Medio
+        if estudiantes_medio:
+            elements.append(Paragraph("🟡 RIESGO MEDIO - Seguimiento Cercano", ParagraphStyle('RiesgoMedio', parent=styles['Normal'], fontSize=12, fontName='Helvetica-Bold', textColor=colors.HexColor('#ffc107'), spaceAfter=10)))
+            
+            medio_data = [['N°', 'Estudiante', 'Factores de Riesgo', 'Acción Recomendada']]
+            
+            for i, estudiante in enumerate(estudiantes_medio, 1):
+                factores_list = estudiante.get('factores', [])
+                factores_text = '<br/>'.join([f"• {factor}" for factor in factores_list])
+                factores_paragraph = Paragraph(factores_text, table_text_style)
+                
+                accion_text = 'Seguimiento semanal<br/>Apoyo pedagógico adicional'
+                accion_paragraph = Paragraph(accion_text, table_text_style)
+                
+                medio_data.append([
+                    Paragraph(str(i), table_text_style),
+                    Paragraph(estudiante.get('nombre', 'N/A'), table_text_style),
+                    factores_paragraph,
+                    accion_paragraph
+                ])
+            
+            medio_table = Table(medio_data, colWidths=[0.3*inch, 1.8*inch, 2.7*inch, 2*inch], rowHeights=[None] + [0.6*inch] * (len(medio_data) - 1))
+            medio_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#ffc107')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#fff3cd')),
+                ('PADDING', (0, 0), (-1, -1), 6),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#fff3cd'), colors.white]),
+            ]))
+            
+            elements.append(medio_table)
+            elements.append(Spacer(1, 0.2*inch))
+
+        # Riesgo Bajo
+        if estudiantes_bajo:
+            elements.append(Paragraph("🟢 RIESGO BAJO - Monitoreo Preventivo", ParagraphStyle('RiesgoBajo', parent=styles['Normal'], fontSize=12, fontName='Helvetica-Bold', textColor=colors.HexColor('#28a745'), spaceAfter=10)))
+            
+            bajo_data = [['N°', 'Estudiante', 'Factores de Riesgo', 'Acción Preventiva']]
+            
+            for i, estudiante in enumerate(estudiantes_bajo, 1):
+                factores_list = estudiante.get('factores', [])
+                factores_text = '<br/>'.join([f"• {factor}" for factor in factores_list])
+                factores_paragraph = Paragraph(factores_text, table_text_style)
+                
+                accion_text = 'Monitoreo quincenal<br/>Refuerzo positivo'
+                accion_paragraph = Paragraph(accion_text, table_text_style)
+                
+                bajo_data.append([
+                    Paragraph(str(i), table_text_style),
+                    Paragraph(estudiante.get('nombre', 'N/A'), table_text_style),
+                    factores_paragraph,
+                    accion_paragraph
+                ])
+            
+            bajo_table = Table(bajo_data, colWidths=[0.3*inch, 1.8*inch, 2.7*inch, 2*inch], rowHeights=[None] + [0.6*inch] * (len(bajo_data) - 1))
+            bajo_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#28a745')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#d4edda')),
+                ('PADDING', (0, 0), (-1, -1), 6),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.HexColor('#d4edda'), colors.white]),
+            ]))
+            
+            elements.append(bajo_table)
+            elements.append(Spacer(1, 0.2*inch))
+
+    # Recomendaciones generales
+    elements.append(Paragraph("Recomendaciones y Plan de Acción", subtitle_style))
+    
+    if total_riesgo > 0:
+        recomendaciones = [
+            "📋 <b>Seguimiento Inmediato:</b> Establecer reuniones semanales con estudiantes en riesgo alto",
+            "👥 <b>Contacto Familiar:</b> Comunicación inmediata con apoderados para coordinar apoyo en casa",
+            "📚 <b>Reforzamiento Académico:</b> Implementar tutorías personalizadas en áreas de mayor dificultad",
+            "📊 <b>Monitoreo Continuo:</b> Evaluación quincenal del progreso de cada estudiante identificado",
+            "🤝 <b>Apoyo Psicopedagógico:</b> Derivar a especialistas cuando sea necesario",
+            "📈 <b>Metas Específicas:</b> Establecer objetivos de mejora claros y alcanzables"
+        ]
+    else:
+        recomendaciones = [
+            "✅ <b>Mantener el Nivel:</b> Continuar con las estrategias pedagógicas actuales",
+            "👀 <b>Vigilancia Preventiva:</b> Mantener monitoreo regular para prevenir futuras situaciones de riesgo",
+            "🎯 <b>Optimización:</b> Identificar oportunidades de mejora en el rendimiento general",
+            "📝 <b>Registro Continuo:</b> Documentar las buenas prácticas implementadas"
+        ]
+    
+    for recomendacion in recomendaciones:
+        rec_paragraph = Paragraph(recomendacion, ParagraphStyle('RecParagraph', parent=styles['Normal'], fontSize=10, spaceAfter=8, leftIndent=15))
+        elements.append(rec_paragraph)
+    
+    elements.append(Spacer(1, 0.3*inch))
+
+    # Nota importante
+    nota_text = "<b>NOTA IMPORTANTE:</b> Este reporte es una herramienta de apoyo para la toma de decisiones pedagógicas. Se recomienda complementar este análisis con la observación directa del docente y la evaluación integral de cada estudiante."
+    nota_paragraph = Paragraph(nota_text, ParagraphStyle('Nota', parent=styles['Normal'], fontSize=9, textColor=colors.HexColor('#6c757d'), alignment=TA_CENTER, spaceAfter=20))
+    elements.append(nota_paragraph)
+
+    # Pie de página
+    elements.append(Spacer(1, 0.3*inch))
+    
     def footer(canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica', 9)

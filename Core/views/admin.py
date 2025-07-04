@@ -1471,60 +1471,58 @@ class ApiAsignaturasView(View):
 class CursoDataView(View):
     """Vista para obtener datos de un curso específico"""
     def get(self, request, curso_id):
+        if not request.user.is_admin:
+            return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
+        
         try:
-            if not request.user.is_admin:
-                return JsonResponse({'success': False, 'error': 'No tienes permiso para realizar esta acción'})
-            
             curso = get_object_or_404(Curso, id=curso_id)
             
-            # Obtener estadísticas del curso
-            total_estudiantes = Estudiante.objects.filter(curso=curso).count()
-            total_asignaturas = AsignaturaImpartida.objects.filter(clases__curso=curso).distinct().count()
-            
-            # Obtener profesor jefe
+            # Obtener profesor jefe de manera segura
             profesor_jefe = None
-            if hasattr(curso, 'jefatura_actual') and curso.jefatura_actual:
-                profesor_jefe = {
-                    'id': curso.jefatura_actual.docente.usuario.auth_user_id,
-                    'nombre': curso.jefatura_actual.docente.usuario.get_full_name()
-                }
+            try:
+                if hasattr(curso, 'jefatura_actual') and curso.jefatura_actual:
+                    profesor_jefe = {
+                        'id': curso.jefatura_actual.docente.usuario.auth_user_id,
+                        'nombre': curso.jefatura_actual.docente.usuario.get_full_name()
+                    }
+            except Exception:
+                profesor_jefe = None
             
-            # Obtener lista de estudiantes
-            estudiantes = []
-            for estudiante in Estudiante.objects.filter(curso=curso).select_related('usuario'):
-                estudiantes.append({
-                    'id': estudiante.pk,
-                    'nombre': estudiante.usuario.get_full_name(),
-                    'rut': f"{estudiante.usuario.rut}-{estudiante.usuario.div}",
-                    'correo': estudiante.usuario.correo
-                })
+            # Obtener contadores
+            try:
+                total_estudiantes = Estudiante.objects.filter(curso=curso).count()
+            except Exception:
+                total_estudiantes = 0
+                
+            try:
+                total_asignaturas = AsignaturaImpartida.objects.filter(clases__curso=curso).distinct().count()
+            except Exception:
+                total_asignaturas = 0
             
-            # Obtener lista de asignaturas
-            asignaturas = []
-            for asignatura in AsignaturaImpartida.objects.filter(clases__curso=curso).distinct().select_related('asignatura', 'docente__usuario'):
-                asignaturas.append({
-                    'id': asignatura.id,
-                    'nombre': asignatura.asignatura.nombre,
-                    'codigo': asignatura.codigo,
-                    'docente': asignatura.docente.usuario.get_full_name() if asignatura.docente else 'Sin docente'
-                })
-            
+            # Devolver solo los datos básicos
             data = {
+                'success': True,
                 'id': curso.id,
                 'nivel': curso.nivel,
                 'letra': curso.letra,
                 'nombre': f"{curso.nivel}°{curso.letra}",
                 'total_estudiantes': total_estudiantes,
                 'total_asignaturas': total_asignaturas,
-                'profesor_jefe': profesor_jefe,
-                'estudiantes': estudiantes,
-                'asignaturas': asignaturas
+                'profesor_jefe': profesor_jefe
             }
             
-            return JsonResponse({'success': True, 'data': data})
+            return JsonResponse(data)
             
+        except Curso.DoesNotExist:
+            return JsonResponse({
+                'success': False, 
+                'error': 'El curso no existe'
+            })
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
+            return JsonResponse({
+                'success': False, 
+                'error': 'Error al cargar los datos del curso'
+            })
 
 @method_decorator([login_required, csrf_exempt], name='dispatch')
 class CursoUpdateView(View):
@@ -1536,9 +1534,16 @@ class CursoUpdateView(View):
             
             curso = get_object_or_404(Curso, id=curso_id)
             
-            nivel = request.POST.get('nivel')
-            letra = request.POST.get('letra', '').upper()
-            profesor_jefe_id = request.POST.get('profesor_jefe_id')
+            # Manejar tanto JSON como form data
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+                nivel = data.get('nivel')
+                letra = data.get('letra', '').upper()
+                profesor_jefe_id = data.get('profesor_jefe_id')
+            else:
+                nivel = request.POST.get('nivel')
+                letra = request.POST.get('letra', '').upper()
+                profesor_jefe_id = request.POST.get('profesor_jefe_id')
             
             errores = []
             

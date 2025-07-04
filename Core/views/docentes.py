@@ -2550,3 +2550,240 @@ class ObtenerClasesDocenteView(View):
                 'success': False,
                 'error': str(e)
             })
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class CrearEventoCalendarioView(View):
+    """
+    Vista para crear eventos de calendario para docentes
+    """
+    
+    def post(self, request):
+        try:
+            # Verificar que el usuario sea docente
+            if not hasattr(request.user.usuario, 'docente'):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Solo los docentes pueden crear eventos de clase'
+                })
+            
+            docente = request.user.usuario.docente
+            
+            # Obtener datos del formulario
+            titulo = request.POST.get('titulo')
+            descripcion = request.POST.get('descripcion', '')
+            fecha = request.POST.get('fecha')
+            hora = request.POST.get('hora', '08:00:00')
+            tipo_evento = request.POST.get('tipo')
+            asignatura_id = request.POST.get('asignatura')
+            
+            # Validaciones básicas
+            if not titulo or not fecha or not tipo_evento or not asignatura_id:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Faltan campos obligatorios (título, fecha, tipo y asignatura)'
+                })
+            
+            # Verificar que el docente imparte la asignatura
+            try:
+                asignatura_impartida = AsignaturaImpartida.objects.get(
+                    id=asignatura_id,
+                    docente=docente
+                )
+            except AsignaturaImpartida.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No tienes permisos para crear eventos en esta asignatura'
+                })
+            
+            # Crear evento de clase
+            evento = CalendarioClase.objects.create(
+                nombre_actividad=titulo,
+                descripcion=descripcion,
+                fecha=fecha,
+                hora=hora,
+                asignatura=asignatura_impartida.asignatura
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Evento creado exitosamente',
+                'evento_id': evento.id
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class EditarEventoCalendarioView(View):
+    """
+    Vista para editar eventos de calendario para docentes
+    """
+    
+    def get(self, request, evento_id):
+        try:
+            # Verificar que el usuario sea docente
+            if not hasattr(request.user.usuario, 'docente'):
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({'success': False, 'error': 'No autorizado'})
+                return redirect('profesor_panel')
+            
+            docente = request.user.usuario.docente
+            
+            # Solo permitir editar eventos de clase (no del colegio)
+            if not evento_id.startswith('clase_'):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Los docentes solo pueden editar eventos de sus asignaturas'
+                })
+            
+            evento_id_real = evento_id.replace('clase_', '')
+            
+            # Verificar que el evento pertenezca a una asignatura del docente
+            try:
+                evento = CalendarioClase.objects.get(
+                    pk=evento_id_real,
+                    asignatura__in=AsignaturaImpartida.objects.filter(
+                        docente=docente
+                    ).values_list('asignatura', flat=True)
+                )
+            except CalendarioClase.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Evento no encontrado o no tienes permisos'
+                })
+            
+            # Si es petición AJAX, devolver JSON
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'evento': {
+                        'titulo': evento.nombre_actividad,
+                        'descripcion': evento.descripcion,
+                        'fecha': evento.fecha.strftime('%Y-%m-%d'),
+                        'hora': str(evento.hora) if evento.hora else '08:00:00',
+                        'asignatura': evento.asignatura.nombre,
+                        'tipo': 'clase'
+                    }
+                })
+            
+            # Si no es AJAX, redirigir al panel del profesor
+            return redirect('profesor_panel')
+            
+        except Exception as e:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': str(e)})
+            return redirect('profesor_panel')
+    
+    def post(self, request, evento_id):
+        try:
+            # Verificar que el usuario sea docente
+            if not hasattr(request.user.usuario, 'docente'):
+                return JsonResponse({'success': False, 'error': 'No autorizado'})
+            
+            docente = request.user.usuario.docente
+            
+            # Solo permitir editar eventos de clase
+            if not evento_id.startswith('clase_'):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Los docentes solo pueden editar eventos de sus asignaturas'
+                })
+            
+            evento_id_real = evento_id.replace('clase_', '')
+            
+            # Verificar que el evento pertenezca a una asignatura del docente
+            try:
+                evento = CalendarioClase.objects.get(
+                    pk=evento_id_real,
+                    asignatura__in=AsignaturaImpartida.objects.filter(
+                        docente=docente
+                    ).values_list('asignatura', flat=True)
+                )
+            except CalendarioClase.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Evento no encontrado o no tienes permisos'
+                })
+            
+            # Obtener datos del formulario
+            titulo = request.POST.get('titulo')
+            descripcion = request.POST.get('descripcion', '')
+            fecha = request.POST.get('fecha')
+            hora = request.POST.get('hora', '08:00:00')
+            
+            # Actualizar evento
+            evento.nombre_actividad = titulo
+            evento.descripcion = descripcion
+            evento.fecha = fecha
+            evento.hora = hora
+            evento.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Evento actualizado exitosamente'
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })
+
+
+@method_decorator(login_required, name='dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
+class EliminarEventoCalendarioView(View):
+    """
+    Vista para eliminar eventos de calendario para docentes
+    """
+    
+    def post(self, request, evento_id):
+        try:
+            # Verificar que el usuario sea docente
+            if not hasattr(request.user.usuario, 'docente'):
+                return JsonResponse({'success': False, 'error': 'No autorizado'})
+            
+            docente = request.user.usuario.docente
+            
+            # Solo permitir eliminar eventos de clase
+            if not evento_id.startswith('clase_'):
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Los docentes solo pueden eliminar eventos de sus asignaturas'
+                })
+            
+            evento_id_real = evento_id.replace('clase_', '')
+            
+            # Verificar que el evento pertenezca a una asignatura del docente
+            try:
+                evento = CalendarioClase.objects.get(
+                    pk=evento_id_real,
+                    asignatura__in=AsignaturaImpartida.objects.filter(
+                        docente=docente
+                    ).values_list('asignatura', flat=True)
+                )
+            except CalendarioClase.DoesNotExist:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Evento no encontrado o no tienes permisos'
+                })
+            
+            # Eliminar evento
+            evento.delete()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Evento eliminado exitosamente'
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            })

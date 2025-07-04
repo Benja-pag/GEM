@@ -1017,9 +1017,11 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.hora_reunion = document.getElementById('hora-reunion').value;
             formData.bloque_horario = '1'; // Bloque por defecto para reuniones
         } else {
-            formData.asignatura_id = document.getElementById('asignatura-evento').value || null;
+            formData.asignatura = document.getElementById('asignatura-evento').value || null;
             formData.fecha = document.getElementById('fecha-evento').value;
             formData.bloque_horario = document.getElementById('bloque-evento').value;
+            // También agregar hora por defecto
+            formData.hora = '08:00:00';
         }
 
         // Validación básica
@@ -1053,7 +1055,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
         } else if (tipoEvento === 'EVALUACION' || tipoEvento === 'CANCELAR_CLASE') {
-            if (!formData.asignatura_id) {
+            if (!formData.asignatura) {
                 alert('Para ' + (tipoEvento === 'EVALUACION' ? 'evaluaciones' : 'cancelar clases') + ', debes seleccionar una asignatura');
                 return;
             }
@@ -1171,12 +1173,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para editar eventos
     window.editarEvento = function(eventoId, eventData) {
-        // Extraer ID real del evento (sin prefijo)
-        var realId = eventoId.replace(/^(colegio_|clase_|cancelada_)/, '');
-        var eventType = eventoId.includes('colegio_') ? 'colegio' : 'clase';
+        // Los docentes solo pueden editar eventos de clase
+        if (!eventoId.startsWith('clase_')) {
+            alert('Solo puedes editar eventos de tus asignaturas');
+            return;
+        }
         
         // Obtener datos del evento desde el backend
-        fetch(`/editar-evento-calendario/${realId}/`, {
+        fetch(`/editar-evento-calendario/${eventoId}/`, {
             method: 'GET',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
@@ -1188,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 var evento = data.evento;
                 
                 // Llenar el formulario de edición
-                document.getElementById('evento-id-edit').value = realId;
+                document.getElementById('evento-id-edit').value = eventoId;
                 document.getElementById('evento-type-edit').value = evento.event_type;
                 document.getElementById('titulo-evento-edit').value = evento.titulo;
                 document.getElementById('fecha-evento-edit').value = evento.fecha;
@@ -1220,23 +1224,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Función para eliminar eventos
     window.eliminarEvento = function(eventoId, titulo, eventData) {
+        // Los docentes solo pueden eliminar eventos de clase
+        if (!eventoId.startsWith('clase_')) {
+            alert('Solo puedes eliminar eventos de tus asignaturas');
+            return;
+        }
+        
         if (!confirm(`¿Estás seguro de que quieres eliminar el evento "${titulo}"?`)) {
             return;
         }
         
-        // Extraer ID real del evento (sin prefijo)
-        var realId = eventoId.replace(/^(colegio_|clase_|cancelada_)/, '');
-        var eventType = eventoId.includes('colegio_') ? 'colegio' : 'clase';
-        
-        fetch(`/eliminar-evento-calendario/${realId}/`, {
+        fetch(`/eliminar-evento-calendario/${eventoId}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            body: new URLSearchParams({
-                'event_type': eventType
-            })
+            body: new URLSearchParams({})
         })
         .then(response => response.json())
         .then(data => {
@@ -1264,6 +1268,7 @@ document.addEventListener('DOMContentLoaded', function() {
             titulo: document.getElementById('titulo-evento-edit').value,
             fecha: document.getElementById('fecha-evento-edit').value,
             descripcion: document.getElementById('descripcion-evento-edit').value,
+            hora: '08:00:00',
             event_type: eventType
         };
         

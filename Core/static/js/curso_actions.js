@@ -1,5 +1,6 @@
-$(document).ready(function() {
-    // Obtener el token CSRF
+// Inicializar los eventos cuando el documento esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar AJAX para incluir el token CSRF
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -14,37 +15,44 @@ $(document).ready(function() {
         }
         return cookieValue;
     }
-    const csrftoken = getCookie('csrftoken');
 
-    // Configurar AJAX para incluir el token CSRF
+    const csrftoken = getCookie('csrftoken');
     $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
+        headers: {
+            'X-CSRFToken': csrftoken
         }
     });
 
-    // Ver detalles del curso
-    $(document).on('click', '.view-curso', function(e) {
-        e.preventDefault();
-        const cursoId = $(this).data('curso-id');
-        verDetalleCurso(cursoId);
+    // Registrar eventos para los botones de acciones
+    document.querySelectorAll('.view-curso').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const cursoId = this.getAttribute('data-curso-id');
+            console.log('Ver curso:', cursoId);
+            verDetalleCurso(cursoId);
+        });
     });
 
-    // Editar curso
-    $(document).on('click', '.edit-curso', function(e) {
-        e.preventDefault();
-        const cursoId = $(this).data('curso-id');
-        editarCurso(cursoId);
+    document.querySelectorAll('.edit-curso').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const cursoId = this.getAttribute('data-curso-id');
+            console.log('Editar curso:', cursoId);
+            editarCurso(cursoId);
+        });
     });
 
-    // Eliminar curso
-    $(document).on('click', '.delete-curso', function(e) {
-        e.preventDefault();
-        const cursoId = $(this).data('curso-id');
-        const row = $(this).closest('tr');
-        confirmarEliminarCurso(cursoId, row);
+    document.querySelectorAll('.delete-curso').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const cursoId = this.getAttribute('data-curso-id');
+            const row = this.closest('tr');
+            console.log('Eliminar curso:', cursoId);
+            confirmarEliminarCurso(cursoId, row);
+        });
     });
 });
 
@@ -59,110 +67,160 @@ function mostrarError(mensaje) {
 
 // Función para ver detalles del curso
 function verDetalleCurso(cursoId) {
+    console.log('Cargando detalles del curso:', cursoId);
     $.ajax({
         url: `/cursos/${cursoId}/data/`,
         type: 'GET',
         success: function(data) {
-            if (data.success) {
-                // Crear el contenido del modal
-                let contenido = `
-                    <div class="modal-body">
-                        <h5 class="mb-3">Detalles del Curso ${data.nivel}°${data.letra}</h5>
-                        
-                        <div class="mb-3">
-                            <h6>Profesor Jefe</h6>
-                            <p>${data.profesor_jefe ? data.profesor_jefe.nombre : 'Sin profesor jefe asignado'}</p>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <h6>Estudiantes (${data.estudiantes.length})</h6>
-                            <ul class="list-group">
-                                ${data.estudiantes.map(estudiante => `
-                                    <li class="list-group-item">
-                                        ${estudiante.nombre} - ${estudiante.rut}
-                                    </li>
-                                `).join('')}
-                            </ul>
-            </div>
-            
-                        <div class="mb-3">
-                            <h6>Asignaturas (${data.asignaturas.length})</h6>
-                            <ul class="list-group">
-                                ${data.asignaturas.map(asignatura => `
-                                    <li class="list-group-item">
-                                        ${asignatura.nombre} - ${asignatura.docente}
-                </li>
-                                `).join('')}
-            </ul>
-                </div>
-            </div>
-        `;
-        
-                // Mostrar el modal con los detalles
+            console.log('Datos recibidos:', data);
+            if (data && data.success) {
                 Swal.fire({
-                    title: `Curso ${data.nivel}°${data.letra}`,
-                    html: contenido,
+                    title: false,
+                    html: `
+                        <div class="card shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chalkboard"></i> 
+                                    Curso ${data.nivel}°${data.letra}
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="rounded-circle bg-info text-white p-3 me-3">
+                                                <i class="fas fa-user-tie fa-2x"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">Profesor Jefe</h6>
+                                                <p class="mb-0 text-muted">
+                                                    ${data.profesor_jefe ? data.profesor_jefe.nombre : 'Sin profesor jefe asignado'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card bg-light mb-3">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                                <h5 class="card-title">${data.total_estudiantes || 0}</h5>
+                                                <p class="card-text text-muted">Estudiantes</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card bg-light mb-3">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-book fa-2x text-warning mb-2"></i>
+                                                <h5 class="card-title">${data.total_asignaturas || 0}</h5>
+                                                <p class="card-text text-muted">Asignaturas</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    showConfirmButton: true,
+                    confirmButtonText: 'Cerrar',
+                    confirmButtonColor: '#3085d6',
                     width: '600px',
-                    showConfirmButton: false,
-                    showCloseButton: true
+                    padding: '0'
                 });
             } else {
-                mostrarError(data.error || 'No se pudieron cargar los detalles del curso');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data?.error || 'No se pudieron cargar los detalles del curso'
+                });
             }
         },
         error: function(xhr, status, error) {
             console.error('Error:', error);
-            mostrarError('Error al cargar los detalles del curso');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cargar los detalles del curso'
+            });
         }
     });
 }
 
 // Función para editar curso
 function editarCurso(cursoId) {
-    // Primero obtener los datos actuales del curso
+    console.log('Cargando formulario de edición:', cursoId);
     $.ajax({
         url: `/cursos/${cursoId}/data/`,
         type: 'GET',
         success: function(data) {
-            if (data.success) {
-                // Crear el formulario de edición
-                let formulario = `
-                    <form id="editarCursoForm">
-                        <div class="mb-3">
-                            <label for="nivel" class="form-label">Nivel</label>
-                            <input type="number" class="form-control" id="nivel" value="${data.nivel}" min="1" max="4" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="letra" class="form-label">Letra</label>
-                            <input type="text" class="form-control" id="letra" value="${data.letra}" maxlength="1" required>
-                            <small class="text-muted">La letra debe ser entre A e I</small>
-                </div>
-                        <div class="mb-3">
-                            <label for="profesor_jefe_id" class="form-label">Profesor Jefe</label>
-                            <select class="form-select" id="profesor_jefe_id" required>
-                                <option value="">-- Seleccione un profesor jefe --</option>
-                                ${data.docentes_disponibles.map(docente => `
-                                    <option value="${docente.id}" ${data.profesor_jefe && data.profesor_jefe.id === docente.id ? 'selected' : ''}>
-                                        ${docente.nombre}
-                                    </option>
-                                `).join('')}
-                            </select>
-            </div>
-                    </form>
-                `;
+            console.log('Datos para edición:', data);
+            if (data && data.success) {
+                const docentesOptions = data.docentes_disponibles ? 
+                    data.docentes_disponibles.map(docente => `
+                        <option value="${docente.id}" 
+                            ${data.profesor_jefe && data.profesor_jefe.id === docente.id ? 'selected' : ''}>
+                            ${docente.nombre}
+                        </option>
+                    `).join('') : '';
 
-                // Mostrar el modal de edición
                 Swal.fire({
-                    title: `Editar Curso ${data.nivel}°${data.letra}`,
-                    html: formulario,
+                    title: false,
+                    html: `
+                        <div class="card shadow">
+                            <div class="card-header bg-warning">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-edit"></i> 
+                                    Editar Curso ${data.nivel}°${data.letra}
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="editarCursoForm">
+                                    <div class="alert alert-danger" id="editCursoErrors" style="display: none;"></div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="nivel" class="form-label">
+                                            <i class="fas fa-layer-group"></i> Nivel
+                                        </label>
+                                        <input type="number" class="form-control" id="nivel" 
+                                               value="${data.nivel}" min="1" max="4" required>
+                                        <div class="form-text">El nivel debe estar entre 1 y 4</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="letra" class="form-label">
+                                            <i class="fas fa-font"></i> Letra
+                                        </label>
+                                        <input type="text" class="form-control" id="letra" 
+                                               value="${data.letra}" maxlength="1" required>
+                                        <div class="form-text">La letra debe ser entre A e I</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="profesor_jefe_id" class="form-label">
+                                            <i class="fas fa-user-tie"></i> Profesor Jefe
+                                        </label>
+                                        <select class="form-select" id="profesor_jefe_id">
+                                            <option value="">-- Sin profesor jefe --</option>
+                                            ${docentesOptions}
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    `,
                     showCancelButton: true,
                     confirmButtonText: 'Guardar',
                     cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#dc3545',
+                    width: '600px',
+                    padding: '0',
                     preConfirm: () => {
-                        // Validar y recoger los datos del formulario
-                        const nivel = $('#nivel').val();
-                        const letra = $('#letra').val().toUpperCase();
-                        const profesorJefeId = $('#profesor_jefe_id').val();
+                        const nivel = document.getElementById('nivel').value;
+                        const letra = document.getElementById('letra').value.toUpperCase();
+                        const profesorJefeId = document.getElementById('profesor_jefe_id').value;
 
                         // Validaciones
                         if (!nivel || nivel < 1 || nivel > 4) {
@@ -171,10 +229,6 @@ function editarCurso(cursoId) {
                         }
                         if (!letra || !/^[A-I]$/.test(letra)) {
                             Swal.showValidationMessage('La letra debe ser entre A e I');
-                            return false;
-                        }
-                        if (!profesorJefeId) {
-                            Swal.showValidationMessage('Debe seleccionar un profesor jefe');
                             return false;
                         }
 
@@ -186,50 +240,72 @@ function editarCurso(cursoId) {
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Enviar los datos actualizados al servidor
-                        $.ajax({
-                            url: `/cursos/${cursoId}/update/`,
-                            type: 'POST',
-                            data: JSON.stringify(result.value),
-                            contentType: 'application/json',
-                            success: function(response) {
-                                if (response.success) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: '¡Éxito!',
-                                        text: response.message,
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    }).then(() => {
-                                        window.location.reload();
-                                    });
-                                } else {
-                                    mostrarError(response.error || 'Error al actualizar el curso');
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Error:', error);
-                                mostrarError('Error al actualizar el curso');
-                            }
-                        });
+                        actualizarCurso(cursoId, result.value);
                     }
                 });
             } else {
-                mostrarError(data.error || 'Error al cargar los datos del curso');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data?.error || 'No se pudieron cargar los datos del curso'
+                });
             }
         },
         error: function(xhr, status, error) {
             console.error('Error:', error);
-            mostrarError('Error al cargar los datos del curso');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cargar los datos del curso'
+            });
         }
     });
 }
 
-// Función para confirmar eliminación
+// Función para actualizar el curso
+function actualizarCurso(cursoId, formData) {
+    $.ajax({
+        url: `/cursos/${cursoId}/update/`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function(data) {
+            if (data && data.success) {
+                // Actualizar la fila en la tabla
+                const row = document.querySelector(`.view-curso[data-curso-id="${cursoId}"]`).closest('tr');
+                row.querySelector('td:first-child').innerHTML = `<span class="badge bg-primary">${formData.nivel}°${formData.letra}</span>`;
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: data.message || 'Curso actualizado exitosamente',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data?.errors ? data.errors.join('\n') : 'Error al actualizar el curso'
+                });
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al actualizar el curso'
+            });
+        }
+    });
+}
+
+// Función para confirmar eliminación de curso
 function confirmarEliminarCurso(cursoId, row) {
     Swal.fire({
         title: '¿Estás seguro?',
-        text: "Esta acción eliminará el curso y todos sus datos relacionados. Esta acción no se puede deshacer.",
+        text: "Esta acción no se puede deshacer",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -248,34 +324,32 @@ function eliminarCurso(cursoId, row) {
     $.ajax({
         url: `/cursos/${cursoId}/delete/`,
         type: 'POST',
-        success: function(response) {
-            if (response.success) {
+        success: function(data) {
+            if (data && data.success) {
                 // Eliminar la fila de la tabla
-                row.fadeOut(400, function() {
-                    $(this).remove();
-                    
-                    // Si no quedan más filas, mostrar mensaje
-                    if ($('table tbody tr').length === 0) {
-                        $('table tbody').append(
-                            '<tr><td colspan="6" class="text-center">No hay cursos registrados</td></tr>'
-                        );
-                    }
-                });
-                
+                row.remove();
                 Swal.fire({
                     icon: 'success',
-                    title: '¡Éxito!',
-                    text: 'Curso eliminado exitosamente',
+                    title: 'Éxito',
+                    text: data.message || 'Curso eliminado exitosamente',
                     showConfirmButton: false,
                     timer: 1500
                 });
             } else {
-                mostrarError(response.error || 'Error al eliminar el curso');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data?.error || 'No se pudo eliminar el curso'
+                });
             }
         },
         error: function(xhr, status, error) {
             console.error('Error:', error);
-            mostrarError('Error al eliminar el curso: ' + error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al eliminar el curso'
+            });
         }
     });
 }
